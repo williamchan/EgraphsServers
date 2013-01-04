@@ -107,7 +107,7 @@ class Schema @Inject() (
   val failedPurchaseData = table[FailedPurchaseData]
   on(failedPurchaseData)(datum => declare(datum.purchaseData is dbType("varchar(1000)")))
 
-  val giftCertificates = table[GiftCertificateEntity]
+  val giftCertificates = table[GiftCertificateEntity]("GiftCertificate")
   // TODO(SER-499): Index declarations
 
   val inventoryBatches = table[InventoryBatch]

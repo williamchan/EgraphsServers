@@ -84,10 +84,6 @@ object GiftCertificateLineItemType {
 case class GiftCertificateLineItemTypeServices @Inject() (schema: Schema)
   extends SavesAsLineItemTypeEntity[GiftCertificateLineItemType]
 {
-
-  // TODO(SER-499): query helpers
-
-
   //
   // SavesAsLineItemTypeEntity members
   //

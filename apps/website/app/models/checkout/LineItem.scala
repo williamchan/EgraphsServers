@@ -13,12 +13,6 @@ import models.enums.{CodeTypeFactory, LineItemNature, CodeType}
 
 trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with KeyedCaseClass[Long] {
 
-  def amount: Money
-  def withAmount(newAmount: Money): LineItem[TransactedT]
-
-  def checkoutId: Long
-  def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
-
   def itemType: LineItemType[TransactedT]
   def subItems: Seq[LineItem[_]]
   def toJson: String                    // TODO(SER-499): Use Json type, maybe even Option
@@ -31,10 +25,21 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with Ke
     IndexedSeq(this) ++ seqOfFlatSubItemSeqs.flatten
   }
 
-  // Convenience LineItemType member accessors
+  //
+  // Entity member accessors and mutators
+  //
+  def amount: Money
+  def checkoutId: Long
+  def withAmount(newAmount: Money): LineItem[TransactedT]
+  def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
+
+  //
+  // LineItemType member accessors
+  //
   def codeType: CodeType = itemType.codeType
   def nature: LineItemNature = itemType.nature
 
+  // TODO(SER-499): see if just using unapply breaks tests
   // KeyedCaseClass
   override def unapplied = (id, amount, checkoutId, domainObject, itemType.id, codeType, nature)
 
@@ -61,7 +66,6 @@ class LineItemStore @Inject() (schema: Schema) {
 
       CodeType(itemTypeEntity._codeType) match {
         case Some(codeType: CodeTypeFactory[LineItemType[_], LineItem[_]]) =>
-          println("codeType: " + codeType.name)
           Some(codeType.itemInstance(itemEntity, itemTypeEntity))
 
         // TODO(SER-499): add logging

@@ -6,6 +6,7 @@ import org.joda.money.{CurrencyUnit, Money}
 
 sealed abstract class CodeType(val name: String)
 
+// TODO(SER-499): remove LIT if no use for it comes up, test the rest of this (type erasure might fuck it up)
 trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   this: CodeType =>
   // take both entities because they're both easily available when restoring
@@ -37,11 +38,11 @@ object CodeType extends Enum {
   //
   // Charges
   //
-  val CashTransaction = new EnumVal("CashTransactionLineItemType")
-    with CodeTypeFactory[CashTransactionLineItemType, CashTransactionLineItem]
+  val StripeCashTransaction = new EnumVal("StripeCashTransactionLineItemType")
+    with CodeTypeFactory[StripeCashTransactionLineItemType, StripeCashTransactionLineItem]
   {
     override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
-      CashTransactionLineItem(itemEntity, typeEntity)
+      StripeCashTransactionLineItem(itemEntity, typeEntity)
     }
   }
 

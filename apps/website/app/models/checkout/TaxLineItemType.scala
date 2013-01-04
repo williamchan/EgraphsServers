@@ -9,13 +9,21 @@ import com.google.inject.Inject
 import services.{AppConfig, Time}
 import play.api.libs.json.Json
 
+/*
+TODO: Taxes can be fleshed out further with a more flexible approach to getting rates, updating rates, etc.
+-Keeping the rate from point of transaction in type entity can help with Checkout updates when occuring after a change in tax rates.
+-Need to be able to get existing tax types by zipcode (currently creates new tax type based on rate pulled from hardcoded map
+ */
+
+
+
 case class TaxLineItemType protected (
   _entity: LineItemTypeEntity,
   zipcode: String,
   taxName: String,
   taxRate: BigDecimal,
   services: TaxLineItemTypeServices = AppConfig.instance[TaxLineItemTypeServices]
-) extends LineItemType[Money] with HasLineItemTypeEntity  // TODO(SER-499): is this necessary?
+) extends LineItemType[Money] with HasLineItemTypeEntity
   with LineItemTypeEntityGettersAndSetters[TaxLineItemType]
   with CanInsertAndUpdateAsThroughServices[TaxLineItemType, LineItemTypeEntity]
 {
@@ -100,7 +108,7 @@ object TaxLineItemType {
 
 
   //
-  // TODO(SER-499): Taxes should be one-to-many; need an easy way to get existing tax types by zip
+  // TODO: Need an easy way to get existing tax types by zip
   // Currently thinking it may have to suffice to store zip in description (using Json) and
   // search on that
   /**

@@ -7,6 +7,10 @@ import com.google.inject.Inject
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import services.AppConfig
 
+
+// TODO: see TaxLineItemType
+
+
 case class TaxLineItem private (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
@@ -32,11 +36,6 @@ case class TaxLineItem private (
 
   override def transact(newCheckoutId: Long): TaxLineItem = {
     if (id <= 0) {
-
-      /**
-       * TODO(SER-499): remove type saving if not keeping item type for each tax item; is there
-       * reason to persist the tax type when it doesn't relate a tax table to the line items table?
-       */
       this.withItemType( itemType.insert() )
         .withCheckoutId( newCheckoutId )
         .insert()
@@ -46,7 +45,7 @@ case class TaxLineItem private (
     }
   }
 
-  // TODO(SER-499): this is repeated a lot, try to refactor into trait
+
   def withItemType(newType: TaxLineItemType) = {
     this.withItemTypeId(newType.id).copy(_typeEntity = newType._entity)
   }

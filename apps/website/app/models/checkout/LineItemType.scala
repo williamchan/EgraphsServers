@@ -5,7 +5,7 @@ import services.{MemberLens, Time}
 import org.squeryl.{Query, KeyedEntity}
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.dsl.ast.LogicalBoolean
-import services.db.{KeyedCaseClass, InsertsAndUpdatesAsEntity, HasEntity, Schema}
+import services.db._
 import scalaz.Lens
 
 import models.enums.{CodeTypeFactory, CodeType, LineItemNature}
@@ -59,15 +59,22 @@ trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity, Long] { this: 
 trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
   extends InsertsAndUpdatesAsEntity[ModelT, LineItemTypeEntity]
   with SavesCreatedUpdated[LineItemTypeEntity]
-  //extends SavesAsEntity[ModelT, LineItemTypeEntity]
 {
   protected def schema: Schema
-  override protected val table = schema.lineItemTypes
+  override protected def table = schema.lineItemTypes
 
   override protected def withCreatedUpdated(toUpdate: LineItemTypeEntity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
 }
+
+trait QueriesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
+  extends QueriesAsEntity[ModelT, LineItemTypeEntity, Long]
+{
+  protected def schema: Schema
+  override protected def table = schema.lineItemTypes
+}
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

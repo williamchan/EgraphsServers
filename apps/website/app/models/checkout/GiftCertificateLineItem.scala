@@ -10,11 +10,7 @@ import org.squeryl.PrimitiveTypeMode._
 import com.google.inject.Inject
 
 
-/**
- * NOTE(SER-499): as it stands, a line item's state is rather different depending on whether it is unpersisted (_domainEntityId = 0), persisted, or restored (itemType = unset). This is a sign of deficiencies in the design and may lead to errors since it's difficult to think of each possible state when writing these line items. Would really like to make this easier to reason about/treat each state uniformly.
- *
- * TODO(SER-499): possibly make itemType an option, since it would be convenient to leave it as None when restoring (unless restoring is so infrequent it just creates noise for little benefit?)
- */
+
 case class GiftCertificateLineItem (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
@@ -69,8 +65,9 @@ case class GiftCertificateLineItem (
   }
 
   def withGiftCertificate(giftCertificate: GiftCertificate) = {
-    // TODO(SER-499): copy lineitemid into giftCertificate (which will be a gift certificate soon...) ...
-    this.copy(_maybeGiftCertificate = Some(giftCertificate))
+    this.copy(
+      _maybeGiftCertificate = Some(giftCertificate.itemId.set(id))
+    )
   }
 
 

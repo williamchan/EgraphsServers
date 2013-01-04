@@ -33,6 +33,8 @@ case class CashTransaction(
   _cashTransactionType: String = "",
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
+  lineItemTypeId: Option[Long] = None,
+  lineItemId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CashTransactionServices = AppConfig.instance[CashTransactionServices]
@@ -73,7 +75,9 @@ case class CashTransaction(
   }
 }
 
-class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[CashTransaction] {
+class CashTransactionStore @Inject() (schema: Schema)
+  extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[CashTransaction]
+{
 
   def findByOrderId(orderId: Long): List[CashTransaction] = {
     from(schema.cashTransactions)(txn =>
@@ -87,6 +91,13 @@ class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[C
       where(txn.printOrderId === Some(printOrderId))
         select (txn)
     )
+  }
+
+  def findByLineItemId(lineItemId: Long): Option[CashTransaction] = {
+    from(schema.cashTransactions)(txn =>
+      where(txn.lineItemId === Some(lineItemId))
+        select (txn)
+    ).headOption
   }
 
   //

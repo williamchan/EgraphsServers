@@ -14,18 +14,6 @@ class CheckoutTests extends EgraphsUnitTest
   with DateShouldMatchers
   with DBTransactionPerTest
 {
-
-  //
-  // Helpers
-  //
-  def checkoutServices = AppConfig.instance[CheckoutServices]
-  def giftCertificateTypeForFriend = GiftCertificateLineItemType("My friend", BigDecimal(75).toMoney())
-  def giftCertificateTypeForShittyFriend = GiftCertificateLineItemType("My shittier friend", BigDecimal(25).toMoney())
-
-  val taxedZip = "98111" // Washington
-  val untaxedZip = "12345"  // not Washington
-
-
   //
   // CanInsertAndUpdateAsThroughServicesTests members
   //
@@ -51,5 +39,18 @@ class CheckoutTests extends EgraphsUnitTest
 
 
 
+
+
+
+
+  //
+  // Helpers
+  //
+  def checkoutServices = AppConfig.instance[CheckoutServices]
+  def giftCertificateTypeForFriend = GiftCertificateLineItemType("My friend", BigDecimal(75).toMoney())
+  def giftCertificateTypeForShittyFriend = GiftCertificateLineItemType("My shittier friend", BigDecimal(25).toMoney())
+
+  val taxedZip = "98111" // Washington
+  val untaxedZip = "12345"  // not Washington
 
 }

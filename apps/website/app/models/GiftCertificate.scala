@@ -13,14 +13,15 @@ import services.db._
 
 
 
-
+//
+// Services
+//
 case class GiftCertificateServices @Inject() (
   schema: Schema,
   lineItemStore: LineItemStore
 ) extends InsertsAndUpdatesAsEntity[GiftCertificate, GiftCertificateEntity]
   with SavesCreatedUpdated[GiftCertificateEntity]
 {
-
   override protected def table = schema.giftCertificates
 
   override protected def modelWithNewEntity(certificate: GiftCertificate, entity: GiftCertificateEntity) = {
@@ -34,6 +35,36 @@ case class GiftCertificateServices @Inject() (
 
 
 
+//
+// Entity
+//
+case class GiftCertificateEntity (
+  _couponId: Long = 0L,
+  _lineItemId: Long = 0L,
+  _lineItemTypeId: Long = 0L,
+  recipient: String = "",
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp
+ ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
+
+  /** Has to be a val or else Squeryl doesn't ~see~ it and can't update */
+  override val id = _couponId
+  override def unapplied = GiftCertificateEntity.unapply(this)
+
+  def couponId = idLens(_couponId, id => copy(_couponId = id))
+  def lineItemId = idLens(_lineItemId, id => copy(_lineItemId = id))
+  def lineItemTypeId = idLens(_lineItemTypeId, id => copy(_lineItemTypeId = id))
+
+  private def idLens = MemberLens[GiftCertificateEntity, Long](this)(_,_)
+}
+
+
+
+
+
+//
+// Model
+//
 case class GiftCertificate protected (
   _entity: GiftCertificateEntity,
   _coupon: Coupon,
@@ -50,8 +81,12 @@ case class GiftCertificate protected (
   }
 
   def save(): GiftCertificate = {
-    // TODO(SER-499): require itemId and typeId > 0
-    this.coupon.set(_coupon.save()).insert()
+    val withSavedCoupon = this.coupon.set(coupon.save())
+    if(id <= 0) {
+      withSavedCoupon.insert()
+    } else {
+      withSavedCoupon.update()
+    }
   }
 
   def code: String = _coupon.code
@@ -114,44 +149,41 @@ object GiftCertificate {
       else (" for " ++ recipient)
     }
   }
-}
 
-case class GiftCertificateEntity (
-  _couponId: Long = 0L,
-  _lineItemId: Long = 0L,
-  _lineItemTypeId: Long = 0L,
-  recipient: String = "",
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
 
-  override def id = _couponId
-  override def unapplied = GiftCertificateEntity.unapply(this)
-
-  def couponId = idLens(_couponId, id => copy(_couponId = id))
-  def lineItemId = idLens(_lineItemId, id => copy(_lineItemId = id))
-  def lineItemTypeId = idLens(_lineItemTypeId, id => copy(_lineItemTypeId = id))
-
-  private def idLens = MemberLens[GiftCertificateEntity, Long](this)(_,_)
+  // TODO(SER-471): def gifterName: String
+  // TODO(SER-471: def gifterEmail: String
 }
 
 
 
 
 
+
+//
+// Store
+//
 class GiftCertificateStore @Inject() (
   schema: Schema,
   couponStore: CouponStore,
   lineItemStore: LineItemStore
-) {
+) extends QueriesAsEntity[GiftCertificate, GiftCertificateEntity, Long] {
   import org.squeryl.PrimitiveTypeMode._
+  import MemberLens.Conversions._
 
-  protected def table = schema.giftCertificates
+  protected override def table = schema.giftCertificates
+
+  protected override def entityToModel(entity: GiftCertificateEntity) = {
+    for (coupon <- couponStore.findById(entity.couponId))
+      yield GiftCertificate(entity, coupon)
+  }
 
   def findByLineItemId(id: Long): Option[GiftCertificate] = {
     for (
       entity <- table.where(entity => entity._lineItemId === id).headOption;
-      coupon <- couponStore.findById(entity.couponId())
+      coupon <- couponStore.findById(entity.couponId)
     ) yield GiftCertificate(entity, coupon)
   }
+
+  // TODO(SER-471): get by gifter, recipient?
 }
