@@ -67,7 +67,11 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
       if(celebrity.minPrice === celebrity.maxPrice && celebrity.minPrice > 0) {
         return "$" + celebrity.minPrice;
       } else if(celebrity.minPrice != celebrity.maxPrice) {
-        return "$" + celebrity.minPrice + "-" + celebrity.maxPrice;
+        if(celebrity.minPrice > 0 ) {
+          return "$" + celebrity.minPrice + "-" + celebrity.maxPrice;
+        } else {
+          return "$" + celebrity.maxPrice;
+        }
       } else {
         return "";
       }
@@ -119,7 +123,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
          **/
         var reloadPage = function() {
           window.location.href =
-            window.Egraphs.page.queryUrl + "?" +
+            window.Egraphs.page.queryUrl + window.Egraphs.page.verticalSlug + "?" +
             $.param({ "query" : window.Egraphs.page.query,
                       "sort" : window.Egraphs.page.sort,
                       "view" : window.Egraphs.page.view,
@@ -177,15 +181,32 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
            reloadPage();
          });
 
+       /**
+        * Vertical button select functionality.
+        *
+        */
+       $(".vertical-button").click(function(e) {
+          var selectedVerticalSlug = "/" + $(this).attr("data-vertical");
+          if(window.Egraphs.page.verticalSlug === selectedVerticalSlug){
+            window.Egraphs.page.verticalSlug = "";
+            window.Egraphs.page.categories = {};
+          } else {
+            window.Egraphs.page.verticalSlug  = selectedVerticalSlug;
+            window.Egraphs.page.categories = {};
+          }
+          reloadPage();
+       });
+
         /**
          * Helper for updating the currently selected CategoryValues
          **/
-        var updateCategories = function(catVal, category) {
+        var updateCategories = function(catVal, category, vertical) {
           if($.inArray(catVal, category) > -1) {
             var idx = $.inArray(catVal, category);
             category.splice(idx, 1);
           } else {
             category.push(catVal);
+            window.Egraphs.page.verticalSlug = "/" + vertical;
           }
         };
         
@@ -206,7 +227,6 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
               var categoryId = $(this).attr("data-category");
               var categoryValues = categories["c" + categoryId];
               var catVal = parseInt($(this).val(), 10);
-
               updateCategories(catVal, categoryValues);
             }
           );
@@ -227,7 +247,7 @@ define(["Egraphs", "libs/angular", "libs/chosen/chosen.jquery.min", "libs/waypoi
             if(window.Egraphs.page.results.celebrities.length === 0 && window.Egraphs.page.categorySelected === false){
               window.Egraphs.page.query = "";
             }
-            updateCategories(catVal, category);
+            updateCategories(catVal, category, $(this).attr("data-vertical"));
             reloadPage();
           }
         );

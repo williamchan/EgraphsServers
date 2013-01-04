@@ -241,10 +241,15 @@
 		p { margin-bottom: 0; }
 
       form {
-        #celebrity-searchbox {
-          width: 45%;
+        div {
+          display: inline;
+          padding-left: 20px;
+          padding-right: 20px;
+          #celebrity-searchbox {
+            width: 40%;
+          }
+          .celebrity-searchbox-container(0);
         }
-        .celebrity-searchbox-container();
       }
 	}
 
@@ -566,8 +571,8 @@
 					
 					span {
 						left: 100%;
-						top: 10px;
-						width: 220px;
+						top: 20px;
+						width: 210px;
 						height: 1px;
 						background: #29abe2;					
 					}
@@ -674,10 +679,15 @@
 
     #landing-more {
         header {
-            form {
-              #celebrity-searchbox {
-                  width: 100%;
+            form { 
+            	div {
+	              #celebrity-searchbox {
+                  width: 70%;
+                  height: 26px;
+                  position: relative;
+                  top: -2px;
                 }
+              }  
             }
         }
     }

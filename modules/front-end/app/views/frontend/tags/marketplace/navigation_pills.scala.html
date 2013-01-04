@@ -1,7 +1,7 @@
-@(categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel],query: String)
+@(verticalViewModels: Iterable[models.frontend.marketplace.VerticalViewModel],query: String)
 <div class="filters">
   <ol>
-  @for(category <- categoryViewModels; categoryValue <- category.categoryValues if categoryValue.active == true) {
+  @for(vertical <- verticalViewModels; category <- vertical.categoryViewModels; categoryValue <- category.categoryValues if categoryValue.active == true) {
     <li><span>@categoryValue.publicName <a class="cv-link" data-category="@category.id" data-categoryvalue="@categoryValue.id" title="Remove filter"><i>&times;</i></a></span></li> 
   }
   @if(query.length > 0){

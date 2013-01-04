@@ -1,0 +1,43 @@
+@(resultSets: List[models.frontend.marketplace.ResultSetViewModel], marketplaceRoute: String)
+@**
+ * Formatting to display result sets for the marketplace landing page.
+ * This is separate (although shares some visual elements) from the marketplace results page.
+ * This layout does NOT support infinite scroll and onyl displays a limited set of celebrities. 
+ * See the differences in the front-end-catalog app. 
+ **@
+<div class="verticals borderfix">
+  <section class="clearfix">
+  @for(results <- resultSets) {
+    <section>
+      <div class="clearfix">
+        <h1><span>@results.subtitle</span></h1> 
+      </div>
+      <div class="clearfix">
+      @for(celebrity <- results.celebrities){
+        <article class="celebrity-result">
+          <figure>
+              @if(celebrity.inventoryRemaining < 1) {
+                <a href="@celebrity.storefrontUrl" class="ribbon"><em>Sold Out</em></a>
+              }
+              <a class="glowborder" href="@celebrity.storefrontUrl"><img src="@celebrity.photoUrl" alt="FPO image"></a>
+          </figure>
+          <hgroup>
+            <h2><a href="@celebrity.storefrontUrl" title="View star: @celebrity.publicName">@celebrity.publicName</a></h2>
+            <h3>@celebrity.secondaryText</h3>
+          </hgroup>
+          <p>
+            <a href="@celebrity.storefrontUrl">              
+            </a>
+          </p>
+        </article>
+      }  
+      </div>
+      <p class="see-more">
+        <em>
+        <a class="clearfix" title="View all @results.subtitle stars" href="@{marketplaceRoute + "/" + results.verticalUrl.getOrElse("")}"><b>View All</b></a>
+        </em>
+      </p>
+    </section>
+  }  
+  </section>
+</div>

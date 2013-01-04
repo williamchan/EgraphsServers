@@ -12,7 +12,7 @@ import play.api.mvc.Result
 
 class GetMarketplaceEndpointTests extends EgraphsUnitTest {
   private def db = AppConfig.instance[DBSession]
-  def routeUnderTest = getMarketplaceResultPage
+  def routeUnderTest = getMarketplaceResultPage("")
     
   "getMarketplaceResultPage" should "serve a default page" in new EgraphsTestApplication {
     val Some(result) = routeAndCall(FakeRequest(GET, routeUnderTest.url))

@@ -80,6 +80,7 @@ GET     /Login/storefront                                         controllers.Lo
 
 GET     /Marketplace/results/list                                 controllers.Marketplace.results_list  
 GET     /Marketplace/results                                      controllers.Marketplace.results 
+GET     /Marketplace/landing                                      controllers.Marketplace.landing
 
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
 GET     /Personalize/index                                        controllers.Personalize.index

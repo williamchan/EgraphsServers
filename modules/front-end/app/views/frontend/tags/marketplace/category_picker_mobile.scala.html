@@ -1,21 +1,29 @@
-@(categoryViewModels: Iterable[models.frontend.marketplace.CategoryViewModel])
- <aside class="mobile-nav">        
+@(verticalViewModels: List[models.frontend.marketplace.VerticalViewModel], multiple: Boolean = true)
+@displayVerticals(verticals: List[models.frontend.marketplace.VerticalViewModel]) = {
+ <aside class="mobile-nav">
   <h2>Filter By:</h2>
   <select id="category-select" multiple>
-  @for(category <- categoryViewModels) {
-    @** 
+   @for(vertical <- verticals;
+        category <- vertical.categoryViewModels) {    @** 
       Using an <option disabled> for category headers because there is a bug in iOS 6 Safari when using optgroups. 
       Bug is documented here: http://www.thecssninja.com/html/optgroup-ios6
       Should be reverted when the bug is fixed because this is non-standard usage. 
     **@
     <option disabled value="0" multiple label="@category.publicName">
     @for(categoryValue <- category.categoryValues) {
-      <option @if(categoryValue.active){selected}  data-category="@category.id" value="@categoryValue.id">@categoryValue.publicName</option>
+      <option @if(categoryValue.active){selected}  data-vertical="@vertical.urlSlug" data-category="@category.id" value="@categoryValue.id">@categoryValue.publicName</option>
     }
-    </optgroup>  
+    </optgroup>
   }
   </select>
   <br>
-  <a id="apply-filters">Apply Filters</a>        
+  <a id="apply-filters">Apply Filters</a>
 </aside> <!-- end .mobile-nav -->
+}
 
+@{val verticalsFilteredOption = verticalViewModels.filter(v => v.active).headOption
+  displayVerticals(verticalsFilteredOption match {
+    case None => verticalViewModels
+    case Some(vertical) => List(vertical)
+  })
+}

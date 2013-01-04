@@ -86,15 +86,19 @@
 }
 
 /* !Celebrity Search Box */
-.celebrity-searchbox-container() {
+.celebrity-searchbox-container(@margin-override: 1px) {
+
+
+  position: relative;
   input[type=search] {
     .inline-block;
     vertical-align: middle;
     font-size: 20px;
-    width: 96%;
+    width: 90%;
     color: @orange;
     margin: 0;
-    background: @white url(../images/bg-icon-magnify.png) no-repeat 95% 50%;
+    -webkit-appearance : none;
+    border-radius: 0;
     .glowborder();
 
     &::-webkit-input-placeholder {
@@ -109,6 +113,17 @@
       color: @orange;
     }
 
+  }
+  input[type=submit] {
+    position: absolute;
+    background: @white url(../images/bg-icon-magnify.png) no-repeat 94% 50%;
+    border: none;
+    width: 20%;
+    vertical-align: middle;
+    right: 10%;
+    -webkit-appearance: none;
+    margin-top: @margin-override;
+    .box-shadow(none);
   }
 }
 
@@ -161,15 +176,15 @@
 }
 
 .marker-left {
-	.marker;
-	padding-left: 8px;
+  .marker;
+  padding-left: 8px;
   background: url(/assets/images/bg-icon-marker-left.png) no-repeat 0 0;	
 }
 
 .marker-right {
-	.marker;
-	text-align: right;
-	padding-right: 10px;
+  .marker;
+  text-align: right;
+  padding-right: 10px;
   background: url(/assets/images/bg-icon-marker-right.png) no-repeat 100% 0;
 }
 
