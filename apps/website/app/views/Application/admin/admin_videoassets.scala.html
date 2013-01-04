@@ -10,7 +10,7 @@
 @import models.website.video.VideoAssetViewModel
 
 @body = {
-<section id="content" class="top" role="main">
+<section id="content" class="top admin-content" role="main">
   <div id="main" class="sub">
     <div class="container" id="celebrity-admin">
       
@@ -57,11 +57,11 @@
       <h1> @status Videos </h1>
 
       <div class="videos">
-          @videoAssetViewModels.map { case VideoAssetViewModel(videoUrl, videoId, celebrityPublicName) =>
+          @videoAssetViewModels.map { case VideoAssetViewModel(videoUrl, videoId, celebrityPublicName, created) =>
 	
 	          <div class="video" style="margin: 20px; float: left;">
 	          
-	            <p> @celebrityPublicName </p>
+	            <p> @celebrityPublicName <small style="font-size:12px">(Uploaded @created GMT)</small></p>
 
                 <video width="540" height="340" controls>
                   <source src='@videoUrl' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
