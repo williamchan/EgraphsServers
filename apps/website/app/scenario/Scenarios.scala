@@ -6,6 +6,7 @@ import egraphs.playutils.Encodings.Base64
 import org.apache.commons.mail.HtmlEmail
 import org.squeryl.PrimitiveTypeMode._
 import models._
+import categories.CategoryValue
 import play.api.mvc.Results.Redirect
 import controllers.WebsiteControllers
 import enums._
@@ -22,7 +23,11 @@ import models.Order
 import play.api.Play
 import play.api.Play.current
 import utils.{TestData, TestConstants}
-import categories.Featured
+import categories._
+import scala.Some
+import models.Administrator
+import models.InventoryBatch
+import models.Order
 
 /**
  * All scenarios supported by the API.
@@ -42,6 +47,8 @@ class Scenarios extends DeclaresScenarios {
   private val mail = AppConfig.instance[services.mail.TransactionalMail]
   private val featured = AppConfig.instance[Featured]
   private val orderStore = AppConfig.instance[OrderStore]
+  private val categoryStore = AppConfig.instance[CategoryStore]
+  private val categoryValueStore = AppConfig.instance[CategoryValueStore]
 
   private lazy val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
   private lazy val today = DateTime.now().toLocalDate.toDate
@@ -60,6 +67,24 @@ class Scenarios extends DeclaresScenarios {
     () =>
       Scenarios.createAdmin()
   }
+  )
+
+  toScenarios add Scenario(
+    "Create an MLB and NBA Vertical",
+    adminCategory,
+    """
+    Creates the default verticals along with their featured CategoryValues
+    """, {
+      () => {
+        val vertical = categoryStore.findByName("Vertical").getOrElse(Category(name="Vertical", publicName="Vertical").save())
+        categoryValueStore.findByName("MLB").getOrElse(CategoryValue(name="MLB", publicName="Major League Baseball", categoryId = vertical.id).save())
+        categoryValueStore.findByName("NBA").getOrElse(CategoryValue(name = "NBA", publicName = "National Basketball Association", categoryId = vertical.id).save())
+
+        val internal = categoryStore.findByName("Internal").getOrElse(Category(name="Internal", publicName="Internal").save())
+        categoryValueStore.findByName("mlb-featured").getOrElse(CategoryValue(name="mlb-featured", publicName="mlb-featured", categoryId = internal.id).save())
+        categoryValueStore.findByName("nba-featured").getOrElse(CategoryValue(name="nba-featured", publicName="nba-featured", categoryId = internal.id).save())
+      }
+    }
   )
 
   toScenarios add Scenario(

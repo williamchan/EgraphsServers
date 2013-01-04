@@ -34,7 +34,7 @@ case class Scenario(name: String, category: String = "Uncategorized", descriptio
     }
     catch {
       case exc:Throwable =>
-        throw new RuntimeException("Error while executing scenario \"" + name + "\"", exc)
+        throw new RuntimeException("Error while executing scenario \"" + name + "\"" + exc.getMessage, exc)
     }
   }
 }
