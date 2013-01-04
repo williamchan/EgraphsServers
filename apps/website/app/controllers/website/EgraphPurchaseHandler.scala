@@ -216,11 +216,12 @@ case class EgraphPurchaseHandler(
       }
 
       // Persist the Order with the Stripe charge info.
-      val order = buyer.buy(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
+      val order = buyer.buyUnsafe(product, recipient, recipientName = recipientName, messageToCelebrity = personalNote, requestedMessage = desiredText)
         .copy(amountPaidInCurrency = product.priceInCurrency)
         .withWrittenMessageRequest(writtenMessageRequest)
         .withPaymentStatus(PaymentStatus.Charged)
-        .save()
+        .save() 
+
       val maybeCashTransaction = charge.map{ c =>
 	      CashTransaction(accountId = buyer.account.id,
 	      orderId = Some(order.id),

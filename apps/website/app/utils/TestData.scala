@@ -148,17 +148,17 @@ object TestData {
     val customer = TestData.newSavedCustomer()
     product match {
       case Some(p) => {
-        customer.buy(p).save()
+        customer.buyUnsafe(p).save()
       }
       case None => {
         val p = TestData.newSavedProduct()
-        customer.buy(p).save()
+        customer.buyUnsafe(p).save()
       }
     }
   }
 
   def newFulfilledOrder(customer: Customer) : (Order, Egraph) = {
-    val order = customer.buy(TestData.newSavedProduct()).save()
+    val order = customer.buyUnsafe(TestData.newSavedProduct()).save()
     (order, order.newEgraph
       .withAssets(TestConstants.signingAreaSignatureStr, Some(TestConstants.signingAreaMessageStr), Base64.decode(TestConstants.voiceStr()))
       .save()

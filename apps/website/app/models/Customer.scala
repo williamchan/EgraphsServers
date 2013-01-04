@@ -67,47 +67,55 @@ case class Customer(
           recipient: Customer = this,
           recipientName: String = this.name,
           messageToCelebrity: Option[String] = None,
-          requestedMessage: Option[String] = None): Order = {
+          requestedMessage: Option[String] = None): Either[Exception, Order] = {
 
-    val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
-    if (remainingInventory <= 0 || activeInventoryBatches.headOption.isEmpty) throw new InsufficientInventoryException("Must have available inventory to purchase product " + product.id)
-
-    val batchToOrderAgainst = services.inventoryBatchStore.selectAvailableInventoryBatch(activeInventoryBatches)
-    val inventoryBatchId = batchToOrderAgainst match {
-      case Some(b) => b.id
-      case _ => 0L //TODO: No, let's return an Either[Exception, Order]
+    val errorOrActiveInventoryBatches = {
+      val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
+      if (remainingInventory <= 0 || activeInventoryBatches.headOption.isEmpty)
+        Left(new InsufficientInventoryException("Must have available inventory to purchase product " + product.id))
+      else
+        Right(activeInventoryBatches)
     }
 
-    val order = Order(
-      buyerId = id,
-      recipientId = recipient.id,
-      productId = product.id,
-      amountPaidInCurrency = BigDecimal(product.price.getAmount),
-      recipientName = recipientName,
-      messageToCelebrity = messageToCelebrity,
-      requestedMessage = requestedMessage,
-      inventoryBatchId = inventoryBatchId,
-      expectedDate = Order.expectedDateFromDelay(product.celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
-    )
+    for {
+      inventoryBatches <- errorOrActiveInventoryBatches.right
+      inventoryBatch <- services.inventoryBatchStore
+        .selectAvailableInventoryBatch(inventoryBatches)
+        .toRight(new InsufficientInventoryException("Missing inventory batch for product = " + product.id))
+        .right
+    } yield {
+      val order = Order(
+        buyerId = id,
+        recipientId = recipient.id,
+        productId = product.id,
+        amountPaidInCurrency = BigDecimal(product.price.getAmount),
+        recipientName = recipientName,
+        messageToCelebrity = messageToCelebrity,
+        requestedMessage = requestedMessage,
+        inventoryBatchId = inventoryBatch.id,
+        expectedDate = Order.expectedDateFromDelay(product.celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE))
 
-    // If admin review is turned off (eg to expedite demos), create the Order already approved
-    if (services.config.adminreviewSkip) {
-      order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
-    } else {
-      order
+      // If admin review is turned off (eg to expedite demos), create the Order already approved
+      if (services.config.adminreviewSkip) {
+        order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+      } else {
+        order
+      }
     }
   }
 
   /**
-   * This is more intended to be used by test code.  Production code should use buy() instead.
+   * This alternative of buy will just throw the exceptions found in the either from buy.
    */
-  //TODO: Finish me.  Follow TODO in buy to complete this.
   def buyUnsafe(product: Product,
           recipient: Customer = this,
           recipientName: String = this.name,
           messageToCelebrity: Option[String] = None,
           requestedMessage: Option[String] = None): Order = {
-    buy(product, recipient, recipientName, messageToCelebrity, requestedMessage) //.right
+    buy(product, recipient, recipientName, messageToCelebrity, requestedMessage).fold(
+      error => throw error,
+      order => order
+    )
   }
 
 

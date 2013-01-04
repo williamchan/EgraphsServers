@@ -50,7 +50,7 @@ class XyzmoBiometricServicesTests extends EgraphsUnitTest
     val celebrity = TestData.newSavedCelebrity()
     val customer = TestData.newSavedCustomer()
     val product = TestData.newSavedProduct(celebrity = Some(celebrity))
-    val order = customer.buy(product).save()
+    val order = customer.buyUnsafe(product).save()
 
     val enrollmentBatch: EnrollmentBatch = EnrollmentBatch(celebrityId = celebrity.id).save()
     //    EnrollmentSample(enrollmentBatchId = enrollmentBatch.id).save(signatureStr = signature1, voiceStr = TestConstants.voiceStr())

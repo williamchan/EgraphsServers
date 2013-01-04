@@ -29,7 +29,7 @@ class GetEgraphExplanationCardEndpointTests extends EgraphsUnitTest {
       val buyer = TestData.newSavedCustomer()
       val recipient = TestData.newSavedCustomer()
       val anotherCustomer = TestData.newSavedCustomer()
-      val order = buyer.buy(TestData.newSavedProduct(), recipient = recipient).save()
+      val order = buyer.buyUnsafe(TestData.newSavedProduct(), recipient = recipient).save()
       val admin = TestData.newSavedAdministrator()
       (order.id, buyer, recipient, anotherCustomer, admin)
     }

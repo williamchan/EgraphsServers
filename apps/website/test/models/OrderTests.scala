@@ -34,7 +34,7 @@ class OrderTests extends EgraphsUnitTest
   override def newEntity = {
     val (customer, product) = newCustomerAndProduct
 
-    customer.buy(product)
+    customer.buyUnsafe(product)
   }
 
   override def saveEntity(toSave: Order) = {
@@ -47,7 +47,7 @@ class OrderTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: Order) = {
     val (customer, product) = newCustomerAndProduct
-    val order = customer.buy(product)
+    val order = customer.buyUnsafe(product)
     toTransform.copy(
       productId = order.productId,
       buyerId = order.buyerId,
@@ -177,7 +177,7 @@ class OrderTests extends EgraphsUnitTest
   "rejectAndCreateNewOrderWithNewProduct" should "create a new order but leave the old one in the db in a rejected status" in new EgraphsTestApplication {
     val (oldOrder, oldPrintOrder) = db.connected(TransactionSerializable) {
       val (buyer, _, _, product) = TestData.newSavedOrderStack()
-      val oldOrder = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+      val oldOrder = buyer.buyUnsafe(product).withPaymentStatus(PaymentStatus.Charged).save()
       val oldPrintOrder = PrintOrder(orderId = oldOrder.id).save()
 
       (oldOrder, oldPrintOrder)
@@ -203,7 +203,7 @@ class OrderTests extends EgraphsUnitTest
 
   "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in new EgraphsTestApplication {
     val (buyer, _, _, product) = TestData.newSavedOrderStack()
-    val order = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+    val order = buyer.buyUnsafe(product).withPaymentStatus(PaymentStatus.Charged).save()
     CashTransaction(accountId = buyer.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
       .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
@@ -225,7 +225,7 @@ class OrderTests extends EgraphsUnitTest
 
   "refund" should "refund the Stripe charge, change the PaymentStatus to Refunded, and create a refund CashTransaction" in new EgraphsTestApplication {
     val (buyer, _, _, product) = TestData.newSavedOrderStack()
-    val order = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+    val order = buyer.buyUnsafe(product).withPaymentStatus(PaymentStatus.Charged).save()
     CashTransaction(accountId = buyer.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
       .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
@@ -260,7 +260,7 @@ class OrderTests extends EgraphsUnitTest
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
     val anotherCustomer = TestData.newSavedCustomer()
-    val order = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
+    val order = buyer.buyUnsafe(TestData.newSavedProduct(), recipient=recipient).save()
 
     order.isBuyerOrRecipient(Some(buyer.id)) should be(true)
     order.isBuyerOrRecipient(Some(recipient.id)) should be(true)
@@ -273,8 +273,8 @@ class OrderTests extends EgraphsUnitTest
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
-    val order1 = buyer.buy(product, recipient=recipient).save()
-    val order2 = recipient.buy(product, recipient=recipient).save()
+    val order1 = buyer.buyUnsafe(product, recipient=recipient).save()
+    val order2 = recipient.buyUnsafe(product, recipient=recipient).save()
 
     val results = orderStore.galleryOrdersWithEgraphs(recipient.id)
 
@@ -292,8 +292,8 @@ class OrderTests extends EgraphsUnitTest
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
-    val order1 = buyer.buy(product, recipient=recipient).save()
-    val order2 = buyer.buy(product, recipient=recipient).save()
+    val order1 = buyer.buyUnsafe(product, recipient=recipient).save()
+    val order2 = buyer.buyUnsafe(product, recipient=recipient).save()
     val egraph1 = TestData.newSavedEgraph()
     val egraph2 = TestData.newSavedEgraph()
 
@@ -386,7 +386,7 @@ class OrderTests extends EgraphsUnitTest
     val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
-    val order = buyer.buy(product, recipient=recipient).save()
+    val order = buyer.buyUnsafe(product, recipient=recipient).save()
     
     (order, recipient)
   }
