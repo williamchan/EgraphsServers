@@ -4,7 +4,6 @@ import org.jclouds.blobstore.BlobStoreContextFactory
 import org.jclouds.aws.s3.AWSS3Client
 import org.jclouds.s3.domain.CannedAccessPolicy
 import services.logging.Logging
-import services.config.ConfigFileProxy
 import services.http.HttpContentService
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -13,7 +12,7 @@ import services.config.ConfigFileProxy
 import com.google.inject.Inject
 import services.Time.IntsToSeconds._
 import org.joda.time.DateTimeConstants
-import org.apache.commons.lang.NotImplementedException
+
 
 /** [[services.blobs.Blobs.BlobProvider]] implementation backed by Amazon S3 */
 private[blobs] case class S3BlobVendor @Inject() (
@@ -76,7 +75,7 @@ private[blobs] case class S3BlobVendor @Inject() (
   }
 
   override def delete(namespace: String, key: String) {
-    throw new NotImplementedException("This feature has not been implemented")
+    throw new UnsupportedOperationException("This feature has not been implemented")
   }
 
   override def checkConfiguration() {
