@@ -282,7 +282,7 @@ case class Order(
       "amountPaidInCents" -> amountPaid.getAmountMinor,
       "reviewStatus" -> reviewStatus.name,
       "audioPrompt" -> ("Recipient: " + recipientName),
-      "orderType" -> writtenMessageRequestToWrite.name
+      "orderType" -> writtenMessageRequestToWrite.name     // Oops, this should be more accurately named writtenMessageType
     )
 
     val optionalFields = Utils.makeOptionalFieldMap(
@@ -342,8 +342,11 @@ case class Order(
       case WrittenMessageRequest.SignatureOnly =>
         None
 
-      case WrittenMessageRequest.CelebrityChoosesMessage =>
+      case WrittenMessageRequest.CelebrityChoosesMessage if requestedMessage.isEmpty =>
         Some("[Make up a message and write it!]")
+
+      case WrittenMessageRequest.CelebrityChoosesMessage if requestedMessage.isDefined =>
+        requestedMessage
 
       case WrittenMessageRequest.SpecificMessage =>
         requestedMessage
