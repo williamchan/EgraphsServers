@@ -21,7 +21,7 @@ private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFoote
       httpFilters.requireEgraphId(egraphId) { egraph =>
       	Action { implicit request =>
       	  if (action == "preview") {
-            Ok(GetEgraphEndpoint.html(egraph = egraph, order = egraph.order, consumerApp = consumerApp))
+            Ok(controllers.routes.WebsiteControllers.getEgraph(egraph.id).url)
           } else {
             val order = egraph.order
             val buyer = order.buyer

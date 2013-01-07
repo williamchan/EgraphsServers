@@ -238,7 +238,7 @@ case class Order(
 
     email.addReplyTo("webserver@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val viewEgraphUrl = services.consumerApp.absoluteUrl(GetEgraphEndpoint.url(id))
+    val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(id).url)
     val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
@@ -674,7 +674,7 @@ object GalleryOrderFactory {
         .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
         .scaledToWidth(product.frame.thumbnailWidthPixels)
       val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-      val viewEgraphUrl = consumerApp.absoluteUrl(GetEgraphEndpoint.url(order.id))
+      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
 
       val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
         fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
