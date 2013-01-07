@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>360&deg; MP3 player UI demo (SoundManager 2): Javascript + Canvas Visualization, basic example</title>
+<meta name="robots" content="noindex" />
 <meta name="description" content="Basic example of 360-degree circular control for MP3 links, with EQ and spectrum visualization options" />
 <!-- demo: make the fonts nicer etc. -->
 <link rel="stylesheet" type="text/css" href="../index.css" />
@@ -26,9 +27,10 @@
 
 <script type="text/javascript">
 
-soundManager.url = '../../swf/'; // path to directory containing SM2 SWF
-
-soundManager.useFastPolling = true; // increased JS callback frequency, combined with useHighPerformance = true
+soundManager.setup({
+  // path to directory containing SM2 SWF
+  url: '../../swf/'
+});
 
 threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
 threeSixtyPlayer.config.showHMSTime = true;
