@@ -61,7 +61,7 @@ function ThreeSixtyPlayer() {
     autoPlay: false,   // start playing the first sound right away
     allowMultiple: false,  // let many sounds play at once (false = only one sound playing at a time)
     loadRingColor: '#ccc', // how much has loaded
-    playRingColor: '#000', // how much has played
+    playRingColor: '#fff', // how much has played
     backgroundRingColor: '#eee', // color shown underneath load + play ("not yet loaded" color)
 
     // optional segment/annotation (metadata) stuff..
@@ -98,7 +98,7 @@ function ThreeSixtyPlayer() {
     peakDataOutside: true,
     peakDataLineRatio: 0.5,
 
-    useAmplifier: true, // "pulse" like a speaker
+    useAmplifier: false, // "pulse" like a speaker
 
     fontSizeMax: null, // set according to CSS
 
@@ -463,7 +463,7 @@ function ThreeSixtyPlayer() {
 
       // tack on some custom data
 
-      diameter = parseInt(self.getElementsByClassName('sm2-360ui','div',oContainer)[0].offsetWidth, 10);
+      diameter = parseInt(self.getElementsByClassName('sm2-360ui','div',oContainer)[0].offsetWidth, 10) / 2;
 
       thisSound._360data = {
         oUI360: self.getParentByClassName(o,'ui360'), // the (whole) entire container
