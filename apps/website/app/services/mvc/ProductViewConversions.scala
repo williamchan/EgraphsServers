@@ -4,7 +4,7 @@ import services.blobs.AccessPolicy
 import models.frontend.storefront._
 import models.ImageAsset.Jpeg
 import controllers.routes.WebsiteControllers.{getStorefrontChoosePhotoCarousel, postStorefrontChoosePhoto}
-import models.{Product, LandscapeEgraphFrame, EgraphFrame, PortraitEgraphFrame}
+import models._
 import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct
@@ -23,10 +23,11 @@ class ProductViewConversions(product: Product) {
    * @param quantityRemaining the remaining inventory before the product is "sold out".
    */
   def asChoosePhotoTileView(celebrityUrlSlug: String = product.celebrity.urlSlug,
-                            quantityRemaining: Int = product.remainingInventoryCount)
+                            quantityRemaining: Int = product.remainingInventoryCount,
+                            accesskey: String = "")
   : ChoosePhotoTileProduct =
   {
-    val carouselViewLink=getStorefrontChoosePhotoCarousel(
+    val carouselViewLinkBase = getStorefrontChoosePhotoCarousel(
       celebrityUrlSlug,
       product.urlSlug
     ).url
@@ -35,7 +36,7 @@ class ProductViewConversions(product: Product) {
       name=product.name,
       price=product.price,
       imageUrl=getProductThumbnailUrl(width=340),
-      targetUrl=carouselViewLink,
+      targetUrl=CelebrityAccesskey.urlWithAccesskey(carouselViewLinkBase, accesskey),
       quantityRemaining=quantityRemaining,
       orientation=orientationOfFrame(product.frame)
     )

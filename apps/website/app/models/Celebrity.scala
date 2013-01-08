@@ -5,7 +5,6 @@ import categories._
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
-import services.blobs.Blobs.Conversions._
 import com.google.inject.{Provider, Inject}
 import org.squeryl.Query
 import services._
@@ -19,19 +18,15 @@ import services.Dimensions
 import org.squeryl.dsl.ManyToMany
 import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
 import anorm._
-import anorm.SqlParser._
 import services.mvc.celebrity.CelebrityViewConversions
-import models.frontend.marketplace.MarketplaceCelebrity
-import models.frontend.marketplace.CelebritySortingTypes
 import play.api.libs.concurrent.Promise
 import models.frontend.marketplace.MarketplaceCelebrity
 import play.api.libs.concurrent.Akka
 import services.db.DBSession
-import services.db.TransactionSerializable
 import org.joda.time.DateTimeConstants
 import models.frontend.landing.CatalogStar
-import services.mvc.celebrity.CatalogStarsAgent
 import services.mvc.celebrity.CatalogStarsQuery
+import org.apache.commons.codec.binary.Base64
 
 /**
  * Services used by each celebrity instance
@@ -340,6 +335,36 @@ object Celebrity {
       val saved = celebrity.save()
       CelebrityWithImage(saved, savedImage)
     }
+  }
+}
+
+object CelebrityAccesskey {
+  private val accesskeySalt = "tituspullo"
+
+  /**
+   * @param id the id of the celebrity accessible by accesskey
+   * @return an accesskey that permits access to the celebrity regardless of published status
+   */
+  def accesskey(id: Long): String = {
+    Base64.encodeBase64URLSafeString((id.toString + accesskeySalt).getBytes)
+  }
+
+  /**
+   * @param accesskeyAttempt the attempted accesskey
+   * @param id the id of the celebrity
+   * @return whether the attempted accesskey matches the accesskey required by the celebrity matching the id
+   */
+  def matchesAccesskey(accesskeyAttempt: String, id: Long): Boolean = {
+    accesskeyAttempt == accesskey(id)
+  }
+
+  /**
+   * @param url the url to decorate with the accesskey
+   * @param accesskey the accesskey
+   * @return the url with the accesskey as a query parameter. If no accesskey was provided, then the original url is returned.
+   */
+  def urlWithAccesskey(urlBase: String, accesskey: String): String = {
+    if (accesskey.isEmpty) urlBase else urlBase + "?accesskey=" + accesskey
   }
 }
 
