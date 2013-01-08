@@ -33,7 +33,7 @@ class RequireAuthenticatedAccount @Inject() (accountStore: AccountStore)
     maybeResult.toRight(left = Forbidden("Email/password information was incorrect."))
   }
 
-  // we couldn't use RequestFilter here since this does't use a form, though it does need a request.
+  // we couldn't use RequestFilter here since this doesn't use a form, though it does need a request.
   def inRequest[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Account => Action[A]): Action[A] = {
     Action(parser) { request =>
       val forbiddenOrAccount = this.filter(request)

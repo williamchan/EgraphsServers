@@ -70,6 +70,7 @@ POST     /admin/celebrities/featured                                      contro
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.postCelebrityAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/egraphs                  controllers.WebsiteControllers.getCelebrityEgraphsAdmin(celebrityId: Long)
+POST     /admin/celebrities/$celebrityId<[0-9]+>/expectedorderdelay       controllers.WebsiteControllers.postExpectedOrderDelay(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/categoryvalues           controllers.WebsiteControllers.postCelebrityCategoryValueAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.getCelebrityInventoryBatchesAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/inventorybatches         controllers.WebsiteControllers.postCreateInventoryBatchAdmin(celebrityId: Long)

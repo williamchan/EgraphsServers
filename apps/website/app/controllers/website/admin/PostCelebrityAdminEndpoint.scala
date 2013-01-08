@@ -19,6 +19,7 @@ import services.{ImageUtil, Utils}
 import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
+import org.joda.time.DateTimeConstants
 
 trait PostCelebrityAdminEndpoint {
   this: Controller =>
@@ -166,7 +167,30 @@ trait PostCelebrityAdminEndpoint {
       }
   	}
   }
-  
+
+  def postExpectedOrderDelay(celebrityId: Long) = postController() {
+    httpFilters.requireAdministratorLogin.inSession() {
+      case (admin, adminAccount) =>
+        httpFilters.requireCelebrityId(celebrityId) { celebrity =>
+          Action { implicit request =>
+            val expectedOrderDelayInDaysForm = Form(
+              single(
+                "delayInDays" -> number))
+              .bindFromRequest()
+
+            expectedOrderDelayInDaysForm.fold(
+              e => BadRequest("No order delay found in request.")
+              ,
+              expectedOrderDelayInDays => {
+                celebrity.copy(expectedOrderDelayInMinutes = expectedOrderDelayInDays * DateTimeConstants.MINUTES_PER_DAY).save()
+                Ok(expectedOrderDelayInDays.toString)
+              }
+            )
+          }
+        }
+    }
+  }
+
   private trait PostCelebrityForm {
      val publicName: String
      val publishedStatusString: String
