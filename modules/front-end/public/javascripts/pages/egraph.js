@@ -2,44 +2,44 @@
 define(["Egraphs", "libs/guiders"], function (Egraphs, guiders) {
 	return {
     go: function () {
-      guiders.createGuider({
-        buttons: [{name: "Close", classString: "btn close-guider"},
-                  {name: "Next", classString: "btn next"}],
-        classString: "egraph-guider",
-        closeOnEscape: true,
-        description: "An egraph is a personalized message and this is a bunch of copy.",
-        id: "first",
-        next: "second",
-        overlay: true,
-        title: "Welcome to Egraphs",
-        xButton: true
-      }).show();
 
-      guiders.createGuider({
-        attachTo: ".sm2-360btn",
-        buttons: [{name: "next", classString: "btn next"}
-                  ],
-        classString: "egraph-guider",
-        description: "Press play to hear a message from Herp Derpson",
-        highlight: ".sm2-360btn",
-        id: "second",
-        next: "third",
-        position: 12,
-        overlay: false,
-        title: "Herp Derpson wanna say somethin'",
-        width: 500
-      });
+      var playSound = function() {
+        $(".sm2-360btn").click();
+        guiders.hideAll();
+      };
 
-      guiders.createGuider({
-        attachTo: ".social",
-        buttons: [{name: "Close", classString: "btn next", onclick: guiders.hideAll}],
-        classString: "egraph-guider",
-        description: "Use the buttons below to share your egraph with your family and friends.",
-        id: "third",
-        position: 12,
-        title: "Share your egraph",
-        width: 350
-      });
+      /**
+       * Create a guider to highlight the Play button on the Egraph page.
+       **/
+      if(Egraphs.page.isPromotional === true) {
+        guiders.createGuider({
+          attachTo: "#360player",
+          classString: "egraph-guider",
+          description: "Press <strong>play</strong> to hear a special message from " + Egraphs.page.signerName,
+          id: "first",
+          offset: {
+            top: 20,
+            left: -3
+          },
+          position: 12,
+          title: Egraphs.page.signerName + " has a message for you!",
+          width: 500,
+          xButton: true
+        }).show();
+
+        /**
+         * Since the 360 player injects html at some point
+         * after document.ready(), we bind to it's container since it is always available.
+        **/
+        $("#360player").click(function() {
+          guiders.hideAll();
+        });
+
+        // Bind to the xButton on the top right to hide the guider.
+        $(".xButton").click(function() {
+          guiders.hideAll();
+        });
+      }
     }
   };
 });

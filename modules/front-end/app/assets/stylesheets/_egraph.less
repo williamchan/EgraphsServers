@@ -58,6 +58,12 @@
 @plaqueWidth: 385px;
 @plaqueHeight: 94px;
 
+//
+// Guider Variables 
+//
+
+@innerBorderColor: #E6E6E6;
+
 
 @font-face {
   font-family: "Bebas Neue";
@@ -84,50 +90,47 @@ body.egraph-page {
     position: absolute;
     padding: 9px 0px 9px 0px;
     z-index: 100;
-    
+    text-align: center;
+
+    .xButton {
+      float: right;
+      margin-top: -5px;
+      margin-right: 5px;
+      background: @white;
+    }
 
     .box-shadow(@frameShadow);
     
     .border-radius(4px);
 
-  h1 {
-    padding-left: 15px;
-    padding-right: 15px;
-    text-transform: uppercase;
-    font-size: 16px;
-    font-weight: 600;
-    display: block;
-    border-bottom: 1px solid #E6E6E6;
-  }
-
-  .guiders_description {
-    padding: 15px;
-    border-bottom: 1px solid #E6E6E6; 
-  }
-
-  .guiders_buttons_container {
-    margin-left: 15px;
-    margin-right: 15px;
-    height: 36px;
-    position: relative;
-
-    .guiders_button {
-      cursor: pointer;
-      display: inline-block;
-      .border-radius(2px);
-
-      &.next {
-        float: right;
-      }
-
-      &.close-guider {
-        //border: none;
-        //border-bottom: 1px dotted @grayDarker;
-        //background: none;
-        float: left;
-        color: @grayDarker;
-      }
+    .guiders_description {
+      padding: 15px;
+      margin-bottom: 0px;
+      //border-bottom: 1px solid @innerBorderColor; 
     }
+
+    .guiders_buttons_container {
+      margin-left: 15px;
+      margin-right: 15px;
+      height: 36px;
+      position: relative;
+
+      .guiders_button {
+        cursor: pointer;
+        display: inline-block;
+        .border-radius(2px);
+
+        &.next {
+          float: right;
+        }
+
+        &.close-guider {
+          margin-top: 4px;
+          border-bottom: 1px dotted @grayDarker;
+          float: left;
+          color: @grayDarker;
+        }
+      }
   }
 
   .guiders_arrow {

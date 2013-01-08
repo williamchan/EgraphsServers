@@ -38,7 +38,7 @@ define(function() {
         top: null,
         left: null
       },
-      onClose: null, 
+      onClose: null,
       onHide: null,
       onShow: null,
       overlay: false,
@@ -52,11 +52,9 @@ define(function() {
     guiders._htmlSkeleton = [
       "<div class='guider'>",
       "  <div class='guiders_content'>",
-      "    <h1 class='guiders_title'></h1>",
+      "    <button type='button' aria-hidden='true' class='xButton'>×</button>",
       "    <div class='guiders_close'></div>",
       "    <p class='guiders_description'></p>",
-      "    <div class='guiders_buttons_container'>",
-      "    </div>",
       "  </div>",
       "  <div class='guiders_arrow'>",
       "  </div>",

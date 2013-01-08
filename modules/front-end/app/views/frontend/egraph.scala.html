@@ -45,6 +45,11 @@
     </script>
 }
 
+@headJs = {
+  Egraphs.page.signerName = "@signerName";
+  Egraphs.page.isPromotional = @isPromotional;
+}
+
 @styles = @{
   Seq(EgraphsAssets.at("soundmanager/360-player/360player.css").url,
       EgraphsAssets.at("soundmanager/360-player/360player-visualization.css").url
@@ -175,4 +180,4 @@
     </script>    
 }
 
-@base_template(title=title.toString, headHtml=headHtml, body=baseBody, jsMain="pages/egraph", suppressHeaderAndFooter=true, cssFiles=styles, bodyClasses=Seq("egraph-page"))
+@base_template(title=title.toString, headHtml=headHtml, body=baseBody, headJs=headJs, jsMain="pages/egraph", suppressHeaderAndFooter=true, cssFiles=styles, bodyClasses=Seq("egraph-page"), viewportFix = false)
