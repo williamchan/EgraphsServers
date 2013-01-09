@@ -20,8 +20,6 @@ private[authtoken] trait AuthenticityTokenFormHelpers {
   }
 
   def asJsonObject(implicit token: AuthenticityToken): Html = {
-    //TODO: would be better to do in with Json libraries.  This code below has the problem of extra ""s around authTokenKey 
-//    Html(Json.stringify(Json.toJson(Map(authTokenKey -> Seq(token.value)))))
-    Html("{" + authTokenKey + ": \"" + token.value + "\"}")
+    Html(Json.stringify(Json.toJson(Map(authTokenKey -> token.value))))
   }
 }

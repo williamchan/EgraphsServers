@@ -71,7 +71,7 @@ case class Customer(
 
     val errorOrActiveInventoryBatches = {
       val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
-      if (remainingInventory <= 0 || activeInventoryBatches.headOption.isEmpty)
+      if (remainingInventory <= 0 || activeInventoryBatches.isEmpty)
         Left(new InsufficientInventoryException("Must have available inventory to purchase product " + product.id))
       else
         Right(activeInventoryBatches)

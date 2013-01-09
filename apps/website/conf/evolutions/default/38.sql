@@ -8,5 +8,3 @@ ALTER TABLE orders ALTER COLUMN expectedDate SET NOT NULL;
 
 # --- !Downs
 ALTER TABLE orders ALTER COLUMN expectedDate DROP NOT NULL;
-
-ALTER TABLE celebrity DROP COLUMN expectedOrderDelayInMinutes;
