@@ -66,6 +66,13 @@ object Order {
       DateUtils.addDays(truncatedDate, 1)
     }
   }
+
+  /**
+   * Gets you the expected delivery date of the celebrity. 
+   */
+  def expectedDeliveryDate(celebrity: Celebrity): Date = {
+    Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
+  }
 }
 
 /**

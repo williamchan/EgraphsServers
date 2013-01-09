@@ -32,6 +32,7 @@ import org.joda.time.DateTimeConstants
 import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.CatalogStarsAgent
 import services.mvc.celebrity.CatalogStarsQuery
+import java.util.Date
 
 /**
  * Services used by each celebrity instance

@@ -45,7 +45,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
    *
    * This method requires no database access (or shouldn't)
    *
-   * @param celeb the celebrity who owns the product that was bought
+   * @param celebrity the celebrity who owns the product that was bought
    * @param product the product that was bought
    * @param buyer the customer who bought the product
    * @param buyerAccount the account of the customer who brought the product
@@ -58,7 +58,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
    * @return a ViewModel that populates the order complete page.
    */
   private def fromModels(
-    celeb: Celebrity,
+    celebrity: Celebrity,
     product: Product,
     buyer: Customer,
     buyerAccount: Account,
@@ -81,10 +81,10 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       buyerEmail = buyerAccount.email,
       ownerName = order.recipientName,
       ownerEmail = recipientAccount.email,
-      celebName = celeb.publicName,
+      celebName = celebrity.publicName,
       productName = product.name,
       productId = product.id,
-      expectedDeliveryDate = inventoryBatch.getExpectedDate,
+      expectedDeliveryDate = Order.expectedDeliveryDate(celebrity),
       faqHowLongLink = faqHowLongLink,
       totalPrice = totalAmountPaid,
       discount = None,

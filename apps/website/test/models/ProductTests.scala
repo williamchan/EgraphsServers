@@ -124,4 +124,24 @@ class ProductTests extends EgraphsUnitTest
     product1.getRemainingInventoryAndActiveInventoryBatches() should be ((48, List(inventoryBatch1)))                  // product1 is in inventoryBatch1, which has 2 purchases
     product2.getRemainingInventoryAndActiveInventoryBatches() should be ((97, List(inventoryBatch1, inventoryBatch2))) // product1 is in both inventoryBatch1 and inventoryBatch1, which have 3 purchases total
   }
+
+  //TODO(myyk): Make this work. SER-656
+  ignore should "not return inventory batches that are no longer available"  in new EgraphsTestApplication {
+    val celebrity = TestData.newSavedCelebrity()
+    val customer = TestData.newSavedCustomer()
+
+    val product = TestData.newSavedProductWithoutInventoryBatch(Some(celebrity))
+    val inventoryBatch1 = TestData.newSavedInventoryBatch(celebrity = celebrity).copy(numInventory = 2).save()
+    val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity).copy(numInventory = 2).save()
+    inventoryBatch1.products.associate(product)
+    inventoryBatch2.products.associate(product)
+
+    customer.buyUnsafe(product).save()
+    customer.buyUnsafe(product).save()
+    customer.buyUnsafe(product).save()
+    product.getRemainingInventoryAndActiveInventoryBatches()._2.size should be (1)
+
+    customer.buyUnsafe(product).save()
+    product.getRemainingInventoryAndActiveInventoryBatches()._2.size should be (0)
+  }
 }
