@@ -6,6 +6,7 @@ import services.Time
 import services.ImageUtil.Conversions._
 import services.AppConfig
 import utils._
+import org.joda.time.DateTimeConstants
 
 class CelebrityTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -117,7 +118,8 @@ class CelebrityTests extends EgraphsUnitTest
       apiKey = Some("apiKey"),
       publicName = TestData.generateFullname(),
       roleDescription = "Pitcher, Tampa Bay Rays",
-      profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now))
+      profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now)),
+      expectedOrderDelayInMinutes = 5 * DateTimeConstants.MINUTES_PER_DAY
     ).withPublishedStatus(PublishedStatus.Published)
   }
 

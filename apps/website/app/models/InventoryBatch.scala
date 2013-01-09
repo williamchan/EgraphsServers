@@ -96,11 +96,12 @@ class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inve
    * @return the inventoryBatch that has the earliest endDate and has inventory remaining (numInventory > number of associated orders)
    */
   def selectAvailableInventoryBatch(activeInventoryBatches: Seq[InventoryBatch]): Option[InventoryBatch] = {
-    if (activeInventoryBatches.headOption.isDefined && activeInventoryBatches.tail.headOption.isEmpty) {
+    if (activeInventoryBatches.size == 1) {
       // There is only one inventoryBatch. Assume that it is the correct inventoryBatch against which to order.
       activeInventoryBatches.headOption
-
     } else {
+      //TODO: I think this should be using find instead of this weird loop with a return.
+      // See if this is even needed anymore before refactoring since this could require many db queries.
       for (inventoryBatch <- activeInventoryBatches.sortWith((batch1, batch2) => batch1.endDate.before(batch2.endDate))) {
         if (orderStore.countOrders(List(inventoryBatch.id)) < inventoryBatch.numInventory) {
           return Some(inventoryBatch)

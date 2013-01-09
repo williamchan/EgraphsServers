@@ -64,7 +64,7 @@ object RepeatableScenarios {
   def customerBuysEveryProductOfCelebrity(customer: Customer, celebrity: Celebrity): Iterable[Order] = {
     val products = celebrity.productsInActiveInventoryBatches()
     for (product <- products) yield {
-      val order = customer.buy(
+      val order = customer.buyUnsafe(
         product,
         recipientName = customer.name,
         requestedMessage = Some(RandomStringUtils.randomAlphabetic(100)),

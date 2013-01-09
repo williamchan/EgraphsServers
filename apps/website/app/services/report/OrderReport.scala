@@ -56,7 +56,7 @@ class OrderReport @Inject()(schema: Schema) extends Report {
         order._reviewStatus,
         formatTime(order.created, "PST"),
         formatDate(order.created, "PST"),
-        order.expectedDate.getOrElse(""),
+        order.expectedDate,
         product.id,
         celebrity.id,
         celebrity.publicName,

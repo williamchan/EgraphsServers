@@ -46,7 +46,6 @@ case class CelebrityServices @Inject() (
   transactionalMail: TransactionalMail
 )
 
-
 /**
  * Persistent entity representing the Celebrities who provide products on
  * our service.
@@ -59,7 +58,8 @@ case class Celebrity(id: Long = 0,
                      bio: String = "",
                      roleDescription: String = "",                                  // e.g. "Pitcher, Red Sox"
                      twitterUsername: Option[String] = None,
-                     profilePhotoUpdated: Option[String] = None, // todo: rename to _profilePhotoKey
+                     profilePhotoUpdated: Option[String] = None, //TODO: rename to _profilePhotoKey
+                     expectedOrderDelayInMinutes: Int = 30 * DateTimeConstants.MINUTES_PER_DAY,
                      _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
                      _landingPageImageKey: Option[String] = None,
@@ -757,6 +757,7 @@ class CelebrityStore @Inject() (
       theOld.roleDescription := theNew.roleDescription,
       theOld.twitterUsername := theNew.twitterUsername,
       theOld.urlSlug := theNew.urlSlug,
+      theOld.expectedOrderDelayInMinutes := theNew.expectedOrderDelayInMinutes,
       theOld._enrollmentStatus := theNew._enrollmentStatus,
       theOld._publishedStatus := theNew._publishedStatus,
       theOld._landingPageImageKey := theNew._landingPageImageKey,

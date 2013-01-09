@@ -26,7 +26,7 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
       val recipient = TestData.newSavedCustomer()
       val anotherCustomer = TestData.newSavedCustomer()
       val admin = TestData.newSavedAdministrator()
-      val order = buyer.buy(TestData.newSavedProduct(), recipient = recipient)
+      val order = buyer.buyUnsafe(TestData.newSavedProduct(), recipient = recipient)
         .withPrivacyStatus(PrivacyStatus.Private)
         .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
       order.newEgraph.withEgraphState(EgraphState.Published)
@@ -51,7 +51,7 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
   "A public egraph" should "be viewable by all" in new EgraphsTestApplication {
     val orderId: Long = db.connected(TransactionSerializable) {
       val buyer = TestData.newSavedCustomer()
-      val order = buyer.buy(TestData.newSavedProduct())
+      val order = buyer.buyUnsafe(TestData.newSavedProduct())
         .withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
       order.newEgraph.withEgraphState(EgraphState.Published)
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr())).save()

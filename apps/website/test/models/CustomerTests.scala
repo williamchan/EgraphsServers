@@ -2,6 +2,7 @@ package models
 
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
+import org.joda.time.DateTimeConstants
 import enums.OrderReviewStatus
 import exception.InsufficientInventoryException
 import services.config.ConfigFileProxy
@@ -57,7 +58,7 @@ class CustomerTests extends EgraphsUnitTest
   "A customer" should "produce Orders that are properly configured" in new EgraphsTestApplication {
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
-    val order = buyer.buy(product, recipient=recipient)
+    val order = buyer.buyUnsafe(product, recipient=recipient)
 
     order.buyerId should be (buyer.id)
     order.recipientId should be (recipient.id)
@@ -68,17 +69,17 @@ class CustomerTests extends EgraphsUnitTest
   it should "make itself the recipient if no recipient is specified" in new EgraphsTestApplication {
     val (buyer, _, product) = savedBuyerRecipientAndProduct()
 
-    buyer.buy(product).recipientId should be (buyer.id)
+    buyer.buyUnsafe(product).recipientId should be (buyer.id)
   }
 
   "buy" should "set inventoryBatchId on the Order" in new EgraphsTestApplication {
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
-    val order = buyer.buy(product, recipient = recipient).save()
+    val order = buyer.buyUnsafe(product, recipient = recipient).save()
     order.inventoryBatchId should be(product.inventoryBatches.head.id)
   }
 
-  "buy" should "create an order whose approval status depends on play config's adminreview.skip" in new EgraphsTestApplication {
+  it should "create an order whose approval status depends on play config's adminreview.skip" in new EgraphsTestApplication {
     // Set up
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
     
@@ -88,28 +89,39 @@ class CustomerTests extends EgraphsUnitTest
     val buyerWithAdminSkip = buyer.copy(services=buyer.services.copy(config=mockConfig))
 
     // Run tests
-    buyer.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.PendingAdminReview)
-    buyerWithAdminSkip.buy(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
+    buyer.buyUnsafe(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.PendingAdminReview)
+    buyerWithAdminSkip.buyUnsafe(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
   }
 
-  "buy" should "throw InsufficientInventoryException if no inventory is available" in new EgraphsTestApplication {
+  it should "create an order whose expected date is relative to the celebrity's expected delay" in new EgraphsTestApplication {
+    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+    // change expected delay to 5 days
+    val delayDays = 5
+    product.celebrity.copy(expectedOrderDelayInMinutes = delayDays * DateTimeConstants.MINUTES_PER_DAY).save()
+
+    val order = buyer.buyUnsafe(product, recipient = recipient).save()
+    val delayDay = Order.expectedDateFromDelay(delayDays * DateTimeConstants.MILLIS_PER_DAY)
+    order.expectedDate.getTime should be (delayDay.getTime)
+  }
+
+  it should "throw InsufficientInventoryException if no inventory is available" in new EgraphsTestApplication {
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
 
     val inventoryBatch = product.inventoryBatches.head.copy(numInventory = 1).save()
 
     // first one should pass
-    buyer.buy(product, recipient = recipient).save()
+    buyer.buyUnsafe(product, recipient = recipient).save()
 
     // should fail due to lack of inventory
     val exception0 = intercept[InsufficientInventoryException] {
-      buyer.buy(product, recipient = recipient).save()
+      buyer.buyUnsafe(product, recipient = recipient).save()
     }
     exception0.getLocalizedMessage should include("Must have available inventory to purchase product")
 
     // should fail due to lack of active InventoryBatch
     inventoryBatch.copy(numInventory = 10, startDate = TestData.jan_01_2012, endDate = TestData.jan_01_2012).save()
     val exception1 = intercept[InsufficientInventoryException] {
-      buyer.buy(product, recipient = recipient).save()
+      buyer.buyUnsafe(product, recipient = recipient).save()
     }
     exception1.getLocalizedMessage should include("Must have available inventory to purchase product")
   }

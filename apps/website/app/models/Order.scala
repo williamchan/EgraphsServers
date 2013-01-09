@@ -3,6 +3,7 @@ package models
 import enums._
 import frontend.egraphs.{OrderDetails, PendingEgraphViewModel, FulfilledEgraphViewModel}
 import java.sql.Timestamp
+import java.util.Date
 import org.joda.money.Money
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Finance.TypeConversions._
@@ -13,7 +14,6 @@ import mail.TransactionalMail
 import payment.{Charge, Payment}
 import org.squeryl.Query
 import org.apache.commons.mail.HtmlEmail
-import java.util.Date
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
@@ -24,6 +24,9 @@ import play.api.templates.Html
 import db.Deletes
 import java.sql.Connection
 import services.db.CurrentTransaction
+import org.joda.time.DateTimeConstants
+import org.apache.commons.lang3.time.DateUtils
+import java.util.Calendar
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -39,6 +42,31 @@ case class OrderServices @Inject() (
   consumerApp: ConsumerApplication,
   @CurrentTransaction connectionFactory: () => Connection
 )
+
+object Order {
+  val defaultExpectedDelay: Long = 30 * DateTimeConstants.MILLIS_PER_DAY
+  def defaultExpectedDate: Date = expectedDateFromDelay(defaultExpectedDelay)
+
+  /**
+   * Gets the Date with delay applied to the current day, rounded up to the nearest day.
+   */
+  def expectedDateFromDelay(delayInMillis: Long): Date = {
+    addMillisecondsAndRoundUpToNextDay(new Date(), delayInMillis.toInt)
+  }
+
+  def addMillisecondsAndRoundUpToNextDay(date: Date, millisToAdd: Int): Date = {
+    val dateSum = DateUtils.addMilliseconds(date, millisToAdd)
+
+    // Make sure to round up to nearest day
+    val truncatedDate = DateUtils.truncate(dateSum, Calendar.DATE)
+    if(DateUtils.isSameInstant(truncatedDate, dateSum)) {
+      truncatedDate
+    } else {
+      //round up
+      DateUtils.addDays(truncatedDate, 1)
+    }
+  }
+}
 
 /**
  * Persistent entity representing the Orders made upon Products of our service
@@ -58,7 +86,7 @@ case class Order(
   amountPaidInCurrency: BigDecimal = 0,
   messageToCelebrity: Option[String] = None,
   requestedMessage: Option[String] = None,
-  expectedDate: Option[Date] = None,
+  expectedDate: Date = Order.defaultExpectedDate,
   _orderType: String = OrderType.Normal.name,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,

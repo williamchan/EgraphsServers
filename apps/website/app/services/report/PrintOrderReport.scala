@@ -55,7 +55,7 @@ class PrintOrderReport @Inject()(schema: Schema) extends Report {
         printOrder.shippingAddress,
         order.id,
         formatDate(order.created),
-        order.expectedDate.getOrElse(""),
+        order.expectedDate,
         product.id,
         celebrity.id,
         celebrity.publicName,

@@ -230,8 +230,8 @@ class Scenarios extends DeclaresScenarios {
     () =>
       val erem = Scenarios.getEremCustomerAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
-      erem.buy(starcraftChampionship, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
-      erem.buy(kingOfPweensCompetition, recipientName = erem.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
+      erem.buyUnsafe(starcraftChampionship, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
+      erem.buyUnsafe(kingOfPweensCompetition, recipientName = erem.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
   }
   )
   
@@ -242,8 +242,8 @@ class Scenarios extends DeclaresScenarios {
     () =>
       val myyk = Scenarios.getMyykCustomerAccount
       val (starcraftChampionship, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
-      myyk.buy(starcraftChampionship, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
-      myyk.buy(kingOfPweensCompetition, recipientName = myyk.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
+      myyk.buyUnsafe(starcraftChampionship, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Don!"), messageToCelebrity = Some("My buddy Don is your biggest fan!")).save()
+      myyk.buyUnsafe(kingOfPweensCompetition, recipientName = myyk.name, requestedMessage = Some("Happy Pweenday, Don!"), messageToCelebrity = Some("Don loves everything you do!")).save()
   }
   )
   
@@ -255,7 +255,7 @@ class Scenarios extends DeclaresScenarios {
       val erem = Scenarios.getEremCustomerAccount
       val myyk = Scenarios.getMyykCustomerAccount
       val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
-      erem.buy(starcraftChampionship, recipient = myyk, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Myyk!"), messageToCelebrity = Some("My buddy Myyk is your biggest fan!")).save()
+      erem.buyUnsafe(starcraftChampionship, recipient = myyk, recipientName = myyk.name, requestedMessage = Some("Happy 13th birthday, Myyk!"), messageToCelebrity = Some("My buddy Myyk is your biggest fan!")).save()
   }
   )
   
@@ -267,7 +267,7 @@ class Scenarios extends DeclaresScenarios {
       val myyk = Scenarios.getMyykCustomerAccount
       val erem = Scenarios.getEremCustomerAccount
       val (_, kingOfPweensCompetition) = Scenarios.getWillsTwoProducts
-      myyk.buy(kingOfPweensCompetition, recipient = erem, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Erem!"), messageToCelebrity = Some("My buddy Erem is your biggest fan!")).save()
+      myyk.buyUnsafe(kingOfPweensCompetition, recipient = erem, recipientName = erem.name, requestedMessage = Some("Happy 13th birthday, Erem!"), messageToCelebrity = Some("My buddy Erem is your biggest fan!")).save()
   }
   )
 

@@ -1,6 +1,7 @@
 package egraphs.authtoken
 
 import play.api.templates.{Html, HtmlFormat, PlayMagic}
+import play.api.libs.json.Json
 
 /**
  * A pair of template helpers that inject authenticity tokens into your forms.
@@ -16,5 +17,9 @@ private[authtoken] trait AuthenticityTokenFormHelpers {
 
   def hiddenInput(implicit token: AuthenticityToken): Html = {
     Html("<input type=\"hidden\" name=\"" + authTokenKey + "\" value=\"" + token.value + "\" />")
+  }
+
+  def asJsonObject(implicit token: AuthenticityToken): Html = {
+    Html(Json.stringify(Json.toJson(Map(authTokenKey -> token.value))))
   }
 }

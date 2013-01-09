@@ -25,6 +25,8 @@ import play.api.mvc.AsyncResult
 import play.api.mvc.PlainResult
 import org.joda.time.DateTimeConstants
 import models.VideoAssetCelebrityStore
+import org.apache.commons.io.FileUtils
+import java.util.Date
 
 class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
   protected override def routeUnderTest = postVideoAsset
@@ -43,6 +45,7 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
     val auth = BasicAuth.Credentials(account.email, password)
 
     val tempFile = File.createTempFile("videoFile", "mp4")
+    FileUtils.writeStringToFile(tempFile, (new Date()).toString)
 
     val filename = "test.mp4"
     val nonFiles = Map("celebrityId" -> Seq(celebrityId.toString))
@@ -63,8 +66,6 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
     val maybeVideoAsset = db.connected(TransactionSerializable) {
       videoAssetCelebrityStore.getVideoAssetByCelebrityId(celebrityId)
     }
-    
-    println("maybe video asset is " + maybeVideoAsset)
 
     maybeVideoAsset match {
       case None => fail("There is no video asset associated with celebrityId " + celebrityId)

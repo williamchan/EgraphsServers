@@ -9,6 +9,10 @@ import javax.mail.internet.InternetAddress
 import play.api.test.FakeRequest
 import services.db.DBSession
 import services.db.TransactionSerializable
+import org.apache.commons.lang3.time.DateUtils
+import java.util.Date
+import java.util.Calendar
+import org.joda.time.DateTimeConstants
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -29,7 +33,7 @@ class OrderTests extends EgraphsUnitTest
   override def newEntity = {
     val (customer, product) = newCustomerAndProduct
 
-    customer.buy(product)
+    customer.buyUnsafe(product)
   }
 
   override def saveEntity(toSave: Order) = {
@@ -42,7 +46,7 @@ class OrderTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: Order) = {
     val (customer, product) = newCustomerAndProduct
-    val order = customer.buy(product)
+    val order = customer.buyUnsafe(product)
     toTransform.copy(
       productId = order.productId,
       buyerId = order.buyerId,
@@ -179,7 +183,7 @@ class OrderTests extends EgraphsUnitTest
   "rejectAndCreateNewOrderWithNewProduct" should "create a new order but leave the old one in the db in a rejected status" in new EgraphsTestApplication {
     val (oldOrder, oldPrintOrder) = db.connected(TransactionSerializable) {
       val (buyer, _, _, product) = TestData.newSavedOrderStack()
-      val oldOrder = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+      val oldOrder = buyer.buyUnsafe(product).withPaymentStatus(PaymentStatus.Charged).save()
       val oldPrintOrder = PrintOrder(orderId = oldOrder.id).save()
 
       (oldOrder, oldPrintOrder)
@@ -205,7 +209,7 @@ class OrderTests extends EgraphsUnitTest
 
   "withChargeInfo" should "set the PaymentStatus, store stripe info, and create an associated CashTransaction" in new EgraphsTestApplication {
     val (buyer, _, _, product) = TestData.newSavedOrderStack()
-    val order = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+    val order = buyer.buyUnsafe(product).withPaymentStatus(PaymentStatus.Charged).save()
     CashTransaction(accountId = buyer.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
       .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
@@ -227,7 +231,7 @@ class OrderTests extends EgraphsUnitTest
 
   "refund" should "refund the Stripe charge, change the PaymentStatus to Refunded, and create a refund CashTransaction" in new EgraphsTestApplication {
     val (buyer, _, _, product) = TestData.newSavedOrderStack()
-    val order = buyer.buy(product).withPaymentStatus(PaymentStatus.Charged).save()
+    val order = buyer.buyUnsafe(product).withPaymentStatus(PaymentStatus.Charged).save()
     CashTransaction(accountId = buyer.account.id, orderId = Some(order.id), stripeCardTokenId = Some("mytoken"), stripeChargeId = Some(NiceCharge.id),billingPostalCode = Some("55555"))
       .withCash(product.price).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
@@ -262,7 +266,7 @@ class OrderTests extends EgraphsUnitTest
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
     val anotherCustomer = TestData.newSavedCustomer()
-    val order = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
+    val order = buyer.buyUnsafe(TestData.newSavedProduct(), recipient=recipient).save()
 
     order.isBuyerOrRecipient(Some(buyer.id)) should be(true)
     order.isBuyerOrRecipient(Some(recipient.id)) should be(true)
@@ -275,8 +279,8 @@ class OrderTests extends EgraphsUnitTest
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
-    val order1 = buyer.buy(product, recipient=recipient).save()
-    val order2 = recipient.buy(product, recipient=recipient).save()
+    val order1 = buyer.buyUnsafe(product, recipient=recipient).save()
+    val order2 = recipient.buyUnsafe(product, recipient=recipient).save()
 
     val results = orderStore.galleryOrdersWithEgraphs(recipient.id)
 
@@ -294,8 +298,8 @@ class OrderTests extends EgraphsUnitTest
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
-    val order1 = buyer.buy(product, recipient=recipient).save()
-    val order2 = buyer.buy(product, recipient=recipient).save()
+    val order1 = buyer.buyUnsafe(product, recipient=recipient).save()
+    val order2 = buyer.buyUnsafe(product, recipient=recipient).save()
     val egraph1 = TestData.newSavedEgraph()
     val egraph2 = TestData.newSavedEgraph()
 
@@ -331,7 +335,7 @@ class OrderTests extends EgraphsUnitTest
     results.size should be (1)
   }
 
-  "filterPendingOrders" should "include egraphs that are awaiting verification, that have passed " +
+  it should "include egraphs that are awaiting verification, that have passed " +
   		"biometrics, or that are approved by admin" in new EgraphsTestApplication {
     
     val (order, recipient) = newOrderAndRecipient
@@ -340,8 +344,8 @@ class OrderTests extends EgraphsUnitTest
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
     results.size should be (3)
   }
-  
-  "filterPendingOrders" should "not include an Egraph that's rejected by admin or that's already published" in new EgraphsTestApplication {
+
+  it should "not include an Egraph that's rejected by admin or that's already published" in new EgraphsTestApplication {
     val (order, recipient) = newOrderAndRecipient
     
     // neither of these Egraphs should affect the gallery size
@@ -350,14 +354,31 @@ class OrderTests extends EgraphsUnitTest
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
     results.size should be (0)
   }
-  
-  "filterPendingOrders" should "contain the Egraph we expect" in new EgraphsTestApplication {
+
+  it should "contain the Egraph we expect" in new EgraphsTestApplication {
     val (order, recipient) = newOrderAndRecipient
     val egraph = order.newEgraph.save()
     
     val results = GalleryOrderFactory.filterPendingOrders(orderStore.galleryOrdersWithEgraphs(recipient.id).toList)
     val queriedEgraph = results.head._2.get
     queriedEgraph.id should be (egraph.id)
+  }
+
+  val dayInMillis = DateTimeConstants.MILLIS_PER_DAY
+  val today = DateUtils.truncate(new Date(), Calendar.DATE)
+  val tomorrow = DateUtils.truncate(new Date(System.currentTimeMillis + dayInMillis), Calendar.DATE)
+  
+  "addMillisecondsAndRoundUpToNextDay" should "not round up on the boundry condition of a day" in {
+    val answer = Order.addMillisecondsAndRoundUpToNextDay(today, dayInMillis)
+
+    answer.getTime should be (tomorrow.getTime)
+  }
+
+  it should "round up when it is not on the boundry" in {
+    val oneMillisecond = 1
+    val answer = Order.addMillisecondsAndRoundUpToNextDay(today, oneMillisecond)
+
+    answer.getTime should be (tomorrow.getTime)
   }
 
   //
@@ -371,7 +392,7 @@ class OrderTests extends EgraphsUnitTest
     val (buyer, recipient, celebrity, product) = TestData.newSavedOrderStack()
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
-    val order = buyer.buy(product, recipient=recipient).save()
+    val order = buyer.buyUnsafe(product, recipient=recipient).save()
     
     (order, recipient)
   }

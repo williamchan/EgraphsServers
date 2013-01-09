@@ -40,7 +40,7 @@ class EgraphImageTests extends EgraphsUnitTest
     blobs.get(blobKey).get.asByteArray.length should be(11381) // If this breaks, check the rendered image
   }
 
-//  TODO: single-point strokes are not being rendered, see issue #120
+//  TODO: single-point strokes are not being rendered, see SER-3
 //  "saveAndGetUrl" should "render single-point stroke" in new EgraphsTestApplication {
 //    val product = TestData.newSavedProduct()
 //    val order = TestData.newSavedOrder(Some(product))

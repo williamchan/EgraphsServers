@@ -13,6 +13,7 @@ import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
+import org.joda.time.DateTimeConstants
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -66,36 +67,57 @@ case class Customer(
           recipient: Customer = this,
           recipientName: String = this.name,
           messageToCelebrity: Option[String] = None,
-          requestedMessage: Option[String] = None): Order = {
+          requestedMessage: Option[String] = None): Either[Exception, Order] = {
 
-    val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
-    if (remainingInventory <= 0 || activeInventoryBatches.headOption.isEmpty) throw new InsufficientInventoryException("Must have available inventory to purchase product " + product.id)
-
-    val batchToOrderAgainst = services.inventoryBatchStore.selectAvailableInventoryBatch(activeInventoryBatches)
-    val (inventoryBatchId, expectedDate) = batchToOrderAgainst match {
-      case Some(b) => (b.id, Option(b.getExpectedDate))
-      case _ => (0L, None) // todo(wchan): Do we want to permit the order to go through?
+    val errorOrActiveInventoryBatches = {
+      val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
+      if (remainingInventory <= 0 || activeInventoryBatches.isEmpty)
+        Left(new InsufficientInventoryException("Must have available inventory to purchase product " + product.id))
+      else
+        Right(activeInventoryBatches)
     }
 
-    val order = Order(
-      buyerId=id,
-      recipientId=recipient.id,
-      productId=product.id,
-      amountPaidInCurrency=BigDecimal(product.price.getAmount),
-      recipientName = recipientName,
-      messageToCelebrity = messageToCelebrity,
-      requestedMessage = requestedMessage,
-      inventoryBatchId = inventoryBatchId,
-      expectedDate = expectedDate
-    )
+    for {
+      inventoryBatches <- errorOrActiveInventoryBatches.right
+      inventoryBatch <- services.inventoryBatchStore
+        .selectAvailableInventoryBatch(inventoryBatches)
+        .toRight(left=new InsufficientInventoryException("Missing inventory batch for product = " + product.id))
+        .right
+    } yield {
+      val order = Order(
+        buyerId = id,
+        recipientId = recipient.id,
+        productId = product.id,
+        amountPaidInCurrency = BigDecimal(product.price.getAmount),
+        recipientName = recipientName,
+        messageToCelebrity = messageToCelebrity,
+        requestedMessage = requestedMessage,
+        inventoryBatchId = inventoryBatch.id,
+        expectedDate = Order.expectedDateFromDelay(product.celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE))
 
-    // If admin review is turned off (eg to expedite demos), create the Order already approved
-    if (services.config.adminreviewSkip) {
-      order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
-    } else {
-      order
+      // If admin review is turned off (eg to expedite demos), create the Order already approved
+      if (services.config.adminreviewSkip) {
+        order.withReviewStatus(OrderReviewStatus.ApprovedByAdmin)
+      } else {
+        order
+      }
     }
   }
+
+  /**
+   * This alternative of buy will just throw the exceptions found in the either from buy.
+   */
+  def buyUnsafe(product: Product,
+          recipient: Customer = this,
+          recipientName: String = this.name,
+          messageToCelebrity: Option[String] = None,
+          requestedMessage: Option[String] = None): Order = {
+    buy(product, recipient, recipientName, messageToCelebrity, requestedMessage).fold(
+      error => throw error,
+      order => order
+    )
+  }
+
 
   //
   // KeyedCaseClass[Long] methods

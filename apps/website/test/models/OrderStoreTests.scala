@@ -16,15 +16,15 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     val buyer = TestData.newSavedCustomer()
     val recipient = TestData.newSavedCustomer()
 
-    val order = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
+    val order = recipient.buyUnsafe(TestData.newSavedProduct(), recipient=recipient).save()
 
     orderStore.findByRecipientCustomerId(recipient.id).size should be (1)
 
-    val order2 = recipient.buy(TestData.newSavedProduct(), recipient=recipient).save()
+    val order2 = recipient.buyUnsafe(TestData.newSavedProduct(), recipient=recipient).save()
 
     orderStore.findByRecipientCustomerId(recipient.id).size should be (2)
 
-    val order3 = buyer.buy(TestData.newSavedProduct(), recipient=recipient).save()
+    val order3 = buyer.buyUnsafe(TestData.newSavedProduct(), recipient=recipient).save()
 
     orderStore.findByRecipientCustomerId(recipient.id).size should be (3)
 
@@ -35,8 +35,8 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     val admin = Administrator().save()
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
 
-    val order1 = buyer.buy(product, recipient=recipient).save()
-    val order2 = recipient.buy(product, recipient=recipient).save()
+    val order1 = buyer.buyUnsafe(product, recipient=recipient).save()
+    val order2 = recipient.buyUnsafe(product, recipient=recipient).save()
 
     val egraph = order1.newEgraph.save()
     egraph.verifyBiometrics.approve(admin).publish(admin).save()
@@ -58,7 +58,7 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
     
     def buyAndSetReviewStatus(status: OrderReviewStatus.EnumVal):Order = {
-      buyer.buy(product, recipient=recipient).withReviewStatus(status).save()
+      buyer.buyUnsafe(product, recipient=recipient).withReviewStatus(status).save()
     }
     
     for (status <- OrderReviewStatus.values) buyAndSetReviewStatus(status)
@@ -79,9 +79,9 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     val inventoryBatch2 = TestData.newSavedInventoryBatch(celebrity = celebrity)
     inventoryBatch1.products.associate(product1)
     inventoryBatch2.products.associate(product2)
-    customer.buy(product1).save()
-    customer.buy(product2).save()
-    customer.buy(product2).save()
+    customer.buyUnsafe(product1).save()
+    customer.buyUnsafe(product2).save()
+    customer.buyUnsafe(product2).save()
 
     val inventoryBatchIds = Seq(inventoryBatch1.id, inventoryBatch2.id)
     orderStore.countOrders(inventoryBatchIds) should be(3)
@@ -92,9 +92,9 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     val numfound = orderStore.getOrderResults().toSeq.length
 
     val (customer0, product0) = newCustomerAndProduct
-    val order0 = customer0.buy(product0).save()
+    val order0 = customer0.buyUnsafe(product0).save()
     val (customer1, product1) = newCustomerAndProduct
-    val order1 = customer1.buy(product1).save()
+    val order1 = customer1.buyUnsafe(product1).save()
 
     val foundAfter = orderStore.getOrderResults().toSeq.length
     val newOrders = (foundAfter - numfound)
@@ -113,9 +113,9 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     inventoryBatch1.products.associate(product1)
     inventoryBatch1.products.associate(product2)
     inventoryBatch2.products.associate(product3)
-    customer.buy(product1).save()
-    customer.buy(product2).save()
-    customer.buy(product3).save()
+    customer.buyUnsafe(product1).save()
+    customer.buyUnsafe(product2).save()
+    customer.buyUnsafe(product3).save()
 
     val inventoryBatchIds = Seq(inventoryBatch1.id, inventoryBatch2.id, inventoryBatch3.id)
     val inventoryBatchIdsAndOrderCount = orderStore.countOrdersByInventoryBatch(inventoryBatchIds)
@@ -130,12 +130,12 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   
   "findByCelebrity" should "find all of a Celebrity's orders by default" in new EgraphsTestApplication {
 
-    val (will, _, celebrity, product) = TestData.newSavedOrderStack()
+    val (customer, _, celebrity, product) = TestData.newSavedOrderStack()
 
     val (firstOrder, secondOrder, thirdOrder) = (
-      will.buy(product).save(),
-      will.buy(product).save(),
-      will.buy(product).save()
+      customer.buyUnsafe(product).save(),
+      customer.buyUnsafe(product).save(),
+      customer.buyUnsafe(product).save()
     )
 
     // Orders of celebrity's products
@@ -148,8 +148,8 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     val (will, _, celebrity, product) = TestData.newSavedOrderStack()
     val (_, _ , _, otherCelebrityProduct) = TestData.newSavedOrderStack()
 
-    val celebOrder = will.buy(product).save()
-    will.buy(otherCelebrityProduct).save()
+    val celebOrder = will.buyUnsafe(product).save()
+    will.buyUnsafe(otherCelebrityProduct).save()
 
     val celebOrders = orderStore.findByCelebrity(celebrity.id)
 
@@ -160,8 +160,8 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
   it should "only find a particular Order when composed with OrderIdFilter" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = TestData.newSavedOrderStack()
 
-    val firstOrder = will.buy(product).save()
-    will.buy(product).save()
+    val firstOrder = will.buyUnsafe(product).save()
+    will.buyUnsafe(product).save()
 
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.orderId(firstOrder.id))
 
@@ -171,10 +171,10 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   it should "exclude orders that have reviewStatus of PendingAdminReview, RejectedByAdmin, or RejectedByCelebrity when composed with ActionableFilter" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = TestData.newSavedOrderStack()
-    val actionableOrder = will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
-    will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
-    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
-    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
+    val actionableOrder = will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
 
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
     found.toSeq.length should be(1)
@@ -188,13 +188,13 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     // Make an order for each Egraph State, and save an Egraph in that state
     val ordersByEgraphState = EgraphState.values.map {
       state =>
-        val order = will.buy(product).approveByAdmin(admin).save()
+        val order = will.buyUnsafe(product).approveByAdmin(admin).save()
         order.newEgraph.withEgraphState(state).save()
         (state, order)
     }
 
     // Also buy one without an Egraph
-    val orderWithoutEgraph = will.buy(product).approveByAdmin(admin).save()
+    val orderWithoutEgraph = will.buyUnsafe(product).approveByAdmin(admin).save()
 
     // Perform the test
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
@@ -209,10 +209,10 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   it should "only include orders that are pendingAdminReview when composed with that filter" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = TestData.newSavedOrderStack()
-    will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
-    val pendingOrder = will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
-    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
-    will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+    val pendingOrder = will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
 
     val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.pendingAdminReview)
     found.toSeq.length should be(1)
@@ -221,10 +221,10 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   it should "only include orders that are rejected when composed with those filters" in new EgraphsTestApplication {
     val (will, _, celebrity, product) = TestData.newSavedOrderStack()
-    will.buy(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
-    will.buy(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
-    val orderRejectedByAdmin = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
-    val orderRejectedByCelebrity = will.buy(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.ApprovedByAdmin).save()
+    will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
+    val orderRejectedByAdmin = will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.RejectedByAdmin).save()
+    val orderRejectedByCelebrity = will.buyUnsafe(product).withReviewStatus(OrderReviewStatus.RejectedByCelebrity).save()
 
     orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejectedByAdmin).head should be(orderRejectedByAdmin)
     orderStore.findByCelebrity(celebrity.id, orderQueryFilters.rejectedByCelebrity).head should be(orderRejectedByCelebrity)
