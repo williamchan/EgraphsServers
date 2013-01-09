@@ -84,7 +84,7 @@ body.egraph-page {
   @step3Color: lighten(@darkestBackground, 7%);
   @step3TransitionHeight: @step2MaintenanceHeight + 268px;
 
-  div.egraph-guider {
+  .egraph-guider {
     background: @white;
     border: 1px solid @gray;
     position: absolute;
@@ -131,40 +131,39 @@ body.egraph-page {
           color: @grayDarker;
         }
       }
-  }
+    }
 
-  .guiders_arrow {
-    width: 42px;
-    height: 42px;
-    position: absolute;
-    display: none;
-    background-repeat: no-repeat;
-    z-index: 100000006 !important;
-    background-image: url(/assets/images/guiders_arrows.png);
-  }
+    .guiders_arrow {
+      width: 42px;
+      height: 42px;
+      position: absolute;
+      display: none;
+      background-repeat: no-repeat;
+      z-index: 100000006 !important;
+      background-image: url(/assets/images/guiders_arrows.png);
+    }
 
-  .guiders_arrow_right {
-    display: block;
-    background-position: 0px 0px;
-    right: -42px;
+    .guiders_arrow_right {
+      display: block;
+      background-position: 0px 0px;
+      right: -42px;
+    }
+    .guiders_arrow_down {
+      display: block;
+      background-position: 0px -42px;
+      bottom: -42px;
+    }
+    .guiders_arrow_up {
+      display: block;
+      background-position: 0px -126px;
+      top: -42px;
+    }
+    .guiders_arrow_left {
+      display: block;
+      background-position: 0px -84px;
+      left: -42px;
+    }
   }
-  .guiders_arrow_down {
-    display: block;
-    background-position: 0px -42px;
-    bottom: -42px;
-  }
-  .guiders_arrow_up {
-    display: block;
-    background-position: 0px -126px;
-    top: -42px;
-  }
-  .guiders_arrow_left {
-    display: block;
-    background-position: 0px -84px;
-    left: -42px;
-  }
-
-}
 
   #guiders_overlay {
     background-color: #000;

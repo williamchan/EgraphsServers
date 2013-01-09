@@ -15,17 +15,19 @@ define(["Egraphs", "libs/guiders"], function (Egraphs, guiders) {
         guiders.createGuider({
           attachTo: "#360player",
           classString: "egraph-guider",
-          description: "Press <strong>play</strong> to hear a special message from " + Egraphs.page.signerName,
+          description: "<strong id='clickortouch'>Click or touch</strong> to hear a special message from " + Egraphs.page.signerName,
           id: "first",
           offset: {
             top: 20,
-            left: -3
+            left: 4
           },
           position: 12,
           title: Egraphs.page.signerName + " has a message for you!",
           width: 500,
           xButton: true
         }).show();
+
+        $("#clickortouch").click(playSound);
 
         /**
          * Since the 360 player injects html at some point
