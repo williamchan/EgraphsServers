@@ -81,7 +81,7 @@ case class Customer(
       inventoryBatches <- errorOrActiveInventoryBatches.right
       inventoryBatch <- services.inventoryBatchStore
         .selectAvailableInventoryBatch(inventoryBatches)
-        .toRight(new InsufficientInventoryException("Missing inventory batch for product = " + product.id))
+        .toRight(left=new InsufficientInventoryException("Missing inventory batch for product = " + product.id))
         .right
     } yield {
       val order = Order(

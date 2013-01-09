@@ -11,8 +11,8 @@
 @import org.joda.time.DateTimeConstants
 @import controllers.WebsiteControllers
 @import routes.WebsiteControllers.postCelebrityCategoryValueAdmin
-@import egraphs.authtoken.AuthenticityToken.safeForm
-@import egraphs.authtoken.AuthenticityToken.asJsonObject
+@import egraphs.authtoken.AuthenticityToken
+@import AuthenticityToken.safeForm
 @import views.html.Application.tags.errorMessage
 @import views.html.Application.tags.formField
 @import views.html.frontend.tags
@@ -20,7 +20,7 @@
 @import views.html.frontend.base_template
 
 @headJs = {
-  Egraphs.page.authToken = @asJsonObject;
+  Egraphs.page.authToken = @AuthenticityToken.asJsonObject;
   Egraphs.page.postExpectedOrderDelayUrl = "@{
     if(celebrity.isDefined) {
       controllers.routes.WebsiteControllers.postExpectedOrderDelay(celebrity.get.id);
