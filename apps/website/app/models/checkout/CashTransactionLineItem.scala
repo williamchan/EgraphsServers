@@ -11,69 +11,98 @@ import play.api.libs.json.Json
 
 
 
+//
+// Services
+//
+case class CashTransactionLineItemServices @Inject() (
+  schema: Schema,
+  cashTransactionStore: CashTransactionStore
+) extends SavesAsLineItemEntity[CashTransactionLineItem] {
 
-// TODO(SER-499): move me
-trait CashTransactionLineItem extends LineItem[CashTransaction] with HasLineItemEntity {
-  protected[checkout] def abortTransaction() // refund charge
-
-  override def subItems = Nil
-
-  def withEntity(entity: LineItemEntity): CashTransactionLineItem
-
+  override protected def modelWithNewEntity(txnItem: CashTransactionLineItem, newEntity: LineItemEntity) = {
+    txnItem.entity.set(newEntity)
+  }
 }
 
-case class StripeCashTransactionLineItem (
+
+
+//
+// Model
+//
+case class CashTransactionLineItem(
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
   _maybeCashTransaction: Option[CashTransaction],
   services: CashTransactionLineItemServices = AppConfig.instance[CashTransactionLineItemServices]
-) extends CashTransactionLineItem
-  with LineItemEntityGettersAndSetters[StripeCashTransactionLineItem]
+) extends LineItem[CashTransaction] with HasLineItemEntity
+  with LineItemEntityGettersAndSetters[CashTransactionLineItem]
   with CanInsertAndUpdateAsThroughServices[CashTransactionLineItem, LineItemEntity]
 {
 
   //
-  // LineItem
+  // LineItem members
   //
-  override def itemType: StripeCashTransactionLineItemType =
-    StripeCashTransactionLineItemType(domainObject)
+  override lazy val itemType: CashTransactionLineItemType =
+    CashTransactionLineItemType(_typeEntity, domainObject)
 
   override def toJson = ""
+  override def subItems = Nil
 
   override lazy val domainObject: CashTransaction = _maybeCashTransaction.getOrElse {
-    services.cashTransactionStore.findByLineItemId(id).getOrElse(
+    services.cashTransactionStore.findByLineItemId(id).getOrElse (
       throw new IllegalArgumentException("No cash transaction provided or found in database.")
     )
   }
 
-  override def transact(checkoutId: Long) = this
+  override def transact(checkout: Checkout) = {
+    // TODO(SER-499): persist entity and type (type entity as of now should be singleton)
+    if (id <= 0) {
+      val savedItem = this.withCheckoutId(checkout.id).insert()
+      val savedCashTxn = domainObject.copy(
+        accountId = checkout.account.id,
+        lineItemId = Some(savedItem.id)
+      ).save()
 
-  
-  
-  //
-  // CashTransactionLineItem
-  //
-  override protected[checkout] def abortTransaction() = { println("aborting and refunding charge") }
+      savedItem.copy(_maybeCashTransaction = Some(savedCashTxn))
 
-  override def withEntity(entity: LineItemEntity) = this.copy(entity)
-  
-  
+    } else {
+      this
+    }
+  }
+
+
+  def makeCharge(): CashTransactionLineItem = {
+    // TODO(SER-499): charge through payment services and update cash transaction
+    this
+  }
+
+
+  protected[checkout] def abortTransaction() = {
+    // TODO(SER-499): implement charge refunding
+    // [[[domainObject.stripeChargeId.map ( services.payment.refund _ )]]]
+    println("aborting and refunding charge")
+  }
+
+
   //
   // LineItemEntityLenses members
   //
-  override lazy val entityLens = Lens[StripeCashTransactionLineItem, LineItemEntity](
-    get = _._entity,
-    set = _ withEntity _
+  override protected lazy val entityLens = Lens[CashTransactionLineItem, LineItemEntity](
+    get = txnItem => txnItem._entity,
+    set = (txnItem, newEntity) => txnItem copy newEntity
   )
 }
 
-object StripeCashTransactionLineItem {
+
+
+
+object CashTransactionLineItem {
   //
   // Create
   //
-  def apply(itemType: StripeCashTransactionLineItemType, transaction: CashTransaction) = {
-    new StripeCashTransactionLineItem(
-      LineItemEntity(transaction.cash, ""),
+  def apply(itemType: CashTransactionLineItemType, transaction: CashTransaction) = {
+    new CashTransactionLineItem(
+      LineItemEntity(transaction.cash, "", itemType.id),
       itemType._entity,
       Some(transaction)
     )
@@ -83,20 +112,8 @@ object StripeCashTransactionLineItem {
   // Restore
   //
   def apply(entity: LineItemEntity, itemEntity: LineItemTypeEntity) = {
-    new StripeCashTransactionLineItem(entity, itemEntity, None)
+    new CashTransactionLineItem(entity, itemEntity, None)
   }
 }
 
 
-
-
-
-case class CashTransactionLineItemServices @Inject() (
-  schema: Schema,
-  cashTransactionStore: CashTransactionStore
-) extends SavesAsLineItemEntity[CashTransactionLineItem] {
-
-  override protected def modelWithNewEntity(txnItem: CashTransactionLineItem, entity: LineItemEntity) = {
-    txnItem.withEntity(entity)
-  }
-}

@@ -9,7 +9,7 @@ trait CanInsertAndUpdateAsThroughServicesTests[
   ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT, KeyT],
   EntityT <: KeyedCaseClass[KeyT],
   KeyT
-] /*extends SavingEntityIdLongTests[EntityT]*/ {
+] {
   this: FlatSpec with ShouldMatchers =>
 
   def newIdValue: KeyT
@@ -30,9 +30,10 @@ trait CanInsertAndUpdateAsThroughServicesTests[
   "A restore model instance" should "be equivalent to the originally saved model" in {
     val saved = saveModel(newModel)
     val maybeRestored = restoreModel(saved.id)
+    val maybeRestoredEntity = maybeRestored.map(model => model._entity)
 
     maybeRestored should not be (None)
-    maybeRestored.get should be (saved)
+    Some(saved._entity) should be (maybeRestoredEntity)
   }
 
   "Restoring an unsaved model id" should "return None" in {
@@ -45,9 +46,9 @@ trait CanInsertAndUpdateAsThroughServicesTests[
     val updatedRestored = restoreModel(updated.id).get
 
     updated.id should be (inserted.id)
-    updated should not be (inserted)
-    updatedRestored should be (updated)
-    updatedRestored should not be (inserted)
+    updated._entity should not be (inserted._entity)
+    updatedRestored._entity should be (updated._entity)
+    updatedRestored._entity should not be (inserted._entity)
   }
 
 }

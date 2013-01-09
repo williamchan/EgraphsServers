@@ -106,12 +106,11 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemT
    *
    */
   protected def entityLens: Lens[T, LineItemTypeEntity]
+  def entity = entityLens.asMemberOf(this)
 
   //
   // Private members
   //
-  private def entity = entityLens.asMember(this)
-
   private[checkout] lazy val descField =
     entityField(get = _._desc)(set = desc => entity().copy(_desc=desc))
   private[checkout] lazy val natureField = entityField(
@@ -125,7 +124,7 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemT
   private def entityField[PropT](get: LineItemTypeEntity => PropT)(set: PropT => LineItemTypeEntity)
   : MemberLens[T, PropT] =
   {
-    entity.xmap(entity => get(entity))(newProp => set(newProp)).asMember(this)
+    entity.xmap(entity => get(entity))(newProp => set(newProp)).asMemberOf(this)
   }
 }
 

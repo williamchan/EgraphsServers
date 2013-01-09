@@ -11,8 +11,9 @@ import org.squeryl.annotations.Transient
 import com.google.inject.Inject
 import models.enums.{CodeTypeFactory, LineItemNature, CodeType}
 
-trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with KeyedCaseClass[Long] {
+trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
 
+  def id: Long
   def itemType: LineItemType[TransactedT]
   def subItems: Seq[LineItem[_]]
   def toJson: String                    // TODO(SER-499): Use Json type, maybe even Option
@@ -20,9 +21,9 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with Ke
 
 
   /** @return flat sequence of this LineItem and its sub-LineItems */
-  def flatten: IndexedSeq[LineItem[_]] = {
+  def flatten: Seq[LineItem[_]] = {
     val seqOfFlatSubItemSeqs = for(subItem <- subItems) yield subItem.flatten
-    IndexedSeq(this) ++ seqOfFlatSubItemSeqs.flatten
+    Seq(this) ++ seqOfFlatSubItemSeqs.flatten
   }
 
   //
@@ -39,10 +40,21 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with Ke
   def codeType: CodeType = itemType.codeType
   def nature: LineItemNature = itemType.nature
 
-  // TODO(SER-499): see if just using unapply breaks tests
-  // KeyedCaseClass
-  override def unapplied = (id, amount, checkoutId, domainObject, itemType.id, codeType, nature)
 
+  /**
+   * Rough approximation for equality between line items; does not detect difference in
+   * implementation specific state.
+   */
+  def equalsLineItem(that: LineItem[_]): Boolean = {
+    if (that != null) {
+      def unpack(item: LineItem[_]) = (item.id, item.amount, item.itemType.id, item.codeType, item.nature, item.domainObject)
+
+      unpack(this) == unpack(that)
+
+    } else {
+      false
+    }
+  }
 }
 
 
@@ -58,18 +70,16 @@ class LineItemStore @Inject() (schema: Schema) {
   // use CodeType of LineItemType to create LineItem's of the correct type
 
   def getItemsByCheckoutId(id: Long): Seq[LineItem[_]] = {
+    /**
+     * Note that using toSeq instead of toList returns a Stream which causes bugs in other steps
+     * of restoring a checkout
+     */
     join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
       select(li, lit) on (li._itemTypeId === lit.id and li._checkoutId === id)
-    ).toSeq.flatMap { entityTuple =>
-
-      val (itemEntity, itemTypeEntity) = entityTuple
-
+    ).toList.flatMap { case (itemEntity, itemTypeEntity) =>
       CodeType(itemTypeEntity._codeType) match {
-        case Some(codeType: CodeTypeFactory[LineItemType[_], LineItem[_]]) =>
-          Some(codeType.itemInstance(itemEntity, itemTypeEntity))
-
-        // TODO(SER-499): add logging
-        case Some(_) => None
+        case Some(codeType: CodeTypeFactory[_, _]) => Some(codeType.itemInstance(itemEntity, itemTypeEntity))
+        case Some(_) => None // TODO(SER-499): add logging
         case None => None
       }
     }
@@ -128,12 +138,11 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
    *
    */
   protected def entityLens: Lens[T, LineItemEntity]
+  def entity = entityLens.asMemberOf(this)
 
   //
   // Private members
   //
-  private def entity = entityLens.asMember(this)
-
   private[checkout] lazy val checkoutIdField = entityField(
     get = _._checkoutId)(
     set = id => entity().copy(_checkoutId=id)
@@ -151,7 +160,7 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
   private def entityField[PropT](get: LineItemEntity => PropT)(set: PropT => LineItemEntity)
   : MemberLens[T, PropT] =
   {
-    entity.xmap(entity => get(entity))(newProp => set(newProp)).asMember(this)
+    entity.xmap(entity => get(entity))(newProp => set(newProp)).asMemberOf(this)
   }
 }
 

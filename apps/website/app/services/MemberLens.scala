@@ -2,7 +2,7 @@ package services
 
 import scalaz.Lens
 
-/** See `asMember` docs in [[services.MemberLens.Conversions.MemberLensConversion]] */
+/** See `asMemberOf` docs in [[services.MemberLens.Conversions.MemberLensConversion]] */
 class MemberLens[A, B](private val self: A, private val lens: Lens[A, B]) {
   def get: B = lens.get(self)
   def apply(): B = lens.get(self)
@@ -48,7 +48,7 @@ object MemberLens {
        *       val city = Lens[Person, String](
        *         get= (person) => person.address.city,
        *         set= (city, person) => person.copy(address=person.address.copy(city=city)
-       *       ).asMember
+       *       ).asMemberOf
        *     }
        *
        *     def usePerson = {
@@ -62,7 +62,7 @@ object MemberLens {
        * }}}
        *
        */
-      def asMember(instance: A) = new MemberLens(instance, lens)
+      def asMemberOf(instance: A) = new MemberLens(instance, lens)
     }
   }
 }

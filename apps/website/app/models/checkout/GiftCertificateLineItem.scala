@@ -45,7 +45,7 @@ case class GiftCertificateLineItem (
    * Presumes that checkoutId is set; persists unsaved instances
    * @return persisted line item
    */
-  override def transact(newCheckoutId: Long): GiftCertificateLineItem = {
+  override def transact(checkout: Checkout): GiftCertificateLineItem = {
     if (id <= 0) {
       /**
        * Save itemType first because it depends neither on a line item or domain object.
@@ -53,10 +53,10 @@ case class GiftCertificateLineItem (
        * Finally, save the line item with the saved giftCertificate and type.
        */
       val savedType = itemType.insert()
-      val savedItem = this.withCheckoutId(newCheckoutId)
+      val savedItem = this.withCheckoutId(checkout.id)
         .withItemType(savedType)
         .insert()
-      val savedGiftCertificate = domainObject.saveFromLineItem(savedItem)
+      val savedGiftCertificate = domainObject.saveWithLineItem(savedItem)
 
       savedItem.withGiftCertificate(savedGiftCertificate)
     } else {
@@ -76,11 +76,16 @@ case class GiftCertificateLineItem (
   }
 
 
+  //
+  // EntityLenses members
+  //
   override protected lazy val entityLens = Lens[GiftCertificateLineItem, LineItemEntity](
     get = cert => cert._entity,
     set = (cert, entity) => cert.copy(entity)
   )
 }
+
+
 
 object GiftCertificateLineItem {
   // Creating

@@ -47,7 +47,7 @@ case class GiftCertificateEntity (
   updated: Timestamp = Time.defaultTimestamp
  ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
 
-  /** Has to be a val or else Squeryl doesn't ~see~ it and can't update */
+  /** id has to be a val or else Squeryl doesn't ~see~ it and can't update */
   override val id = _couponId
   override def unapplied = GiftCertificateEntity.unapply(this)
 
@@ -74,7 +74,7 @@ case class GiftCertificate protected (
 {
   import MemberLens.Conversions._
 
-  def saveFromLineItem(item: GiftCertificateLineItem) = {
+  def saveWithLineItem(item: GiftCertificateLineItem) = {
     this.typeId.set(item.itemType.id)
       .itemId.set(item.id)
       .save()
@@ -104,7 +104,7 @@ case class GiftCertificate protected (
   }
 
 
-  private lazy val maybeItemEntity = services.lineItemStore.findEntityById(itemId.get)
+  private def maybeItemEntity = services.lineItemStore.findEntityById(itemId.get)
 
 
   //

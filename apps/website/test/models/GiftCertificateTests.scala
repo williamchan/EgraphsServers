@@ -29,6 +29,7 @@ class GiftCertificateTests extends EgraphsUnitTest
    * -invalid amount fails
    * -get gifter name, email
    * -store methods
+   * -saveWithLineItem
    *
    * -create gift certificate and then make purchase with the coupon it creates :O
    */

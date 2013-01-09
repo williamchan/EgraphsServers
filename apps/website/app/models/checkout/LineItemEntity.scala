@@ -22,7 +22,13 @@ case class LineItemEntity(
 }
 
 object LineItemEntity {
-  def apply(amount: Money, notes: String): LineItemEntity = {
-    new LineItemEntity(_amountInCurrency = amount.getAmount, notes = notes)
+  def apply(amount: Money, notes: String): LineItemEntity = apply(amount, notes, 0)
+
+  def apply(amount: Money, notes: String, typeId: Long): LineItemEntity = {
+    new LineItemEntity(
+      _itemTypeId = typeId,
+      _amountInCurrency = amount.getAmount,
+      notes = notes
+    )
   }
 }

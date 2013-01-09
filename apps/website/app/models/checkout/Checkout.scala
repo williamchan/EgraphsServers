@@ -1,5 +1,7 @@
 package models.checkout
 
+
+
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums._
 import org.squeryl.KeyedEntity
@@ -7,9 +9,14 @@ import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db._
-import models.{Customer, HasCreatedUpdated, SavesCreatedUpdated}
+import models._
 import com.google.inject.Inject
 import services.payment.Charge
+import services.logging.Logging
+import models.checkout.Checkout.CheckoutFailedCashTransactionResolutionError
+import scala.Left
+import scala.Some
+import scala.Right
 
 
 // NOTE(SER-499): CashTransaction sets convention that payments to us are positive
@@ -36,7 +43,7 @@ package object checkout {
   type LineItemTypes = Seq[LineItemType[_]]
 }
 
-import checkout._
+import models.checkout.checkout._
 
 
 
@@ -44,12 +51,16 @@ import checkout._
 //
 // Services
 //
-class CheckoutServices @Inject() (
+case class CheckoutServices @Inject() (
   schema: Schema,
-  lineItemStore: LineItemStore
+  lineItemStore: LineItemStore,
+  customerStore: CustomerStore,
+  accountStore: AccountStore,
+  addressStore: AddressStore
 ) extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity]
   with SavesCreatedUpdated[CheckoutEntity]
 {
+
   override protected def table = schema.checkouts
 
   override def modelWithNewEntity(checkout: Checkout, entity: CheckoutEntity) = checkout.copy(entity)
@@ -73,17 +84,7 @@ class CheckoutServices @Inject() (
 }
 
 
-//
-// Entity
-//
-case class CheckoutEntity(
-  id: Long = 0,
-  customerId: Long = 0,
-  created: Timestamp = Time.defaultTimestamp,
-  updated: Timestamp = Time.defaultTimestamp
-) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-  override def unapplied = CheckoutEntity.unapply(this)
-}
+
 
 
 
@@ -93,13 +94,17 @@ case class CheckoutEntity(
 case class Checkout (
   _entity: CheckoutEntity,
   _typesOrItems: Either[LineItemTypes, LineItems],
+  _customer: Option[Customer],
   _additionalTypes: LineItemTypes = Nil,
   services: CheckoutServices = AppConfig.instance[CheckoutServices]
-) extends HasEntity[CheckoutEntity, Long] with KeyedCaseClass[Long]
+) extends HasEntity[CheckoutEntity, Long]
   with CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
 {
+  import Checkout._
 
-  // uses LineItems and LineItemTypes
+  //
+  // Checkout members
+  //
   lazy val lineItems: LineItems =  _typesOrItems match {
     case Right(items: LineItems) => resolveTypes(_additionalTypes, items)
     case Left(types: LineItemTypes) => resolveTypes(types)
@@ -110,16 +115,24 @@ case class Checkout (
     case Right(items: LineItems) => _additionalTypes ++ items.map(_.itemType)
   }
 
+  lazy val customer: Customer = _customer.getOrElse(
+    services.customerStore.findById(customerId).getOrElse(
+      throw new IllegalArgumentException("No customer associated with this checkout.")
+    )
+  )
+
 
 
   /**
-   * To be used for adding any line item types (products, discounts, refunds, etc)
+   * Adds unpersisted types to a persisted checkout (to queue up for an update) or adds to other
+   * types in an unpersisted checkout.
+   *
    * @param additionalTypes -- to be added to this checkout
    * @return If transacted, checkout with additionalTypes in _additionalTypes; otherwise, checkout
    *         with _additionalTypes added to lineItemTypes.
    */
   def withAdditionalTypes(additionalTypes: LineItemTypes) = {
-    if (id > 0) {
+    if (isPersisted) {
       this.copy(_additionalTypes = additionalTypes ++ _additionalTypes)
     } else {
       this.copy(_typesOrItems = Left(additionalTypes ++ lineItemTypes))
@@ -127,24 +140,47 @@ case class Checkout (
   }
 
   /**
+   * TODO(SER-499): work out customer details
+   *
    * Persists this checkout, its types, and its items
    * @return PersistedCheckout of the transacted checkout
    */
-  def transact(): Checkout = {
-    // TODO(SER-499): take charge information, make charge
+  def transact(
+    cashTransactionType: CashTransactionLineItemType //,customer: Option[Customer]
+  ): Either[CheckoutFailed, Checkout] = {
+    
 
     // TODO(SER-499): require payment/sum of [products, fees, taxes]/total and charges to be zero.
     // TODO(SER-499): make transact take checkout context
-    if (id > 0) {
-      updateTransaction()
+    if (isPersisted) {
+      updateTransaction(cashTransactionType)
 
     } else {
 
-      // Completely untransacted
-      val savedCheckout = this.insert()
-      val savedItems = savedCheckout.lineItems.map( item => item.transact(savedCheckout.id) )
 
-      this.copy(savedCheckout._entity, Right(savedItems))
+      // get cash transaction line item
+      val cashTransactionItem = cashTransactionType.lineItems(lineItems, Nil).headOption.getOrElse(
+        return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
+      )
+
+      // TODO(SER-499): make charge
+
+
+      // TODO(SER-499): wrap in db transaction
+      val savedCheckout = this.insert()
+      val savedItems = (cashTransactionItem +: savedCheckout.lineItems) map {
+        item => item.transact(savedCheckout)
+      }
+
+      // refund charge if transaction failed, return CheckoutFailed
+
+      // else return the saved checkout
+//      Right( this.copy(
+//        _entity = savedCheckout._entity,
+//        _typesOrItems = Right(savedItems)
+//      ))
+
+      Right( Checkout(savedCheckout._entity, savedItems))
     }
   }
 
@@ -157,10 +193,10 @@ case class Checkout (
    *
    * @return Updated checkout
    */
-  protected def updateTransaction(): Checkout = {
+  protected def updateTransaction(cashTransactionType: CashTransactionLineItemType): Either[CheckoutFailed, Checkout] = {
     // TODO(SER-499): clean this whole bessy up
     if (_additionalTypes.isEmpty) {
-      this // NOTE(SER-499): doesn't touch updated timestamp, is that okay?
+      Right(this) // NOTE(SER-499): doesn't touch updated timestamp, is that okay?
 
     } else {
       import LineItemNature._
@@ -196,7 +232,11 @@ case class Checkout (
 
       /** calculate new fees, taxes, total */
       // Has all tax, fee, & summary types, will apply them to entire checkout
-      val tempCheckout = new Checkout(CheckoutEntity(), Left(lineItemTypes))
+      val tempCheckout = new Checkout(
+        _entity = CheckoutEntity(),
+        _typesOrItems = Left(lineItemTypes),
+        _customer = _customer
+      )
 
       val grossNewTaxes = tempCheckout.lineItemsOfNature(Tax)
       val grossNewFees = tempCheckout.lineItemsOfNature(Fee)
@@ -205,6 +245,7 @@ case class Checkout (
       val newItems = netNewTaxes ++ netNewFees ++ lineItems.filter(item => _additionalTypes.contains(item.itemType))
 
 
+      // TODO(SER-499): replace with CheckoutFailed's
       assert(netNewTaxes.map(item => item.itemType).toSet.size == netNewTaxes.size, "There should be no duplicate taxes.")
       assert(netNewFees.map(item => item.itemType).toSet.size == netNewFees.size, "There should be no duplicate fees.")
 
@@ -213,14 +254,19 @@ case class Checkout (
       _typesOrItems match {
         case Right(alreadyTransactedItems: LineItems) =>
           // TODO(SER-499): require sum of amounts is zero
-          val newItemsTransacted = newItems.map( item => item.transact(id) )
+          val newItemsTransacted = newItems.map( item => item.transact(this) )
 
           val updatedLineItems = newItemsTransacted ++
             replaceItems(alreadyTransactedItems, Seq(tempCheckout.subtotal, tempCheckout.total))
 
-          this.copy(_typesOrItems = Right(updatedLineItems), _additionalTypes = Nil).update()
+          Right(
+            this.copy(
+              _typesOrItems = Right(updatedLineItems),
+              _additionalTypes = Nil
+            ).update()
+          )
 
-        case _ => throw new Exception("Cannot update checkout because it has not been inserted yet.")
+        case _ => Left(CheckoutFailedUpdatedUnpersistedError(this, cashTransactionType))
       }
 
     }
@@ -228,15 +274,12 @@ case class Checkout (
 
 
   //
-  // KeyedCaseClass members
-  //
-  override def id = _entity.id
-  override def unapplied = ( _entity, lineItems.map(item => item.unapplied).toSet )
-
-
-  //
   // utility members
   //
+  def account = customer.account
+  def addresses = account.addresses
+  def customerId = _entity.customerId
+
   def subtotal: SubtotalLineItem = lineItemsOfCodeType(CodeType.Subtotal).head
   def total: TotalLineItem = lineItemsOfCodeType(CodeType.Total).head
 
@@ -285,6 +328,7 @@ case class Checkout (
       }
     }
 
+    var i: Int = 0
     def resolve(pass: ResolutionPass): LineItems = {
       pass.execute match {
         case ResolutionPass(allItems, Nil) => allItems
@@ -301,21 +345,28 @@ case class Checkout (
 
 
 
-object Checkout {
-  import checkout._
+object Checkout extends Logging {
 
   // Create
-  def apply(types: LineItemTypes, zipcode: String) = {
+  def apply(types: LineItemTypes, zipcode: String, maybeCustomer: Option[Customer]) = {
     val maybeZipcode = if (zipcode.isEmpty) None else Some(zipcode)
-    val typesWithTaxesAndSummaries = types ++ taxesAndSummariesByZip(maybeZipcode)
+    val typesSansOldSummaries = types.filter(itemType => itemType.nature != LineItemNature.Summary)
+    val typesWithTaxesAndSummaries = typesSansOldSummaries ++ taxesAndSummariesByZip(maybeZipcode)
 
-    new Checkout(CheckoutEntity(), Left(typesWithTaxesAndSummaries))
+    new Checkout(
+      _entity = new CheckoutEntity(),
+      _typesOrItems = Left(typesWithTaxesAndSummaries),
+      _customer = maybeCustomer
+    )
   }
 
   // Restore
   def apply(entity: CheckoutEntity, items: LineItems) = {
-    assert(!items.exists(item => item.checkoutId != entity.id))
-    new Checkout(entity, Right(itemsWithSummaries(items)))
+    new Checkout(
+      _entity = entity,
+      _typesOrItems = Right(itemsWithSummaries(items)),
+      _customer = None
+    )
   }
 
 
@@ -334,15 +385,32 @@ object Checkout {
 
   protected def itemsWithSummaries(items: LineItems): LineItems = {
     val nonSummaries = items.filter (item => item.nature != LineItemNature.Summary )
-
-    val subtotal = items.find( item => item.codeType == CodeType.Subtotal )
-      .getOrElse(SubtotalLineItemType.lineItems(nonSummaries, Seq()).head)
-
-    val total = items.find( item => item.codeType == CodeType.Total )
-      .getOrElse(TotalLineItemType.lineItems(nonSummaries, Seq()).head)
+    val subtotal = SubtotalLineItemType.lineItems(nonSummaries, Seq()).head
+    val total = TotalLineItemType.lineItems(nonSummaries, Seq()).head
 
     subtotal +: (total +: nonSummaries)
   }
+
+
+  // TODO(SER-499): add more failure cases as they appear
+  sealed abstract class CheckoutFailed(val failedCheckoutData: FailedCheckoutData)
+
+  case class CheckoutFailedCashTransactionResolutionError(
+    checkout: Checkout,
+    cashTransaction: CashTransactionLineItemType
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransaction))
+
+  case class CheckoutFailedUpdatedUnpersistedError(
+    checkout: Checkout,
+    cashTransaction: CashTransactionLineItemType
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransaction))
+
 }
+
+// TODO(SER-499): move me to another file, add persistance and functionality
+case class FailedCheckoutData(
+  checkout: Checkout,
+  cashTransactionLineItemType: CashTransactionLineItemType
+)
 
 

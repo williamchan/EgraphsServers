@@ -3,90 +3,135 @@ package models.checkout
 import models.{CashTransactionStore, CashTransaction}
 import models.enums.{CashTransactionType, CodeType, LineItemNature}
 import org.joda.money.Money
-import scalaz.Lens
-import services.db.{QueriesAsEntity, CanInsertAndUpdateAsThroughServices, Schema}
+import scalaz.{Scalaz, Lens}
+import services.db.{InsertsAndUpdatesAsEntity, QueriesAsEntity, CanInsertAndUpdateAsThroughServices, Schema}
 import org.squeryl.PrimitiveTypeMode._
 import services.AppConfig
 import com.google.inject.Inject
 import play.api.libs.json.Json
 
 
-
-trait CashTransactionLineItemType extends LineItemType[CashTransaction] with HasLineItemTypeEntity {
-  override def nature = LineItemNature.Charge
-
-  // expected constructor arguments
-  def accountId: Long
-  def billingPostalCode: Option[String]
-  def stripeCardTokenId: Option[String]
-
-  override def codeType = _entity.codeType
-}
-
-case class StripeCashTransactionLineItemType (
+case class CashTransactionLineItemType (
+  _entity: LineItemTypeEntity,
   accountId: Long,
   billingPostalCode: Option[String],
   stripeCardTokenId: Option[String],
+  _maybeTransaction: Option[CashTransaction],
   services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
-) extends CashTransactionLineItemType {
+) extends LineItemType[CashTransaction] with HasLineItemTypeEntity
+  with LineItemTypeEntityLenses[CashTransactionLineItemType]
+  with LineItemTypeEntityGetters[CashTransactionLineItemType]
+{
+  import checkout._
 
-  override lazy val _entity = StripeCashTransactionLineItemType.entity
-
+  // TODO(SER-499): more Json
   override def toJson = ""
 
-  override def description = "Line item type for cash transaction made through Stripe"
-
-
-
   // lineItems makes line item for total from resolvedItems
-  override def lineItems(resolved: Seq[LineItem[_]], unresolved: Seq[LineItemType[_]])
-  : Seq[StripeCashTransactionLineItem] = {
-    for(total <- resolved.filter(item => item.codeType == CodeType.Total)) yield {
-      require(total.amount.isZero || stripeCardTokenId.isDefined, "Stripe card token required for non-zero totals.")
+  override def lineItems(resolved: LineItems, unresolved: LineItemTypes): Seq[CashTransactionLineItem] = {
+    _maybeTransaction match {
 
-      val txn = CashTransaction(
-        accountId = accountId,
-        billingPostalCode = billingPostalCode,
-        stripeCardTokenId = stripeCardTokenId
-      ) .withCashTransactionType(CashTransactionType.Checkout)
-        .withCash(total.amount)
+      case Some(txn: CashTransaction) => Seq(CashTransactionLineItem(this, txn))
 
-      StripeCashTransactionLineItem(this, txn)
+      case None => resolved.find(item => item.codeType == CodeType.Total) match {
+        case Some(total) =>
+          require(total.amount.isZero || stripeCardTokenId.isDefined,
+            "Stripe card token required for non-zero totals."
+          )
+
+          /** stripeChargeId set in Checkout transaction */
+          val txn = CashTransaction(
+            accountId = accountId,
+            billingPostalCode = billingPostalCode,
+            stripeCardTokenId = stripeCardTokenId
+          ) .withCashTransactionType(CashTransactionType.Checkout)
+            .withCash(total.amount.negated)
+
+
+          // NOTE(SER-499): this shouldn't ever actually change anything if used correctly
+          val txnType = if (total.amount.isNegative) {
+            this.entity.set(CashTransactionLineItemType.refundEntity)
+          } else {
+            this.entity.set(CashTransactionLineItemType.paymentEntity)
+          }
+
+          Seq(CashTransactionLineItem(txnType, txn))
+
+        case None => Nil
+      }
     }
   }
 
 
-}
-
-object StripeCashTransactionLineItemType {
-  type CashTransLITServices = CashTransactionLineItemTypeServices
-
-  def apply(cashTransaction: CashTransaction) = {
-    new StripeCashTransactionLineItemType(
-      cashTransaction.accountId,
-      cashTransaction.billingPostalCode,
-      cashTransaction.stripeCardTokenId
-    )
-  }
-
-
-  // TODO(SER-499): would like this to be a lazy val... maybe move into store or services
-  protected def entity(
-    implicit services: CashTransLITServices = AppConfig.instance[CashTransLITServices]
-  ): LineItemTypeEntity = {
-    LineItemTypeEntity(
-      desc = CodeType.StripeCashTransaction.name + " entity",
-      nature = LineItemNature.Charge,
-      codeType = CodeType.StripeCashTransaction
-    )
-  }
-
+  override protected lazy val entityLens = Lens[CashTransactionLineItemType, LineItemTypeEntity](
+    get = txnType => txnType._entity,
+    set = (txnType, newEntity) => txnType.copy(newEntity)
+  )
 }
 
 
 
 
 
+
+object CashTransactionLineItemType {
+
+  // TODO(SER-499): get entity from store or services instead since there's not really a need
+  // for multiple cash transaction line item types
+  def codeType = CodeType.CashTransaction
+  def refundEntity = entityMap(LineItemNature.Refund)
+  def paymentEntity = entityMap(LineItemNature.Payment)
+
+  /**
+   * This memoizes db calls to get the entities for payments and refund cash transaction line item types
+   * NOTE(SER-499): think of a way to make this more testable
+   */
+  private val entityMap = Scalaz.immutableHashMapMemo {
+    nature: LineItemNature => AppConfig.instance[CashTransactionLineItemTypeServices].findEntityByNature(nature)
+  }
+
+  //
+  // Create
+  //
+  def apply(accountId: Long, billingPostalCode: Option[String], stripeCardTokenId: Option[String]) = {
+    new CashTransactionLineItemType(
+      _entity = paymentEntity,
+      accountId = accountId,
+      billingPostalCode = billingPostalCode,
+      stripeCardTokenId = stripeCardTokenId,
+      _maybeTransaction = None
+    )
+  }
+
+  // TODO(SER-499): def payment and def refund, possibly replace use of apply
+
+  //
+  // Restore
+  //
+  def apply(entity: LineItemTypeEntity, cashTransaction: CashTransaction) = {
+    // TODO(SER-499): remove entity if not needed
+    new CashTransactionLineItemType(
+      _entity = entity,
+      accountId = cashTransaction.accountId,
+      billingPostalCode = cashTransaction.billingPostalCode,
+      stripeCardTokenId = cashTransaction.stripeCardTokenId,
+      _maybeTransaction = Some(cashTransaction)
+    )
+  }
+
+
+  // TODO(SER-499): manage entity in a reasonably performant way, considering that it may be a singleton
+  //  type CashTxnLITServices = CashTransactionLineItemTypeServices
+  //  protected def entity(
+  //    implicit services: CashTxnLITServices = AppConfig.instance[CashTxnLITServices]
+  //  ): LineItemTypeEntity = {
+  //    LineItemTypeEntity(
+  //      desc = CodeType.CashTransaction.name + " entity",
+  //      nature = LineItemNature.Charge,
+  //      codeType = CodeType.CashTransaction
+  //    )
+  //  }
+}
 
 
 
@@ -102,13 +147,42 @@ object StripeCashTransactionLineItemType {
 
 case class CashTransactionLineItemTypeServices @Inject() (
   schema: Schema
-) {
+) extends SavesAsLineItemTypeEntity[CashTransactionLineItemType] {
+  import org.squeryl.PrimitiveTypeMode._
+
+  override protected def modelWithNewEntity(
+    txn: CashTransactionLineItemType,
+    newEntity: LineItemTypeEntity
+  ): CashTransactionLineItemType = { txn.entity.set(newEntity) }
+
+  protected def codeType = CashTransactionLineItemType.codeType
+
+  protected def entityDesc(nature: LineItemNature) = {
+    "%s %s entity".format(codeType.name, nature.name)
+  }
+
+  protected def entityFromNature(nature: LineItemNature) = {
+    LineItemTypeEntity(entityDesc(nature), nature, codeType)
+  }
+
+  def findEntityByNature(nature: LineItemNature) = {
+    schema.lineItemTypes.where(entity =>
+      entity._codeType === codeType.name and entity._nature === nature.name
+    ).headOption.getOrElse(
+      this.insert(entityFromNature(nature))
+    )
+  }
+
 
 }
+
+
+
 
 
 class CashTransactionLineItemTypeStore @Inject() (
   schema: Schema
 ) {
+
 
 }

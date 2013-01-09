@@ -17,10 +17,12 @@ case class SubtotalLineItem (
   }
 
 
+  //
   // NOTE(SER-499): unused
+  //
   override val id: Long = checkout.Unpersisted
   override def domainObject = amount
-  override def transact(checkoutId: Long) = this
+  override def transact(checkout: Checkout) = this
   override def checkoutId = checkout.Unpersisted
   override def withCheckoutId(newCheckoutId: Long) = this
   override def subItems = Nil
@@ -46,6 +48,8 @@ object SubtotalLineItemType extends SubtotalLineItemType {
     resolvedItems: Seq[LineItem[_]],
     pendingResolution: Seq[LineItemType[_]]
   ): Seq[SubtotalLineItem] = {
+
+    // TODO(refunds): at this point, it may be good if refunds of specific items have been applied or are factored into calculations here
     def isProduct(itemType: LineItemType[_]) = itemType.nature == LineItemNature.Product
 
     pendingResolution.filter(isProduct(_)) match {

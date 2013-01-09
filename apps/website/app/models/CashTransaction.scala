@@ -33,7 +33,6 @@ case class CashTransaction(
   _cashTransactionType: String = "",
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
-  lineItemTypeId: Option[Long] = None,
   lineItemId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,

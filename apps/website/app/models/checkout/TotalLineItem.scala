@@ -15,10 +15,13 @@ case class TotalLineItem (
     ""
   }
 
+
+  //
   // NOTE(SER-499): unused
+  //
   override val id: Long = checkout.Unpersisted
   override def domainObject = amount
-  override def transact(checkoutId: Long) = this
+  override def transact(checkout: Checkout) = this
   override def checkoutId = checkout.Unpersisted
   override def withCheckoutId(newCheckoutId: Long) = this
   override def subItems = Nil
@@ -36,7 +39,9 @@ object TotalLineItemType extends TotalLineItemType {
 
 
   /**
-   * Sums the taxes, fees
+   * Sums everything except the subtotal. (Could use subtotal in place of products and refunds, but
+   * re-summing over the products seems more robust against errors.)
+   *
    * @param resolvedItems
    * @param pendingResolution
    * @return Seq(new line items) if the line item type was successfully applied.
@@ -46,20 +51,19 @@ object TotalLineItemType extends TotalLineItemType {
     resolvedItems: Seq[LineItem[_]],
     pendingResolution: Seq[LineItemType[_]]
   ): Seq[TotalLineItem] = {
-    def isNeededItem(item: LineItem[_]) = isNeededType(item.itemType)
-    def isNeededType(itemType: LineItemType[_]) = itemType.nature != LineItemNature.Summary
+    import LineItemNature._
 
-    pendingResolution.find(isNeededType) match {
-      case None =>
-        val totalAmount = resolvedItems.foldLeft(Money.zero(CurrencyUnit.USD)) { (acc, next) =>
-          if (isNeededItem(next)) acc plus next.amount else acc
-        }
+    if (pendingResolution.isEmpty) {
 
-        Seq(TotalLineItem(totalAmount))
-      case _ => Nil
+      val totalAmount = resolvedItems.foldLeft(Money.zero(CurrencyUnit.USD)) { (acc, next) =>
+        if (next.nature != Summary) acc plus next.amount else acc
+      }
+
+      Seq(TotalLineItem(totalAmount))
+
+    } else {
+      Nil
 
     }
-    // Want to sum subtotal, discounts, tax, and fees
-
   }
 }

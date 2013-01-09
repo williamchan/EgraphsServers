@@ -34,10 +34,10 @@ case class TaxLineItem private (
 
 
 
-  override def transact(newCheckoutId: Long): TaxLineItem = {
+  override def transact(checkout: Checkout): TaxLineItem = {
     if (id <= 0) {
-      this.withItemType( itemType.insert() )
-        .withCheckoutId( newCheckoutId )
+      this.withItemType(itemType.insert())
+        .withCheckoutId(checkout.id)
         .insert()
 
     } else {
@@ -51,11 +51,17 @@ case class TaxLineItem private (
   }
 
 
+  //
+  // EntityLens members
+  //
   override protected lazy val entityLens = Lens[TaxLineItem, LineItemEntity] (
     get = tax => tax._entity,
     set = (tax, entity) => tax.copy(entity)
   )
 }
+
+
+
 
 object TaxLineItem {
   def apply(itemType: TaxLineItemType, amount: Money) = {
