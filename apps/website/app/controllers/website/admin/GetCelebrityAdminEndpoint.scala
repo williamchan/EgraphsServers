@@ -1,17 +1,13 @@
 package controllers.website.admin
 
-import play.api.mvc.Controller
-import models.{AccountStore, CelebrityStore, Celebrity}
+import models.{CelebrityAccesskey, AccountStore, CelebrityStore, Celebrity}
 import models.enums.PublishedStatus
 import models.categories._
-import controllers.WebsiteControllers
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import play.api.mvc.{Action, Controller}
-import play.api.mvc.Results.{Ok, Redirect, NotFound}
 import controllers.website.consumer.CelebrityLandingConsumerEndpoint
-import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
-import org.apache.commons.lang3.StringEscapeUtils
+import services.mvc.ImplicitHeaderAndFooterData
 
 private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -44,11 +40,17 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               val (errorFields, fieldDefaults) = getCelebrityDetail(celebrity = Some(celebrity))
               val celebCategoryValueIds = (for(filterValue <- celebrity.categoryValues) yield { filterValue.id }).toSet
 
+              val urlWithAccesskey = CelebrityAccesskey.urlWithAccesskey(
+                controllers.routes.WebsiteControllers.getCelebrityLanding(celebrity.urlSlug).url,
+                CelebrityAccesskey.accesskey(celebrity.id)
+              )
+
               Ok(views.html.Application.admin.admin_celebritydetail(
                 isCreate = false,
                 errorFields = errorFields,
                 fields = fieldDefaults,
-                celebrity = Option(celebrity),
+                celebrity = Some(celebrity),
+                urlWithAccesskey = Some(urlWithAccesskey),
                 currentCategoryValueIds = celebCategoryValueIds,
                 categoryValueCategories = categoryValueStore.findCategoryValueCategoryViewModel))
             }

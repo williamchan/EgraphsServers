@@ -11,7 +11,7 @@ class HttpFilters @Inject()(
   val requireAuthenticityTokenFilter: RequireAuthenticityTokenFilter,
   val requireCelebrityAndProductUrlSlugs: RequireCelebrityAndProductUrlSlugs,
   val requireCelebrityId: RequireCelebrityId,
-  val requireCelebrityPublished: RequireCelebrityPublished,
+  val requireCelebrityPublishedAccess: RequireCelebrityPublishedAccess,
   val requireCelebrityUrlSlug: RequireCelebrityUrlSlug,
   val requireCustomerLogin: RequireCustomerLogin,
   val requireCustomerUsername: RequireCustomerUsername,
@@ -21,7 +21,7 @@ class HttpFilters @Inject()(
   val requireOrderIdOfCelebrity: RequireOrderIdOfCelebrity,
   val requirePrintOrderId: RequirePrintOrderId,
   val requireProductId: RequireProductId,
-  val requireProductPublished: RequireProductPublished,
+  val requireProductPublishedAccess: RequireProductPublishedAccess,
   val requireProductUrlSlug: RequireProductUrlSlug,
   val requireSessionId: RequireSessionId
 )
