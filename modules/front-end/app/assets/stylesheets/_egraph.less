@@ -1,5 +1,3 @@
-@import "_bootstrap.less";
-
 .linear-gradient-multi( ... ) {
   background-image: -webkit-linear-gradient(@arguments);
   background-image: -moz-linear-gradient(@arguments);
@@ -22,6 +20,7 @@
 //
 @darkestBackground: darken(#dfe5e6, 5%);
 @spotlightColor: white;
+@frameShadow: -6px 10px 12px 0px rgba(0, 0, 0, .4);
 
 //
 // Portrait variables
@@ -57,13 +56,19 @@
 @plaqueWidth: 385px;
 @plaqueHeight: 94px;
 
+//
+// Guider Variables 
+//
+
+@innerBorderColor: #E6E6E6;
+
 
 @font-face {
   font-family: "Bebas Neue";
   src:url('/assets/typefaces/BebasNeue.otf')
 }
 
-html.egraph-page {
+body.egraph-page {
   @bgGradientStart: 5px;
   
   @step1Color: lighten(@darkestBackground, 10%);
@@ -76,6 +81,102 @@ html.egraph-page {
 
   @step3Color: lighten(@darkestBackground, 7%);
   @step3TransitionHeight: @step2MaintenanceHeight + 268px;
+
+  .egraph-guider {
+    background: @white;
+    border: 1px solid @gray;
+    position: absolute;
+    padding: 9px 0px 9px 0px;
+    z-index: 100;
+    text-align: center;
+
+    .xButton {
+      float: right;
+      margin-top: -5px;
+      margin-right: 5px;
+      background: @white;
+    }
+
+    .box-shadow(@frameShadow);
+    
+    .border-radius(4px);
+
+    .guiders_description {
+      padding: 15px;
+      margin-bottom: 0px;
+      //border-bottom: 1px solid @innerBorderColor; 
+    }
+
+    .guiders_buttons_container {
+      margin-left: 15px;
+      margin-right: 15px;
+      height: 36px;
+      position: relative;
+
+      .guiders_button {
+        cursor: pointer;
+        display: inline-block;
+        .border-radius(2px);
+
+        &.next {
+          float: right;
+        }
+
+        &.close-guider {
+          margin-top: 4px;
+          border-bottom: 1px dotted @grayDarker;
+          float: left;
+          color: @grayDarker;
+        }
+      }
+    }
+
+    .guiders_arrow {
+      width: 42px;
+      height: 42px;
+      position: absolute;
+      display: none;
+      background-repeat: no-repeat;
+      z-index: 100000006 !important;
+      background-image: url(/assets/images/guiders_arrows.png);
+    }
+
+    .guiders_arrow_right {
+      display: block;
+      background-position: 0px 0px;
+      right: -42px;
+    }
+    .guiders_arrow_down {
+      display: block;
+      background-position: 0px -42px;
+      bottom: -42px;
+    }
+    .guiders_arrow_up {
+      display: block;
+      background-position: 0px -126px;
+      top: -42px;
+    }
+    .guiders_arrow_left {
+      display: block;
+      background-position: 0px -84px;
+      left: -42px;
+    }
+  }
+
+  #guiders_overlay {
+    background-color: #000;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    opacity: 0.5;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    z-index: 10;
+  }
+
+
 
   //
   // START BACKGROUND GRADIENT
@@ -99,11 +200,7 @@ html.egraph-page {
 
   // Make sure the gradient is always visible no matter page size. This is mostly
   // due to warping that happens with the SoundManager <embed>
-  background-size:auto 200%; 
-
-  body {
-    background:none;
-  }
+  background-size:auto 200%;
 
   .container {
     // Change the usual 940px width to 1000px for the egraph page
@@ -120,7 +217,7 @@ html.egraph-page {
       background-color:#333;
 
       .frame {
-        .box-shadow(-6px 10px 12px 0px rgba(0, 0, 0, .4));
+        .box-shadow(@frameShadow);
         border-top:1px solid white;
       }
 

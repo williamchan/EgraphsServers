@@ -185,8 +185,10 @@
     </ol>
     <h2>Egraph Page</h2>
     <ol>
-      @catalogEntry("Egraph/portrait", "Portrait orientation")
-      @catalogEntry("Egraph/landscape", "Landscape orientation")
+      @catalogEntry(routes.Egraph.portrait(isPromotional = false).url, "Portrait orientation")
+      @catalogEntry(routes.Egraph.landscape(isPromotional = false).url, "Landscape orientation")
+      @catalogEntry(routes.Egraph.portrait(isPromotional = true).url, "Promotional Portrait")
+      @catalogEntry(routes.Egraph.landscape(isPromotional = true).url, "Promotional Landscape")
     </ol>    
     <h2>Emails</h2>
     <ol>
