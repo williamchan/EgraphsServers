@@ -70,18 +70,6 @@ class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inve
     )
   }
 
-  @deprecated("Stop using this instead use getAvailableInventoryBatches", "SER-656")
-  def getActiveInventoryBatches(product: Product): Query[InventoryBatch] = {
-    from(schema.inventoryBatches, schema.inventoryBatchProducts)((inventoryBatch, association) =>
-      where(
-        inventoryBatch.id === association.inventoryBatchId
-          and association.productId === product.id
-          and FilterOneTable.reduceFilters(List(inventoryBatchQueryFilters.activeOnly), inventoryBatch)
-      )
-        select (inventoryBatch)
-    )
-  }
-
   /**
    * Get available inventory batches by quantity and time for provided product.
    * (They are ordered by end date ascending.)

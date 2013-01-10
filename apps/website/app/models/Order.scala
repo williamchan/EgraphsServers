@@ -18,13 +18,12 @@ import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import social.{Twitter, Facebook}
-import controllers.website.GetEgraphEndpoint
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import db.Deletes
 import java.sql.Connection
 import services.db.CurrentTransaction
-import org.joda.time.DateTimeConstants
+import org.joda.time.{DateMidnight, DateTimeConstants}
 import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 
@@ -44,8 +43,7 @@ case class OrderServices @Inject() (
 )
 
 object Order {
-  val defaultExpectedDelay: Long = 30 * DateTimeConstants.MILLIS_PER_DAY
-  def defaultExpectedDate: Date = expectedDateFromDelay(defaultExpectedDelay)
+  def defaultExpectedDate: Date = new DateMidnight().plusDays(30).toDate
 
   /**
    * Gets the Date with delay applied to the current day, rounded up to the nearest day.
@@ -71,7 +69,8 @@ object Order {
    * Gets you the expected delivery date of the celebrity. 
    */
   def expectedDeliveryDate(celebrity: Celebrity): Date = {
-    Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
+    Order.defaultExpectedDate
+//    Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
   }
 }
 
@@ -273,7 +272,7 @@ case class Order(
 
     email.addReplyTo("webserver@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val viewEgraphUrl = services.consumerApp.absoluteUrl(GetEgraphEndpoint.url(id))
+    val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(id).url)
     val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
@@ -712,7 +711,7 @@ object GalleryOrderFactory {
         .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
         .scaledToWidth(product.frame.thumbnailWidthPixels)
       val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-      val viewEgraphUrl = consumerApp.absoluteUrl(GetEgraphEndpoint.url(order.id))
+      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
 
       val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
         fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),

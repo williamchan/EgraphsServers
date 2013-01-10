@@ -7,6 +7,7 @@ import services.ConsumerApplication
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import services.mvc.ImplicitHeaderAndFooterData
+import services.mvc.egraphs.EgraphView
 
 private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
 
@@ -21,7 +22,7 @@ private[controllers] trait GetEgraphAdminEndpoint extends ImplicitHeaderAndFoote
       httpFilters.requireEgraphId(egraphId) { egraph =>
       	Action { implicit request =>
       	  if (action == "preview") {
-            Ok(GetEgraphEndpoint.html(egraph = egraph, order = egraph.order, consumerApp = consumerApp))
+            Ok(EgraphView.renderEgraphPage(egraph=egraph, order=egraph.order, consumerApp = consumerApp))
           } else {
             val order = egraph.order
             val buyer = order.buyer
