@@ -18,13 +18,12 @@ import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import social.{Twitter, Facebook}
-import controllers.website.GetEgraphEndpoint
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import db.Deletes
 import java.sql.Connection
 import services.db.CurrentTransaction
-import org.joda.time.DateTimeConstants
+import org.joda.time.{DateMidnight, DateTimeConstants}
 import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 
@@ -44,8 +43,7 @@ case class OrderServices @Inject() (
 )
 
 object Order {
-  val defaultExpectedDelay: Long = 30 * DateTimeConstants.MILLIS_PER_DAY
-  def defaultExpectedDate: Date = expectedDateFromDelay(defaultExpectedDelay)
+  def defaultExpectedDate: Date = new DateMidnight().plusDays(30).toDate
 
   /**
    * Gets the Date with delay applied to the current day, rounded up to the nearest day.
