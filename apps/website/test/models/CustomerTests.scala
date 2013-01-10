@@ -138,7 +138,7 @@ class CustomerTests extends EgraphsUnitTest
     customerStore.findOrCreateByEmail(account.email, "joe fan") should be(customer)
   }
 
-  "findOrCreateByEmail" should "create an username when it creates." in new EgraphsTestApplication {
+  it should "create an username when it creates." in new EgraphsTestApplication {
     val (customer, _) = createCustomerWithFindOrCreateByEmail()
     usernameHistoryStore.findCurrentByCustomer(customer) should not be (None)
   }

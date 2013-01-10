@@ -48,7 +48,7 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest with DBTransact
     viewModel.withAffiliateMarketing should be(false)
   }
   
-  "fromOrder" should "set printPrice and hasPrintOrder when there is an associated PrintOrder" in new EgraphsTestApplication {    
+  it should "set printPrice and hasPrintOrder when there is an associated PrintOrder" in new EgraphsTestApplication {    
     val order = TestData.newSavedOrder()
     val product = order.product
     val printOrder = PrintOrder(orderId = order.id).save()
@@ -62,7 +62,7 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest with DBTransact
     viewModel.hasPrintOrder should be(true)
   }
   
-  "fromOrder" should "set totalPrice to zero if no associated CashTransaction was provided" in new EgraphsTestApplication {    
+  it should "set totalPrice to zero if no associated CashTransaction was provided" in new EgraphsTestApplication {    
     val order = TestData.newSavedOrder()
     val product = order.product
     val printOrder = PrintOrder(orderId = order.id).save()

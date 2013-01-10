@@ -115,17 +115,15 @@ trait PostOrderAdminEndpoint { this: Controller =>
                 Form(single("newProductId" -> number)).bindFromRequest().fold(
                   errors => BadRequest(Html("<html><body> Incorrect Product Id </body></html>")),
                   newProductId => {
-                    val maybeOk = for{
-                      product <- productStore.findById(newProductId)
-                      inventoryBatch <- inventoryBatchStore.getActiveInventoryBatches(product).filter(batch => batch.hasInventory).headOption
+                    val badRequestOrRedirect = for{
+                      product <- productStore.findById(newProductId).toRight(BadRequest(Html("<html><body> Incorrect product id = " + newProductId + " </body></html>"))).right
+                      inventoryBatch <- inventoryBatchStore.getAvailableInventoryBatches(product).headOption.toRight(BadRequest(Html("<html><body> No inventory batch for product id = " + newProductId + " </body></html>"))).right
                     } yield {
                       // create a new order
                       val newOrder = order.rejectAndCreateNewOrderWithNewProduct(product, inventoryBatch)
                       Redirect(GetOrderAdminEndpoint.url(newOrder.id))  
                     }
-                    maybeOk.getOrElse(
-                      BadRequest(Html("<html><body> Incorrect product id or no inventory batch for = " + newProductId + " </body></html>"))
-                    )
+                    badRequestOrRedirect.merge
                   }
                 )
               }

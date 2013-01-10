@@ -23,7 +23,7 @@ class ProductViewConversions(product: Product) {
    * @param quantityRemaining the remaining inventory before the product is "sold out".
    */
   def asChoosePhotoTileView(celebrityUrlSlug: String = product.celebrity.urlSlug,
-                            quantityRemaining: Int = product.remainingInventoryCount,
+                            quantityRemaining: BigInt = product.remainingInventoryCount,
                             accesskey: String = "")
   : ChoosePhotoTileProduct =
   {
@@ -48,7 +48,7 @@ class ProductViewConversions(product: Product) {
    * @param celebUrlSlug identifies the celebrity for forming the link to post the product selection.
    */
   def asChoosePhotoCarouselView(celebUrlSlug: String=product.celebrity.urlSlug,
-                                quantityRemaining: Int = product.remainingInventoryCount,
+                                quantityRemaining: BigInt = product.remainingInventoryCount,
                                 fbAppId: String,
                                 consumerApp: ConsumerApplication)(implicit request: RequestHeader)
   : ChoosePhotoCarouselProduct =
