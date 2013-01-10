@@ -32,13 +32,6 @@ case class InventoryBatch(
     services.celebStore.get(celebrityId)
   }
 
-  /**
-   * @return Date 7 days after endDate
-   */
-  def getExpectedDate: Date = {
-    new DateTime(endDate).plusDays(7).toDate
-  }
-
   def getRemainingInventory: Int = {
     numInventory - services.orderStore.countOrders(List(id))
   }

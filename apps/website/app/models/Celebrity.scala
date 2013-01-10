@@ -26,6 +26,7 @@ import services.db.DBSession
 import org.joda.time.DateTimeConstants
 import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.CatalogStarsQuery
+import java.util.Date
 import org.apache.commons.codec.binary.Base64
 
 /**

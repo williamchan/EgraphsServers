@@ -278,6 +278,7 @@ case class Product(
    * The most appropriate is the one that will get egraph to the customer fastest, which is
    * the inventory batch that ends the soonest.
    */
+  // TODO: SER-656 fix this, it is broken.  It isn't even checking to make sure there is inventory available.
   def nextInventoryBatchToEnd: Option[InventoryBatch] = {
     val batches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
 

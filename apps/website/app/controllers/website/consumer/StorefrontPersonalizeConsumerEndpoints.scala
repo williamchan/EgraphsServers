@@ -16,6 +16,7 @@ import controllers.routes.WebsiteControllers.{
   getStorefrontReview, 
   getStorefrontPersonalize => reverseGetStorefrontPersonalize
 }
+import models.Order
 
 /**
  * Manages GET and POST of the egraph purchase personalization form.
@@ -74,10 +75,10 @@ trait StorefrontPersonalizeConsumerEndpoints
             import PersonalizeForm.Params
   
             PersonalizeFormView.empty(
-              actionUrl=actionTarget,
-              isGiftParam=Params.IsGift,
-              recipientNameParam=Params.RecipientName,
-              recipientEmailParam=Params.RecipientEmail,
+              actionUrl = actionTarget,
+              isGiftParam = Params.IsGift,
+              recipientNameParam = Params.RecipientName,
+              recipientEmailParam = Params.RecipientEmail,
               messageOptionParam = Params.WrittenMessageRequest,
               messageTextParam = Params.WrittenMessageRequestText,
               noteToCelebrityParam = Params.NoteToCelebrity,
@@ -95,16 +96,16 @@ trait StorefrontPersonalizeConsumerEndpoints
           )
   
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)
-  
+
           Ok(views.html.frontend.celebrity_storefront_personalize(
-            form=formView,
-            guaranteedDelivery=nextInventoryBatch.getExpectedDate,
-            writtenMessageCharacterLimit=PurchaseFormChecks.maxWrittenMessageChars,
-            messageToCelebrityCharacterLimit=PurchaseFormChecks.maxNoteToCelebChars,
-            orderSummary=orderSummary,
-            productPreviewUrl=product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
-            orientation=product.frame.previewCssClass
-          ))
+            form = formView,
+            guaranteedDelivery = Order.expectedDeliveryDate(celeb),
+            writtenMessageCharacterLimit = PurchaseFormChecks.maxWrittenMessageChars,
+            messageToCelebrityCharacterLimit = PurchaseFormChecks.maxNoteToCelebChars,
+            orderSummary = orderSummary,
+            productPreviewUrl = product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
+            orientation = product.frame.previewCssClass)
+          )
         }
         
         redirectOrOk.merge

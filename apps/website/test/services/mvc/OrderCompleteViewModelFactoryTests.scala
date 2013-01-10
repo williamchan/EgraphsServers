@@ -25,15 +25,15 @@ class OrderCompleteViewModelFactoryTests extends EgraphsUnitTest with DBTransact
     val inventoryBatch = order.inventoryBatch
     val buyerAccount = buyer.account
     val product = order.product
-    val celeb = product.celebrity
+    val celebrity = product.celebrity
     val cashTransaction = CashTransaction(orderId = Some(order.id), accountId = order.buyer.account.id,
         amountInCurrency = product.priceInCurrency).withCashTransactionType(CashTransactionType.EgraphPurchase).save()
 
     val viewModel = new OrderCompleteViewModelFactory(smartMock[ConfigFileProxy]).fromOrder(order)
     viewModel.buyerEmail should be (buyerAccount.email)
     viewModel.buyerName should be (buyer.name)
-    viewModel.celebName should be (celeb.publicName)
-    viewModel.expectedDeliveryDate should be (inventoryBatch.getExpectedDate)
+    viewModel.celebName should be (celebrity.publicName)
+    viewModel.expectedDeliveryDate should be (Order.expectedDeliveryDate(celebrity))
     viewModel.orderDate should be (order.created)
     viewModel.orderNumber should be (order.id)
     viewModel.ownerEmail should be (recipientAccount.email)

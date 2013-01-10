@@ -93,7 +93,8 @@ case class Customer(
         messageToCelebrity = messageToCelebrity,
         requestedMessage = requestedMessage,
         inventoryBatchId = inventoryBatch.id,
-        expectedDate = Order.expectedDateFromDelay(product.celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE))
+        expectedDate = Order.expectedDeliveryDate(product.celebrity)
+      )
 
       // If admin review is turned off (eg to expedite demos), create the Order already approved
       if (services.config.adminreviewSkip) {

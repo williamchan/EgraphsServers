@@ -15,6 +15,8 @@ import services.blobs.AccessPolicy
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import controllers.routes.WebsiteControllers.{getStorefrontReview => reverseGetStorefrontReview}
+import org.joda.time.DateTimeConstants
+import models.Order
 
 /**
  * Manages GET and POST of the Review page in the purchase flow.
@@ -86,7 +88,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
             recipientName = validPersonalizeForm.recipientName,
             noteToCelebrity = validPersonalizeForm.noteToCelebrity,
             basePrice = product.price,
-            guaranteedDelivery = inventoryBatch.getExpectedDate,
+            guaranteedDelivery = Order.expectedDeliveryDate(celeb),
             highQualityPrintParamName = Params.HighQualityPrint,
             highQualityPrint = doPrint,
             actionUrl = controllers.routes.WebsiteControllers.postStorefrontReview(celebrityUrlSlug, productUrlSlug).url,
