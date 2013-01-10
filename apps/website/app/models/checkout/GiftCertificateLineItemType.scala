@@ -28,7 +28,7 @@ case class GiftCertificateLineItemType (
 
   override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
     val giftCertificate = GiftCertificate(recipient, amount)
-    Seq(GiftCertificateLineItem(this, giftCertificate))
+    Some(Seq(GiftCertificateLineItem(this, giftCertificate)))
   }
 
   override def id = _entity.id

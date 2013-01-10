@@ -57,6 +57,8 @@ case class CashTransactionLineItem(
   override def transact(checkout: Checkout) = {
     // TODO(SER-499): persist entity and type (type entity as of now should be singleton)
     if (id <= 0) {
+      assert(checkout.account.id > 0)
+
       val savedItem = this.withCheckoutId(checkout.id).insert()
       val savedCashTxn = domainObject.copy(
         accountId = checkout.account.id,
@@ -73,6 +75,7 @@ case class CashTransactionLineItem(
 
   def makeCharge(): CashTransactionLineItem = {
     // TODO(SER-499): charge through payment services and update cash transaction
+    println("making charge")
     this
   }
 
@@ -81,6 +84,7 @@ case class CashTransactionLineItem(
     // TODO(SER-499): implement charge refunding
     // [[[domainObject.stripeChargeId.map ( services.payment.refund _ )]]]
     println("aborting and refunding charge")
+    this
   }
 
 

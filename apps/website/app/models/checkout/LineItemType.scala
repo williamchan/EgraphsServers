@@ -48,7 +48,7 @@ trait LineItemType[+TransactedT] {
   def lineItems(
     resolvedItems: Seq[LineItem[_]],
     pendingResolution: Seq[LineItemType[_]]
-  ): Seq[LineItem[TransactedT]]
+  ): Option[Seq[LineItem[TransactedT]]] // or Seq[Option[...]]
 }
 
 

@@ -1,5 +1,6 @@
 package models.checkout
 
+import checkout._
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{CodeType, LineItemNature}
 
@@ -47,10 +48,7 @@ object TotalLineItemType extends TotalLineItemType {
    * @return Seq(new line items) if the line item type was successfully applied.
    *         Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
-  override def lineItems(
-    resolvedItems: Seq[LineItem[_]],
-    pendingResolution: Seq[LineItemType[_]]
-  ): Seq[TotalLineItem] = {
+  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
     import LineItemNature._
 
     if (pendingResolution.isEmpty) {
@@ -59,10 +57,10 @@ object TotalLineItemType extends TotalLineItemType {
         if (next.nature != Summary) acc plus next.amount else acc
       }
 
-      Seq(TotalLineItem(totalAmount))
+      Some(Seq(TotalLineItem(totalAmount)))
 
     } else {
-      Nil
+      None
 
     }
   }

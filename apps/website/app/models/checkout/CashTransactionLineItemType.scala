@@ -28,10 +28,10 @@ case class CashTransactionLineItemType (
   override def toJson = ""
 
   // lineItems makes line item for total from resolvedItems
-  override def lineItems(resolved: LineItems, unresolved: LineItemTypes): Seq[CashTransactionLineItem] = {
+  override def lineItems(resolved: LineItems, unresolved: LineItemTypes = Nil) = {
     _maybeTransaction match {
 
-      case Some(txn: CashTransaction) => Seq(CashTransactionLineItem(this, txn))
+      case Some(txn: CashTransaction) => Some(Seq(CashTransactionLineItem(this, txn)))
 
       case None => resolved.find(item => item.codeType == CodeType.Total) match {
         case Some(total) =>
@@ -55,9 +55,9 @@ case class CashTransactionLineItemType (
             this.entity.set(CashTransactionLineItemType.paymentEntity)
           }
 
-          Seq(CashTransactionLineItem(txnType, txn))
+          Some(Seq(CashTransactionLineItem(txnType, txn)))
 
-        case None => Nil
+        case None => None
       }
     }
   }

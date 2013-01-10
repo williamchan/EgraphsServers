@@ -1,5 +1,6 @@
 package models.checkout
 
+import checkout._
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{CodeType, LineItemNature}
 
@@ -44,24 +45,21 @@ object SubtotalLineItemType extends SubtotalLineItemType {
    * @return Seq(new line items) if the line item type was successfully applied.
    *         Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
-  override def lineItems(
-    resolvedItems: Seq[LineItem[_]],
-    pendingResolution: Seq[LineItemType[_]]
-  ): Seq[SubtotalLineItem] = {
+  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
 
     // TODO(refunds): at this point, it may be good if refunds of specific items have been applied or are factored into calculations here
     def isProduct(itemType: LineItemType[_]) = itemType.nature == LineItemNature.Product
 
     pendingResolution.filter(isProduct(_)) match {
-      case Seq(_) => Nil
-      case Nil => Seq {
+      case Seq(_) => None
+      case Nil => Some( Seq {
         val amount: Money = resolvedItems.foldLeft (Money.zero(CurrencyUnit.USD)) {
           (acc, next) =>
             if (isProduct(next.itemType)) next.amount plus acc.getAmount
             else acc
         }
         new SubtotalLineItem(amount)
-      }
+      })
     }
   }
 }

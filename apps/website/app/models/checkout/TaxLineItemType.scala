@@ -58,9 +58,9 @@ case class TaxLineItemType protected (
 
         // (subtotal - discounts) * tax rate
         val taxAmount = (subtotal.amount minus totalDiscount) multipliedBy (taxRate.bigDecimal, java.math.RoundingMode.UP)
-        Seq(TaxLineItem(this, taxAmount))
+        Some(Seq(TaxLineItem(this, taxAmount)))
 
-      case _ => Nil
+      case _ => None
     }
   }
 

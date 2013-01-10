@@ -4,19 +4,17 @@ package models.checkout
 
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums._
-import org.squeryl.KeyedEntity
 import org.squeryl.PrimitiveTypeMode._
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db._
 import models._
 import com.google.inject.Inject
-import services.payment.Charge
 import services.logging.Logging
-import models.checkout.Checkout.CheckoutFailedCashTransactionResolutionError
 import scala.Left
 import scala.Some
 import scala.Right
+import exception.InsufficientInventoryException
 
 
 // NOTE(SER-499): CashTransaction sets convention that payments to us are positive
@@ -56,7 +54,8 @@ case class CheckoutServices @Inject() (
   lineItemStore: LineItemStore,
   customerStore: CustomerStore,
   accountStore: AccountStore,
-  addressStore: AddressStore
+  addressStore: AddressStore,
+  dbSession: DBSession
 ) extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity]
   with SavesCreatedUpdated[CheckoutEntity]
 {
@@ -157,32 +156,43 @@ case class Checkout (
 
     } else {
 
-
-      // get cash transaction line item
-      val cashTransactionItem = cashTransactionType.lineItems(lineItems, Nil).headOption.getOrElse(
-        return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
-      )
-
-      // TODO(SER-499): make charge
-
-
-      // TODO(SER-499): wrap in db transaction
-      val savedCheckout = this.insert()
-      val savedItems = (cashTransactionItem +: savedCheckout.lineItems) map {
-        item => item.transact(savedCheckout)
+      // get cash transaction line item with charge
+      val cashTransactionItem = cashTransactionType.lineItems(lineItems) match {
+        case Some((txnItem: CashTransactionLineItem) :: _) => txnItem.makeCharge()
+        // case Some(Nil) => // possible case for checkouts that don't need a cash transaction?
+        case _ => return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
       }
 
-      // refund charge if transaction failed, return CheckoutFailed
+      // transact everything
+      val savedCheckout = this.insert()
 
-      // else return the saved checkout
-//      Right( this.copy(
-//        _entity = savedCheckout._entity,
-//        _typesOrItems = Right(savedItems)
-//      ))
+      val savedItems: LineItems = (cashTransactionItem +: savedCheckout.lineItems).map { (item: LineItem[_]) =>
+        try {
+          item.transact(savedCheckout)
+        } catch {
 
-      Right( Checkout(savedCheckout._entity, savedItems))
+          // NOTE: checkout entity remains in DB for now after failure, but checkout entity alone is inconsequential
+          // refund charge and return error case
+          case e: InsufficientInventoryException => {
+            return Left(CheckoutFailedInsufficientInventory(this, cashTransactionItem.abortTransaction()))
+          }
+
+          case e: Exception => {
+            // DEBUG
+            println("**CHECKOUT ERROR: " + e)
+
+
+            return Left(CheckoutFailedError(this, cashTransactionItem.abortTransaction()))
+          }
+        }
+      }
+
+      // Note that reconstructing the checkout, instead of copying, updates total and subtotal
+      Right( Checkout(savedCheckout._entity, savedItems) )
     }
   }
+
+
 
   /**
    * Updates an existing checkout and its contents.
@@ -276,8 +286,8 @@ case class Checkout (
   //
   // utility members
   //
-  def account = customer.account
-  def addresses = account.addresses
+  lazy val account = customer.account
+  lazy val addresses = account.addresses
   def customerId = _entity.customerId
 
   def subtotal: SubtotalLineItem = lineItemsOfCodeType(CodeType.Subtotal).head
@@ -311,10 +321,10 @@ case class Checkout (
           curr: LineItemType[_] = unresolved.head,
           after: LineItemTypes = unresolved.tail
         ): ResolutionPass = (after, curr.lineItems(acc, before ++ after)) match {
-          case (Nil, Nil) => ResolutionPass(acc, curr +: before)
-          case (Nil, res) => ResolutionPass(res ++ acc,  before)
-          case (next :: rest, Nil) => iterate(acc)(curr +: before, next, rest)
-          case (next :: rest, res) => iterate(res ++ acc)( before, next, rest)
+          case (Nil, None) => ResolutionPass(acc, curr +: before)
+          case (Nil, Some(res)) => ResolutionPass(res ++ acc,  before)
+          case (next :: rest, None) => iterate(acc)(curr +: before, next, rest)
+          case (next :: rest, Some(res)) => iterate(res ++ acc)( before, next, rest)
         }
 
         if (unresolved.isEmpty) this  // no additional to resolve
@@ -354,7 +364,7 @@ object Checkout extends Logging {
     val typesWithTaxesAndSummaries = typesSansOldSummaries ++ taxesAndSummariesByZip(maybeZipcode)
 
     new Checkout(
-      _entity = new CheckoutEntity(),
+      _entity = new CheckoutEntity(customerId = maybeCustomer.map(_.id).getOrElse(0)),
       _typesOrItems = Left(typesWithTaxesAndSummaries),
       _customer = maybeCustomer
     )
@@ -385,20 +395,37 @@ object Checkout extends Logging {
 
   protected def itemsWithSummaries(items: LineItems): LineItems = {
     val nonSummaries = items.filter (item => item.nature != LineItemNature.Summary )
-    val subtotal = SubtotalLineItemType.lineItems(nonSummaries, Seq()).head
-    val total = TotalLineItemType.lineItems(nonSummaries, Seq()).head
+    val subtotal = SubtotalLineItemType.lineItems(nonSummaries, Seq()).get.head // lol
+    val total = TotalLineItemType.lineItems(nonSummaries, Seq()).get.head       // lololol
 
     subtotal +: (total +: nonSummaries)
   }
 
 
-  // TODO(SER-499): add more failure cases as they appear
+
+  //
+  // Checkout failure cases
+  //
   sealed abstract class CheckoutFailed(val failedCheckoutData: FailedCheckoutData)
 
   case class CheckoutFailedCashTransactionResolutionError(
     checkout: Checkout,
-    cashTransaction: CashTransactionLineItemType
-  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransaction))
+    cashTransactionType: CashTransactionLineItemType
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
+
+  case class CheckoutFailedInsufficientInventory(
+    checkout: Checkout,
+    canceledTransactionItem: CashTransactionLineItem
+  ) extends CheckoutFailed(
+    FailedCheckoutData(checkout, canceledTransactionItem.itemType, Some(canceledTransactionItem))
+  )
+
+  case class CheckoutFailedError(
+    checkout: Checkout,
+    canceledTransactionItem: CashTransactionLineItem
+  ) extends CheckoutFailed(
+    FailedCheckoutData(checkout, canceledTransactionItem.itemType, Some(canceledTransactionItem))
+  )
 
   case class CheckoutFailedUpdatedUnpersistedError(
     checkout: Checkout,
@@ -410,7 +437,8 @@ object Checkout extends Logging {
 // TODO(SER-499): move me to another file, add persistance and functionality
 case class FailedCheckoutData(
   checkout: Checkout,
-  cashTransactionLineItemType: CashTransactionLineItemType
+  cashTransactionLineItemType: CashTransactionLineItemType,
+  maybeCashTransactionLineIte: Option[CashTransactionLineItem] = None
 )
 
 
