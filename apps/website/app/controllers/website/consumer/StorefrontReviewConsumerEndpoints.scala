@@ -15,7 +15,7 @@ import services.blobs.AccessPolicy
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import controllers.routes.WebsiteControllers.{getStorefrontReview => reverseGetStorefrontReview}
-import org.joda.time.DateTimeConstants
+import org.joda.time.{DateMidnight, DateTimeConstants}
 import models.Order
 
 /**
@@ -88,7 +88,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
             recipientName = validPersonalizeForm.recipientName,
             noteToCelebrity = validPersonalizeForm.noteToCelebrity,
             basePrice = product.price,
-            guaranteedDelivery = Order.expectedDeliveryDate(celeb),
+            guaranteedDelivery = Order.defaultExpectedDate, // Order.expectedDeliveryDate(celeb),
             highQualityPrintParamName = Params.HighQualityPrint,
             highQualityPrint = doPrint,
             actionUrl = controllers.routes.WebsiteControllers.postStorefrontReview(celebrityUrlSlug, productUrlSlug).url,

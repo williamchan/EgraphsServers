@@ -69,7 +69,8 @@ object Order {
    * Gets you the expected delivery date of the celebrity. 
    */
   def expectedDeliveryDate(celebrity: Celebrity): Date = {
-    Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
+    Order.defaultExpectedDate
+//    Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
   }
 }
 
