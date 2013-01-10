@@ -144,9 +144,9 @@ POST    /subscribe                                                  controllers.
 GET     /sweepstakes/insider                                        controllers.WebsiteControllers.getInsiderSweepstakes
 GET     /terms                                                      controllers.WebsiteControllers.getTerms
 
-GET     /:celebrityUrlSlug                                          controllers.WebsiteControllers.getCelebrityLanding(celebrityUrlSlug: String)
-GET     /:celebrityUrlSlug/photos                                   controllers.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug: String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug                   controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug                                          controllers.WebsiteControllers.getCelebrityLanding(celebrityUrlSlug: String, accesskey: String ?= "")
+GET     /:celebrityUrlSlug/photos                                   controllers.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug: String, accesskey: String ?= "")
+GET     /:celebrityUrlSlug/photos/:productUrlSlug                   controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug:String, accesskey: String ?= "")
 POST    /:celebrityUrlSlug/photos/:productUrlSlug                   controllers.WebsiteControllers.postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug:String)
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/personalize       controllers.WebsiteControllers.getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
 POST    /:celebrityUrlSlug/photos/:productUrlSlug/personalize       controllers.WebsiteControllers.postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)

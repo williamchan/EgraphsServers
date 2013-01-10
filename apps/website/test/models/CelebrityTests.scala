@@ -5,7 +5,6 @@ import javax.imageio.ImageIO
 import services.Time
 import services.ImageUtil.Conversions._
 import services.AppConfig
-import play.api.Play
 import utils._
 import org.joda.time.DateTimeConstants
 
@@ -137,5 +136,12 @@ class CelebrityTests extends EgraphsUnitTest
     celeb.categoryValues.size should be (2)
     celeb.categoryValues.exists(cv => cv.id == categoryValue1.id) should be (true)
     celeb.categoryValues.exists(cv => cv.id == categoryValue2.id) should be (true)
+  }
+
+  "Celebrity accesskey" should "generate uniquely and be hard to guess" in {
+    val accesskey = CelebrityAccesskey.accesskey(1)
+    CelebrityAccesskey.matchesAccesskey(accesskey, 1) should be(true)
+    CelebrityAccesskey.matchesAccesskey("notmyaccesskey", 1) should be(false)
+    CelebrityAccesskey.matchesAccesskey(accesskey, 2) should be(false)
   }
 }

@@ -1,20 +1,19 @@
 package models
 
 import java.security.SecureRandom
-import play.api.libs.Codecs
 import java.math.BigInteger
 import java.util.Date
 import org.postgresql.util.Base64
 import services.crypto.Crypto.SHA256
 
-case class Password (hash: String, salt: String) {
+case class Password(hash: String, salt: String) {
   /**
    * Test whether a provided password is the true password.
    *
    * @param attempt the password to test
    * @return true that the provided password is the entity's password.
    */
-  def is (attempt: String): Boolean = {
+  def is(attempt: String): Boolean = {
     Password.hashPassword(attempt, salt) == this.hash
   }
 }
@@ -87,8 +86,7 @@ object Password {
    *
    * @return result of the hash function iterated n times
    */
-  def hashNTimes(toHash: String, times: Int = 1): String = {    
-    
+  def hashNTimes(toHash: String, times: Int = 1): String = {
     (1 to times).foldLeft(toHash)((nthHash, _) => SHA256.hash(nthHash))
   }
 

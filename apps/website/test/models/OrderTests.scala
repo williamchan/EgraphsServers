@@ -22,7 +22,6 @@ class OrderTests extends EgraphsUnitTest
   with DBTransactionPerTest
 {
   private def orderStore = AppConfig.instance[OrderStore]
-  private def orderQueryFilters = AppConfig.instance[OrderQueryFilters]
   private def printOrderStore = AppConfig.instance[PrintOrderStore]
   private def cashTransactionStore = AppConfig.instance[CashTransactionStore]
   private def consumerApp = AppConfig.instance[ConsumerApplication]
@@ -138,6 +137,13 @@ class OrderTests extends EgraphsUnitTest
     rendered.contains("created") should be(true)
     rendered.contains("updated") should be(true)
     rendered.contains("product") should be(true)
+  }
+
+  "renderedForApi" should "return requestedMessage when available, even if writtenMessageRequest is CelebrityChoosesMessage" in new EgraphsTestApplication {
+    val order = newEntity.copy(requestedMessage = Some("requestedMessage"))
+      .withWrittenMessageRequest(WrittenMessageRequest.CelebrityChoosesMessage).save()
+    val rendered = order.renderedForApi
+    rendered("requestedMessage") should be("requestedMessage")
   }
 
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in new EgraphsTestApplication {

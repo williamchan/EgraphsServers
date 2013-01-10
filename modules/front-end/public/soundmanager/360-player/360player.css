@@ -22,7 +22,7 @@
 }
 
 .sm2-360ui {
- position:relative; 
+ position:relative;
  display:inline-block; /* firefox 3 et al */
  float:left; /* IE 6+7, firefox 2 needs this, inline-block would work with fx3 and others */
  *display:inline;

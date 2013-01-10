@@ -3,12 +3,9 @@ package controllers.website.consumer
 import services.http.{POSTControllerMethod, ControllerMethod}
 import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
-import play.api.mvc.Results.{Redirect, Ok}
 import services.http.forms.purchase.PurchaseFormFactory
 import services.{ConsumerApplication, Utils}
 import models.{ProductStore, Celebrity, Product}
-import controllers.WebsiteControllers
-import services.mvc.celebrity.CelebrityViewConversions
 import services.http.filters.HttpFilters
 import play.api.mvc.Call
 import play.api.mvc.Action
@@ -46,16 +43,18 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @param celebrityUrlSlug identifies the celebrity storefront to serve.
    * @return the web page.
    */
-  def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String) = controllerMethod.withForm() 
+  def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String, accesskey: String = "") = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedCelebrity =>
-      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedCelebrity)(otherFilter = httpFilters.requireCelebrityPublished.filter(maybeUnpublishedCelebrity)) { celebrity =>
+      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedCelebrity)(
+        otherFilter = httpFilters.requireCelebrityPublishedAccess.filter((maybeUnpublishedCelebrity, accesskey))
+      ) { celebrity =>
 
         Action { implicit request =>
           val celebrityUrlSlug = celebrity.urlSlug
 
           val productViews = for (product <- celebrity.productsInActiveInventoryBatches()) yield {
-            product.asChoosePhotoTileView(celebrityUrlSlug = celebrityUrlSlug)
+            product.asChoosePhotoTileView(celebrityUrlSlug = celebrityUrlSlug, accesskey = accesskey)
           }
 
           val forms = purchaseFormFactory.formsForStorefront(celebrity.id)(request.session)
@@ -89,9 +88,9 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @param productUrlSlug identifies the first product to display
    * @return the web page.
    */
-  def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
+  def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String, accesskey: String = "") = controllerMethod.withForm()
   { implicit authToken =>
-    httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
+    httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug, accesskey) { (celeb, product) =>
       Action { implicit request =>
         val products = celeb.productsInActiveInventoryBatches().toSeq
         val tiledViewLink = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug).url
