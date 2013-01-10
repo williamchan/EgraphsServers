@@ -17,6 +17,7 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Session
 import play.api.templates.Html
 import services._
+import mvc.egraphs.EgraphView
 import services.blobs.AccessPolicy
 import services.graphics.Handwriting
 import services.http.ControllerMethod
@@ -57,67 +58,9 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
         case Some(FulfilledOrder(order, egraph)) if isViewable(order)(session) => {
           val maybeCustomerId = session.customerId
           val maybeGalleryLink = maybeCustomerId.map { customerId =>
-            controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId.toLong).url
+            controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId).url
           }
-  
-          // Get related data model objects
-          val product = order.product
-          val celebrity = product.celebrity
-
-          // Prepare the framed image
-          val frame = product.frame match {
-            case PortraitEgraphFrame => PortraitEgraphFrameViewModel
-            case LandscapeEgraphFrame => LandscapeEgraphFrameViewModel
-          }
-
-          val rawSignedImage = egraph.image(product.photoImage)
-          // TODO SER-170 this code is quite similar to that in GalleryOrderFactory.
-          // Refactor together and put withSigningOriginOffset inside EgraphImage.
-          val frameFittedImage = rawSignedImage
-            .withPenWidth(penWidth)
-            .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-            .withPenShadowOffset(shadowX, shadowY)
-            .scaledToWidth(frame.imageWidthPixels)
-
-          val svgzImageUrl = frameFittedImage.getSavedUrl(AccessPolicy.Public)
-          val rasterImageUrl = frameFittedImage.rasterized.getSavedUrl(AccessPolicy.Public)
-
-          // Prepare the icon
-          val icon = product.icon
-          val frameFittedIconUrl = icon.resized(Product.minIconWidth, Product.minIconWidth).getSaved(AccessPolicy.Public).url
-
-          // Prepare the story
-          val story = egraph.story(celebrity, product, order)
-
-          // Signed at date
-          val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
-
-          // Social links
-          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
-
-          val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
-            fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
-            thumbnailUrl = rasterImageUrl,
-            viewEgraphUrl = thisPageLink)
-
-          val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = thisPageLink)
-
-          Ok(views.html.frontend.egraph(
-            signerName = celebrity.publicName,
-            recipientName = order.recipientName,
-            frameCssClass = frame.cssClass,
-            frameLayoutColumns = frame.cssFrameColumnClasses,
-            productIcon = frameFittedIconUrl,
-            storyLayoutColumns = frame.cssStoryColumnClasses,
-            storyTitle = product.storyTitle,
-            storyBody = story.body,
-            audioUrl = egraph.assets.audioMp3Url,
-            signedImage = svgzImageUrl,
-            signedOnDate = formattedSigningDate,
-            shareOnFacebookLink = facebookShareLink,
-            shareOnTwitterLink = twitterShareLink,
-            galleryLink =  maybeGalleryLink
-          ))
+          Ok(EgraphView.renderEgraphPage(egraph=egraph, order=order, galleryLink = maybeGalleryLink, consumerApp = consumerApp))
         }
         case Some(FulfilledOrder(order, egraph)) => Forbidden(views.html.frontend.errors.forbidden())
         case None => NotFound("No Egraph exists with the provided identifier.")
