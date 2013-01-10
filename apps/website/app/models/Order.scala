@@ -26,6 +26,7 @@ import services.db.CurrentTransaction
 import org.joda.time.{DateMidnight, DateTimeConstants}
 import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
+import org.joda.time.DateTime
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -48,12 +49,12 @@ object Order {
   /**
    * Gets the Date with delay applied to the current day, rounded up to the nearest day.
    */
-  def expectedDateFromDelay(delayInMillis: Long): Date = {
-    addMillisecondsAndRoundUpToNextDay(new Date(), delayInMillis.toInt)
+  def expectedDateFromDelay(delayInMinutes: Int): Date = {
+    addMinutesAndRoundUpToNextDay(DateTime.now(), delayInMinutes)
   }
 
-  def addMillisecondsAndRoundUpToNextDay(date: Date, millisToAdd: Int): Date = {
-    val dateSum = DateUtils.addMilliseconds(date, millisToAdd)
+  def addMinutesAndRoundUpToNextDay(date: DateTime, minutesToAdd: Int): Date = {
+    val dateSum = date.plusMinutes(minutesToAdd).toDate()
 
     // Make sure to round up to nearest day
     val truncatedDate = DateUtils.truncate(dateSum, Calendar.DATE)
@@ -69,8 +70,7 @@ object Order {
    * Gets you the expected delivery date of the celebrity. 
    */
   def expectedDeliveryDate(celebrity: Celebrity): Date = {
-    Order.defaultExpectedDate
-//    Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes * DateTimeConstants.MILLIS_PER_MINUTE)
+    Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes)
   }
 }
 

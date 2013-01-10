@@ -14,6 +14,7 @@ import utils.DateShouldMatchers
 import utils.EgraphsUnitTest
 import utils.SavingEntityIdLongTests
 import utils.TestData
+import org.joda.time.DateTime
 
 @RunWith(classOf[JUnitRunner])
 class CustomerTests extends EgraphsUnitTest
@@ -100,7 +101,7 @@ class CustomerTests extends EgraphsUnitTest
     product.celebrity.copy(expectedOrderDelayInMinutes = delayDays * DateTimeConstants.MINUTES_PER_DAY).save()
 
     val order = buyer.buyUnsafe(product, recipient = recipient).save()
-    val delayDay = Order.expectedDateFromDelay(delayDays * DateTimeConstants.MILLIS_PER_DAY)
+    val delayDay = DateTime.now.plusDays(delayDays).toDateMidnight.toDate
     order.expectedDate.getTime should be (delayDay.getTime)
   }
 
