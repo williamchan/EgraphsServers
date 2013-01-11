@@ -1,4 +1,4 @@
-define(["Egraphs", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
+define(["Egraphs", "pages/marketplace"], function (Egraphs, marketplace) {
  
   return {
     go: function () {
@@ -8,45 +8,17 @@ define(["Egraphs", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
        **/
 
      $(document).ready(function() {
-        /**
-         * Reconstructs url from any changes to data model.
-         * Used to retain state across reloads.
-         **/
-        var reloadPage = function() {
-          window.location.href =
-            window.Egraphs.page.queryUrl + window.Egraphs.page.verticalSlug + "?" +
-            $.param({ "query" : window.Egraphs.page.query}) +
-            "&" + $.param(window.Egraphs.page.categories);
-        };
-        
-       /**
+      /**
         * Vertical button select functionality.
         *
         */
        $(".vertical-button").click(function(e) {
-          var selectedVerticalSlug = "/" + $(this).attr("data-vertical");
-          if(window.Egraphs.page.verticalSlug === selectedVerticalSlug){
-            window.Egraphs.page.verticalSlug = "";
-            window.Egraphs.page.categories = {};
-          } else {
-            window.Egraphs.page.verticalSlug = selectedVerticalSlug;
-            window.Egraphs.page.categories = {};
-          }
-          reloadPage();
+          var vertical = $(this);
+          var slug =  vertical.attr("data-vertical");
+          var id = vertical.attr("id");
+          marketplace.selectVertical(slug, id);
+          marketplace.reloadPage();
        });
-
-        /**
-         * Helper for updating the currently selected CategoryValues
-         **/
-        var updateCategories = function(catVal, category, vertical) {
-          if($.inArray(catVal, category) > -1) {
-            var idx = $.inArray(catVal, category);
-            category.splice(idx, 1);
-          } else {
-            category.push(catVal);
-            window.Egraphs.page.verticalSlug = "/" + vertical;
-          }
-        };
         
         /**
          * Binds apply filters link to processing the multiple select widget visible on resolutions < 720px.
@@ -54,19 +26,18 @@ define(["Egraphs", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
          **/
         $("#apply-filters").click(function(e) {
           // Clear out previous category values
-          var categories = window.Egraphs.page.categories;
-          $.each(categories, function(cat) {
-            cat.length = 0;
-          });
+          marketplace.clearCategories();
+
           // Apply new selections
-          $("option:selected", "#category-select").each(
+          $("#category-select").find(":selected").each(
             function(index) {
-              var category = categories["c" + $(this).attr("data-category")];
-              var catVal = $(this).val();
-              updateCategories(catVal, category, $(this).attr("data-vertical"));
+              var categoryId = $(this).attr("data-category");
+              var categoryValues = categories["c" + categoryId];
+              var catVal = parseInt($(this).val(), 10);
+              marketplace.updateCategories(catVal, categoryValues);
             }
           );
-          reloadPage();
+          marketplace.reloadPage();
         });
 
         /**
@@ -79,8 +50,8 @@ define(["Egraphs", "libs/chosen/chosen.jquery.min"], function (Egraphs) {
             var category = window.Egraphs.page.categories["c" + link.attr("data-category")];
             var catVal = parseInt(link.attr("data-categoryvalue"), 10);
             
-            updateCategories(catVal, category, $(this).attr("data-vertical"));
-            reloadPage();
+            marketplace.updateCategories(catVal, category, $(this).attr("data-vertical"));
+            marketplace.reloadPage();
           }
         );
 
