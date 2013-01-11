@@ -1,6 +1,12 @@
 define(["Egraphs"], function (Egraphs) {
   /**
-   * Base marketplace code shared by the marketplace landing page and the
+   * Base marketplace code shared by the marketplace landing page and the results page.
+   * The aim of most of the functions below is to retain the state of a search in the url bar.
+   * If a user clicks list view, we want to reload the same results for whatever they were looking at before
+   * in a list view. Likewise, if a user selects a new filter, we want all the previous selections to remain enabled.
+   * The same idea applies to removing a filter or any other changes, with the exception of the search box, since the previous
+   * settings may not be applicable and give a confusing set of results.
+   *
   **/
 
   var marketplace = {};
