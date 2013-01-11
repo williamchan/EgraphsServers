@@ -387,21 +387,16 @@ case class Egraph(
    * from its biometrics calculation.
    */
   private def withRecalculatedStatus(vbgVerifySample: Option[VBGVerifySample], xyzmoVerifyUser: Option[XyzmoVerifyUser]): Egraph = {
-    val newState = (xyzmoVerifyUser, vbgVerifySample) match {
-
-      case (None, _) | (_, None)=>
-        FailedBiometrics
-
-      // We have return codes from both services. Taking a look at them...
-      case (Some(signatureResult), Some(voiceResult)) =>
-        val isSignatureMatch = signatureResult.isMatch.getOrElse(false)
-        val isVoiceMatch = voiceResult.success.getOrElse(false)
-        (isSignatureMatch, isVoiceMatch) match {
-          case (true, true) => PassedBiometrics
-          case _ => FailedBiometrics
-        }
+    val signaturePassed = xyzmoVerifyUser match {
+      case Some(signatureResult) if signatureResult.isMatch.getOrElse(false) => true
+      case _ => false
+    }
+    val voicePassed = vbgVerifySample match {
+      case Some(voiceResult) if voiceResult.success.getOrElse(false) => true
+      case _ => false
     }
 
+    val newState = if (signaturePassed && voicePassed) PassedBiometrics else FailedBiometrics
     withEgraphState(newState)
   }
 
