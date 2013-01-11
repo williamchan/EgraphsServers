@@ -93,16 +93,17 @@ class CustomerTests extends EgraphsUnitTest
     buyerWithAdminSkip.buyUnsafe(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
   }
 
-  it should "create an order whose expected date is relative to the celebrity's expected delay" in new EgraphsTestApplication {
-    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
-    // change expected delay to 5 days
-    val delayDays = 5
-    product.celebrity.copy(expectedOrderDelayInMinutes = delayDays * DateTimeConstants.MINUTES_PER_DAY).save()
-
-    val order = buyer.buyUnsafe(product, recipient = recipient).save()
-    val delayDay = Order.expectedDateFromDelay(delayDays * DateTimeConstants.MILLIS_PER_DAY)
-    order.expectedDate.getTime should be (delayDay.getTime)
-  }
+//  Commenting out since hot fix a0170fcf7be09263ce98bee58fc63d723ae55082 changed this behavior.
+//  it should "create an order whose expected date is relative to the celebrity's expected delay" in new EgraphsTestApplication {
+//    val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
+//    // change expected delay to 5 days
+//    val delayDays = 5
+//    product.celebrity.copy(expectedOrderDelayInMinutes = delayDays * DateTimeConstants.MINUTES_PER_DAY).save()
+//
+//    val order = buyer.buyUnsafe(product, recipient = recipient).save()
+//    val delayDay = Order.expectedDateFromDelay(delayDays * DateTimeConstants.MILLIS_PER_DAY)
+//    order.expectedDate.getTime should be (delayDay.getTime)
+//  }
 
   it should "throw InsufficientInventoryException if no inventory is available" in new EgraphsTestApplication {
     val (buyer, recipient, product) = savedBuyerRecipientAndProduct()
