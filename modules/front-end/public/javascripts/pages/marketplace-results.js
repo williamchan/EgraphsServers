@@ -197,7 +197,7 @@ define(["Egraphs", "pages/marketplace", "libs/angular", "libs/waypoints.min"], f
           $("#category-select").find(":selected").each(
             function(index) {
               var categoryId = $(this).attr("data-category");
-              var categoryValues = categories["c" + categoryId];
+              var categoryValues = Egraphs.page.categories["c" + categoryId];
               var catVal = parseInt($(this).val(), 10);
               marketplace.updateCategories(catVal, categoryValues);
             }
