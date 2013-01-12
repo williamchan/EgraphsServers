@@ -89,7 +89,6 @@ class CustomerTests extends EgraphsUnitTest
     
     val buyerWithAdminSkip = buyer.copy(services=buyer.services.copy(config=mockConfig))
 
-    // Run tests
     buyer.buyUnsafe(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.PendingAdminReview)
     buyerWithAdminSkip.buyUnsafe(product, recipient=recipient).reviewStatus should be (OrderReviewStatus.ApprovedByAdmin)
   }
@@ -101,7 +100,7 @@ class CustomerTests extends EgraphsUnitTest
     product.celebrity.copy(expectedOrderDelayInMinutes = delayDays * DateTimeConstants.MINUTES_PER_DAY).save()
 
     val order = buyer.buyUnsafe(product, recipient = recipient).save()
-    val delayDay = DateTime.now.plusDays(delayDays).toDateMidnight.toDate
+    val delayDay = DateTime.now.plusDays(delayDays + 1).toDateMidnight.toDate // rounds up
     order.expectedDate.getTime should be (delayDay.getTime)
   }
 
