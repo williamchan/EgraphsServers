@@ -143,7 +143,7 @@ function(forms, payment, Egraphs) {
         try {
           // If there is nothing to charge, then skip creation of Stripe token.
           if (checkout.totalAmount === 0) {
-            return true; 
+            return true;
           }
           else {
             var expiration = expiryDates();
