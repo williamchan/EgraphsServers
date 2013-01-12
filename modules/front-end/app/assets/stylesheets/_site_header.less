@@ -42,6 +42,27 @@
     }
   }
 
+  .search-control {
+    .celebrity-searchbox-container(0px);
+        
+    input[type="search"] {
+      font-size: 14px;
+      width: 65%;
+      margin-bottom: 3px;
+    }
+
+    .btn {
+
+      i {
+        margin-top: 2px;
+      }
+      .glowborder();
+      background: @orange;
+      margin-bottom: 3px;
+    }
+
+  }
+
   // Some elements only become visible at smaller screen sizes
   .mobile-only {
     display: none;
@@ -80,7 +101,7 @@
   } // end .logo
   
   .navbar-item {
-  
+
     p {
     
       border-left: 1px solid @grayVeryLight;
@@ -93,7 +114,7 @@
     
     }   
 
-  } // end .navbar-item
+  } // end .navbar-item 
 
   #account-social {
     float: right;
