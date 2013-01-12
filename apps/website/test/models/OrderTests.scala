@@ -13,6 +13,7 @@ import org.apache.commons.lang3.time.DateUtils
 import java.util.Date
 import java.util.Calendar
 import org.joda.time.DateTimeConstants
+import org.joda.time.DateTime
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -365,18 +366,17 @@ class OrderTests extends EgraphsUnitTest
   }
 
   val dayInMillis = DateTimeConstants.MILLIS_PER_DAY
-  val today = DateUtils.truncate(new Date(), Calendar.DATE)
-  val tomorrow = DateUtils.truncate(new Date(System.currentTimeMillis + dayInMillis), Calendar.DATE)
+  val today = DateTime.now.toDateMidnight.toDateTime
+  val tomorrow = DateTime.now.plusDays(1).toDateMidnight.toDate
   
-  "addMillisecondsAndRoundUpToNextDay" should "not round up on the boundry condition of a day" in {
-    val answer = Order.addMillisecondsAndRoundUpToNextDay(today, dayInMillis)
-
+  "addMinutesAndRoundUpToNextDay" should "not round up on the boundry condition of a day" in {
+    val answer = Order.addMinutesAndRoundUpToNextDay(today, DateTimeConstants.MINUTES_PER_DAY)
     answer.getTime should be (tomorrow.getTime)
   }
 
   it should "round up when it is not on the boundry" in {
-    val oneMillisecond = 1
-    val answer = Order.addMillisecondsAndRoundUpToNextDay(today, oneMillisecond)
+    val oneMinute = 1
+    val answer = Order.addMinutesAndRoundUpToNextDay(today, oneMinute)
 
     answer.getTime should be (tomorrow.getTime)
   }

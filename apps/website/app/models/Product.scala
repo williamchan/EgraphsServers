@@ -253,41 +253,13 @@ case class Product(
     services.celebStore.get(celebrityId)
   }
 
-  //TODO: Create Jira and link here. This should be improved to be 1 query.
-  /**
-   * Returns the remaining inventory of this Product and the active InventoryBatches for this Product.
-   *
-   * wchan: I have to admit that I don't remember why I wrote it this way. But the InventoryBatches are used when
-   * created an Order against a specific InventoryBatch (this way, the InventoryBatch will already be in memory).
-   */
-  def getRemainingInventoryAndActiveInventoryBatches(): (Int, Seq[InventoryBatch]) = {
-    val activeInventoryBatches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
-    val accumulatedInventoryCountAndBatchId = (0, List.empty[Long])
-    val (totalInventory, inventoryBatchIds) = activeInventoryBatches.foldLeft(accumulatedInventoryCountAndBatchId) { (accum, inventoryBatch) =>
-      val (currentInventoryCount, currentBatchIdList) = accum
-      (currentInventoryCount + inventoryBatch.numInventory, inventoryBatch.id :: currentBatchIdList)
-    }
-    val numOrders = services.orderStore.countOrders(inventoryBatchIds)
-    (totalInventory - numOrders, activeInventoryBatches)
+  def availableInventoryBatches: Iterable[InventoryBatch] = {
+    services.inventoryBatchStore.getAvailableInventoryBatches(this)
   }
 
-  /**
-   * Returns the most appropriate inventory batch to purchase from on this product, if there
-   * were any active inventory batches.
-   *
-   * The most appropriate is the one that will get egraph to the customer fastest, which is
-   * the inventory batch that ends the soonest.
-   */
-  // TODO: SER-656 fix this, it is broken.  It isn't even checking to make sure there is inventory available.
-  def nextInventoryBatchToEnd: Option[InventoryBatch] = {
-    val batches = services.inventoryBatchStore.getActiveInventoryBatches(this).toSeq
-
-    batches.sortWith((batch1, batch2) => batch1.endDate.before(batch2.endDate)).headOption
-  }
-
-  /** Returns the remaining inventory in this product's batch */
-  def remainingInventoryCount: Int = {
-    this.getRemainingInventoryAndActiveInventoryBatches()._1
+  /** Returns the remaining inventory in this product's batches */
+  def remainingInventoryCount: BigInt = {
+    this.availableInventoryBatches.foldLeft(BigInt(0))((sum, next) => sum + next.numInventory) 
   }
 
   //

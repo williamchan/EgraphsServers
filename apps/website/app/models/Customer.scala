@@ -69,20 +69,8 @@ case class Customer(
           messageToCelebrity: Option[String] = None,
           requestedMessage: Option[String] = None): Either[Exception, Order] = {
 
-    val errorOrActiveInventoryBatches = {
-      val (remainingInventory, activeInventoryBatches) = product.getRemainingInventoryAndActiveInventoryBatches()
-      if (remainingInventory <= 0 || activeInventoryBatches.isEmpty)
-        Left(new InsufficientInventoryException("Must have available inventory to purchase product " + product.id))
-      else
-        Right(activeInventoryBatches)
-    }
-
     for {
-      inventoryBatches <- errorOrActiveInventoryBatches.right
-      inventoryBatch <- services.inventoryBatchStore
-        .selectAvailableInventoryBatch(inventoryBatches)
-        .toRight(left=new InsufficientInventoryException("Missing inventory batch for product = " + product.id))
-        .right
+      inventoryBatch <- product.availableInventoryBatches.headOption.toRight(new InsufficientInventoryException("Must have available inventory to purchase product " + product.id)).right
     } yield {
       val order = Order(
         buyerId = id,

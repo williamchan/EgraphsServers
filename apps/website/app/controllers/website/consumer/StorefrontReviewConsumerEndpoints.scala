@@ -88,7 +88,7 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
             recipientName = validPersonalizeForm.recipientName,
             noteToCelebrity = validPersonalizeForm.noteToCelebrity,
             basePrice = product.price,
-            guaranteedDelivery = Order.defaultExpectedDate, // Order.expectedDeliveryDate(celeb),
+            guaranteedDelivery = Order.expectedDeliveryDate(celeb),
             highQualityPrintParamName = Params.HighQualityPrint,
             highQualityPrint = doPrint,
             actionUrl = controllers.routes.WebsiteControllers.postStorefrontReview(celebrityUrlSlug, productUrlSlug).url,

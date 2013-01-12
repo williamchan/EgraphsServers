@@ -251,14 +251,10 @@ class PurchaseForms @Inject()(
   def redirectOrNextInventoryBatch(celebrityUrlSlug: String, product: models.Product)
   : Either[Result, InventoryBatch] =
   {
-    product.nextInventoryBatchToEnd.toRight(
-      left=this.redirectToInsufficientInventoryPage(
-        celebrityUrlSlug,
-        product.urlSlug
-      )
+    product.availableInventoryBatches.headOption.toRight(
+      left = this.redirectToInsufficientInventoryPage(celebrityUrlSlug, product.urlSlug)
     )
   }
-
 
   /**
    * Returns the printing option on the right if one has been provided in a previously

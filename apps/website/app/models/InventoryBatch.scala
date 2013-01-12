@@ -9,6 +9,7 @@ import java.sql.Timestamp
 import java.util.Date
 import org.squeryl.dsl.ManyToMany
 import org.joda.time.DateTime
+import enums.PublishedStatus
 
 case class InventoryBatchServices @Inject()(store: InventoryBatchStore,
                                             orderStore: OrderStore,
@@ -69,39 +70,59 @@ class InventoryBatchStore @Inject()(schema: Schema, orderStore: OrderStore, inve
     )
   }
 
-  def getActiveInventoryBatches(product: Product): Query[InventoryBatch] = {
-    from(schema.inventoryBatches, schema.inventoryBatchProducts)((inventoryBatch, association) =>
+  /**
+   * Get available inventory batches by quantity and time for provided product.
+   * (They are ordered by end date ascending.)
+   */
+  def getAvailableInventoryBatches(myProduct: Product): Iterable[InventoryBatch] = {
+    val query = join(schema.inventoryBatches, schema.inventoryBatchProducts, schema.products, schema.orders.leftOuter)((inventoryBatch, association, product, order) =>
       where(
-        inventoryBatch.id === association.inventoryBatchId
-          and association.productId === product.id
-          and FilterOneTable.reduceFilters(List(inventoryBatchQueryFilters.activeOnly), inventoryBatch)
-      )
-        select (inventoryBatch)
-    )
+        product.id === myProduct.id and
+          product._publishedStatus === PublishedStatus.Published.name and
+          FilterOneTable.reduceFilters(List(inventoryBatchQueryFilters.activeOnly), inventoryBatch))
+        groupBy (
+          inventoryBatch.numInventory, inventoryBatch.id, order.map(o => o.id))
+          //TODO: It would be great if this nvl would work instead of having to do this on the server.  Maybe a squeryl bug in here, idk.
+          //          compute (sum(nvl(order.map(o => 1), 0)))
+          on (
+            inventoryBatch.id === association.inventoryBatchId,
+            product.id === association.productId,
+            inventoryBatch.id === order.map(_.inventoryBatchId))
+          )
+
+    val availableInventoryBatchIds = {
+      val availableInventoryBatchIdsAndTotalInventoriesAndOrders = query.toList.map { row =>
+        val totalInventory = row.key._1
+        val inventoryBatchId = row.key._2
+        val orderCount = row.key._3.map(_ => 1).getOrElse(0)
+        (inventoryBatchId, totalInventory, orderCount)
+      }
+
+      val grouped = availableInventoryBatchIdsAndTotalInventoriesAndOrders.groupBy {
+        case (inventoryBatchId, totalInventory, orderCount) => (inventoryBatchId, totalInventory)
+      }
+      val inventoryBatchIdAndRemainingInventories = grouped.map {
+        case (inventoryBatchIdAndTotalInventory, everythingAndOrders) =>
+          val (inventoryBatchId, totalInventory) = inventoryBatchIdAndTotalInventory
+          everythingAndOrders.size match {
+            case 1 => (inventoryBatchId, totalInventory - everythingAndOrders.head._3) // head._3 is 0 if there was no order on that inventory batch, otherwise it is 1
+            case orderCount => (inventoryBatchId, totalInventory - orderCount)
+          }
+      }
+
+      inventoryBatchIdAndRemainingInventories.filter {
+        case (inventoryBatchId, remainingInventory) => (remainingInventory > 0)
+      }
+    }.map { case (inventoryBatchId, remainingInventory) => inventoryBatchId }
+
+    val availableInventoryBatchQuery = from(schema.inventoryBatches)(inventoryBatch => select(inventoryBatch)orderBy(inventoryBatch.endDate asc)).
+        withFilter(inventoryBatch => availableInventoryBatchIds.toList.contains(inventoryBatch.id))
+
+    availableInventoryBatchQuery.map(ib => ib)
   }
 
   def inventoryBatches(product: Product): Query[InventoryBatch] with ManyToMany[InventoryBatch, InventoryBatchProduct] = {
     schema.inventoryBatchProducts.right(product)
-  }
-
-  /**
-   * @param activeInventoryBatches inventoryBatches that are active based on startDate and endDate
-   * @return the inventoryBatch that has the earliest endDate and has inventory remaining (numInventory > number of associated orders)
-   */
-  def selectAvailableInventoryBatch(activeInventoryBatches: Seq[InventoryBatch]): Option[InventoryBatch] = {
-    if (activeInventoryBatches.size == 1) {
-      // There is only one inventoryBatch. Assume that it is the correct inventoryBatch against which to order.
-      activeInventoryBatches.headOption
-    } else {
-      //TODO: I think this should be using find instead of this weird loop with a return.
-      // See if this is even needed anymore before refactoring since this could require many db queries.
-      for (inventoryBatch <- activeInventoryBatches.sortWith((batch1, batch2) => batch1.endDate.before(batch2.endDate))) {
-        if (orderStore.countOrders(List(inventoryBatch.id)) < inventoryBatch.numInventory) {
-          return Some(inventoryBatch)
-        }
-      }
-      None
-    }
   }
 
   //

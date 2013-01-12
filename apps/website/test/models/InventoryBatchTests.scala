@@ -91,7 +91,7 @@ class InventoryBatchTests extends EgraphsUnitTest
     psqlException.getLocalizedMessage should startWith("ERROR: duplicate key value violates unique constraint \"idxd8791317\"")
   }
 
-  "getActiveInventoryBatches" should "return InventoryBatches with active startDate-endDate periods" in new EgraphsTestApplication {
+  "getAvailableInventoryBatches" should "return InventoryBatches with active startDate-endDate periods" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val product = TestData.newSavedProductWithoutInventoryBatch(celebrity)
     val inventoryBatch1 = InventoryBatch(celebrityId = celebrity.id, numInventory = 50, startDate = TestData.today, endDate = TestData.tomorrow).save()
@@ -101,32 +101,54 @@ class InventoryBatchTests extends EgraphsUnitTest
 
     inventoryBatchInThePast.products.associate(product)
     inventoryBatchInTheFuture.products.associate(product)
-    inventoryBatchStore.getActiveInventoryBatches(product).toSeq.length should be(0)
+    inventoryBatchStore.getAvailableInventoryBatches(product).isEmpty should be(true)
 
     inventoryBatch1.products.associate(product)
-    inventoryBatchStore.getActiveInventoryBatches(product).toSet should be(Set(inventoryBatch1))
+    inventoryBatchStore.getAvailableInventoryBatches(product).toSet should be(Set(inventoryBatch1))
 
     inventoryBatch2.products.associate(product)
-    inventoryBatchStore.getActiveInventoryBatches(product).toSet should be(Set(inventoryBatch1, inventoryBatch2))
+    inventoryBatchStore.getAvailableInventoryBatches(product).toSet should be(Set(inventoryBatch1, inventoryBatch2))
   }
 
-  "selectAvailableInventoryBatch" should "return inventoryBatch with earliest endDate that has available inventory" in new EgraphsTestApplication {
+  it should "not return inventory batches with no inventory quantity" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
-    val ib1 = TestData.newSavedInventoryBatch(celebrity).copy(numInventory = 0, endDate = TestData.tomorrow).save()
-    val ib2 = TestData.newSavedInventoryBatch(celebrity).copy(numInventory = 1, endDate = TestData.twoDaysHence).save()
-    val ib3 = TestData.newSavedInventoryBatch(celebrity).copy(numInventory = 1, endDate = TestData.threeDaysHence).save()
-    val ib4 = TestData.newSavedInventoryBatch(celebrity).copy(numInventory = 1, endDate = TestData.sevenDaysHence).save()
     val product = TestData.newSavedProductWithoutInventoryBatch(celebrity)
-    ib2.products.associate(product)
-    TestData.newSavedOrder(Some(product)).copy(inventoryBatchId = ib2.id).save()
+    val ib = TestData.newSavedInventoryBatch(product).copy(numInventory = 0, endDate = TestData.tomorrow).save()
 
     // zero case
-    inventoryBatchStore.selectAvailableInventoryBatch(List.empty[InventoryBatch]) should be(None)
+    inventoryBatchStore.getAvailableInventoryBatches(product).isEmpty should be(true)
+  }
 
-    // 1 case
-    inventoryBatchStore.selectAvailableInventoryBatch(List(ib3)) should be(Some(ib3))
+  it should "not return inventoryBatches that have been sold out" in new EgraphsTestApplication {
+    val celebrity = TestData.newSavedCelebrity()
+    val product = TestData.newSavedProductWithoutInventoryBatch(celebrity)
+    val ib1 = TestData.newSavedInventoryBatch(product).copy(numInventory = 1, endDate = TestData.threeDaysHence).save()
+    val ib2 = TestData.newSavedInventoryBatch(product).copy(numInventory = 1, endDate = TestData.sevenDaysHence).save()
+    TestData.newSavedOrder(Some(product)).copy(inventoryBatchId = ib1.id).save()
 
-    // multiple case: ib1 and ib2 should be skipped because they lack inventory, and ib3 should be sorted to come before ib4
-    inventoryBatchStore.selectAvailableInventoryBatch(List(ib1, ib2, ib4, ib3)) should be(Some(ib3))
+    // product associated with ib1 and ib2, but ib1 should have 0 inventory left, so only should have available ib2.
+    inventoryBatchStore.getAvailableInventoryBatches(product).toSet should be(Set(ib2))
+  }
+
+  it should "return inventoryBatches that have remaining inventory quantities" in new EgraphsTestApplication {
+    val celebrity = TestData.newSavedCelebrity()
+    val product = TestData.newSavedProductWithoutInventoryBatch(celebrity)
+    val ib1 = TestData.newSavedInventoryBatch(product).copy(numInventory = 1, endDate = TestData.threeDaysHence).save()
+    val ib2 = TestData.newSavedInventoryBatch(product).copy(numInventory = 2, endDate = TestData.sevenDaysHence).save()
+    val ib3 = TestData.newSavedInventoryBatch(product).copy(numInventory = 0, endDate = TestData.tomorrow).save()
+
+    // ordered by date
+    inventoryBatchStore.getAvailableInventoryBatches(product).toList should be(List(ib1, ib2))
+  }
+
+  it should "return inventoryBatches that have correct date ordering" in new EgraphsTestApplication {
+    val celebrity = TestData.newSavedCelebrity()
+    val product = TestData.newSavedProductWithoutInventoryBatch(celebrity)
+    val ib1 = TestData.newSavedInventoryBatch(product).copy(numInventory = 1, endDate = TestData.threeDaysHence).save()
+    val ib2 = TestData.newSavedInventoryBatch(product).copy(numInventory = 1, endDate = TestData.sevenDaysHence).save()
+    val ib3 = TestData.newSavedInventoryBatch(product).copy(numInventory = 1, endDate = TestData.tomorrow).save()
+
+    // ordered by date
+    inventoryBatchStore.getAvailableInventoryBatches(product).toList should be(List(ib3, ib1, ib2))
   }
 }
