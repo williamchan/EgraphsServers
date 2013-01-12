@@ -19,6 +19,10 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.landing(sampleStars.slice(0, count)))
   }
 
+  def landing_a =  Action {
+    Ok(views.html.frontend.landing_A(sampleStars.slice(0,8)))
+  }
+
   /**
    * Displays a permutation of the page with gift certificate messaging up top. 
    **/
