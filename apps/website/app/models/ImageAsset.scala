@@ -1,7 +1,7 @@
 package models
 
 import models.ImageAsset.{Resolution, ImageType}
-import javax.imageio.ImageIO
+import javax.imageio.{ImageWriteParam, IIOImage, ImageIO}
 import java.awt.image.BufferedImage
 import services._
 import blobs.Blobs
@@ -11,6 +11,8 @@ import ImageUtil.Conversions._
 import services.blobs.AccessPolicy
 import com.google.inject.Inject
 import services.logging.Logging
+import java.io.ByteArrayOutputStream
+import javax.imageio.stream.MemoryCacheImageOutputStream
 
 case class ImageAssetServices @Inject() (blobs: Blobs, images: ImageUtil)
 
@@ -52,10 +54,19 @@ class ImageAsset(
   /**
    * Persist this image asset to the blobstore
    */
-  def save(access:AccessPolicy=AccessPolicy.Private): ImageAsset = {
+  def save(access:AccessPolicy=AccessPolicy.Private, compressionQuality: Option[Float] = None): ImageAsset = {
+    val bytes = compressionQuality match {
+      case None => renderFromMaster.asByteArray(imageType)
+      case Some(quality) => ImageUtil.getBytes(
+        renderFromMaster,
+        ImageAsset.Jpeg,
+        ImageWriteParam.MODE_EXPLICIT,
+        quality)
+    }
+
     services.blobs.put(
       key,
-      renderFromMaster.asByteArray(imageType),
+      bytes,
       access=access
     )
 
@@ -68,9 +79,9 @@ class ImageAsset(
    *
    * @return the saved ImageAsset
    */
-  def getSaved(access:AccessPolicy=AccessPolicy.Private): ImageAsset = {
+  def getSaved(access:AccessPolicy=AccessPolicy.Private, compressionQuality: Option[Float] = None): ImageAsset = {
     if (!isPersisted) {
-      save(access)
+      save(access, compressionQuality)
     }
     else {
       this

@@ -2,7 +2,7 @@ package models
 
 import enums.OrderReviewStatus
 import java.sql.Timestamp
-import services.{Utils, Time, AppConfig}
+import services.{Time, AppConfig}
 import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
@@ -13,7 +13,6 @@ import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
-import org.joda.time.DateTimeConstants
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -107,6 +106,9 @@ case class Customer(
     )
   }
 
+  def renderedForApi: Map[String, Any] = {
+    Map("id" -> id, "name" -> name)
+  }
 
   //
   // KeyedCaseClass[Long] methods

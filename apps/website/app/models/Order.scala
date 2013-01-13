@@ -23,7 +23,7 @@ import play.api.templates.Html
 import db.Deletes
 import java.sql.Connection
 import services.db.CurrentTransaction
-import org.joda.time.{DateMidnight, DateTimeConstants}
+import org.joda.time.DateMidnight
 import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 import org.joda.time.DateTime
@@ -393,6 +393,30 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
+case class FulfilledOrderBundle(egraph: Egraph, order:Order, product: Product, celebrity: Celebrity) {
+  private val desiredWidth = 480
+  def renderedForApi: Map[String, Any] = {
+    val imageUrl = egraph.image(product.photoImage).rasterized.scaledToWidth(595).getSavedUrl(accessPolicy = AccessPolicy.Public)
+    Map(
+      "orderId" -> order.id,
+      "egraphId" -> egraph.id,
+      "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url),
+      "image" -> imageUrl,
+      "audio" -> egraph.assets.audioMp3Url,
+      "video" -> "",
+      "icon" -> product.iconUrl,
+      "signedAt" -> new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt),
+      "messageToCelebrity" -> order.messageToCelebrity.getOrElse(""),
+      "celebrityName" -> celebrity.publicName,
+      "celebritySubtitle" -> celebrity.roleDescription,
+      "celebrityMasthead" -> celebrity.landingPageImage.resizedWidth(desiredWidth).getSaved(AccessPolicy.Public, Some(0.8f)).url,
+      "productTitle" -> product.name,
+      "recipientName" -> order.recipientName,
+      "recipientId" -> order.recipientId
+    )
+  }
+}
+
 class OrderStore @Inject() (
   schema: Schema
 ) extends SavesWithLongKey[Order]
@@ -416,6 +440,38 @@ class OrderStore @Inject() (
       )
         select (FulfilledOrder(order, egraph))
     ).headOption
+  }
+
+  def findFulfilledForCustomer(customer: Customer): Iterable[FulfilledOrderBundle] = {
+    import schema.{egraphs, orders, products, celebrities}
+    from(egraphs, orders, products, celebrities)((egraph, order, product, celebrity) =>
+      where(
+        order.recipientId === customer.id and
+          egraph.orderId === order.id and
+          egraph._egraphState === EgraphState.Published.name and
+          order.productId === product.id and
+          product.celebrityId === celebrity.id
+      )
+        select(FulfilledOrderBundle(egraph, order, product, celebrity))
+        orderBy (egraph.id desc)
+    ).page(0, Utils.defaultPageLength)
+  }
+
+  /**
+   * These are 5 "good" egraphs and 5 "bad" ones based on audio.
+   */
+  def findTenSpecificFulfilled(): Iterable[FulfilledOrderBundle] = {
+    import schema.{egraphs, orders, products, celebrities}
+    from(egraphs, orders, products, celebrities)((egraph, order, product, celebrity) =>
+      where(
+        order.id in List(400,493,794,1403,2703,2708,1886,1621,3329,2552,981) and
+          egraph.orderId === order.id and
+          egraph._egraphState === EgraphState.Published.name and
+          order.productId === product.id and
+          product.celebrityId === celebrity.id
+      )
+        select(FulfilledOrderBundle(egraph, order, product, celebrity))
+    ).page(0, Utils.defaultPageLength)
   }
 
   /**
