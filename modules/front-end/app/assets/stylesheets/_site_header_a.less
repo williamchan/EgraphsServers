@@ -3,11 +3,14 @@
 //
 
 // Default styles (all screen sizes)
-#top {
+#top-a {
   .clearfix();
 
-  position: relative;
-  z-index: 1;
+  position: fixed;
+  top: 0px;
+  left: 0;
+  right: 0;
+  z-index: 2;
   .box-shadow(0px 2px 4px rgba(0, 0, 0, .15));  
   background: @offWhite;  
   padding-top: 2px;
@@ -32,7 +35,7 @@
       padding-left: 15px;
       padding-right: 15px;
     }
-
+    
     p {
       border-left: 1px solid @grayVeryLight;
     
@@ -229,7 +232,7 @@
 // the edges of the content column itself rather than the content within
 // the content column. Below this res, layout will use bootstrap's defaults.
 @media (min-width: 1340px) {
-  #top {
+  #top-a {
     .logo { margin-left: -20px; }
     .social { margin-right: -40px; }
   }
@@ -237,7 +240,7 @@
 
 
 @media (max-width: 979px) and (min-width: 768px) {
-  #top {
+  #top-a {
     .social {
       > ul {
         padding-left: 10px;     
@@ -273,7 +276,7 @@
 // forward slashes as a delimiter and use smaller social links.
 //
 @media (max-width: 767px) {
-  #top {    
+  #top-a {    
     padding-top:5px;
     padding-bottom: 0;
           
@@ -382,7 +385,7 @@
 // the they would run into the social tools.
 //
 @media (max-width: 600px) {
-  #top {
+  #top-a {
     // Pop the text linkz down to the second row
     #logo-account-social {
       .clearfix();      
@@ -407,7 +410,7 @@
 // iPhone width to accomodate more than two links in the top bar.
 //
 @media (max-width: 480px) {
-  #top {
+  #top-a {
     .linkz {
       .navbar-item {
         .separator-after:after {
@@ -422,7 +425,7 @@
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 
-  #top {
+  #top-a {
   
     .logo h1 a {
       background-image: url(/assets/images/logo-ios.png);      
