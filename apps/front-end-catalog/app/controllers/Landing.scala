@@ -20,7 +20,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def landing_a =  Action {
-    Ok(views.html.frontend.landing_A(sampleStars.slice(0,8)))
+    Ok(views.html.frontend.landing_a(sampleStars.slice(0,8)))
   }
 
   /**
