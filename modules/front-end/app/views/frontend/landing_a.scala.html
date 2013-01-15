@@ -65,18 +65,25 @@
 
     <div id="main">
 
-      <div class="container">
 
-        <footer id="landing-stars">
+      <div id ="landing-content-a" class="container">
+        <ul id="tabs" data-tab="tabs"class="switcher">
+          <li class="active left-tab"><a class="switcher-tab" href="#shop">Shop</a></li>
+          <li class="right-tab"><a class="switcher-tab" href="#learn">Learn</a></li>
+        </ul>
+        <section id="shop" class="tab">
           @starsBlock(stars, clearFix=true)
-        </footer> <!-- end #landing-stars -->
-        @tags.landing.welcome_header()
+        </section>
 
-        @tags.landing.landing_steps()
+        <section id="learn" class="tab" style="display: none">
+          @tags.landing.welcome_header()
 
-        @tags.landing.landing_details()
+          @tags.landing.landing_steps()
 
-        @tags.landing.landing_more(None, Some("/stars"))
+          @tags.landing.landing_details()
+
+          @tags.landing.landing_more(None, Some("/stars"))
+        </section>
 
         <p class="to-top"><a href="#top">Back to Top</a></p>
 
@@ -90,7 +97,7 @@
 
 @base_template_a(
   title="Share a moment with your favorite star",
-  jsMain="pages/landing",
+  jsMain="pages/landing-a",
   headJs=modalJs,
   body=baseBody
 )

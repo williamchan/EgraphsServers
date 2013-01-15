@@ -4,6 +4,54 @@
 @import "_landing_masthead_a.less";
 
 // Styles for the rest of the page
+
+#landing-content-a {
+  .switcher {
+    position: absolute;
+    display: block;
+    top: -6.0em;
+    text-align: center;
+    background: none;
+    list-style: none;
+    width: 50%;
+    margin: 0 25% 0 25%;
+    .box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5));
+
+    > li {
+      position: relative;
+      background: @white;
+      width: 49%;
+      font-size: 24px;
+      float: left;
+      display: block;
+      text-transform: uppercase;
+
+      &.left-tab {
+        .box-shadow(inset -2px -2px 8px rgba(0, 0, 0, .4));
+      }
+      &.right-tab {
+        .box-shadow(inset 2px -2px 8px rgba(0, 0, 0, .4));
+      } 
+
+      &.active {
+        .box-shadow(none);
+        background: @contentBackground;
+      }
+
+      > a {
+        padding: 10px 0 10px 0;
+        line-height: 1.5em;
+        display: block;
+        color: @grayLight;
+        &.active {
+
+        }
+      }
+    }
+  }
+}
+
+
 #landing-stars {
   
   h3 {
@@ -320,6 +368,7 @@
 } // #landing-more
 
 @media (min-width: 1080px) {
+
   #landing-stars {
   
     h3 {
@@ -587,7 +636,24 @@
 
 }
 
+@media (max-width: 1080px) {
+  #landing-content-a {
+    .switcher {
+      top: -3.5em;
+    }
+  }
+  
+}
+
 @media (max-width: 767px) {
+  #landing-content-a {
+    .switcher {
+      width: 100%;
+      margin: 0 0 0 0;
+    }
+  }
+  
+
   #landing-welcome {
   
     .span6 {
