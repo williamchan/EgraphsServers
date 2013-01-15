@@ -35,24 +35,7 @@
       	
         </div>
         <div id="account-social">
-          <div class="social">            
-            <ul class="clearfix">
-                @**<li>
-                  <div class="search-control input-append">
-                    <input type="search" class="span2" placeholder="Find your star"></input>
-                    <button class="btn" type="button"><i class="icon-search icon-white"></i></button>
-                  </div>
-                </li>**@
-                <li><a href="@headerData.egraphsFacebookLink" class="facebook">Facebook</a></li>
-                <li><a href="@headerData.egraphsTwitterLink" class="twitter">Twitter</a></li>
-
-              <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
-            </ul>
-            
-          </div> <!-- end .social -->
-
           <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
-            
             <ul>
               @{headerData.loggedInStatus match {
                 case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
@@ -81,7 +64,13 @@
             <p><a class="separator-after" href="@url"><span>Gift Certificates</span></a></p>
             
           </div> <!-- end .gift-certificates -->
-        }    
+        }
+
+        <div class="navbar-item search-control input-append">
+          <input type="search" class="span2" placeholder="ex: Name or City"></input>
+          <button class="btn" type="button"><i class="icon-search icon-white"></i></button>
+        </div>  <!-- end .search-control -->
+        
         <div class="navbar-item mobile-only">
           
           <p><span class="separator-after"><a href="@headerData.egraphsFacebookLink" class="responsive-social-sprite facebook">f</a></span></p>
