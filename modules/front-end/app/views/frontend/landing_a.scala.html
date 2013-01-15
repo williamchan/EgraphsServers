@@ -31,11 +31,11 @@
               <img src="@star.imageUrl" alt="@star.name" />              
             </a>
           </figure>
-
-          <h4><a href="@star.storefrontUrl">@star.name &rsaquo;</a></h4>
-
-          <p>@star.secondaryText</p>
-
+          <hgroup>
+            <p class="price">$price</p>
+            <h4><a href="@star.storefrontUrl">@star.name</a></h4>
+            <h5>@star.secondaryText</h5>
+          </hgroup>
         </article>        
       }
 
@@ -61,19 +61,120 @@
     getStartedUrl=Some("/stars")
   )
 
-  <section id="content" role="main">
+  <section id="content" role="main" class="landing">
 
     <div id="main">
-
-
       <div id ="landing-content-a" class="container">
+        
         <ul id="tabs" data-tab="tabs"class="switcher">
           <li class="active left-tab"><a class="switcher-tab" href="#shop">Shop</a></li>
           <li class="right-tab"><a class="switcher-tab" href="#learn">Learn</a></li>
         </ul>
+        
         <section id="shop" class="tab">
-          @starsBlock(stars, clearFix=true)
-        </section>
+          <div class="module">
+            <h2>This Week's Featured Stars</h2>
+            @starsBlock(stars, clearFix=true)
+          </div>
+          <div class="module" id="browse">
+             <h2>Get an Egraph from your favorite Star</h2>
+             <div class="row">
+              <div class="clearfix">
+                <article class="span4">
+                  <h3>MLB</h3>
+                  <ul>
+                    @for(i <- 0 until 3) {
+                    <li>
+                      <a href="#">
+                        Atlanta Braves
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                      Boston Red Sox
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                      Houston Astros
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Miami Marlins
+                      </a>  
+                    </li>
+                    }
+                    <li>
+                      <a href="#">See all MLB Teams</a>
+                    </li>
+                  </ul>
+                </article>
+                <article class="span4">
+                  <h3>NBA</h3>
+                  <ul>
+                    @for(i <- 0 until 3) {
+                    <li>
+                      <a href="#">
+                        Atlanta Hawks
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                      Boston Celtics
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Houston Rockets
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Miami Heat
+                      </a>  
+                    </li>
+                    }
+                    <li>
+                      <a href="#">See all NBA Teams</a>
+                    </li>
+                  </ul>
+                </article>
+                <article class="span4">
+                  <h3>TV</h3>
+                  <ul>
+                    @for(i <- 0 until 3) {
+                    <li>
+                      <a href="#">
+                        Jersey Shore
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Battlestar Galactica
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Sportscenter
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">
+                        Breaking Bad
+                      </a>  
+                    </li>
+                    }
+                    <li>
+                      <a href="#">See all TV Stars</a>
+                    </li>
+                  </ul>
+                </article>
+                
+              </div>
+             </div>
+          </div>
+        </section>    
 
         <section id="learn" class="tab" style="display: none">
           @tags.landing.welcome_header()
