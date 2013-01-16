@@ -4,9 +4,7 @@ import checkout._
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{CodeType, LineItemNature}
 
-case class TotalLineItem (
-  amount: Money
-) extends LineItem[Money] {
+case class TotalLineItem (amount: Money) extends LineItem[Money] {
 
   override def itemType = TotalLineItemType
   override def withAmount(newAmount: Money) = this.copy(newAmount)
@@ -53,15 +51,11 @@ object TotalLineItemType extends TotalLineItemType {
 
     if (pendingResolution.isEmpty) {
 
-      val totalAmount = resolvedItems.foldLeft(Money.zero(CurrencyUnit.USD)) { (acc, next) =>
-        if (next.nature != Summary) acc plus next.amount else acc
-      }
-
+      val totalAmount = resolvedItems.notOfNature(Summary).sumAmounts
       Some(Seq(TotalLineItem(totalAmount)))
 
     } else {
       None
-
     }
   }
 }

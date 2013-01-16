@@ -55,6 +55,13 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
       false
     }
   }
+
+
+  def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](desiredCodeType: CodeTypeFactory[LIT, LI]) = {
+    if (codeType != desiredCodeType) None
+    else Some(this.asInstanceOf[LI])
+  }
+
 }
 
 

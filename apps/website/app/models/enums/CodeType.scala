@@ -23,10 +23,7 @@ object CodeType extends Enum {
   //
   // Products
   //
-
-  //
-  // Discounts
-  //
+  /** NOTE: GiftCertificateLineItem and Type are products when purchased, coupons when used */
   val GiftCertificate = new EnumVal("GiftCertificateLineItemType")
     with CodeTypeFactory[GiftCertificateLineItemType, GiftCertificateLineItem]
   {
@@ -34,6 +31,11 @@ object CodeType extends Enum {
       GiftCertificateLineItem(itemEntity, typeEntity)
     }
   }
+
+  //
+  // Discounts
+  //
+
 
   //
   // Charges

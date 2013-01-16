@@ -45,7 +45,7 @@ case class CashTransactionLineItemType (
             billingPostalCode = billingPostalCode,
             stripeCardTokenId = stripeCardTokenId
           ) .withCashTransactionType(CashTransactionType.Checkout)
-            .withCash(total.amount.negated)
+            .withCash(total.amount)
 
 
           // NOTE(SER-499): this shouldn't ever actually change anything if used correctly

@@ -7,8 +7,7 @@ import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
 import com.google.inject.Inject
 import models.{CashTransaction, CashTransactionStore}
 import play.api.libs.json.Json
-
-
+import services.payment.{Charge, Payment}
 
 
 //
@@ -16,6 +15,7 @@ import play.api.libs.json.Json
 //
 case class CashTransactionLineItemServices @Inject() (
   schema: Schema,
+  payment: Payment,
   cashTransactionStore: CashTransactionStore
 ) extends SavesAsLineItemEntity[CashTransactionLineItem] {
 
@@ -73,18 +73,41 @@ case class CashTransactionLineItem(
   }
 
 
-  def makeCharge(): CashTransactionLineItem = {
-    // TODO(SER-499): charge through payment services and update cash transaction
-    println("making charge")
-    this
+  def makeCharge(checkout: Checkout): CashTransactionLineItem = {
+    require(amount.negated isEqual domainObject.cash, "Line item amount and transaction amount are out of sync")
+
+    if (amount.isZero) {
+      // DEBUG
+      println("not charging because amount is zero")
+      // END DEBUG
+
+      this
+
+    } else {
+      require(checkout.id > 0, "Checkout with persisted entity required to make charge.")
+      require(id <= 0, "Untransacted CashTransactionLineItem required to make charge.")
+      require(_maybeCashTransaction.isDefined, "Required CashTransaction information is not present.")
+
+      // DEBUG
+      println("making charge")
+      // END DEBUG
+
+      val txn = domainObject
+      val charge = services.payment.charge(txn.cash, txn.stripeCardTokenId.get, "Checkout #" + checkout.id)
+      val newTransaction = txn.copy(stripeChargeId = Some(charge.id))
+      this.copy(_maybeCashTransaction = Some(newTransaction))
+    }
   }
 
 
   protected[checkout] def abortTransaction() = {
-    // TODO(SER-499): implement charge refunding
-    // [[[domainObject.stripeChargeId.map ( services.payment.refund _ )]]]
+    require(id <= 0, "Transaction has already completed. Update checkout with refund instead.")
+
+    // DEBUG
     println("aborting and refunding charge")
-    this
+    // END DEBUG
+
+    domainObject.stripeChargeId.map ( c => services.payment.refund (c) )
   }
 
 
@@ -106,7 +129,7 @@ object CashTransactionLineItem {
   //
   def apply(itemType: CashTransactionLineItemType, transaction: CashTransaction) = {
     new CashTransactionLineItem(
-      LineItemEntity(transaction.cash, "", itemType.id),
+      LineItemEntity(transaction.cash.negated, "", itemType.id),
       itemType._entity,
       Some(transaction)
     )

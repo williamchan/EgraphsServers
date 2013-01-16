@@ -1,7 +1,6 @@
 package models.checkout
 
 
-
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums._
 import org.squeryl.PrimitiveTypeMode._
@@ -15,6 +14,7 @@ import scala.Left
 import scala.Some
 import scala.Right
 import exception.InsufficientInventoryException
+import services.payment.Charge
 
 
 // NOTE(SER-499): CashTransaction sets convention that payments to us are positive
@@ -39,6 +39,32 @@ package object checkout {
 
   type LineItems = Seq[LineItem[_]]
   type LineItemTypes = Seq[LineItemType[_]]
+  type FailureOrCheckout = Either[Checkout.CheckoutFailed, Checkout]
+
+
+  implicit def lineItemSeqToMemberDSL(items: LineItems) = new {
+    def subtotalOption = ofCodeType(CodeType.Subtotal).headOption
+    def taxes: Seq[TaxLineItem] = ofCodeType(CodeType.Tax)
+    def fees: LineItems = ofNature(LineItemNature.Fee)
+    def totalOption = ofCodeType(CodeType.Total).headOption
+    def payments: LineItems = ofNature(LineItemNature.Payment)
+
+    def ofCodeType[LIT <: LineItemType[_], LI <: LineItem[_]] (codeType: CodeTypeFactory[LIT, LI]) = {
+      items.flatMap(_.asCodeTypeOption(codeType))
+    }
+
+    def ofCodeTypes(codeTypes: Set[CodeType]) = items.filter(codeTypes contains _.codeType)
+    def notOfCodeType(codeType: CodeType) = items.filterNot(_.codeType == codeType)
+    def notofCodeTypes(codeTypes: Set[CodeType]) = items.filterNot(codeTypes contains _.codeType)
+
+    def ofNature(nature: LineItemNature) = items.filter(_.nature == nature)
+    def ofNatures(natures: Set[LineItemNature]) = items.filter(natures contains _.nature)
+    def notOfNature(nature: LineItemNature) = items.filterNot(_.nature == nature)
+    def notOfNatures(natures: Set[LineItemNature]) = items.filterNot(natures contains _.nature)
+
+
+    def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD)){ _ plus _.amount }
+  }
 }
 
 import models.checkout.checkout._
@@ -94,7 +120,7 @@ case class Checkout (
   _entity: CheckoutEntity,
   _typesOrItems: Either[LineItemTypes, LineItems],
   _customer: Option[Customer],
-  _additionalTypes: LineItemTypes = Nil,
+  pendingTypes: LineItemTypes = Nil,
   services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends HasEntity[CheckoutEntity, Long]
   with CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
@@ -105,13 +131,13 @@ case class Checkout (
   // Checkout members
   //
   lazy val lineItems: LineItems =  _typesOrItems match {
-    case Right(items: LineItems) => resolveTypes(_additionalTypes, items)
+    case Right(items: LineItems) => resolveTypes(pendingTypes, items)
     case Left(types: LineItemTypes) => resolveTypes(types)
   }
 
   lazy val lineItemTypes: LineItemTypes = _typesOrItems match {
     case Left(types: LineItemTypes) => types
-    case Right(items: LineItems) => _additionalTypes ++ items.map(_.itemType)
+    case Right(items: LineItems) => pendingTypes ++ items.map(_.itemType)
   }
 
   lazy val customer: Customer = _customer.getOrElse(
@@ -122,21 +148,62 @@ case class Checkout (
 
 
 
+
+  // TODO: make sure this includes discounts that are becoming invalid with pending changes
+  lazy val pendingItems = {
+    /**
+     * matches new items to old items and produces the items of the difference (or full new price
+     * if no matching old item exists)
+     */
+    def grossToNet(newItems: LineItems, oldItems: LineItems) = newItems.flatMap { newItem =>
+      val oldAmount = oldItems.find(_.itemType == newItem.itemType).map(_.amount)
+        .getOrElse(Money.zero(CurrencyUnit.USD))
+
+      if (oldAmount isGreaterThan newItem.amount) {
+        None // refund item will list this difference
+      } else {
+        Some(newItem.withAmount(newItem.amount minus oldAmount)) // update amount to difference
+      }
+    }
+
+    val pendingWithSummaries = SubtotalLineItemType +: (TotalLineItemType +: pendingTypes)
+    val itemsSansSummaries = lineItems.filter(_.nature == LineItemNature.Summary)
+    val allResolved = resolveTypes(pendingWithSummaries, itemsSansSummaries)
+
+    allResolved.filter(item => pendingWithSummaries.contains(item.itemType))
+  }
+
+
+
+
+
+  def withCustomer(customer: Customer) = {
+    this.copy(
+      _entity = _entity.copy(customerId = customer.id),
+      _customer = Some(customer)
+    )
+  }
+
+
   /**
    * Adds unpersisted types to a persisted checkout (to queue up for an update) or adds to other
    * types in an unpersisted checkout.
    *
-   * @param additionalTypes -- to be added to this checkout
-   * @return If transacted, checkout with additionalTypes in _additionalTypes; otherwise, checkout
-   *         with _additionalTypes added to lineItemTypes.
+   * @param newTypes -- to be added to this checkout
+   * @return If transacted, checkout with pendingTypes in pendingTypes; otherwise, checkout
+   *         with pendingTypes added to lineItemTypes.
    */
-  def withAdditionalTypes(additionalTypes: LineItemTypes) = {
-    if (isPersisted) {
-      this.copy(_additionalTypes = additionalTypes ++ _additionalTypes)
+  def withAdditionalTypes(newTypes: LineItemTypes) = {
+    if (isTransacted) {
+      this.copy(pendingTypes = newTypes ++ pendingTypes)
+
     } else {
-      this.copy(_typesOrItems = Left(additionalTypes ++ lineItemTypes))
+      this.copy(_typesOrItems = Left(pendingTypes ++ lineItemTypes))
+
     }
   }
+
+
 
   /**
    * TODO(SER-499): work out customer details
@@ -144,52 +211,68 @@ case class Checkout (
    * Persists this checkout, its types, and its items
    * @return PersistedCheckout of the transacted checkout
    */
-  def transact(
-    cashTransactionType: CashTransactionLineItemType //,customer: Option[Customer]
-  ): Either[CheckoutFailed, Checkout] = {
-    
-
-    // TODO(SER-499): require payment/sum of [products, fees, taxes]/total and charges to be zero.
-    // TODO(SER-499): make transact take checkout context
-    if (isPersisted) {
+  def transact(cashTransactionType: CashTransactionLineItemType): FailureOrCheckout = {
+    if (isTransacted) {
       updateTransaction(cashTransactionType)
 
     } else {
+      saveTransaction(cashTransactionType)
 
-      // get cash transaction line item with charge
-      val cashTransactionItem = cashTransactionType.lineItems(lineItems) match {
-        case Some((txnItem: CashTransactionLineItem) :: _) => txnItem.makeCharge()
-        // case Some(Nil) => // possible case for checkouts that don't need a cash transaction?
-        case _ => return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
-      }
-
-      // transact everything
-      val savedCheckout = this.insert()
-
-      val savedItems: LineItems = (cashTransactionItem +: savedCheckout.lineItems).map { (item: LineItem[_]) =>
-        try {
-          item.transact(savedCheckout)
-        } catch {
-
-          // NOTE: checkout entity remains in DB for now after failure, but checkout entity alone is inconsequential
-          // refund charge and return error case
-          case e: InsufficientInventoryException => {
-            return Left(CheckoutFailedInsufficientInventory(this, cashTransactionItem.abortTransaction()))
-          }
-
-          case e: Exception => {
-            // DEBUG
-            println("**CHECKOUT ERROR: " + e)
-
-
-            return Left(CheckoutFailedError(this, cashTransactionItem.abortTransaction()))
-          }
-        }
-      }
-
-      // Note that reconstructing the checkout, instead of copying, updates total and subtotal
-      Right( Checkout(savedCheckout._entity, savedItems) )
     }
+  }
+
+
+
+
+  /**
+   * Makes a charge through the provided cash transaction information and persists all line items and
+   * types as necessary. Makes sure not to charge customer if an error occurs in which the checkout
+   * cannot be persisted.
+   *
+   * @param cashTransactionType cash transaction to pay for checkout
+   * @return Transacted checkout or failure
+   */
+  protected def saveTransaction(cashTransactionType: CashTransactionLineItemType): FailureOrCheckout = {
+    val savedCheckout = this.insert()
+
+
+    // get cash transaction line item with charge
+    val cashTransactionItem = cashTransactionType.lineItems(lineItems) match {
+      case Some(Nil) => // possible case for checkouts that don't need a cash transaction?
+        return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
+
+      case Some(Seq(txnItem: CashTransactionLineItem)) =>
+        txnItem.makeCharge(savedCheckout)
+
+      case Some(txns: LineItems) =>
+        // precaution against runtime errors from type erasure; make sure itms passed to failure are actually txns
+        val actualTxns = txns.flatMap(item => item.asCodeTypeOption(CodeType.CashTransaction))
+        return Left(CheckoutFailedMultiplePaymentsResolved(this, actualTxns))
+
+      case None =>
+        return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
+    }
+
+
+    // TODO(SER-499): wrap in transaction, currently doesn't roll back lineitems or domain objects...
+    // transact line items
+    val savedItems: LineItems = (cashTransactionItem +: savedCheckout.lineItems).map { (item: LineItem[_]) =>
+      try {
+        item.transact(savedCheckout)
+      } catch {
+        // NOTE: checkout entity remains in DB for now after failure, but checkout entity alone is inconsequential
+
+        case e: InsufficientInventoryException =>
+          return Left(CheckoutFailedInsufficientInventory(this, cashTransactionItem, cashTransactionItem.abortTransaction()))
+
+        case e: Exception => /* DEBUG */ println("**CHECKOUT ERROR: " + e) /* END DEBUG */
+          return Left(CheckoutFailedError(this, cashTransactionItem, cashTransactionItem.abortTransaction()))
+
+      }
+    }
+
+    // Note that reconstructing the checkout, instead of copying, updates total and subtotal
+    Right( Checkout(savedCheckout._entity, savedItems) )
   }
 
 
@@ -201,79 +284,32 @@ case class Checkout (
    * - should refund taxes
    * - TODO: should not refund fees (e.g. shipping)
    *
-   * @return Updated checkout
+   * @return Updated checkout or failure
    */
-  protected def updateTransaction(cashTransactionType: CashTransactionLineItemType): Either[CheckoutFailed, Checkout] = {
-    // TODO(SER-499): clean this whole bessy up
-    if (_additionalTypes.isEmpty) {
+  protected def updateTransaction(cashTransactionType: CashTransactionLineItemType): FailureOrCheckout = {
+
+    if (pendingTypes.isEmpty) {
       Right(this) // NOTE(SER-499): doesn't touch updated timestamp, is that okay?
 
     } else {
-      import LineItemNature._
-
-      def grossToNet(gross: LineItems, old: LineItems) = gross.flatMap { newItem =>
-        val oldAmount = old.find(_.itemType == newItem.itemType).map(_.amount).getOrElse(Money.zero(CurrencyUnit.USD))
-
-        if (oldAmount isGreaterThan newItem.amount) None
-        else Some(newItem.withAmount(newItem.amount minus oldAmount))
-      }
-
-      def replaceItems(oldItems: LineItems, replacementItems: LineItems) =
-        replacementItems.foldLeft(oldItems){ (itemsAcc, nextReplacementItem) =>
-          itemsAcc.updated(
-            itemsAcc.indexWhere(item => item.itemType == nextReplacementItem.itemType),
-            nextReplacementItem
-          )
-        }
-
       /**
-       * Need to:
-       * 1. Get the new taxes, fees, total as the difference between what a fresh checkout with all
-       *    of this carts line item types produces and the ones that already exist in this checkout
-       * 2. Collect and transact items from _additionalTypes and the new taxes and fees
-       * 3. Return checkout with no _additionalTypes, just transacted line items
-       *
-       * - make sure not to try to get the newly created items (from _additionalTypes) from the
-       *   tempCheckout because all its lineItems will appear unpersisted (since they are, technically)
+       * Update flow:
+       * 1. Get the differences between previously transacted items and updated items
+       * 2. Collect and transact items from pendingTypes and newly generated items (ex: taxes and
+       *    fees of non-zero differences from previous transaction)
+       * 3. Return checkout with no pendingTypes, just all transacted line items
        */
 
-      val oldTaxes = lineItemsOfNature(Tax)
-      val oldFees = lineItemsOfNature(Fee)
-
-      /** calculate new fees, taxes, total */
-      // Has all tax, fee, & summary types, will apply them to entire checkout
-      val tempCheckout = new Checkout(
-        _entity = CheckoutEntity(),
-        _typesOrItems = Left(lineItemTypes),
-        _customer = _customer
-      )
-
-      val grossNewTaxes = tempCheckout.lineItemsOfNature(Tax)
-      val grossNewFees = tempCheckout.lineItemsOfNature(Fee)
-      val netNewTaxes = grossToNet(grossNewTaxes, oldTaxes)
-      val netNewFees = grossToNet(grossNewFees, oldFees)
-      val newItems = netNewTaxes ++ netNewFees ++ lineItems.filter(item => _additionalTypes.contains(item.itemType))
-
-
-      // TODO(SER-499): replace with CheckoutFailed's
-      assert(netNewTaxes.map(item => item.itemType).toSet.size == netNewTaxes.size, "There should be no duplicate taxes.")
-      assert(netNewFees.map(item => item.itemType).toSet.size == netNewFees.size, "There should be no duplicate fees.")
-
-
-      /** transact items from _additionalTypes and new taxes, fees, etc associated with them */
+      /** transact items from pendingTypes and new taxes, fees, etc associated with them */
       _typesOrItems match {
         case Right(alreadyTransactedItems: LineItems) =>
           // TODO(SER-499): require sum of amounts is zero
-          val newItemsTransacted = newItems.map( item => item.transact(this) )
+          // TODO(SER-499): charge/refund the balance to cashTransactionType's item
 
-          val updatedLineItems = newItemsTransacted ++
-            replaceItems(alreadyTransactedItems, Seq(tempCheckout.subtotal, tempCheckout.total))
+          val updatedLineItems = pendingItems.map( item => item.transact(this) ) ++ alreadyTransactedItems
 
           Right(
-            this.copy(
-              _typesOrItems = Right(updatedLineItems),
-              _additionalTypes = Nil
-            ).update()
+            Checkout(_entity, updatedLineItems).update()
           )
 
         case _ => Left(CheckoutFailedUpdatedUnpersistedError(this, cashTransactionType))
@@ -283,25 +319,8 @@ case class Checkout (
   }
 
 
-  //
-  // utility members
-  //
-  lazy val account = customer.account
-  lazy val addresses = account.addresses
-  def customerId = _entity.customerId
 
-  def subtotal: SubtotalLineItem = lineItemsOfCodeType(CodeType.Subtotal).head
-  def total: TotalLineItem = lineItemsOfCodeType(CodeType.Total).head
 
-  def flattenLineItems: LineItems = {
-    for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
-  }
-
-  def lineItemsOfCodeType[ LIT <: LineItemType[_], LI  <: LineItem[_] ] (codeType: CodeTypeFactory[LIT, LI]): Seq[LI] = {
-    for (item <- lineItems if item.codeType == codeType) yield item.asInstanceOf[LI]
-  }
-
-  def lineItemsOfNature(nature: LineItemNature) = lineItems.filter(_.nature == nature)
 
   protected def resolveTypes(types: LineItemTypes, preexistingItems: LineItems = Seq()) = {
 
@@ -320,7 +339,7 @@ case class Checkout (
           before: LineItemTypes = Nil,
           curr: LineItemType[_] = unresolved.head,
           after: LineItemTypes = unresolved.tail
-        ): ResolutionPass = (after, curr.lineItems(acc, before ++ after)) match {
+          ): ResolutionPass = (after, curr.lineItems(acc, before ++ after)) match {
           case (Nil, None) => ResolutionPass(acc, curr +: before)
           case (Nil, Some(res)) => ResolutionPass(res ++ acc,  before)
           case (next :: rest, None) => iterate(acc)(curr +: before, next, rest)
@@ -350,6 +369,30 @@ case class Checkout (
 
     resolve(ResolutionPass(unresolved = types))
   }
+
+
+  //
+  // utility members
+  //
+  def isTransacted = id > 0 // could also do _typesOrItems.isRight
+
+  lazy val account = customer.account
+  lazy val addresses = account.addresses
+
+  def customerId = _entity.customerId
+
+  def total: TotalLineItem = lineItems.totalOption.get
+  def subtotal: SubtotalLineItem = lineItems.subtotalOption.get
+  def taxes: Seq[TaxLineItem] = lineItems.taxes
+  def fees: LineItems = lineItems.fees
+  def payments: LineItems = lineItems.payments
+  def balance: Money = pendingItems.totalOption.get.amount minus total.amount
+
+
+  def flattenLineItems: LineItems = {
+    for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
+  }
+
 }
 
 
@@ -411,34 +454,44 @@ object Checkout extends Logging {
   case class CheckoutFailedCashTransactionResolutionError(
     checkout: Checkout,
     cashTransactionType: CashTransactionLineItemType
-  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, Seq(cashTransactionType)))
 
   case class CheckoutFailedInsufficientInventory(
     checkout: Checkout,
-    canceledTransactionItem: CashTransactionLineItem
+    canceledTransactionItem: CashTransactionLineItem,
+    maybeCharge: Option[Charge]
   ) extends CheckoutFailed(
-    FailedCheckoutData(checkout, canceledTransactionItem.itemType, Some(canceledTransactionItem))
+    FailedCheckoutData(checkout, Seq(canceledTransactionItem.itemType), Seq(canceledTransactionItem))
+  )
+
+  case class CheckoutFailedMultiplePaymentsResolved(
+    checkout: Checkout,
+    cashTransactionItems: Seq[CashTransactionLineItem]
+  ) extends CheckoutFailed(
+    FailedCheckoutData(checkout, cashTransactionItems.map(_.itemType), cashTransactionItems)
   )
 
   case class CheckoutFailedError(
     checkout: Checkout,
-    canceledTransactionItem: CashTransactionLineItem
+    canceledTransactionItem: CashTransactionLineItem,
+    maybeCharge: Option[Charge]
   ) extends CheckoutFailed(
-    FailedCheckoutData(checkout, canceledTransactionItem.itemType, Some(canceledTransactionItem))
+    FailedCheckoutData(checkout, Seq(canceledTransactionItem.itemType), Seq(canceledTransactionItem))
   )
 
   case class CheckoutFailedUpdatedUnpersistedError(
     checkout: Checkout,
-    cashTransaction: CashTransactionLineItemType
-  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransaction))
+    cashTransactionType: CashTransactionLineItemType
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, Seq(cashTransactionType)))
 
 }
 
 // TODO(SER-499): move me to another file, add persistance and functionality
 case class FailedCheckoutData(
   checkout: Checkout,
-  cashTransactionLineItemType: CashTransactionLineItemType,
-  maybeCashTransactionLineIte: Option[CashTransactionLineItem] = None
+  cashTransactionLineItemTypes: Seq[CashTransactionLineItemType] = Nil,
+  cashTransactionLineItems: Seq[CashTransactionLineItem] = Nil,
+  maybeTempCheckout: Option[Checkout] = None
 )
 
 
