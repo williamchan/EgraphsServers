@@ -34,6 +34,7 @@
         	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
       	
         </div>
+      
         <div id="account-social">
           <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
             <ul>
@@ -45,7 +46,7 @@
           </nav>
         </div> <!-- end #account-social -->
       </div> <!-- end #logo-account-social -->
-
+      
       <div class="linkz">
         <div class="navbar-item our-stars">
           
@@ -58,13 +59,6 @@
           <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
           
         </div> <!-- end .explore -->
-        @headerData.giftCertificateLink.map{ url =>
-          <div class="navbar-item gift-certificates">
-            
-            <p><a class="separator-after" href="@url"><span>Gift Certificates</span></a></p>
-            
-          </div> <!-- end .gift-certificates -->
-        }
 
         <div class="navbar-item">
           <div>
@@ -76,6 +70,7 @@
         </div>  <!-- end .search-control -->
 
       </div> <!-- end .linkz -->
+      
 
     </div> <!-- end .container -->
   </div> <!-- end .row -->

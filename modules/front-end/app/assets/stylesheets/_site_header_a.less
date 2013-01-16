@@ -7,13 +7,14 @@
   .clearfix();
 
   position: fixed;
-  top: 0px;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 2;
   .box-shadow(0px 2px 4px rgba(0, 0, 0, .15));  
   background: @offWhite;  
-  padding-top: 2px;
+  padding-top: 7px;
+  padding-right: 4px;
   padding-bottom: 2px;
   text-shadow: 0 1px 1px @white;
   
@@ -39,7 +40,7 @@
 
     > div {
       border-left: 1px solid @white;
-      height: 70px;
+      height: 59px;
       display: table-cell;
       vertical-align: middle;
     }
@@ -47,17 +48,9 @@
     p {
       a {
         display: block;
-        line-height: 70px;        
+        line-height: 55px;        
         border-left: 1px solid @white;
       }
-    }
-
-    &.gift-certificates a span{
-      background: @orange;
-      color: @white;
-      text-shadow: none;
-      padding: 4px 8px;
-      .box-shadow(inset 0px 0px 1px 0px @gray); 
     }
   }
 
@@ -72,15 +65,16 @@
   
   .logo {
     float: left;
-  
+    margin-right: 15px;
+
     h1 {
     
       width: 175px;
     
       a {
         display: block;
-        height: 70px;
-        background: url(/assets/images/logo.png) no-repeat 0 0;
+        height: 58px;
+        background: url(/assets/images/logo-cropped.png) no-repeat 0 0;
         
         // scale logo responsively with height.
         background-size: auto 100%; 
@@ -99,7 +93,7 @@
   } // end .logo
 
   #account-social {
-    float: right;
+    float: right
   }
 
   .account {
@@ -115,7 +109,7 @@
       position: relative;
       list-style: none;
       margin: 0;
-      padding: 20px 40px 0 40px;
+      padding: 10px 40px 0 40px;
       height: 50px;
       border-left: 1px solid @white;
       border-right: 1px solid @white;
@@ -242,12 +236,6 @@
       padding-right: 10px;
     }
 
-    .navbar-item {   
-      &.gift-certificates a span{
-        padding: 4px 4px;
-      }
-    }
-
     .container {
       width: 100%;
     }
@@ -256,6 +244,11 @@
     }
     .social {
      margin-right: 5px;
+    }
+
+    // This keeps the search box from shrinking
+    input.span2, textarea.span2, .uneditable-input.span2 {
+      width: 140px;
     }
   } // end #top
 }
@@ -266,7 +259,7 @@
 // forward slashes as a delimiter and use smaller social links.
 //
 @media (max-width: 767px) {
-  #top-a {    
+  #top-a {
     padding-top:5px;
     padding-bottom: 0;
           
@@ -279,22 +272,22 @@
 
       h1 {        
         width:114px;
-        a {          
-          height: 46px;
+        a {
+          height: 40px;
         }
       }
     }
 
     .linkz {
-      margin-left: 10%;
-      margin-right: 10%;
-      width: 80%;
-      padding-top:8px;
-      padding-bottom:5px;
+      float: left;
+      margin-left: 0%;
+      margin-right: 0%;
+      width: 67%;
       text-align:center;
 
       .navbar-item {
         display:inline-block;
+        border: none;
         float:none;
 
         p { 
@@ -305,7 +298,14 @@
           border: none;
           padding-left:0px;
           padding-right:0px;
-          line-height: 1em;
+          line-height: 0em;
+        }
+
+        > div {
+          display: inline;
+	      border: none;
+	      padding-left:0px;
+	      padding-right:0px;
         }
 
         .separator-after:after {
@@ -323,13 +323,11 @@
       }
     }
 
-
-    #account-social {
-      float: right;
-      padding-top:5px;
-
-      .social {
-        display:none;
+    .search-control {
+      margin-left: 0;
+      margin-right: 0px;
+      input[type="search"] {
+        height: 35px;
       }
     }
 
@@ -369,6 +367,23 @@
   }
 }
 
+//
+// Bump the links and search bar to the next line, and make header no longer fixed.
+//
+@media (max-width: 688px) {
+  #top-a {
+    position: absolute;
+
+    .linkz {
+      position: static;
+      width: auto;
+      float: center;
+      margin-left: 0px;
+      margin-right: 0px;
+      padding-top: 0px;
+    }
+  }
+}
 
 //
 // Bump text links to the second level when the screen becomes small enough that
@@ -379,17 +394,6 @@
     // Pop the text linkz down to the second row
     #logo-account-social {
       .clearfix();      
-    }
-
-    // Remove margins so that it centers correctly,
-    // and top-padding because, being on another line, we no longer need to align
-    // with the rest of the header.
-    .linkz {
-      float: none;
-      margin-left: 0px;
-      margin-right: 0px;
-      width: 100%;
-      padding-top: 0px;
     }
   }
 }
@@ -447,4 +451,3 @@
   }
   
 }
-
