@@ -32,7 +32,7 @@
             </a>
           </figure>
           <hgroup>
-            <p class="price">$price</p>
+            <p class="price">$50</p>
             <h4><a href="@star.storefrontUrl">@star.name</a></h4>
             <h5>@star.secondaryText</h5>
           </hgroup>
@@ -42,6 +42,118 @@
       @if(clearFix) {</div>}
     </div>
   }
+}
+
+@verticalAndTeams = {
+  <div class="module" id="browse">
+    <h2>Find your favorite team</h2>
+      <div class="row">
+        <div class="clearfix">
+          <article class="span4">
+            <div class="clearfix">
+              <a id="MLB" class="vertical-button" href=""><img src="@EgraphsAssets.at("/images/icon-logo-mlb.png")">
+                <h3>MLB</h3>
+              </a>
+            </div>  
+            <ul>
+              @for(i <- 0 until 3) {
+              <li>
+                <a href="#">
+                  Atlanta Braves
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                Boston Red Sox
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                Houston Astros
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Miami Marlins
+                </a>  
+              </li>
+              }
+              <li>
+                <a href="#">See all MLB Teams</a>
+              </li>
+            </ul>
+          </article>
+          <article class="span4">
+            <div class="clearfix">
+              <a id="NBA" class="vertical-button btn btn-primary " data-vertical="/major-league-baseball" href=""><img src="@EgraphsAssets.at("/images/icon-logo-nba.png")">
+                <h3>NBA</h3>
+              </a>
+            </div>  
+          <ul>
+              @for(i <- 0 until 3) {
+              <li>
+                <a href="#">
+                  Atlanta Hawks
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                Boston Celtics
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Houston Rockets
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Miami Heat
+                </a>  
+              </li>
+              }
+              <li>
+                <a href="#">See all NBA Teams</a>
+              </li>
+            </ul>
+          </article>
+          <article class="span4">
+            <div class="clearfix">
+              <a id="NBA" class="vertical-button btn btn-primary " data-vertical="/major-league-baseball" href=""><img src="@EgraphsAssets.at("/images/icon-logo-nba.png")">
+                <h3>TV</h3>
+              </a>
+            </div>  
+            <ul>
+              @for(i <- 0 until 3) {
+              <li>
+                <a href="#">
+                  Jersey Shore
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Battlestar Galactica
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Sportscenter
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Breaking Bad
+                </a>  
+              </li>
+              }
+              <li>
+                <a href="#">See all TV Stars</a>
+              </li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </div>
 }
 
 @modalJs = {
@@ -72,108 +184,58 @@
         </ul>
         
         <section id="shop" class="tab">
+          <div id="verticals" class="module">
+             <h2>Find your favorite stars on egraphs</h2>
+            <div class="row">
+              <div class="clearfix">
+              @for(text <- Seq("MLB", "NBA", "TV")) {
+                <div class="vertical-select span4">
+                  <a class="glowborder" href="#">
+                    <img class="backdrop" src='@EgraphsAssets.at("images/mlb-stadium.jpg")'></img>
+                    <h3>@text &gt;&gt;</h3>
+                    <img class="icon" src="@EgraphsAssets.at("/images/icon-logo-mlb.png")">
+                  </a>  
+                </div>
+              }
+              </div>  
+            </div>
+          </div> 
           <div class="module">
             <h2>This Week's Featured Stars</h2>
             @starsBlock(stars, clearFix=true)
           </div>
-          <div class="module" id="browse">
-             <h2>Get an Egraph from your favorite Star</h2>
-             <div class="row">
+          <div id="testimonials" class="module">
+            <h2>Look We Have Customers</h2>
+            <div class="row">
               <div class="clearfix">
-                <article class="span4">
-                  <h3>MLB</h3>
-                  <ul>
-                    @for(i <- 0 until 3) {
-                    <li>
-                      <a href="#">
-                        Atlanta Braves
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                      Boston Red Sox
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                      Houston Astros
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        Miami Marlins
-                      </a>  
-                    </li>
-                    }
-                    <li>
-                      <a href="#">See all MLB Teams</a>
-                    </li>
-                  </ul>
-                </article>
-                <article class="span4">
-                  <h3>NBA</h3>
-                  <ul>
-                    @for(i <- 0 until 3) {
-                    <li>
-                      <a href="#">
-                        Atlanta Hawks
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                      Boston Celtics
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        Houston Rockets
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        Miami Heat
-                      </a>  
-                    </li>
-                    }
-                    <li>
-                      <a href="#">See all NBA Teams</a>
-                    </li>
-                  </ul>
-                </article>
-                <article class="span4">
-                  <h3>TV</h3>
-                  <ul>
-                    @for(i <- 0 until 3) {
-                    <li>
-                      <a href="#">
-                        Jersey Shore
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        Battlestar Galactica
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        Sportscenter
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        Breaking Bad
-                      </a>  
-                    </li>
-                    }
-                    <li>
-                      <a href="#">See all TV Stars</a>
-                    </li>
-                  </ul>
-                </article>
-                
+              @for(i <- 0 until 3){
+                <div class="span4">
+                <blockquote class=".pull-right">
+                  <p>
+                    Egraphs is life-changing. Thanks to Egraphs, I got my son a message from Sauron himself! My lil orc child is overjoyed!
+                  </p>
+                  <small>Some Orc Bastard, <cite title="Middle-earth 11/18/1941">Middle-Earth</cite></small>
+                </blockquote>
+                </div>
+              }  
               </div>
-             </div>
+            </div>  
           </div>
+
+          @verticalAndTeams
+          <div id="teams" class="module">
+            <h2>Look we have teams</h2>
+            <div class="row">
+              <div class="clearfix">
+              @for(text <-  Seq("Yankees", "Angels", "Nationals", "Brewers")) {  
+                <a class="span1 team-button">
+                  <img src="@EgraphsAssets.at("/images/nyy.png")">
+                  @**<h5>@text</h5>**@
+                </a>  
+              }  
+              </div>
+            </div>
+          </div> 
         </section>    
 
         <section id="learn" class="tab" style="display: none">

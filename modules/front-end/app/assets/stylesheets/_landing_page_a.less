@@ -10,7 +10,7 @@
     .switcher {
       position: absolute;
       display: block;
-      top: -6.0em;
+      top: -4.8em;
       text-align: center;
       background: none;
       list-style: none;
@@ -22,7 +22,7 @@
         position: relative;
         background: @white;
         width: 49%;
-        font-size: 24px;
+        font-size: 18px;
         float: left;
         display: block;
         text-transform: uppercase;
@@ -40,7 +40,7 @@
         }
 
         > a {
-          padding: 10px 0 10px 0;
+          padding: 5px 0 5px 0;
           line-height: 1.5em;
           display: block;
           color: @grayLight;
@@ -54,13 +54,108 @@
 
   #shop {
 
-    #browse {
+    #verticals {
+      .vertical-select {
+        .backdrop { .glowborder()}
+        
+        .icon {
+          position: relative;
+          float: right;
+          top: -80px;
+          border: 1px solid @grayLight;
+
+          margin-right: 5px;
+          background: @white;
+        }
+
+        h3 {
+          color: @white;
+          position: relative;
+          top: -45px;
+          margin-left: 10px;
+          font-size: 32px;
+        }
+      }
+    }
+
+    #teams {
+      a.team-button{      
         text-align: center;
+        border: 1px solid lighten(#b3b3b3,10%);
+        .border-radius(2px);
+        .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
+        .box-shadow(0px 0px 0px @orange);
+        cursor: pointer;
+        display: block;
+        margin-bottom: .875em;
+        @transition: border .2s linear, box-shadow .2s linear;
+        .transition(@transition);
+        vertical-align: middle;
+
+        &:hover {
+            .box-shadow(0px 0px 6px @orange);
+            border: 1px solid @orange;
+        }
+        
+        h5 {
+          text-shadow: 0 1px 0 #fff;
+          display: inline-block;
+          font-size: .75em;
+        }
+        img {
+          display: inline-block;
+        }
+      }
+    }
+
+    #browse {
+        a.vertical-button {            
+          text-align: center;
+          border: 1px solid lighten(#b3b3b3,10%);
+          .border-radius(2px);
+          .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
+          .box-shadow(0px 0px 0px @orange);
+          cursor: pointer;
+          display: block;
+          margin-bottom: .875em;
+          @transition: border .2s linear, box-shadow .2s linear;
+          .transition(@transition);
+          vertical-align: middle;
+
+          &:hover {
+              .box-shadow(0px 0px 6px @orange);
+              border: 1px solid @orange;
+          }
+          
+          h3 {
+            text-shadow: 0 1px 0 #fff;
+            display: inline-block;
+            font-size: .875em;
+          }
+          img {
+            display: inline-block;
+          }
+
+          &#MLB {
+           padding: 4px 0 4px 0;
+            img {
+              height: 17px;
+            }
+          }
+
+          &#NBA {
+            img {
+              height: 30px;
+            }
+          }
+        }
+
         ul {
           text-align: center;
           list-style: none;
           margin-left: 0;          
           font-size: 14px;
+
           a {
             color: @gray;
             &:hover { color: @orange; }

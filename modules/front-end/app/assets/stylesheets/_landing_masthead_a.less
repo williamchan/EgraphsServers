@@ -38,10 +38,21 @@
   }
 }
 
-// Past 1340 pixels width we turn on the radial gradient that obscures the
+// Past 1080 pixels width we turn on the radial gradient that obscures the
 // photo's edge
-@media (min-width: 1340px) {
+@media (min-width: 1080px) {
   #masthead-home-a {
+    height: 356px;
+
+    h1 {
+      // margin-top:126px;
+      max-width:440px;
+    }   
+
+    .header-parent {
+      padding:0px; // overwrite unattractive bootstrap padding
+    }
+
     .banner-gradient {  
       background: url(../images/bg-banner-gradient.png) repeat-y 50% 0;
     }
@@ -51,26 +62,12 @@
   
   // Put in a radial fade-to-dark-gray for big screens.
   .cssgradients #masthead-home-a .banner-gradient { 
-    background: -moz-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px,  rgba(26,26,26,1) 745px); /* FF3.6+ */
-    background: -webkit-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Opera 12+ */
-    background: -ms-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* IE10+ */
-    background: radial-gradient(circle at center, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* W3C */
-  }
-} // end min-width: 1340px;
 
-@media (min-width: 1080px) {
-  #masthead-home-a {
-    height: 306px;
-
-    h1 {
-      margin-top:126px;
-      max-width:440px;
-    }   
-
-    .header-parent {
-      padding:0px; // overwrite unattractive bootstrap padding
-    }
+    background: -moz-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 320px,  rgba(26,26,26,1) 476px); /* FF3.6+ */
+    background: -webkit-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 320px, rgba(26,26,26,1) 476px); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 320px, rgba(26,26,26,1) 476px); /* Opera 12+ */
+    background: -ms-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 320px, rgba(26,26,26,1) 476px); /* IE10+ */
+    background: radial-gradient(circle at center, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 320px, rgba(26,26,26,1) 476px); /* W3C */
   }
 } // end min-width: 1080px;
 
