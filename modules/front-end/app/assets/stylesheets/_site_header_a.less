@@ -30,15 +30,21 @@
   .navbar-item {    
     float: left;
     text-align: center;
+    border-left: 1px solid @grayVeryLight;
 
     a {
       padding-left: 15px;
       padding-right: 15px;
     }
-    
+
+    > div {
+      border-left: 1px solid @white;
+      height: 70px;
+      display: table-cell;
+      vertical-align: middle;
+    }
+
     p {
-      border-left: 1px solid @grayVeryLight;
-    
       a {
         display: block;
         line-height: 70px;        
@@ -53,10 +59,6 @@
       padding: 4px 8px;
       .box-shadow(inset 0px 0px 1px 0px @gray); 
     }
-  }
-
-  .search-control {
-    .celebrity-searchbox-container2()
   }
 
   // Some elements only become visible at smaller screen sizes
@@ -208,6 +210,11 @@
     float: right;
   }
 
+  .search-control {
+    .celebrity-searchbox-container2();
+    margin-left: 15px;
+    margin-right: 15px;
+  }
 } // end #top
 
 
@@ -440,3 +447,4 @@
   }
   
 }
+
