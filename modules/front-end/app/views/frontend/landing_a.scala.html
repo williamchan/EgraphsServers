@@ -1,4 +1,6 @@
-@(stars:Iterable[models.frontend.landing.CatalogStar], signup:Boolean = false
+@(stars:Iterable[models.frontend.landing.CatalogStar],
+  verticalSelectViewModels: Iterable[models.frontend.landing.VerticalSelectViewModel],
+  signup:Boolean = false
 )(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
@@ -13,6 +15,9 @@
 @import models.frontend.landing.CatalogStar
 @import views.html.frontend.tags
 
+@loremIpsum = {
+  <h2> Lorem ipsum dolor sit amet</h2>
+}
 @starsBlock(stars: Iterable[CatalogStar], clearFix: Boolean) = {
   @for(starRow <- stars.grouped(4).toList) {
     <div class="celebrities row">
@@ -46,7 +51,7 @@
 
 @verticalAndTeams = {
   <div class="module" id="browse">
-    <h2>Find your favorite team</h2>
+    @loremIpsum
       <div class="row">
         <div class="clearfix">
           <article class="span4">
@@ -155,6 +160,27 @@
       </div>
     </div>
 }
+@verticalsRow(verticals: Iterable[models.frontend.landing.VerticalSelectViewModel])= {
+    <div id="verticals" class="module">
+        <div class="row">
+            <div class="clearfix">
+                @for(vertical <- verticals) {
+                <div class="vertical-select span4 offset">
+                    <a class="glowborder" title="@vertical.longName" href="#">
+                      <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
+                       @** <img class="backdrop" alt="@vertical.longName" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')"></img>**@
+                        <h3>@vertical.title &gt;&gt;</h3>
+                         @vertical.iconUrl.map { url =>
+                           <img class="icon" src="@EgraphsAssets.at(url).url">
+                        }
+                      </div>
+                    </a>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+}
 
 @modalJs = {
   @if(signup) {
@@ -184,37 +210,22 @@
         </ul>
         
         <section id="shop" class="tab">
-          <div id="verticals" class="module">
-             <h2>Find your favorite stars on egraphs</h2>
-            <div class="row">
-              <div class="clearfix">
-              @for(text <- Seq("MLB", "NBA", "TV")) {
-                <div class="vertical-select span4">
-                  <a class="glowborder" href="#">
-                    <img class="backdrop" src='@EgraphsAssets.at("images/mlb-stadium.jpg")'></img>
-                    <h3>@text &gt;&gt;</h3>
-                    <img class="icon" src="@EgraphsAssets.at("/images/icon-logo-mlb.png")">
-                  </a>  
-                </div>
-              }
-              </div>  
-            </div>
-          </div> 
+          @verticalsRow(verticalSelectViewModels)
           <div class="module">
-            <h2>This Week's Featured Stars</h2>
+            @loremIpsum
             @starsBlock(stars, clearFix=true)
           </div>
           <div id="testimonials" class="module">
-            <h2>Look We Have Customers</h2>
+            @loremIpsum
             <div class="row">
               <div class="clearfix">
               @for(i <- 0 until 3){
                 <div class="span4">
                 <blockquote class=".pull-right">
                   <p>
-                    Egraphs is life-changing. Thanks to Egraphs, I got my son a message from Sauron himself! My lil orc child is overjoyed!
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula magna dui, mattis eleifend sapien. Proin imperdiet, odio id tincidunt venenatis, risus enim auctor nisl, vel malesuada libero sapien in urna.
                   </p>
-                  <small>Some Orc Bastard, <cite title="Middle-earth 11/18/1941">Middle-Earth</cite></small>
+                  <small>Aphrodite, <cite title="Mt Olympus, WA 11/18/1941">Mt. Olympus, WA</cite></small>
                 </blockquote>
                 </div>
               }  
@@ -224,7 +235,7 @@
 
           @verticalAndTeams
           <div id="teams" class="module">
-            <h2>Look we have teams</h2>
+            @loremIpsum
             <div class="row">
               <div class="clearfix">
               @for(text <-  Seq("Yankees", "Angels", "Nationals", "Brewers")) {  

@@ -8,24 +8,24 @@
 
   #landing-content-a {
     .switcher {
-      position: absolute;
-      display: block;
-      top: -4.8em;
-      text-align: center;
       background: none;
+      display: block;
       list-style: none;
-      width: 50%;
       margin: 0 25% 0 25%;
+      position: absolute;
+      text-align: center;
+      top: -4.8em;
+      width: 50%;
       .box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5));
 
       > li {
-        position: relative;
         background: @white;
-        width: 49%;
-        font-size: 18px;
-        float: left;
         display: block;
+        float: left;
+        font-size: 18px;
+        position: relative;
         text-transform: uppercase;
+        width: 49%;
 
         &.left-tab {
           .box-shadow(inset -2px -2px 8px rgba(0, 0, 0, .4));
@@ -40,12 +40,13 @@
         }
 
         > a {
-          padding: 5px 0 5px 0;
-          line-height: 1.5em;
-          display: block;
           color: @grayLight;
-          &.active {
-
+          display: block;
+          line-height: 1.5em;
+          padding: 5px 0 5px 0;
+          
+          &:hover {
+           color: @orange; 
           }
         }
       }
@@ -56,24 +57,36 @@
 
     #verticals {
       .vertical-select {
-        .backdrop { .glowborder()}
-        
-        .icon {
+        margin-bottom: 1.75em;
+                .backdrop { 
+          background-size: contain;
+          .glowborder();
+          height: 168.5px;
           position: relative;
-          float: right;
-          top: -80px;
-          border: 1px solid @grayLight;
+          z-index: 0;
 
-          margin-right: 5px;
-          background: @white;
-        }
 
-        h3 {
-          color: @white;
-          position: relative;
-          top: -45px;
-          margin-left: 10px;
-          font-size: 32px;
+          h3 {
+            bottom: 0;
+            color: @white;
+            font-size: 32px;
+            margin-left: 10px;
+            position: absolute;
+            text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
+          }
+
+          .icon {
+            // .glowborder();
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            z-index: 100;
+            .box-shadow(0px 3px 3px rgba(0, 0, 0, .5));
+            margin-bottom: 4px;
+            border: 1px solid @white;
+            margin-right: 5px;
+            background: @white;
+          }
         }
       }
     }
@@ -749,23 +762,30 @@
   }
 }
 
-@media (max-width: 1080px) {
-  #landing-content-a {
+@media (max-width: 1079px) {
+  .landing #landing-content-a {
     .switcher {
-      top: -3.5em;
+      top: -2.3em;
     }
+    .vertical-select {
+      margin-top: 15px;
+    }
+  }
+
+  #content {
+    top: -75px;
   }
   
 }
 
 @media (max-width: 767px) {
-  #landing-content-a {
+  .landing #landing-content-a {
     .switcher {
-      width: 100%;
+      right: 0;
       margin: 0 0 0 0;
+      width: 50%;
     }
   }
-  
 
   #landing-welcome {
   
@@ -774,10 +794,11 @@
     }
   
   } // #landing-welcome
+
 }
 
 @media (max-width: 767px) and (min-width: 640px) {
-  #landing-welcome {
+  .landing #landing-welcome {
   
     .span6 {
       float: left;
@@ -795,7 +816,7 @@
 
 @media (max-width: 767px) and (min-width: 481px) {
 
-  #landing-stars {
+  .landing #landing-stars {
   
     .row {
       margin-left: -20px;
@@ -819,12 +840,14 @@
   
   } // end .celebrities
 
+  #content {
+    top: -50px;
+  }
 }
 
 @media (max-width:480px) {
+  .landing #landing-stars {
 
-  #landing-stars {
-    
     .row {
     
       margin-left: -20px;
@@ -855,20 +878,20 @@
   
   }
 
+  #landing-more {
+    header form div {
 
-    #landing-more {
-        header {
-            form { 
-              div {
-                #celebrity-searchbox {
-                  width: 70%;
-                  height: 26px;
-                  position: relative;
-                  top: -2px;
-                }
-              }  
-            }
-        }
+      #celebrity-searchbox {
+        width: 70%;
+        height: 26px;
+        position: relative;
+        top: -2px;
+          
+      }
     }
+  }
 
+  #content {
+    top: 0;
+  } 
 }

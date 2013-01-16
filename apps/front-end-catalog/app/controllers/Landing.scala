@@ -2,7 +2,7 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import models.frontend.landing.CatalogStar
+import models.frontend.landing.{VerticalSelectViewModel, CatalogStar}
 import helpers.DefaultImplicitTemplateParameters
 import models.frontend.header.HeaderData
 
@@ -20,7 +20,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def landing_a =  Action {
-    Ok(views.html.frontend.landing_a(sampleStars.slice(0,8)))
+    Ok(views.html.frontend.landing_a(sampleStars.slice(0,8), verticals))
   }
 
   /**
@@ -83,5 +83,25 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
     makeSampleStar(7, "Frodo Baggins", Some("Savior of Middle Earth")),
     makeSampleStar(8, "Sauron Himself", None)
   )
+
+  private val verticals = Seq(
+    VerticalSelectViewModel(
+      url = "#",
+      title = "MLB",
+      longName = "Get an egraph from an MLB star." ,
+      tileUrl = "images/mlb-stadium.jpg",
+      iconUrl = Some("images/icon-logo-mlb.png")),
+    VerticalSelectViewModel(
+      url = "#",
+      title = "NBA",
+      longName = "Get an egraph from an NBA star." ,
+      tileUrl = "images/nba-stadium.jpg",
+      iconUrl = Some("images/icon-logo-nba.png")),
+    VerticalSelectViewModel(
+      url = "#",
+      title = "Gift Cards",
+      longName = "Get a gift card for a loved one or friend." ,
+      tileUrl = "images/crowd.jpg")
+   )
 }
 
