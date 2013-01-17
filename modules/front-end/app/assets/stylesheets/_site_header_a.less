@@ -3,11 +3,11 @@
 //
 
 // Default styles (all screen sizes)
-.inline-container {
+.header-sized-container {
   height: 67px;
 }
 
-#top-a {
+#top {
   .clearfix();
 
   position: fixed;
@@ -221,7 +221,7 @@
 // the edges of the content column itself rather than the content within
 // the content column. Below this res, layout will use bootstrap's defaults.
 @media (min-width: 1340px) {
-  #top-a {
+  #top {
     .logo { margin-left: -20px; }
     .social { margin-right: -40px; }
   }
@@ -229,7 +229,7 @@
 
 
 @media (max-width: 979px) and (min-width: 768px) {
-  #top-a {
+  #top {
     .social {
       > ul {
         padding-left: 10px;     
@@ -264,11 +264,11 @@
 // forward slashes as a delimiter and use smaller social links.
 //
 @media (max-width: 767px) {
-  .inline-container {
+  .header-sized-container {
     height: 47px;
   }
 
-  #top-a {
+  #top {
     padding-top:5px;
     padding-bottom: 0;
           
@@ -378,7 +378,7 @@
 }
 
 @media (max-width: 707px) {
-  .inline-container {
+  .header-sized-container {
     height: 77px;
   }
 }
@@ -387,11 +387,11 @@
 // Bump the links and search bar to the next line, and make header no longer fixed.
 //
 @media (max-width: 688px) {
-  .inline-container {
+  .header-sized-container {
     height: 47px;
   }
 
-  #top-a {
+  #top {
     position: absolute;
 
     .linkz {
@@ -406,7 +406,7 @@
 }
 
 @media (max-width: 676px) {
-  .inline-container {
+  .header-sized-container {
     height: 71px;
   }
 }
@@ -416,11 +416,11 @@
 // the they would run into the social tools.
 //
 @media (max-width: 600px) {
-  .inline-container {
+  .header-sized-container {
     height: 87px;
   }
 
-  #top-a {
+  #top {
     // Pop the text linkz down to the second row
     #logo-account-social {
       .clearfix();      
@@ -434,7 +434,7 @@
 // iPhone width to accomodate more than two links in the top bar.
 //
 @media (max-width: 480px) {
-  #top-a {
+  #top {
     .linkz {
       .navbar-item {
         .separator-after:after {
@@ -447,14 +447,14 @@
 }
 
 @media (max-width: 421px) {
-  .inline-container {
+  .header-sized-container {
     height: 111px;
   }
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 
-  #top-a {
+  #top {
   
     .logo h1 a {
       background-image: url(/assets/images/logo-ios.png);      
