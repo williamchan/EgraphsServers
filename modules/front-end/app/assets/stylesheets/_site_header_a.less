@@ -3,6 +3,10 @@
 //
 
 // Default styles (all screen sizes)
+.inline-container {
+  height: 67px;
+}
+
 #top-a {
   .clearfix();
 
@@ -13,7 +17,7 @@
   z-index: 2;
   .box-shadow(0px 2px 4px rgba(0, 0, 0, .15));  
   background: @offWhite;  
-  padding-top: 7px;
+  padding-top: 2px;
   padding-right: 4px;
   padding-bottom: 2px;
   text-shadow: 0 1px 1px @white;
@@ -40,7 +44,7 @@
 
     > div {
       border-left: 1px solid @white;
-      height: 59px;
+      height: 63px;
       display: table-cell;
       vertical-align: middle;
     }
@@ -48,7 +52,7 @@
     p {
       a {
         display: block;
-        line-height: 55px;        
+        line-height: 63px;        
         border-left: 1px solid @white;
       }
     }
@@ -66,6 +70,7 @@
   .logo {
     float: left;
     margin-right: 15px;
+    padding-top: 5px;
 
     h1 {
     
@@ -259,6 +264,10 @@
 // forward slashes as a delimiter and use smaller social links.
 //
 @media (max-width: 767px) {
+  .inline-container {
+    height: 47px;
+  }
+
   #top-a {
     padding-top:5px;
     padding-bottom: 0;
@@ -269,6 +278,7 @@
 
     .logo {
       float:left;
+      padding-top: 0px;
 
       h1 {        
         width:114px;
@@ -325,7 +335,7 @@
 
     .search-control {
       margin-left: 0;
-      margin-right: 0px;
+      margin-right: 5px;
       input[type="search"] {
         height: 35px;
       }
@@ -367,10 +377,20 @@
   }
 }
 
+@media (max-width: 707px) {
+  .inline-container {
+    height: 77px;
+  }
+}
+
 //
 // Bump the links and search bar to the next line, and make header no longer fixed.
 //
 @media (max-width: 688px) {
+  .inline-container {
+    height: 47px;
+  }
+
   #top-a {
     position: absolute;
 
@@ -385,11 +405,21 @@
   }
 }
 
+@media (max-width: 676px) {
+  .inline-container {
+    height: 71px;
+  }
+}
+
 //
 // Bump text links to the second level when the screen becomes small enough that
 // the they would run into the social tools.
 //
 @media (max-width: 600px) {
+  .inline-container {
+    height: 87px;
+  }
+
   #top-a {
     // Pop the text linkz down to the second row
     #logo-account-social {
@@ -416,6 +446,11 @@
   }
 }
 
+@media (max-width: 421px) {
+  .inline-container {
+    height: 111px;
+  }
+}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 
