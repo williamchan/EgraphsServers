@@ -27,7 +27,7 @@ object AudioConverter {
     val targetTempFile = TempFile.named(tempFilesId + "/audio.mp3")
     Utils.saveToFile(sourceWav, sourceTempFile)
 
-    convertToMp3(sourceTempFile.getPath, targetTempFile.getPath)
+    Utils.convertMediaFile(sourceTempFile, targetTempFile)
     val audioAsMp3 = Blobs.Conversions.fileToByteArray(targetTempFile)
 
     sourceTempFile.delete()
@@ -41,7 +41,7 @@ object AudioConverter {
     val targetTempFile = TempFile.named(tempFilesId + "/audio.aac")
     Utils.saveToFile(sourceAudio, sourceTempFile)
 
-    convertToMp3(sourceTempFile.getPath, targetTempFile.getPath)
+    Utils.convertMediaFile(sourceTempFile, targetTempFile)
     val audioAsAAC = Blobs.Conversions.fileToByteArray(targetTempFile)
 
     sourceTempFile.delete()
@@ -52,18 +52,5 @@ object AudioConverter {
   def getDurationOfWav(file: File): Int = {
     val format: AudioFormat = AudioSystem.getAudioInputStream(/*also accepts inputStream*/ file).getFormat
     (file.length / format.getSampleRate / format.getFrameSize / format.getChannels + 1).toInt
-  }
-
-  /**
-   * Code taken from http://wiki.xuggle.com/MediaTool_Introduction.
-   *
-   * @param sourceTempFileLoc file location that contains the source audio
-   * @param targetTempFileLoc target file location to store the converted mp3 data
-   */
-  private def convertToMp3(sourceTempFileLoc: String, targetTempFileLoc: String) {
-    val reader = ToolFactory.makeReader(sourceTempFileLoc)
-    val writer = ToolFactory.makeWriter(targetTempFileLoc, reader)
-    reader.addListener(writer)
-    while (reader.readPacket() == null) {}
   }
 }
