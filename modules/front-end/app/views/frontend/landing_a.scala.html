@@ -1,5 +1,5 @@
 @(stars:Iterable[models.frontend.landing.CatalogStar],
-  verticalSelectViewModels: Iterable[models.frontend.landing.VerticalSelectViewModel],
+  verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
   signup:Boolean = false
 )(
   implicit headerData: models.frontend.header.HeaderData,
@@ -43,10 +43,10 @@
           </hgroup>
         </article>        
       }
-
       @if(clearFix) {</div>}
     </div>
   }
+  <a href="#">See all stars &gt;&gt;</a>
 }
 
 @verticalAndTeams = {
@@ -54,125 +54,43 @@
     @loremIpsum
       <div class="row">
         <div class="clearfix">
-          <article class="span4">
-            <div class="clearfix">
-              <a id="MLB" class="vertical-button" href=""><img src="@EgraphsAssets.at("/images/icon-logo-mlb.png")">
-                <h3>MLB</h3>
+          @for(vertical <- verticalViewModels) {
+
+            <article class="span6">
+              <a id="@vertical.shortName" class="vertical-button" href=""><img src="@EgraphsAssets.at(vertical.iconUrl)"/>
+                <h3>@vertical.shortName</h3>
               </a>
-            </div>  
-            <ul>
-              @for(i <- 0 until 3) {
-              <li>
-                <a href="#">
-                  Atlanta Braves
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                Boston Red Sox
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                Houston Astros
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  Miami Marlins
-                </a>  
-              </li>
-              }
-              <li>
-                <a href="#">See all MLB Teams</a>
-              </li>
-            </ul>
-          </article>
-          <article class="span4">
-            <div class="clearfix">
-              <a id="NBA" class="vertical-button btn btn-primary " data-vertical="/major-league-baseball" href=""><img src="@EgraphsAssets.at("/images/icon-logo-nba.png")">
-                <h3>NBA</h3>
-              </a>
-            </div>  
-          <ul>
-              @for(i <- 0 until 3) {
-              <li>
-                <a href="#">
-                  Atlanta Hawks
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                Boston Celtics
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  Houston Rockets
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  Miami Heat
-                </a>  
-              </li>
-              }
-              <li>
-                <a href="#">See all NBA Teams</a>
-              </li>
-            </ul>
-          </article>
-          <article class="span4">
-            <div class="clearfix">
-              <a id="NBA" class="vertical-button btn btn-primary " data-vertical="/major-league-baseball" href=""><img src="@EgraphsAssets.at("/images/icon-logo-nba.png")">
-                <h3>TV</h3>
-              </a>
-            </div>  
-            <ul>
-              @for(i <- 0 until 3) {
-              <li>
-                <a href="#">
-                  Jersey Shore
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  Battlestar Galactica
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  Sportscenter
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  Breaking Bad
-                </a>  
-              </li>
-              }
-              <li>
-                <a href="#">See all TV Stars</a>
-              </li>
-            </ul>
-          </article>
+              <ul>
+              @for(category <- vertical.categoryViewModels;
+                   categoryValue <- category.categoryValues) {
+                <li>
+                  <a href="#">
+                    @categoryValue.publicName,&nbsp;
+                  </a>
+                </li>
+
+                }
+                <li>
+                  <a href="#">See all @vertical.shortName Teams</a>
+                </li>
+              </ul>
+            </article>
+          }
+          </div>
         </div>
       </div>
     </div>
 }
-@verticalsRow(verticals: Iterable[models.frontend.landing.VerticalSelectViewModel])= {
+@verticalsRow(verticals: Iterable[models.frontend.marketplace.VerticalViewModel])= {
     <div id="verticals" class="module">
         <div class="row">
             <div class="clearfix">
                 @for(vertical <- verticals) {
                 <div class="vertical-select span4 offset">
-                    <a class="glowborder" title="@vertical.longName" href="#">
+                    <a class="glowborder" title="@vertical.publicName" href="#">
                       <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
-                       @** <img class="backdrop" alt="@vertical.longName" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')"></img>**@
-                        <h3>@vertical.title &gt;&gt;</h3>
-                         @vertical.iconUrl.map { url =>
-                           <img class="icon" src="@EgraphsAssets.at(url).url">
-                        }
+                        <h3>@vertical.shortName &gt;&gt;</h3>
+                           <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url">
                       </div>
                     </a>
                 </div>
@@ -182,6 +100,61 @@
     </div>
 }
 
+@testimonials = {
+   <div id="testimonials" class="module">
+    @loremIpsum
+    <div class="row">
+      <div class="clearfix">
+      @for(i <- 0 until 3){
+        <div class="span4">
+        <blockquote class=".pull-right">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula magna dui, mattis eleifend sapien. Proin imperdiet, odio id tincidunt venenatis, risus enim auctor nisl, vel malesuada libero sapien in urna.
+          </p>
+          <small>Aphrodite, <cite title="Mt Olympus, WA 11/18/1941">Mt. Olympus, WA</cite></small>
+        </blockquote>
+        </div>
+      }  
+      </div>
+    </div>  
+  </div>
+}
+
+@teams = {
+  <div id="teams" class="module">
+  @loremIpsum
+    <div class="row">
+      <div class="clearfix">
+        @for(vertical <- verticalViewModels) {
+        <div class="carousel slide span12" id="@vertical.shortName-carousel">
+          <div class="carousel-inner">
+            @for(category <- vertical.categoryViewModels;
+                 (categoryValue, index) <- category.categoryValues.zipWithIndex) {
+              @if(index % 10 == 0) {
+              <div class="item @if(index == 0){active}">
+                <ul class="thumbnails">
+                    <li class="span1"></li>
+              }  
+                  <li class="span1">
+                    <div class="thumbnail">
+                      <img src="@EgraphsAssets.at(categoryValue.iconUrl).url"/>
+                    </div>  
+                  </li>
+              @if(index % 10 == 9 || index == category.categoryValues.size - 1) {
+                <li class="span1"></li>
+                </ul>
+              </div>
+              }
+            }  
+          </div>
+          <a data-slide="prev" href="#@vertical.shortName-carousel" class="left carousel-control">‹</a>
+          <a data-slide="next" href="#@vertical.shortName-carousel" class="right carousel-control">›</a>
+        </div>
+        }
+      </div>
+    </div>
+  </div>   
+}
 @modalJs = {
   @if(signup) {
     Egraphs.page.modalOn = true;
@@ -210,43 +183,14 @@
         </ul>
         
         <section id="shop" class="tab">
-          @verticalsRow(verticalSelectViewModels)
+          @verticalsRow(verticalViewModels)
           <div class="module">
             @loremIpsum
             @starsBlock(stars, clearFix=true)
           </div>
-          <div id="testimonials" class="module">
-            @loremIpsum
-            <div class="row">
-              <div class="clearfix">
-              @for(i <- 0 until 3){
-                <div class="span4">
-                <blockquote class=".pull-right">
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula magna dui, mattis eleifend sapien. Proin imperdiet, odio id tincidunt venenatis, risus enim auctor nisl, vel malesuada libero sapien in urna.
-                  </p>
-                  <small>Aphrodite, <cite title="Mt Olympus, WA 11/18/1941">Mt. Olympus, WA</cite></small>
-                </blockquote>
-                </div>
-              }  
-              </div>
-            </div>  
-          </div>
 
           @verticalAndTeams
-          <div id="teams" class="module">
-            @loremIpsum
-            <div class="row">
-              <div class="clearfix">
-              @for(text <-  Seq("Yankees", "Angels", "Nationals", "Brewers")) {  
-                <a class="span1 team-button">
-                  <img src="@EgraphsAssets.at("/images/nyy.png")">
-                  @**<h5>@text</h5>**@
-                </a>  
-              }  
-              </div>
-            </div>
-          </div> 
+
         </section>    
 
         <section id="learn" class="tab" style="display: none">

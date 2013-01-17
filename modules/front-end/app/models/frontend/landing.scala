@@ -32,3 +32,10 @@ case class VerticalSelectViewModel(
   tileUrl: String,
   iconUrl: Option[String] = None
 )
+
+case class CategoryValueSelectViewModel(
+  url: String,
+  iconUrl: String,
+  name: String
+)
+

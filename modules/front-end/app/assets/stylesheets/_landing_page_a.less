@@ -92,7 +92,23 @@
     }
 
     #teams {
-      a.team-button{      
+      a.team-button {
+        display:inline-block;
+        margin: 2px 0 2px 0;
+        // border: 1px solid @grayLight;
+        // background: @orange;
+        // .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
+                  max-width: 60px;
+        h5 {
+          text-shadow: 0 1px 0 #fff;
+          // display: inline-block;
+          font-size: .75em;
+        }
+        img {
+
+        }
+      }
+      a.none{      
         text-align: center;
         border: 1px solid lighten(#b3b3b3,10%);
         .border-radius(2px);
@@ -128,12 +144,14 @@
           .border-radius(2px);
           .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
           .box-shadow(0px 0px 0px @orange);
+          clear: left;
           cursor: pointer;
           display: block;
           margin-bottom: .875em;
           @transition: border .2s linear, box-shadow .2s linear;
           .transition(@transition);
           vertical-align: middle;
+          // width: 60%;
 
           &:hover {
               .box-shadow(0px 0px 6px @orange);
@@ -157,6 +175,7 @@
           }
 
           &#NBA {
+            padding: 4px 0 4px 0;
             img {
               height: 30px;
             }
@@ -164,11 +183,16 @@
         }
 
         ul {
-          text-align: center;
+
           list-style: none;
           margin-left: 0;          
-          font-size: 14px;
-
+          font-size: 12px;
+          
+          li {
+            float: left;
+            line-height: 18px;
+          }
+          
           a {
             color: @gray;
             &:hover { color: @orange; }

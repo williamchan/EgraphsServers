@@ -1,5 +1,5 @@
 /* Scripting for the landing page */
-define(["bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover", "bootstrap/bootstrap-tab"],
+define(["bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover", "bootstrap/bootstrap-tab", "bootstrap/bootstrap-carousel"],
 function () {
   return {
     go: function() {
@@ -26,6 +26,9 @@ function () {
           $(tab.attr("href")).fadeIn();
           e.preventDefault();
         });
+
+        $('[id^="myCarousel"]').carousel();
+
       });
     }
   };
