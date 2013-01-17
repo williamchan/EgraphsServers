@@ -1,7 +1,7 @@
 package models
 
 import models.ImageAsset.{Resolution, ImageType}
-import javax.imageio.{ImageWriteParam, IIOImage, ImageIO}
+import javax.imageio.{ImageWriteParam, ImageIO}
 import java.awt.image.BufferedImage
 import services._
 import blobs.Blobs
@@ -11,8 +11,6 @@ import ImageUtil.Conversions._
 import services.blobs.AccessPolicy
 import com.google.inject.Inject
 import services.logging.Logging
-import java.io.ByteArrayOutputStream
-import javax.imageio.stream.MemoryCacheImageOutputStream
 
 case class ImageAssetServices @Inject() (blobs: Blobs, images: ImageUtil)
 

@@ -12,6 +12,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
 import play.api.mvc.Request
 import play.api.Play.current
+import com.xuggle.mediatool.ToolFactory
 
 /**
  * Helpful utilities with no other place to call home
@@ -187,5 +188,18 @@ object Utils extends Utils {
     e.printStackTrace(new PrintWriter(stringWriter))
     play.api.Logger.error("Fatal error: " + e.getClass + ": " + e.getMessage)
     stringWriter.toString.split("\n").foreach(line => play.api.Logger.info(line))
+  }
+
+  /**
+   * Code taken from http://wiki.xuggle.com/MediaTool_Introduction.
+   *
+   * @param sourceFile file that contains the source audio
+   * @param targetFile target file to store the converted mp3 data
+   */
+  def convertMediaFile(sourceFile: File, targetFile: File) {
+    val reader = ToolFactory.makeReader(sourceFile.getPath)
+    val writer = ToolFactory.makeWriter(targetFile.getPath, reader)
+    reader.addListener(writer)
+    while (reader.readPacket() == null) {}
   }
 }
