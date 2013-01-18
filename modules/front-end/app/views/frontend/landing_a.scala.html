@@ -46,7 +46,8 @@
       @if(clearFix) {</div>}
     </div>
   }
-  <a href="#">See all stars &gt;&gt;</a>
+  @tags.landing.get_started("/stars", "See All Stars")
+@**  <a href="#">See all stars &gt;&gt;</a>**@
 }
 
 @verticalAndTeams = {
@@ -85,16 +86,23 @@
     <div id="verticals" class="module">
         <div class="row">
             <div class="clearfix">
-                @for(vertical <- verticals) {
-                <div class="vertical-select span4 offset">
-                    <a class="glowborder" title="@vertical.publicName" href="#">
-                      <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
-                        <h3>@vertical.shortName &gt;&gt;</h3>
-                           <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url">
-                      </div>
-                    </a>
-                </div>
-                }
+              @for(vertical <- verticals) {
+                <div class="vertical-select span4">
+                  <a class="glowborder" title="@vertical.publicName" href="#">
+                    <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
+                      <h3>@vertical.shortName &gt;&gt;</h3>
+                         <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url"/>
+                    </div>
+                  </a>
+                </div> 
+              }
+                <div class="vertical-select span4">
+                  <a class="glowborder" title="Get a gift card" href="#">
+                    <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/crowd.jpg").url')">
+                      <h3>Gift Cards &gt;&gt;</h3>
+                    </div>
+                  </a>
+                </div>  
             </div>
         </div>
     </div>
@@ -194,7 +202,6 @@
         <section id="shop" class="tab">
           @verticalsRow(verticalViewModels)
           <div class="module">
-            @loremIpsum
             @starsBlock(stars, clearFix=true)
           </div>
 
