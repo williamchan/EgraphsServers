@@ -191,6 +191,37 @@ trait PostCelebrityAdminEndpoint {
     }
   }
 
+  def postOfficialTwitterScreenName(celebrityId: Long) = postController() {
+    httpFilters.requireAdministratorLogin.inSession() {
+      case (admin, adminAccount) =>
+        httpFilters.requireCelebrityId(celebrityId) { celebrity =>
+          Action { implicit request =>
+            val officialTwitterScreenNameForm = Form(
+              single(
+                "officialTwitterScreenName" -> text))
+              .bindFromRequest()
+
+            officialTwitterScreenNameForm.fold(
+              e => BadRequest("No twitter screen name in request."),
+              officialScreenName => {
+                // take off the '@' if it is on there
+                val screenName = {
+                  val trimmed = officialScreenName.trim
+                  if (!trimmed.isEmpty && trimmed.charAt(0) == '@') {
+                    trimmed.tail
+                  } else {
+                    trimmed
+                  }
+                }
+
+                celebrity.copy(twitterUsername = Some(screenName)).save()
+                Ok(screenName)
+              })
+          }
+        }
+    }
+  }
+
   private trait PostCelebrityForm {
      val publicName: String
      val publishedStatusString: String

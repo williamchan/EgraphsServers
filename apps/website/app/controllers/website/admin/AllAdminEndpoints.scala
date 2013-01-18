@@ -34,6 +34,7 @@ trait AllAdminEndpoints
   with GetProductAdminEndpoint
   with GetReportsAdminEndpoint
   with GetToolsAdminEndpoint
+  with GetTwitterDataAdminEndpoint
   with GetVideoAssetAdminEndpoint
   with PostAccountAdminEndpoint
   with PostCategoryAdminEndpoint

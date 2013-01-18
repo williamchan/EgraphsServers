@@ -16,6 +16,7 @@ import services.logging.{Logging, LoggingContext}
 import services.mvc.celebrity.{CatalogStarsAgent, UpdateCatalogStarsActor}
 import services.payment.Payment
 import services.mvc.search.RebuildSearchIndexActor
+import services.mvc.celebrity.UpdateTwitterFollowersActor
 
 object Global extends controllers.ToyBox with Logging {
   // for ToyBox; see .conf file in use for further configuration
@@ -60,6 +61,9 @@ object Global extends controllers.ToyBox with Logging {
             configProxy.blobstoreVendor == "filesystem") {
           TestModeBootstrap.run()
         }
+
+        // Schedule the update of twitter followers
+        UpdateTwitterFollowersActor.init()
 
         // Schedule catalog stars updating
         UpdateCatalogStarsActor.init()
