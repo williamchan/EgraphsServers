@@ -70,6 +70,7 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val signatureVendor = string("signature.vendor", "yesmaam", "xyzmoprod", "xyzmobeta")
   val voiceVendor = string("voice.vendor", "yesmaam", "fsprod", "fsbeta")
 
+  val twitter = string("twitter", "fake", "twitter4j")
   val fbAppid = string("fb.appid")
   val fbAppsecret = string("fb.appsecret")
   val ipadBuildVersion = string("ipad.buildversion")
