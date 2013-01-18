@@ -41,8 +41,8 @@ class VerticalStore @Inject() (categoryStore: CategoryStore) {
     for(cv <- category.categoryValues) yield {
       cv.name match {
         case "MLB" => Vertical(categoryValue = cv, shortName = "MLB", urlSlug = "major-league-baseball",
-          iconUrl = "images/icon-logo-mlb.png", titleUrl = "images/mlb-stadium.jpg", featuredQuery ="mlb-featured")
-        case "NBA" => Vertical(categoryValue = cv, titleUrl ="images/nba-stadium.jpg", shortName = "NBA", urlSlug = "national-basketball-association",
+          iconUrl = "images/icon-logo-mlb.png", tileUrl = "images/mlb-stadium.jpg", featuredQuery ="mlb-featured")
+        case "NBA" => Vertical(categoryValue = cv, tileUrl ="images/nba-stadium.jpg", shortName = "NBA", urlSlug = "national-basketball-association",
           iconUrl = "images/icon-logo-nba.png", featuredQuery ="nba-featured")
       }
     }

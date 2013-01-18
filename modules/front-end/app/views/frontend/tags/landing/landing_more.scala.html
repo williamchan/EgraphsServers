@@ -14,7 +14,8 @@
         }
       }
     </h1>
-    @getStartedUrl.map{ url =>
+  </header>
+  @getStartedUrl.map{ url =>
       @{
         celebrityPublicName match {
           case None => tags.landing.searchbox(url)
@@ -22,7 +23,4 @@
         }
       }
     }
-
-  </header>
-
 </section> <!-- end #landing-more -->

@@ -5,6 +5,22 @@
 
 // Styles for the rest of the page
 .landing {
+    .help-block {
+      padding-left: 5px;
+      font-size: 12px;
+    }
+    .search-control {
+      width: 300px;
+      .celebrity-searchbox-container2();
+      overflow: hidden;
+      input {
+        width: 85%;
+      }
+
+      button {
+        float: right;
+      }
+    }
 
   #landing-content-a {
     .switcher {
@@ -57,73 +73,70 @@
 
     #verticals {
       .vertical-select {
-          margin-bottom: 1.75em;
-          
-          .backdrop { 
-            background-size: cover;
-            background-repeat: no-repeat;
-            .glowborder();
-            position: relative;
-            z-index: 0;
+        margin-bottom: 2.5em;
+        
+        .backdrop { 
+          background-size: cover;
+          background-repeat: no-repeat;
+          .glowborder();
+          position: relative;
+          z-index: 0;
 
-            h3 {
-              bottom: 0;
-              color: @white;
-              font-size: 32px;
-              margin-left: 10px;
-              position: absolute;
-              text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
-            }
-
-            .icon {
-              // .glowborder();
-              position: absolute;
-              bottom: 0;
-              right: 0;
-              z-index: 100;
-              .box-shadow(0px 3px 3px rgba(0, 0, 0, .5));
-              margin-bottom: 4px;
-              border: 1px solid @white;
-              margin-right: 5px;
-              background: @white;
-            }
+          h3 {
+            bottom: 0;
+            color: @white;
+            font-size: 32px;
+            margin-left: 10px;
+            position: absolute;
+            text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
           }
+
+          .icon {
+            .box-shadow(0px 3px 3px rgba(0, 0, 0, .5));
+            background: @white;
+            border: 1px solid @white;
+            bottom: 0;
+            margin-bottom: 4px;
+            margin-right: 5px;
+            position: absolute;
+            right: 0;
+            z-index: 100;
+          }
+        }
       }
     }
 
     #teams {
+      
       a.team-button {
+
         display:inline-block;
         margin: 2px 0 2px 0;
-        // border: 1px solid @grayLight;
-        // background: @orange;
-        // .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
-                  max-width: 60px;
-        h5 {
-          text-shadow: 0 1px 0 #fff;
-          // display: inline-block;
-          font-size: .75em;
-        }
-        img {
+        max-width: 60px;
 
+        h5 {
+          font-size: .75em;
+          text-shadow: 0 1px 0 #fff;
         }
       }
-      a.none{      
-        text-align: center;
-        border: 1px solid lighten(#b3b3b3,10%);
+
+      a.none {
+
         .border-radius(2px);
-        .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
         .box-shadow(0px 0px 0px @orange);
+        .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
+        .transition(@transition);
+        @transition: border .2s linear, box-shadow .2s linear;
+        border: 1px solid lighten(#b3b3b3,10%);
         cursor: pointer;
         display: block;
         margin-bottom: .875em;
-        @transition: border .2s linear, box-shadow .2s linear;
-        .transition(@transition);
+        text-align: center;
         vertical-align: middle;
 
         &:hover {
-            .box-shadow(0px 0px 6px @orange);
-            border: 1px solid @orange;
+          .box-shadow(0px 0px 6px @orange);
+          border: 1px solid @orange;
         }
         
         h5 {
@@ -131,6 +144,7 @@
           display: inline-block;
           font-size: .75em;
         }
+
         img {
           display: inline-block;
         }
@@ -138,72 +152,84 @@
     }
 
     #browse {
-        a.vertical-button {            
-          text-align: center;
-          border: 1px solid lighten(#b3b3b3,10%);
-          .border-radius(2px);
-          .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
-          .box-shadow(0px 0px 0px @orange);
-          clear: left;
-          cursor: pointer;
-          display: block;
-          margin-bottom: .875em;
-          @transition: border .2s linear, box-shadow .2s linear;
-          .transition(@transition);
-          vertical-align: middle;
-          // width: 60%;
 
-          &:hover {
-              .box-shadow(0px 0px 6px @orange);
-              border: 1px solid @orange;
-          }
-          
-          h3 {
-            text-shadow: 0 1px 0 #fff;
-            display: inline-block;
-            font-size: .875em;
-          }
+      a.vertical-button {            
+
+        .border-radius(2px);
+        .box-shadow(0px 0px 0px @orange);
+        .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
+        .transition(@transition);
+        @transition: border .2s linear, box-shadow .2s linear;
+        border: 1px solid lighten(#b3b3b3,10%);
+        clear: left;
+        cursor: pointer;
+        display: block;
+        margin-bottom: .875em;
+        text-align: center;
+        vertical-align: middle;
+
+        &:hover {
+            .box-shadow(0px 0px 6px @orange);
+            border: 1px solid @orange;
+        }
+        
+        h3 {
+          text-shadow: 0 1px 0 #fff;
+          display: inline-block;
+          font-size: .875em;
+        }
+
+        img {
+          display: inline-block;
+        }
+
+        &#MLB {
+         padding: 4px 0 4px 0;
           img {
-            display: inline-block;
-          }
-
-          &#MLB {
-           padding: 4px 0 4px 0;
-            img {
-              height: 17px;
-            }
-          }
-
-          &#NBA {
-            padding: 4px 0 4px 0;
-            img {
-              height: 30px;
-            }
+            height: 17px;
           }
         }
 
-        ul {
-
-          list-style: none;
-          margin-left: 0;          
-          font-size: 12px;
-          
-          li {
-            float: left;
-            line-height: 18px;
+        &#NBA {
+          padding: 4px 0 4px 0;
+          img {
+            height: 30px;
           }
-          
+        }
+      }
+
+      ul {
+
+        font-size: 12px;
+        list-style: none;
+        margin-left: 0;          
+        .content-columns(3);         
+        li {
+          line-height: 18px;
+        
           a {
-            color: @gray;
-            &:hover { color: @orange; }
+          &:hover { color: @orange; }
+          color: @gray;
           }
-          li:last-child { 
-            a {
-              border-bottom: 1px dotted @gray;
-              &:hover { border-bottom: 1px dotted @orange; }
+        }
+        
+        
+        
+        li:last-child { 
+          // position: absolute;
+          // bottom: 0;
+          // right: 0;  
+          a {
+            border-bottom: 1px dotted @blue;
+            color: @blue;
+
+            &:hover { 
+              border-bottom: 1px dotted @orange; 
+              color: @orange;
             }
           }
         }
+      }
     }
     
     #view-stars {
@@ -221,26 +247,18 @@
 
     #landing-stars {
 
-      .row {
-      
-        margin-top: -40px;
-        margin-bottom: 40px;
-        margin-right: -20px;
-      
-        > div {
-      
-          position: relative;
-          padding: 34px 0 10px 0;
-          background: #fff;
-      
-        }
-      
+      p.stars-link {
+        position: absolute;
+        right: 0;
+        margin-top: -5px;
       }
-          
+    
     } // end #landing-stars
 
     .celebrities {
-
+        &:last-of-type{
+          margin-bottom: 0;
+        }
         article {
           
           text-align: left;
@@ -518,23 +536,6 @@
 
   @media (min-width: 1080px) {
 
-    #landing-stars {
-    
-      h3 {
-        margin-right: 0;
-      }
-    
-      .row {
-      
-        margin-top: 0;
-        
-        > div {
-          margin: -40px -20px 0 -20px;    
-          padding-left: 20px;
-        }
-      }
-      
-    } // end #landing-stars
 
   } // end min-width: 1080px;
 
@@ -670,7 +671,7 @@
 
   @media (min-width: 979px) {
     #shop #verticals .vertical-select .backdrop {
-      min-height: 167px;
+      min-height: 168.5px;
     }
   
     #landing-details {
@@ -800,8 +801,10 @@
   }
 
   #content.landing {
-    top: -75px;
+    // top: -75px;
+    margin-top: -75px;
   }
+
 }
 
 @media (max-width: 978px) and (min-width: 768px) {
@@ -834,6 +837,8 @@
       }
     
     } // #landing-welcome
+
+    
   }
 }
 
@@ -862,7 +867,13 @@
   .landing {
     #shop #verticals .vertical-select.span4 {
       float: left;
-      margin: 10px 2% 10px 0;
+      
+      &:first-of-type{
+        margin-left: 0;
+      }  
+
+      margin-left: 3%;
+      
       width: 31.333%;
       .backdrop {
 
@@ -873,30 +884,22 @@
     }
     #landing-stars {
     
-      .row {
-        margin-left: -20px;
+      .celebrities {
+      
+        article {
         
-        > div { padding-left: 15px; }
+          float: left;
+          width: 48%;
+          margin-right: 2%;
         
-      }
-    
-    
+        }
+      
+      } // end .celebrities
+
     }
 
-    .celebrities {
-    
-      article {
-      
-        float: left;
-        width: 48%;
-        margin-right: 2%;
-      
-      }
-    
-    } // end .celebrities
-
     #content.landing {
-      top: -50px;
+      margin-top: -50px;
     }
   } 
 }
@@ -914,26 +917,19 @@
 
 @media (max-width:480px) {
   .landing {
-    #shop #verticals .vertical-select.span4 .backdrop {
+    #shop {
+      #verticals .vertical-select.span4 .backdrop {
         height: 168.5px;
       }
-    }
 
-    #landing-stars {  
+      #browse ul {
 
-      .row {
-      
-        margin-left: -20px;
-        
-        > div {
-          padding-left: 20px;
-          padding-right: 20px;
-          padding-top: 24px;
+        .content-columns(2);   
+        li {
+          // width: 49.9%;
         }
-      
       }
-    
-    }
+    } 
 
     #landing-welcome {
     
@@ -963,8 +959,9 @@
         }
       }
     }
+  }  
 
   #content.landing {
-    top: 0;
-  } 
+    margin-top: 0;
+  }
 }

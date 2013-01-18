@@ -2,6 +2,7 @@ package models
 
 import com.google.inject.{Singleton, AbstractModule}
 import models.categories.CategoryServices
+import services.mvc.marketplace.MarketplaceServices
 import vbg._
 import xyzmo._
 import uk.me.lings.scalaguice.ScalaModule
@@ -27,6 +28,7 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[ImageAssetServices].in[Singleton]
     bind[InventoryBatchServices].in[Singleton]
     bind[InventoryBatchProductServices].in[Singleton]
+    bind[MarketplaceServices].in[Singleton]
     bind[OrderServices].in[Singleton]
     bind[PrintOrderServices].in[Singleton]
     bind[ProductServices].in[Singleton]

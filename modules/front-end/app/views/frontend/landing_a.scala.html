@@ -19,40 +19,41 @@
   <h2> Lorem ipsum dolor sit amet</h2>
 }
 @starsBlock(stars: Iterable[CatalogStar], clearFix: Boolean) = {
-  @for(starRow <- stars.grouped(4).toList) {
-    <div class="celebrities row">
-      @if(clearFix) {<div class="clearfix">}
+  <div id="landing-stars" class="module">
+    @for(starRow <- stars.grouped(4).toList) {
+      <div class="celebrities row">
+        @if(clearFix) {<div class="clearfix">}
 
-      @for(star <- starRow) {
-        <article class="span3">
-          <figure>
-            @if(!star.hasInventoryRemaining) {
-              <div class="ribbon simple">
-                <a class="soldout-tooltip" href="/faq#how-many" rel="tooltip" title="More available soon!">Sold out <span class="question">?</span>
-                </a>
-              </div>
-            }
-            <a class="glowborder" href="@star.storefrontUrl" >
-              <img src="@star.imageUrl" alt="@star.name" />              
-            </a>
-          </figure>
-          <hgroup>
-            <p class="price">$50</p>
-            <h4><a href="@star.storefrontUrl">@star.name</a></h4>
-            <h5>@star.secondaryText</h5>
-          </hgroup>
-        </article>        
-      }
-      @if(clearFix) {</div>}
-    </div>
-  }
-  @tags.landing.get_started("/stars", "See All Stars")
-@**  <a href="#">See all stars &gt;&gt;</a>**@
+        @for(star <- starRow) {
+          <article class="span3">
+            <figure>
+              @if(!star.hasInventoryRemaining) {
+                <div class="ribbon simple">
+                  <a class="soldout-tooltip" href="/faq#how-many" rel="tooltip" title="More available soon!">Sold out <span class="question">?</span>
+                  </a>
+                </div>
+              }
+              <a class="glowborder" href="@star.storefrontUrl" >
+                <img src="@star.imageUrl" alt="@star.name" />              
+              </a>
+            </figure>
+            <hgroup>
+              <p class="price">$50</p>
+              <h4><a href="@star.storefrontUrl">@star.name</a></h4>
+              <h5>@star.secondaryText</h5>
+            </hgroup>
+          </article>        
+        }
+        @if(clearFix) {</div>}
+      </div>
+    }
+    @tags.landing.get_started("/stars", "See All Stars", "stars-link")
+  </div>  
 }
 
 @verticalAndTeams = {
   <div class="module" id="browse">
-    @loremIpsum
+    <h2>Find your team on Egraphs</h2>
       <div class="row">
         <div class="clearfix">
           @for(vertical <- verticalViewModels) {
@@ -66,45 +67,44 @@
                    categoryValue <- category.categoryValues) {
                 <li>
                   <a href="#">
-                    @categoryValue.publicName,&nbsp;
+                    @categoryValue.publicName&nbsp;
                   </a>
                 </li>
 
                 }
                 <li>
-                  <a href="#">See all @vertical.shortName Teams</a>
+                  <a href="#" class="all-teams">See all @vertical.shortName Teams &gt;&gt;</a>
                 </li>
               </ul>
             </article>
           }
           </div>
         </div>
-      </div>
     </div>
 }
 @verticalsRow(verticals: Iterable[models.frontend.marketplace.VerticalViewModel])= {
-    <div id="verticals" class="module">
-        <div class="row">
-            <div class="clearfix">
-              @for(vertical <- verticals) {
-                <div class="vertical-select span4">
-                  <a class="glowborder" title="@vertical.publicName" href="#">
-                    <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
-                      <h3>@vertical.shortName &gt;&gt;</h3>
-                         <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url"/>
-                    </div>
-                  </a>
-                </div> 
-              }
-                <div class="vertical-select span4">
-                  <a class="glowborder" title="Get a gift card" href="#">
-                    <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/crowd.jpg").url')">
-                      <h3>Gift Cards &gt;&gt;</h3>
-                    </div>
-                  </a>
-                </div>  
-            </div>
+  <div id="verticals" class="module">
+    <div class="row">
+      <div class="clearfix">
+        @for(vertical <- verticals) {
+          <div class="vertical-select span4">
+            <a class="glowborder" title="@vertical.publicName" href="#">
+              <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
+                <h3>@vertical.shortName &gt;&gt;</h3>
+                <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url"/>
+              </div>
+            </a>
+          </div> 
+        }
+          <div class="vertical-select span4">
+            <a class="glowborder" title="Get a gift card" href="#">
+              <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/crowd.jpg").url')">
+                <h3>Gift Cards &gt;&gt;</h3>
+              </div>
+            </a>
+          </div>  
         </div>
+      </div>
     </div>
 }
 
@@ -201,17 +201,15 @@
         </section>        
         <section id="shop" class="tab">
           @verticalsRow(verticalViewModels)
-          <div class="module">
-            @starsBlock(stars, clearFix=true)
-          </div>
+          
+          @starsBlock(stars, clearFix=true)
 
           @verticalAndTeams
-
+          @tags.landing.searchbox("/stars")
         </section>    
+        
 
-
-        <p class="to-top"><a href="#top">Back to Top</a></p>
-
+          <p class="to-top"><a href="#to-top">Back to Top</a></p>  
       </div> <!-- end .container -->
 
     </div> <!-- end #main -->
