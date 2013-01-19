@@ -27,7 +27,12 @@ function () {
           e.preventDefault();
         });
 
-        $('[id^="myCarousel"]').carousel();
+        $("a.helper").click(function() {
+          $("#learn-switch").click();
+        });
+
+
+        //$('[id^="myCarousel"]').carousel();
 
       });
     }
