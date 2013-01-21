@@ -50,6 +50,7 @@ function(payment, validationDirective, logging, module) {
     expiryYear: "creditCardExpiryYear"
   };
 
+  // Directive that supplies support for <form credit-card-form name="cc">...</form>
   var creditCardFormDirective = function(ngModule) {
     ngModule.directive('creditCardForm', function($rootScope) {
 
@@ -186,13 +187,7 @@ function(payment, validationDirective, logging, module) {
           var ngModel = ctrls[1];
 
           // Create and add the parser where applicable
-          if (validate !== undefined) {
-            ngModel.$parsers.push(
-              validationDirective.parser(name, ngModel, function(viewValue) {
-                return validate(viewValue);
-              })
-            );
-          }
+          ngModel.$parsers.push(validationDirective.parser(name, ngModel, validate));
 
           // Add the control to the form
           formCtrl.registerFormComponent(name, attrs.name, ngModel);
@@ -201,6 +196,7 @@ function(payment, validationDirective, logging, module) {
     });
   };
 
+  // Provides support for <input credit-card-number>
   var creditCardNumberDirective = function(ngModule) {
     ccFieldDirective(ngModule, directiveNames.number, function(viewValue) {
       if (viewValue) {
@@ -211,6 +207,7 @@ function(payment, validationDirective, logging, module) {
     });
   };
 
+  // Provides support for <input credit-card-cvc>
   var creditCardCvcDirective = function(ngModule) {
     ccFieldDirective(ngModule, directiveNames.cvc, function(viewValue) {
       if (viewValue) {
@@ -221,6 +218,7 @@ function(payment, validationDirective, logging, module) {
     });
   };
 
+  // Provides support for <input credit-card-expiry-month> and <input credit-card-expiry-year>
   var creditCardExpiryDirectives = function(ngModule) {
     ccFieldDirective(ngModule, directiveNames.expiryMonth);
     ccFieldDirective(ngModule, directiveNames.expiryYear);

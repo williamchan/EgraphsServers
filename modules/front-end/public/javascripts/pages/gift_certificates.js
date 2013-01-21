@@ -1,9 +1,14 @@
-/* Scripting for the gift certificates checkout page */
-
+/* Scripting for the gift certificates checkout page.
+ *
+ * Note that this is a half-complete implementation. It currently correctly validates and
+ * accepts all payment info and ships it off to our payment partner, but nothing further.
+ *
+ * When we want to finish this, a controller will have to be written to accept the payment info
+ * as well as to incrementally validate.
+ *
+ */
 /*global angular */
 define([
-  "services/forms",
-  "services/payment",
   "services/ng/payment",
   "page",
   "window",
@@ -11,10 +16,12 @@ define([
   "module",
   "services/responsive-modal"
 ],
-function(forms, payment, ngPayment, page, window, logging, requireModule) {
+function(ngPayment, page, window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
   var forEach = angular.forEach;
 
+  // Helper type that adds some richer data on top of the certificate objects injected by the
+  // page.
   var GiftCertificateOption = function(data) {
     this.price = data.price;
     this.type = data.type;
@@ -33,14 +40,18 @@ function(forms, payment, ngPayment, page, window, logging, requireModule) {
     this.amountFieldClass = select? "scrolled-out": "scrolled-in";
   };
 
+  // Populate the array of certificate options ($25, $50, etc)
   var certificateOptions = [];
   forEach(page.certificateOptions, function(option) {
     certificateOptions.push(new GiftCertificateOption(option));
   });
 
+  // Create an angular module to manage page logic, and provide it
+  // credit-card bindings.
   var module = angular.module('giftCertificatePurchaseApp', []);
   ngPayment.applyDirectives(module);
 
+  // For use in non-production
   var sampleData = {
     order: {
       recipientName: "Herp Derpson",
@@ -57,10 +68,11 @@ function(forms, payment, ngPayment, page, window, logging, requireModule) {
     }
   };
 
+  // Angular controller that handles all page interaction
   var GiftCertificatePurchaseController = function ($scope) {
     var config = page.config;
-    var paymentToken;
 
+    // Bang some page configuration into the $scope
     angular.extend($scope, {
       certificateOptions: certificateOptions,
       months: page.months,
@@ -81,53 +93,6 @@ function(forms, payment, ngPayment, page, window, logging, requireModule) {
     $scope.onCardInfoValidated = function(cardToken) {
       log("Woot! success");
       log($scope);
-    };
-
-    $scope.printScope = function() {
-      log($scope);
-    };
-
-    /**
-     * Iterates through all errors of all forms, and removes any that began with "remote-"
-     * from the controls to which they applied.
-     */
-    var clearRemoteErrors = function() {
-      forEach(forms(), function(form) {
-        forEach(form.$error, function(controlsWithErrors, errorName) {
-          if (errorName.search("remote_") === 0) {
-            forEach(controlsWithErrors, function(controlWithErrors) {
-              controlWithErrors.$setValidity(errorName, true);
-            });
-          }
-        });
-      });
-    };
-
-    var formsValid = function() {
-      return !($scope.ownAmount.$invalid || $scope.pay.$invalid || $scope.personalize.$invalid);
-    };
-
-    var dirtyUserControls = function() {
-      forEach(userControls(), function(control) {
-        // Hackily set dirty flag on all user controls to
-        // enable error styling even on previously un-touched
-        // inputs.
-        control.$setViewValue(control.$viewValue);
-      });
-    };
-
-    var userControls = function() {
-      return [
-        $scope.ownAmount.amount,
-        $scope.personalize.recipientName,
-        $scope.personalize.gifterName,
-        $scope.personalize.email,
-        $scope.pay.postalCode
-      ];
-    };
-
-    var forms = function() {
-      return [$scope.ownAmount, $scope.personalize, $scope.pay];
     };
 
     // Select the default option

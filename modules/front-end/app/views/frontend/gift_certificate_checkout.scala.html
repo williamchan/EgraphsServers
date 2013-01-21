@@ -1,4 +1,3 @@
-
 @()(
   implicit
   headerData: models.frontend.header.HeaderData,
@@ -14,6 +13,9 @@
 @import models.frontend.forms.Field
 
 @headJs = {
+  @**
+   *As a client-driven page, most data will be banged into JS rather than directly into the template 
+   *@
   angular.extend(Egraphs.page, {
     certificateOptions: [
       {type:"concrete", price:25},

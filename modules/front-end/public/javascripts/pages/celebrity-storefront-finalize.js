@@ -14,9 +14,7 @@ function(forms, payment, Egraphs) {
 
         } else {
           // Use the provided purchase token to present redacted card info.
-          var paymentModule = payment[thisPage.paymentJsModule];
-          paymentModule.setPublishableKey(thisPage.paymentApiKey);
-          paymentModule.getToken(thisPage.paymentToken, function(status, response) {
+          payment.getToken(thisPage.paymentToken, function(status, response) {
             if (status === 200) {
               var card = response.card;
               $ccElem.text(card.type + ": ************" + card.last4);
