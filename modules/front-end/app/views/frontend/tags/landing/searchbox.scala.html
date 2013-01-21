@@ -1,12 +1,8 @@
 @(url: String, autofocus:Boolean=false)
-<div class="row">
-  <div  class="offset4 span5">
-    <form action="@url" class="form-inline">
-      <div class="search-control input-append">
-        <input type="search" name="query" @if(autofocus) {autofocus="autofocus"} class="" placeholder="Find your star"></input>
-        <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
-      </div>  
-      <span class="help-block">e.g. Kapler, Red Sox, Boston</span>
-    </form>
-  </div>
-</div>
+<form action="@url" class="form-inline span5">
+  <div class="search-control input-append">
+    <input type="search" name="query" @if(autofocus) {autofocus="autofocus"} class="" placeholder="Find your star"></input>
+    <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
+  </div>  
+  <span class="help-block">e.g. Kapler, Red Sox, Boston</span>
+</form>

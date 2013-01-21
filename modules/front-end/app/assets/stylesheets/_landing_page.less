@@ -240,18 +240,17 @@
 		
 		p { margin-bottom: 0; }
 
-      form {
-        div {
-          display: inline;
-          padding-left: 20px;
-          padding-right: 20px;
-          #celebrity-searchbox {
-            width: 40%;
-          }
-          .celebrity-searchbox-container(0);
-        }
-      }
 	}
+
+	form {
+  	.search-control {
+    	.celebrity-searchbox-container2(); 
+  	}     
+
+  	.help-block {
+  		font-size: 12px;
+  	}
+  }
 
 	.actions {
 
@@ -675,21 +674,4 @@
 		}
 	
 	}
-
-
-    #landing-more {
-        header {
-            form { 
-            	div {
-	              #celebrity-searchbox {
-                  width: 70%;
-                  height: 26px;
-                  position: relative;
-                  top: -2px;
-                }
-              }  
-            }
-        }
-    }
-
 }
