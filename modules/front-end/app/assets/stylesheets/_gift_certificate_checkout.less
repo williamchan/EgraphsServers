@@ -77,6 +77,7 @@
       // The circle that appears inside the "Review Order" button
       &.in-button {
         text-indent:0px;
+        cursor:pointer;
         letter-spacing:normal;
         background-image: none;
         background-color: white;
@@ -108,6 +109,27 @@
       // Labels for all text inputs
       .control-label {
         text-align: left;
+      }
+
+      input, select {
+        color: #666;
+
+        &:focus {
+          border-color: rgba(82,168,236,.8);
+          outline: 0;
+          outline: thin dotted \9; /* IE6-9 */
+          .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6)");
+        }
+
+        &.ng-valid.ng-dirty:not(:focus) {
+          border-color:lighten(@green, 20%);
+        }
+
+        // Any unfocused, previously entered inputs that are invalid should be
+        // called out.
+        &.ng-invalid.ng-dirty:not(:focus) {
+          border-color: darken(red, 10%);
+        }
       }
     }
 
@@ -168,6 +190,9 @@
     }
 
     #choose-amount {
+      form {
+        margin:0px;
+      }
       .amount-option {
         position:relative;
 
@@ -207,18 +232,30 @@
         // Special styling for "SET MY OWN AMOUNT"
         &.own-amount {
           button.btn {
+            position:relative;
+            z-index:2;
             font-size:20px;
           }
 
           #amount-field {
+            .transition(margin-top .5s ease-in-out);
             position:relative;
+            z-index:1;
             display:inline-block;
             float:right;
             margin-top:15px;
 
+            &.scrolled-in {
+              margin-top:-50px;
+            }
+
+            &.scrolled-out {
+              margin-top:6px;
+            }
+
             .dollah {
               position:relative;
-              top:-1px;
+              top:2px;
               color:#333;
               font-size:20px;
               padding-right:7px;
@@ -226,6 +263,7 @@
 
             input {
               max-width:70px;
+              margin-bottom:0px;
             }
           }
         }
@@ -233,6 +271,7 @@
 
       .hint {
         padding-top:4px;
+        margin-bottom:2px;
         text-align:center;
       }
 
@@ -246,18 +285,36 @@
         margin-bottom:0px;
       }
 
+      .hint {
+        margin-bottom: 12px;
+      }
+    }
+
+    #personalize, #pay {
       .control-group {
         margin-right:10px;
         
         input {
           width:100%;
         }
-      }
 
+        .errors {
+          font-weight:300;
+          font-size:14px;
+          
+          strong {
+            font-weight:600;
+          }
 
-      .hint {
-        margin-bottom: 12px;
-      }
+          .alert {
+            width:100%;
+            margin-top:7px;
+            position:relative;
+            padding:4px;
+            margin-bottom:0px;
+          }
+        }
+      }      
     }
 
     #pay {
@@ -273,13 +330,22 @@
         margin-right:10px;
       }
 
-      input {
+      select {
         width:100%;
       }
 
-      input#card-cvc, input#postal-code {
+      input#card-cvc, input#postal-code, {
         max-width:50px;
       }
+      
+      select#card-exp-month {
+        width:60px;
+      }
+
+      select#card-exp-year {
+        width:80px;
+      }
+
     }
 
     #review-button {
