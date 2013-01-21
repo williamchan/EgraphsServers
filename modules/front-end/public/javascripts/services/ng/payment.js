@@ -8,7 +8,7 @@
  *
  *   <!-- Create a form with the directive, and give it a name. -->
  *   <form credit-card-form name="ccForm">
- *     <!-- Create necesary form inputs for card: number, cvc, expiry month, expiry year
+ *     <!-- Create necessary form inputs for card: number, cvc, expiry month, expiry year
  *          The form inputs will automatically use payment.js's client-side validation methods.
  *          You can name them whatever you want, but they do need a name. -->
  *     <input credit-card-number name="cardNumber" type="text" />
