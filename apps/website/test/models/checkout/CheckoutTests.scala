@@ -9,6 +9,8 @@ import org.scalatest.matchers.{MatchResult, Matcher}
 import services.db.{Schema, TransactionSerializable, DBSession}
 import models.enums.CodeType
 import services.payment.StripeTestPayment
+import TestData._
+import models.checkout.Checkout.{CheckoutFailed, FailedCheckoutWithCharge}
 
 
 class CheckoutTests extends EgraphsUnitTest
@@ -23,8 +25,8 @@ class CheckoutTests extends EgraphsUnitTest
   //
   override def newIdValue = 0
   override def improbableIdValue = java.lang.Integer.MAX_VALUE
-  override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), taxedZip, Some(customer))
-  override def saveModel(toSave: Checkout): Checkout = toSave.transact(cashTxnType) match {
+  override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), taxedZip, Some(newSavedCustomer()))
+  override def saveModel(toSave: Checkout): Checkout = toSave.transact(cashTxnTypeFor(toSave)) match {
     case Right(checkout) => checkout
     case Left(failure) => fail("failed with " + failure)
   }
@@ -37,36 +39,37 @@ class CheckoutTests extends EgraphsUnitTest
 
 
   //
-  // Test cases
+  // Companion test cases
   //
   "Checkout" should "add summaries to new checkouts" in {
-    val taxedCheckout = Checkout(oneGiftCertificate, taxedZip, Some(customer))
-    val untaxedCheckout = Checkout(oneGiftCertificate, untaxedZip, Some(customer))
-    val checkoutWithoutZip = Checkout(oneGiftCertificate, "", Some(customer))
+    val taxedCheckout = Checkout(oneGiftCertificate, taxedZip, Some(newSavedCustomer()))
+    val untaxedCheckout = Checkout(oneGiftCertificate, untaxedZip, Some(newSavedCustomer()))
+    val checkoutWithoutZip = Checkout(oneGiftCertificate, "", Some(newSavedCustomer()))
     val checkoutWithoutCustomer = Checkout(oneGiftCertificate, taxedZip, None)
 
-    taxedCheckout.lineItemTypes.filter(SubtotalLineItemType eq _) should have length (1)
-    taxedCheckout.lineItemTypes.filter(TotalLineItemType eq _) should have length (1)
-    taxedCheckout.subtotal should not be (null)
-    taxedCheckout.total should not be (null)
-
-    untaxedCheckout.lineItemTypes.filter(SubtotalLineItemType eq _) should have length (1)
-    untaxedCheckout.lineItemTypes.filter(TotalLineItemType eq _) should have length (1)
-    untaxedCheckout.subtotal should not be (null)
-    untaxedCheckout.total should not be (null)
-
-    checkoutWithoutZip.lineItemTypes.filter(SubtotalLineItemType eq _) should have length (1)
-    checkoutWithoutZip.lineItemTypes.filter(TotalLineItemType eq _) should have length (1)
-    checkoutWithoutZip.subtotal should not be (null)
-    checkoutWithoutZip.total should not be (null)
-
-    checkoutWithoutCustomer.lineItemTypes.filter(SubtotalLineItemType eq _) should have length (1)
-    checkoutWithoutCustomer.lineItemTypes.filter(TotalLineItemType eq _) should have length (1)
-    checkoutWithoutCustomer.subtotal should not be (null)
-    checkoutWithoutCustomer.total should not be (null)
+    taxedCheckout should haveCorrectSummaries
+    untaxedCheckout should haveCorrectSummaries
+    checkoutWithoutZip should haveCorrectSummaries
+    checkoutWithoutCustomer should haveCorrectSummaries
   }
 
+
   it should "add summaries to restored checkouts" in (pending)
+
+  // TODO(SER-499): test expected values from checkout with added types (balance, total, etc)
+  // need to re-evaluate total and balance
+      //total updated, not the balance
+        //  +: expected behavior, "total" always available
+        //  -: balance may need to be a line item (instead of just Money)
+
+      //total constant, not updated
+        //  +: easier adding of types, less micromanaging items
+        //  -: sum additional items for balance
+
+      //total as balance
+        //  +: no extra balance concept
+        //  -: unexpected, actual total is calculation
+
 
   it should "add taxes to checkouts in taxed zipcodes" in {
     val checkout = Checkout(oneGiftCertificate, taxedZip, None)
@@ -74,15 +77,21 @@ class CheckoutTests extends EgraphsUnitTest
   }
 
 
+  //
+  // Checkout test cases
+  //
   "A checkout" should "fail to transact without a customer" in {
     val checkout = Checkout(oneGiftCertificate, taxedZip, None)
-    lazy val failedTransaction = checkout.transact(cashTxnType)
+    lazy val failedTransaction = checkout.transact(randomCashTxnType)
 
     failedTransaction should be ('left)
 
     failedTransaction match {
       // TODO(SER-499): check that maybeCharge is refunded
-      case _ =>
+      case Left(error: FailedCheckoutWithCharge) =>
+        error.maybeCharge should be ('defined)
+        error.maybeCharge.get.refunded should be (true)
+      case Left(other: CheckoutFailed) => fail("Expected error with charge, received " + other.getClass)
     }
   }
 
@@ -134,7 +143,7 @@ class CheckoutTests extends EgraphsUnitTest
 
 
   //
-  // Helpers
+  // Data helpers
   //
   def checkoutServices = AppConfig.instance[CheckoutServices]
   def payment = { val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap(); pment }
@@ -152,9 +161,22 @@ class CheckoutTests extends EgraphsUnitTest
 
   // NOTE(SER-499): zipcode might benefit from being communicated to taxes and cash txn through checkout context
 
-  def cashTxnType = CashTransactionLineItemType(customer.account.id, Some(taxedZip), Some(token))
-  def customer = TestData.newSavedCustomer()
+  // txn type is associated with the checkout's customer's account
+  def cashTxnTypeFor(checkout: Checkout) = CashTransactionLineItemType(checkout.account.id, Some(taxedZip), Some(token))
 
+  // txn type associated with new unused account id
+  def randomCashTxnType = CashTransactionLineItemType(newSavedAccount().id, Some(taxedZip), Some(token))
+
+
+
+
+
+
+
+
+  //
+  // Matchers
+  //
   def beContainedIn(otherItems: LineItems, checkoutState: String = "other") = Matcher { left: LineItems =>
     val notInOtherItems = left.filterNot { item => otherItems.exists(item equalsLineItem _) }
     val successMessage = "All items were contained in %s checkout".format(checkoutState)
@@ -164,5 +186,15 @@ class CheckoutTests extends EgraphsUnitTest
     )
 
     MatchResult(notInOtherItems.isEmpty, failMessage, successMessage)
+  }
+
+  def haveCorrectSummaries = Matcher { checkout: Checkout =>
+    val numSubtotals = checkout.lineItemTypes.filter(SubtotalLineItemType eq _).length
+    val numTotals = checkout.lineItemTypes.filter(TotalLineItemType eq _).length
+
+    MatchResult(numSubtotals == 1 && numTotals == 1,
+      "%d and %d subtotals and totals found.".format(numSubtotals, numTotals),
+      "Only 1 subtotal and subtotal found"
+    )
   }
 }

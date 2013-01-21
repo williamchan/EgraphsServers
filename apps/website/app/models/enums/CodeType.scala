@@ -7,6 +7,7 @@ import org.joda.money.{CurrencyUnit, Money}
 sealed abstract class CodeType(val name: String)
 
 // TODO(SER-499): remove LIT if no use for it comes up, test the rest of this (type erasure might fuck it up)
+// TODO(SER-499): move itemInstance into CodeType (above) if it makes sense, reduces boilerplate significantly
 trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   this: CodeType =>
   // take both entities because they're both easily available when restoring
@@ -78,3 +79,7 @@ object CodeType extends Enum {
     }
   }
 }
+
+
+
+trait HasCodeType { def codeType: CodeType }

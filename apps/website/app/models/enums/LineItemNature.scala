@@ -16,3 +16,7 @@ object LineItemNature extends Enum {
   val Refund = new EnumVal("Refund") {}
 
 }
+
+
+
+trait HasLineItemNature { def nature: LineItemNature }

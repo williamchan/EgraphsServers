@@ -8,19 +8,19 @@ import org.squeryl.dsl.ast.LogicalBoolean
 import services.db._
 import scalaz.Lens
 
-import models.enums.{CodeTypeFactory, CodeType, LineItemNature}
+import models.enums._
 import models.{HasCreatedUpdated, SavesCreatedUpdated}
 import org.squeryl.annotations.Transient
 import com.google.inject.Inject
 
 
-trait LineItemType[+TransactedT] {
+trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
   def id: Long
 
   // Convenience entity-member accessors
   def description: String
-  def nature: LineItemNature
-  def codeType: CodeType
+//  def nature: LineItemNature
+//  def codeType: CodeType
 
   // Serialization
   def toJson: String

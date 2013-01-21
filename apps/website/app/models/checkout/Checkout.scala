@@ -4,7 +4,7 @@ package models.checkout
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums._
 import org.squeryl.PrimitiveTypeMode._
-import java.sql.Timestamp
+import java.sql.{Connection, Timestamp}
 import services.{AppConfig, Time}
 import services.db._
 import models._
@@ -42,6 +42,9 @@ package object checkout {
   type FailureOrCheckout = Either[Checkout.CheckoutFailed, Checkout]
 
 
+  //
+  // LineItems DSL conversion
+  //
   implicit def lineItemSeqToMemberDSL(items: LineItems) = new {
     def subtotalOption = ofCodeType(CodeType.Subtotal).headOption
     def taxes: Seq[TaxLineItem] = ofCodeType(CodeType.Tax)
@@ -62,7 +65,6 @@ package object checkout {
     def notOfNature(nature: LineItemNature) = items.filterNot(_.nature == nature)
     def notOfNatures(natures: Set[LineItemNature]) = items.filterNot(natures contains _.nature)
 
-
     def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD)){ _ plus _.amount }
   }
 }
@@ -81,7 +83,8 @@ case class CheckoutServices @Inject() (
   customerStore: CustomerStore,
   accountStore: AccountStore,
   addressStore: AddressStore,
-  dbSession: DBSession
+  dbSession: DBSession,
+  @CurrentTransaction currentTxnConnectionFactory: () => Connection
 ) extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity]
   with SavesCreatedUpdated[CheckoutEntity]
 {
@@ -107,7 +110,6 @@ case class CheckoutServices @Inject() (
     checkouts.toSeq
   }
 }
-
 
 
 
@@ -180,8 +182,7 @@ case class Checkout (
   def withCustomer(customer: Customer) = {
     this.copy(
       _entity = _entity.copy(customerId = customer.id),
-      _customer = Some(customer)
-    )
+      _customer = Some(customer))
   }
 
 
@@ -233,47 +234,56 @@ case class Checkout (
    * @return Transacted checkout or failure
    */
   protected def saveTransaction(cashTransactionType: CashTransactionLineItemType): FailureOrCheckout = {
+    // NOTE(SER-499): not going to rollback checkout entity on transaction failure for now to make it easy to check for number of failure case by querying for checkout entities with no corresponding line item entities
     val savedCheckout = this.insert()
 
+    val conn = services.currentTxnConnectionFactory()
+    val savepoint = conn.setSavepoint()
 
     // get cash transaction line item with charge
     val cashTransactionItem = cashTransactionType.lineItems(lineItems) match {
-      case Some(Nil) => // possible case for checkouts that don't need a cash transaction?
-        return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
-
       case Some(Seq(txnItem: CashTransactionLineItem)) =>
         txnItem.makeCharge(savedCheckout)
 
       case Some(txns: LineItems) =>
-        // precaution against runtime errors from type erasure; make sure itms passed to failure are actually txns
+        // precaution against runtime errors from type erasure; make sure items passed to failure are actually txns
         val actualTxns = txns.flatMap(item => item.asCodeTypeOption(CodeType.CashTransaction))
         return Left(CheckoutFailedMultiplePaymentsResolved(this, actualTxns))
 
-      case None =>
+      case _ =>
         return Left(CheckoutFailedCashTransactionResolutionError(this, cashTransactionType))
     }
 
 
     // TODO(SER-499): wrap in transaction, currently doesn't roll back lineitems or domain objects...
     // transact line items
-    val savedItems: LineItems = (cashTransactionItem +: savedCheckout.lineItems).map { (item: LineItem[_]) =>
-      try {
-        item.transact(savedCheckout)
-      } catch {
-        // NOTE: checkout entity remains in DB for now after failure, but checkout entity alone is inconsequential
+    val savedItems: LineItems = try {
+      (cashTransactionItem +: savedCheckout.lineItems)
+        .map { _.transact(savedCheckout) }
 
-        case e: InsufficientInventoryException =>
-          return Left(CheckoutFailedInsufficientInventory(this, cashTransactionItem, cashTransactionItem.abortTransaction()))
+    } catch {
+      // NOTE: checkout entity remains in DB for now after failure, but checkout entity alone is inconsequential
 
-        case e: Exception => /* DEBUG */ println("**CHECKOUT ERROR: " + e) /* END DEBUG */
-          return Left(CheckoutFailedError(this, cashTransactionItem, cashTransactionItem.abortTransaction()))
+      case e: InsufficientInventoryException =>
+        conn.rollback(savepoint)
+        return Left(CheckoutFailedInsufficientInventory(this, cashTransactionItem, cashTransactionItem.abortTransaction()))
 
-      }
+      case e: Exception =>
+        conn.rollback(savepoint)
+        /* DEBUG */ println("**CHECKOUT ERROR: " + e) /* END DEBUG */
+        return Left(CheckoutFailedError(this, cashTransactionItem, cashTransactionItem.abortTransaction()))
+
     }
+
+
 
     // Note that reconstructing the checkout, instead of copying, updates total and subtotal
     Right( Checkout(savedCheckout._entity, savedItems) )
   }
+
+
+
+
 
 
 
@@ -303,6 +313,7 @@ case class Checkout (
       /** transact items from pendingTypes and new taxes, fees, etc associated with them */
       _typesOrItems match {
         case Right(alreadyTransactedItems: LineItems) =>
+          // TODO(SER-499): set db savepoints
           // TODO(SER-499): require sum of amounts is zero
           // TODO(SER-499): charge/refund the balance to cashTransactionType's item
 
@@ -450,6 +461,7 @@ object Checkout extends Logging {
   // Checkout failure cases
   //
   sealed abstract class CheckoutFailed(val failedCheckoutData: FailedCheckoutData)
+  protected[checkout] trait FailedCheckoutWithCharge { def maybeCharge: Option[Charge] }
 
   case class CheckoutFailedCashTransactionResolutionError(
     checkout: Checkout,
@@ -462,7 +474,7 @@ object Checkout extends Logging {
     maybeCharge: Option[Charge]
   ) extends CheckoutFailed(
     FailedCheckoutData(checkout, Seq(canceledTransactionItem.itemType), Seq(canceledTransactionItem))
-  )
+  ) with FailedCheckoutWithCharge
 
   case class CheckoutFailedMultiplePaymentsResolved(
     checkout: Checkout,
@@ -477,7 +489,7 @@ object Checkout extends Logging {
     maybeCharge: Option[Charge]
   ) extends CheckoutFailed(
     FailedCheckoutData(checkout, Seq(canceledTransactionItem.itemType), Seq(canceledTransactionItem))
-  )
+  ) with FailedCheckoutWithCharge
 
   case class CheckoutFailedUpdatedUnpersistedError(
     checkout: Checkout,

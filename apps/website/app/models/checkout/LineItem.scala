@@ -9,9 +9,10 @@ import scalaz.Lens
 import models.{HasCreatedUpdated, SavesCreatedUpdated}
 import org.squeryl.annotations.Transient
 import com.google.inject.Inject
-import models.enums.{CodeTypeFactory, LineItemNature, CodeType}
+import models.enums._
+import scala.Some
 
-trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
+trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with HasLineItemNature with HasCodeType {
 
   def id: Long
   def itemType: LineItemType[TransactedT]
@@ -35,10 +36,10 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] {
   def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
 
   //
-  // LineItemType member accessors
+  // HasLineItemNature and HasCodeType members
   //
-  def codeType: CodeType = itemType.codeType
-  def nature: LineItemNature = itemType.nature
+  override def codeType: CodeType = itemType.codeType
+  override def nature: LineItemNature = itemType.nature
 
 
   /**
