@@ -1,4 +1,4 @@
-/*package models.checkout
+package models.checkout
 
 import checkout._
 import org.joda.money.{CurrencyUnit, Money}
@@ -15,7 +15,7 @@ import services.Finance.TypeConversions._
 case class BalanceLineItem(amount: Money) extends LineItem[Money] {
 
   override def itemType = BalanceLineItemType
-  override val withAmount = this.copy(_)
+  override def withAmount(newAmount: Money) = this.copy(newAmount)
 
   override def toJson = {
     // TODO(SER-499): implement
@@ -40,22 +40,21 @@ object BalanceLineItemType extends BalanceLineItemType {
   override val description = "Balance"
   override val nature = LineItemNature.Summary
   override val codeType = CodeType.Balance
+  override val toJson = ""
 
 
   override def lineItems(resolved: LineItems, pendingResolution: LineItemTypes) = {
     import LineItemNature._
-    pendingResolution.find(Set(Payment, Summary) contains _.nature) match {
-      case Some(_) => None
-      case None => {
-        val total = resolved.find(_.codeType == CodeType.Total)
-        val payments = resolved.filter(_.nature == LineItemNature.Payment)
 
-        val difference = (total +: payments).foldLeft(BigDecimal(0).toMoney())(_ plus _.amount)
-        Some(Seq(BalanceLineItem(difference)))
+    if (pendingResolution.ofNatures(Payment, Summary).isEmpty) {
+       Some {
+        val total = resolved(CodeType.Total).head
+        val payments = resolved(Payment)
+        val difference = total.amount plus payments.sumAmounts // payments to us are negative
+        Seq(BalanceLineItem(difference))
       }
-
+    } else {
+      None
     }
   }
-
 }
-*/

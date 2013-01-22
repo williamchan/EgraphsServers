@@ -2,15 +2,14 @@ package models.checkout
 
 import utils._
 import org.joda.money.{CurrencyUnit, Money}
-import services.AppConfig
-import services.Finance.TypeConversions._
-import models.checkout.checkout._
 import org.scalatest.matchers.{MatchResult, Matcher}
+import services.AppConfig
 import services.db.{Schema, TransactionSerializable, DBSession}
-import models.enums.CodeType
+import services.Finance.TypeConversions._
 import services.payment.StripeTestPayment
+import models.checkout.checkout._
+import models.checkout.Checkout._
 import TestData._
-import models.checkout.Checkout.{CheckoutFailed, FailedCheckoutWithCharge}
 
 
 class CheckoutTests extends EgraphsUnitTest
@@ -25,7 +24,7 @@ class CheckoutTests extends EgraphsUnitTest
   //
   override def newIdValue = 0
   override def improbableIdValue = java.lang.Integer.MAX_VALUE
-  override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), taxedZip, Some(newSavedCustomer()))
+  override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), Some(taxedZip), Some(newSavedCustomer()))
   override def saveModel(toSave: Checkout): Checkout = toSave.transact(cashTxnTypeFor(toSave)) match {
     case Right(checkout) => checkout
     case Left(failure) => fail("failed with " + failure)
@@ -38,41 +37,25 @@ class CheckoutTests extends EgraphsUnitTest
 
 
 
-  //
-  // Companion test cases
-  //
-  "Checkout" should "add summaries to new checkouts" in {
-    val taxedCheckout = Checkout(oneGiftCertificate, taxedZip, Some(newSavedCustomer()))
-    val untaxedCheckout = Checkout(oneGiftCertificate, untaxedZip, Some(newSavedCustomer()))
-    val checkoutWithoutZip = Checkout(oneGiftCertificate, "", Some(newSavedCustomer()))
-    val checkoutWithoutCustomer = Checkout(oneGiftCertificate, taxedZip, None)
 
-    taxedCheckout should haveCorrectSummaries
-    untaxedCheckout should haveCorrectSummaries
-    checkoutWithoutZip should haveCorrectSummaries
-    checkoutWithoutCustomer should haveCorrectSummaries
+  //
+  // Companion Object test cases
+  //
+  "Checkout" should "not add duplicate summaries" in {
+    val taxedCheckout = Checkout(oneGiftCertificate, Some(taxedZip), Some(newSavedCustomer()))
+    val untaxedCheckout = Checkout(oneGiftCertificate, Some(untaxedZip), Some(newSavedCustomer()))
+    val checkoutWithoutZip = Checkout(oneGiftCertificate, None, Some(newSavedCustomer()))
+    val checkoutWithoutCustomer = Checkout(oneGiftCertificate, Some(taxedZip), None)
+
+    // check that checkouts only have one of each summary (e.g. subtotal, total, balance)
+    taxedCheckout should notHaveDuplicateSummaries
+    untaxedCheckout should notHaveDuplicateSummaries
+    checkoutWithoutZip should notHaveDuplicateSummaries
+    checkoutWithoutCustomer should notHaveDuplicateSummaries
   }
 
-
-  it should "add summaries to restored checkouts" in (pending)
-
-  // TODO(SER-499): test expected values from checkout with added types (balance, total, etc)
-  // need to re-evaluate total and balance
-      //total updated, not the balance
-        //  +: expected behavior, "total" always available
-        //  -: balance may need to be a line item (instead of just Money)
-
-      //total constant, not updated
-        //  +: easier adding of types, less micromanaging items
-        //  -: sum additional items for balance
-
-      //total as balance
-        //  +: no extra balance concept
-        //  -: unexpected, actual total is calculation
-
-
   it should "add taxes to checkouts in taxed zipcodes" in {
-    val checkout = Checkout(oneGiftCertificate, taxedZip, None)
+    val checkout = Checkout(oneGiftCertificate, Some(taxedZip), None)
     checkout.taxes should not be (Nil)
   }
 
@@ -80,14 +63,17 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Checkout test cases
   //
+
+  // TODO(SER-499): additional save test cases
+  // -don't make zero-value charges
+
   "A checkout" should "fail to transact without a customer" in {
-    val checkout = Checkout(oneGiftCertificate, taxedZip, None)
+    val checkout = Checkout(oneGiftCertificate, Some(taxedZip), None)
     lazy val failedTransaction = checkout.transact(randomCashTxnType)
 
     failedTransaction should be ('left)
 
     failedTransaction match {
-      // TODO(SER-499): check that maybeCharge is refunded
       case Left(error: FailedCheckoutWithCharge) =>
         error.maybeCharge should be ('defined)
         error.maybeCharge.get.refunded should be (true)
@@ -97,18 +83,25 @@ class CheckoutTests extends EgraphsUnitTest
 
   it should "have a balance of zero after transaction" in {
     val transacted = saveModel(newModel)
-    transacted.total should have ('amount (zeroDollars))
-    transacted.balance should be (zeroDollars)
+    transacted.total should haveNegatedAmountOf (transacted.payments.head)
+    transacted.balance should haveAmount (zeroDollars)
   }
 
   it should "charge the customer for the total on checkout" in {
     val total = newModel.total
     val transacted = saveModel(newModel)
-    val txnItem = transacted.lineItems.find(_.codeType == CodeType.CashTransaction ).get
+    val txnItem = transacted.payments.head
 
-    txnItem.amount should be (total.amount.negated)
+    txnItem should haveNegatedAmountOf (total)
   }
 
+
+
+
+  // TODO(SER-499): additional test cases
+  // -require payment
+  // -make payment appropriately
+  // -do nothing without add. types
 
   "A restored checkout" should "contain same line items as saved checkout" in {
     val saved = saveModel(newModel)
@@ -119,15 +112,23 @@ class CheckoutTests extends EgraphsUnitTest
     restoredItems should beContainedIn (savedItems, "saved")
   }
 
-  it should "update when transacted after being persisted in initial transaction" in {
-    val saved = saveModel(newModel)
-    val transformed = transformModel(saved)
-    val updated = saveModel(transformed)
-    val restored = restoreModel(updated.id).get
+  it should "update when transacted with additional types" in {
+    val savedRestored = restoreModel(saveModel(newModel).id).get
+    val transformed = transformModel(savedRestored) // adds additional types
+    val updated = saveModel(transformed)    // updates
+    val updatedRestored = restoreModel(updated.id).get
 
-    saved.id should be (updated.id)
-    updated._entity.updated.getTime should be > (saved._entity.updated.getTime)
-    updated._entity.updated.getTime should equal (restored._entity.updated.getTime)
+    savedRestored.id should be (updated.id)
+    updated._entity.updated.getTime should be > (savedRestored._entity.updated.getTime)
+    updated._entity.updated.getTime should be (updatedRestored._entity.updated.getTime)
+  }
+
+  it should "have correct balance" in {
+    val restored = restoreModel(saveModel(newModel).id)
+  }
+
+  it should "require payment for update with non-zero balance" in {
+
   }
 
   it should "contain same line items as after most recent update" in {
@@ -188,7 +189,7 @@ class CheckoutTests extends EgraphsUnitTest
     MatchResult(notInOtherItems.isEmpty, failMessage, successMessage)
   }
 
-  def haveCorrectSummaries = Matcher { checkout: Checkout =>
+  def notHaveDuplicateSummaries = Matcher { checkout: Checkout =>
     val numSubtotals = checkout.lineItemTypes.filter(SubtotalLineItemType eq _).length
     val numTotals = checkout.lineItemTypes.filter(TotalLineItemType eq _).length
 
@@ -197,4 +198,14 @@ class CheckoutTests extends EgraphsUnitTest
       "Only 1 subtotal and subtotal found"
     )
   }
+
+  def haveAmount(desiredAmount: Money) = Matcher { left: LineItem[_] =>
+    MatchResult(left.amount == desiredAmount,
+      (left.amount + " did not equal " + desiredAmount),
+      "LineItem has desired amount"
+    )
+  }
+
+  def haveAmountOf(right: LineItem[_]) = haveAmount(right.amount)
+  def haveNegatedAmountOf(right: LineItem[_]) = haveAmount(right.amount.negated)
 }

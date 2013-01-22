@@ -45,27 +45,28 @@ package object checkout {
   //
   // LineItems DSL conversion
   //
-  implicit def lineItemSeqToMemberDSL(items: LineItems) = new {
-    def subtotalOption = ofCodeType(CodeType.Subtotal).headOption
-    def taxes: Seq[TaxLineItem] = ofCodeType(CodeType.Tax)
-    def fees: LineItems = ofNature(LineItemNature.Fee)
-    def totalOption = ofCodeType(CodeType.Total).headOption
-    def payments: LineItems = ofNature(LineItemNature.Payment)
+  implicit def itemTypeSeqToMemberDSL(types: LineItemTypes) = new HasNatureToMemberDSL(types) {}
+  implicit def lineItemSeqToMemberDSL(items: LineItems) = new HasNatureToMemberDSL(items) {
+    def apply[LIT <: LineItemType[_], LI <: LineItem[_]](codeType: CodeTypeFactory[LIT, LI]) =
+      ofCodeType(codeType)
 
     def ofCodeType[LIT <: LineItemType[_], LI <: LineItem[_]] (codeType: CodeTypeFactory[LIT, LI]) = {
       items.flatMap(_.asCodeTypeOption(codeType))
     }
-
-    def ofCodeTypes(codeTypes: Set[CodeType]) = items.filter(codeTypes contains _.codeType)
+    def ofCodeTypes(codeTypes: CodeType*) = items.filter(codeTypes contains _.codeType)
     def notOfCodeType(codeType: CodeType) = items.filterNot(_.codeType == codeType)
-    def notofCodeTypes(codeTypes: Set[CodeType]) = items.filterNot(codeTypes contains _.codeType)
+    def notofCodeTypes(codeTypes: CodeType*) = items.filterNot(codeTypes contains _.codeType)
 
-    def ofNature(nature: LineItemNature) = items.filter(_.nature == nature)
-    def ofNatures(natures: Set[LineItemNature]) = items.filter(natures contains _.nature)
-    def notOfNature(nature: LineItemNature) = items.filterNot(_.nature == nature)
-    def notOfNatures(natures: Set[LineItemNature]) = items.filterNot(natures contains _.nature)
+    def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD))( _ plus _.amount )
+  }
 
-    def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD)){ _ plus _.amount }
+  abstract class HasNatureToMemberDSL[T <: HasLineItemNature](elements: Seq[T]) {
+    def apply(nature: LineItemNature) = ofNature(nature)
+
+    def ofNature(nature: LineItemNature) = elements.filter(_.nature == nature)
+    def ofNatures(natures: LineItemNature*) = elements.filter(natures contains _.nature)
+    def notOfNature(nature: LineItemNature) = elements.filterNot(_.nature == nature)
+    def notOfNatures(natures: LineItemNature*) = elements.filterNot(natures contains _.nature)
   }
 }
 
@@ -132,15 +133,21 @@ case class Checkout (
   //
   // Checkout members
   //
-  lazy val lineItems: LineItems =  _typesOrItems match {
-    case Right(items: LineItems) => resolveTypes(pendingTypes, items)
-    case Left(types: LineItemTypes) => resolveTypes(types)
+  lazy val lineItems: LineItems =  {
+    val (unresolvedTypes, resolvedItems) = _typesOrItems match {
+      case Right(items: LineItems) => (summaryTypes ++ pendingTypes, items)
+      case Left(_) => (lineItemTypes, Nil)
+    }
+    resolveTypes(unresolvedTypes, resolvedItems)
   }
 
-  lazy val lineItemTypes: LineItemTypes = _typesOrItems match {
-    case Left(types: LineItemTypes) => types
-    case Right(items: LineItems) => pendingTypes ++ items.map(_.itemType)
+  lazy val lineItemTypes: LineItemTypes = summaryTypes ++ pendingTypes ++ {
+    _typesOrItems match {
+      case Left(types: LineItemTypes) => types
+      case Right(items: LineItems) => items.map(_.itemType)
+    }
   }
+
 
   lazy val customer: Customer = _customer.getOrElse(
     services.customerStore.findById(customerId).getOrElse(
@@ -157,22 +164,20 @@ case class Checkout (
      * matches new items to old items and produces the items of the difference (or full new price
      * if no matching old item exists)
      */
-    def grossToNet(newItems: LineItems, oldItems: LineItems) = newItems.flatMap { newItem =>
-      val oldAmount = oldItems.find(_.itemType == newItem.itemType).map(_.amount)
-        .getOrElse(Money.zero(CurrencyUnit.USD))
+//    def grossToNet(newItems: LineItems, oldItems: LineItems) = newItems.flatMap { newItem =>
+//      val oldAmount = oldItems.find(_.itemType == newItem.itemType).map(_.amount)
+//        .getOrElse(Money.zero(CurrencyUnit.USD))
+//
+//      if (oldAmount isGreaterThan newItem.amount) {
+//        None // refund item will list this difference
+//      } else {
+//        Some(newItem.withAmount(newItem.amount minus oldAmount)) // update amount to difference
+//      }
+//    }
 
-      if (oldAmount isGreaterThan newItem.amount) {
-        None // refund item will list this difference
-      } else {
-        Some(newItem.withAmount(newItem.amount minus oldAmount)) // update amount to difference
-      }
-    }
-
-    val pendingWithSummaries = SubtotalLineItemType +: (TotalLineItemType +: pendingTypes)
-    val itemsSansSummaries = lineItems.filter(_.nature == LineItemNature.Summary)
-    val allResolved = resolveTypes(pendingWithSummaries, itemsSansSummaries)
-
-    allResolved.filter(item => pendingWithSummaries.contains(item.itemType))
+    // TODO(SER-499): update taxes and fees
+    val pendingTypeSet = pendingTypes.toSet
+    lineItems.filter(item => pendingTypeSet.contains(item.itemType))
   }
 
 
@@ -392,18 +397,16 @@ case class Checkout (
 
   def customerId = _entity.customerId
 
-  def total: TotalLineItem = lineItems.totalOption.get
-  def subtotal: SubtotalLineItem = lineItems.subtotalOption.get
-  def taxes: Seq[TaxLineItem] = lineItems.taxes
-  def fees: LineItems = lineItems.fees
-  def payments: LineItems = lineItems.payments
-  def balance: Money = pendingItems.totalOption.get.amount minus total.amount
+  def subtotal: SubtotalLineItem = lineItems(CodeType.Subtotal).head
+  def total: TotalLineItem = lineItems(CodeType.Total).head
+  def balance = lineItems(CodeType.Balance).head
+  def fees: LineItems = lineItems(LineItemNature.Fee)
+  def taxes: Seq[TaxLineItem] = lineItems(CodeType.Tax)
+  def payments: LineItems = lineItems(LineItemNature.Payment)
 
+  def flattenLineItems: LineItems = lineItems.flatMap( _.flatten )
 
-  def flattenLineItems: LineItems = {
-    for (lineItem <- lineItems; flattened <- lineItem.flatten) yield flattened
-  }
-
+  private def summaryTypes = Seq(SubtotalLineItemType, TotalLineItemType, BalanceLineItemType)
 }
 
 
@@ -412,14 +415,15 @@ case class Checkout (
 object Checkout extends Logging {
 
   // Create
-  def apply(types: LineItemTypes, zipcode: String, maybeCustomer: Option[Customer]) = {
-    val maybeZipcode = if (zipcode.isEmpty) None else Some(zipcode)
-    val typesSansOldSummaries = types.filter(itemType => itemType.nature != LineItemNature.Summary)
-    val typesWithTaxesAndSummaries = typesSansOldSummaries ++ taxesAndSummariesByZip(maybeZipcode)
+  def apply(types: LineItemTypes, maybeZipcode: Option[String], maybeCustomer: Option[Customer]) = {
+
+    // defensively remove summaries, add taxes
+    val typesWithTaxes = types.notOfNature(LineItemNature.Summary) ++ taxesByZip(maybeZipcode)
+    val customerId = maybeCustomer.map(_.id).getOrElse(0L)
 
     new Checkout(
-      _entity = new CheckoutEntity(customerId = maybeCustomer.map(_.id).getOrElse(0)),
-      _typesOrItems = Left(typesWithTaxesAndSummaries),
+      _entity = CheckoutEntity(customerId = customerId),
+      _typesOrItems = Left(typesWithTaxes),
       _customer = maybeCustomer
     )
   }
@@ -428,7 +432,7 @@ object Checkout extends Logging {
   def apply(entity: CheckoutEntity, items: LineItems) = {
     new Checkout(
       _entity = entity,
-      _typesOrItems = Right(itemsWithSummaries(items)),
+      _typesOrItems = Right(items.notOfNature(LineItemNature.Summary)),
       _customer = None
     )
   }
@@ -441,18 +445,8 @@ object Checkout extends Logging {
    * @param maybeZipcode - None defaults to no taxes
    * @return Sequence of subtotal, taxes, and total (in that order)
    */
-  protected def taxesAndSummariesByZip(maybeZipcode: Option[String]): LineItemTypes = {
-    Seq(SubtotalLineItemType) ++
-      TaxLineItemType.getTaxesByZip(maybeZipcode.getOrElse(TaxLineItemType.noZipcode)) ++
-      Seq(TotalLineItemType)
-  }
-
-  protected def itemsWithSummaries(items: LineItems): LineItems = {
-    val nonSummaries = items.filter (item => item.nature != LineItemNature.Summary )
-    val subtotal = SubtotalLineItemType.lineItems(nonSummaries, Seq()).get.head // lol
-    val total = TotalLineItemType.lineItems(nonSummaries, Seq()).get.head       // lololol
-
-    subtotal +: (total +: nonSummaries)
+  protected def taxesByZip(maybeZipcode: Option[String]): LineItemTypes = {
+    TaxLineItemType.getTaxesByZip(maybeZipcode.getOrElse(TaxLineItemType.noZipcode))
   }
 
 

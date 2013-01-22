@@ -42,20 +42,22 @@ object TotalLineItemType extends TotalLineItemType {
    * re-summing over the products seems more robust against errors.)
    *
    * @param resolvedItems
-   * @param pendingResolution
+   * @param pendingTypes
    * @return Seq(new line items) if the line item type was successfully applied.
    *         Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
-  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
+  override def lineItems(resolvedItems: LineItems, pendingTypes: LineItemTypes) = {
     import LineItemNature._
 
-    if (pendingResolution.isEmpty) {
+    def pendingNeeded = pendingTypes.ofNatures(Tax, Fee)
+    def maybeSubtotal = resolvedItems(CodeType.Subtotal).headOption.map(_.amount)
 
-      val totalAmount = resolvedItems.notOfNature(Summary).sumAmounts
-      Some(Seq(TotalLineItem(totalAmount)))
-
-    } else {
-      None
+    (pendingNeeded, maybeSubtotal) match {
+      case (Nil, Some(subtotal: Money)) => Some {
+        val taxesAndFees = resolvedItems.ofNatures(Tax, Fee).sumAmounts
+        Seq(TotalLineItem(taxesAndFees plus subtotal))
+      }
+      case _ => None
     }
   }
 }

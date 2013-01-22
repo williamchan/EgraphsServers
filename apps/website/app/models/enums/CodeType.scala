@@ -70,6 +70,12 @@ object CodeType extends Enum {
     }
   }
 
+  val Balance = new EnumVal("BalanceLineItemType") with CodeTypeFactory[BalanceLineItemType, BalanceLineItem] {
+    override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity) = {
+      BalanceLineItem(itemEntity.amount)
+    }
+  }
+
   //
   // Taxes
   //

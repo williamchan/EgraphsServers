@@ -33,10 +33,10 @@ case class CashTransactionLineItemType (
 
       case Some(txn: CashTransaction) => Some(Seq(CashTransactionLineItem(this, txn)))
 
-      case None => resolved.find(item => item.codeType == CodeType.Total) match {
-        case Some(total) =>
-          require(total.amount.isZero || stripeCardTokenId.isDefined,
-            "Stripe card token required for non-zero totals."
+      case None => resolved(CodeType.Balance) match {
+        case Seq(balance: BalanceLineItem) =>
+          require(balance.amount.isZero || stripeCardTokenId.isDefined,
+            "Stripe card token required for non-zero balance."
           )
 
           /** stripeChargeId set in Checkout transaction */
@@ -45,19 +45,17 @@ case class CashTransactionLineItemType (
             billingPostalCode = billingPostalCode,
             stripeCardTokenId = stripeCardTokenId
           ) .withCashTransactionType(CashTransactionType.Checkout)
-            .withCash(total.amount)
+            .withCash(balance.amount)
 
 
-          // NOTE(SER-499): this shouldn't ever actually change anything if used correctly
-          val txnType = if (total.amount.isNegative) {
-            this.entity.set(CashTransactionLineItemType.refundEntity)
-          } else {
-            this.entity.set(CashTransactionLineItemType.paymentEntity)
-          }
+          // TODO(SER-499): this awkwardness could probably be cleaned up
+          // check for consistent use of semantics and sign of amounts
+          if (balance.amount.isNegative) require(_entity == CashTransactionLineItemType.refundEntity)
+          else require(_entity == CashTransactionLineItemType.paymentEntity)
 
-          Some(Seq(CashTransactionLineItem(txnType, txn)))
+          Some(Seq(CashTransactionLineItem(this, txn)))
 
-        case None => None
+        case _ => None
       }
     }
   }
