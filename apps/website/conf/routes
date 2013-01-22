@@ -112,6 +112,7 @@ POST     /admin/videoassets/$id<[0-9]+>                                   contro
 ##
 
 GET     /                                                           controllers.WebsiteControllers.getRootConsumerEndpoint
+GET     /new                                                        controllers.WebsiteControllers.getRootConsumerEndpointA
 GET     /about                                                      controllers.WebsiteControllers.getAbout
 GET     /account/settings                                           controllers.WebsiteControllers.getAccountSettings
 POST    /account/settings                                           controllers.WebsiteControllers.postAccountSettings

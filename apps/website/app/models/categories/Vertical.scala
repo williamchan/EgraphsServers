@@ -19,6 +19,7 @@ object VerticalStore {
  * @param shortName A short name, appropriate for the row of vertical buttons. Think acronyms.
  * @param urlSlug A urlSlug for our router. Think SEO & marketing.
  * @param iconUrl An icon for the vertical buttons. The size isn't standardized.
+ * @param tileUrl Tile for display on HP, 600x368 (16:9)
  * @param featuredQuery a search term which will generate the top three results for a given vertical on the marketplace
  *                      landing page.
  */
@@ -26,6 +27,7 @@ case class Vertical(categoryValue: CategoryValue,
                     shortName: String,
                     urlSlug: String,
                     iconUrl: String,
+                    tileUrl: String,
                     featuredQuery: String) {
   lazy val categories = {
     categoryValue.categories
@@ -39,8 +41,8 @@ class VerticalStore @Inject() (categoryStore: CategoryStore) {
     for(cv <- category.categoryValues) yield {
       cv.name match {
         case "MLB" => Vertical(categoryValue = cv, shortName = "MLB", urlSlug = "major-league-baseball",
-          iconUrl = "images/icon-logo-mlb.png", featuredQuery ="mlb-featured")
-        case "NBA" => Vertical(categoryValue = cv, shortName = "NBA", urlSlug = "national-basketball-association",
+          iconUrl = "images/icon-logo-mlb.png", tileUrl = "images/mlb-stadium.jpg", featuredQuery ="mlb-featured")
+        case "NBA" => Vertical(categoryValue = cv, tileUrl ="images/nba-stadium.jpg", shortName = "NBA", urlSlug = "national-basketball-association",
           iconUrl = "images/icon-logo-nba.png", featuredQuery ="nba-featured")
       }
     }

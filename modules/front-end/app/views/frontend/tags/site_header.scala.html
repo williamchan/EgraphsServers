@@ -1,4 +1,4 @@
-@(headerData: models.frontend.header.HeaderData)
+@(headerData: models.frontend.header.HeaderData, landingVersion: String ="")
 @**   Renders the default header using the provided header data. *@
 
 @import models.frontend.header.HeaderLoggedIn
@@ -34,19 +34,9 @@
         	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
       	
         </div>
+      
         <div id="account-social">
-          <div class="social">
-            
-            <ul class="clearfix">
-              <li><a href="@headerData.egraphsFacebookLink" class="facebook">Facebook</a></li>
-              <li><a href="@headerData.egraphsTwitterLink" class="twitter">Twitter</a></li>
-              <!-- <li><a href="#" class="addthis">AddThis</a></li> -->
-            </ul>
-            
-          </div> <!-- end .social -->
-
           <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
-            
             <ul>
               @{headerData.loggedInStatus match {
                 case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
@@ -56,41 +46,36 @@
           </nav>
         </div> <!-- end #account-social -->
       </div> <!-- end #logo-account-social -->
-
+      
       <div class="linkz">
         <div class="navbar-item our-stars">
-          
           <p><a class="separator-after" href="@headerData.ourStarsLink">Enter our store</a></p>
           
         </div> <!-- end .our-stars -->
               
         <div class="navbar-item">
           
-          <p><a class="separator-after" href="@headerData.insideAnEgraphLink">Inside an egraph</a></p>
+          <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
           
         </div> <!-- end .explore -->
-        @headerData.giftCertificateLink.map{ url =>
-          <div class="navbar-item gift-certificates">
-            
-            <p><a class="separator-after" href="@url"><span>Gift Certificates</span></a></p>
-            
-          </div> <!-- end .gift-certificates -->
-        }    
-        <div class="navbar-item mobile-only">
-          
-          <p><span class="separator-after"><a href="@headerData.egraphsFacebookLink" class="responsive-social-sprite facebook">f</a></span></p>
-          
-        </div> <!-- end responsive fb link -->
-        <div class="navbar-item mobile-only">
-          
-          <p><a href="@headerData.egraphsTwitterLink" class="responsive-social-sprite twitter">t</a></p>
-          
-        </div> <!-- end responsive twitter link -->
 
+        <div class="navbar-item">
+          <div>
+            <form action="/stars">
+              <div class="search-control input-append">
+                <input name="query" type="search" class="span2" placeholder="Search names, teams"></input>
+                <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
+              </div>
+            </form>  
+          </div>
+        </div>  <!-- end .search-control -->
       </div> <!-- end .linkz -->
-
-    </div> <!-- end .container -->
-  </div> <!-- end .row -->
+    </div> <!-- end .row -->
+  </div> <!-- end .container -->
 
 </header> <!-- end #top -->
+
+<!-- This just takes up as much space as the header so that other things below can appear below the header. -->
+<div id="to-top" class="header-sized-container"></div>
+
 <!-- End site_header.scala.html -->

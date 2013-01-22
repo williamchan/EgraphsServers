@@ -46,15 +46,33 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def verticalSet: List[VerticalViewModel] = {
     List(
-      VerticalViewModel(id = 1, urlSlug="/major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", active = true, categoryViewModels = mlbCategories()),
-      VerticalViewModel(id = 2, urlSlug="/national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png", categoryViewModels = nbaCategories() )
+      VerticalViewModel(id = 1, urlSlug="major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", active = true, categoryViewModels = mlbCategories()),
+      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png", categoryViewModels = nbaCategories() )
     )
   }
 
   def landingVerticalSet: List[VerticalViewModel] = {
     List(
-      VerticalViewModel(id = 1, urlSlug="/major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", categoryViewModels = mlbCategories(Option(false))),
-      VerticalViewModel(id = 2, urlSlug="/national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png", categoryViewModels = nbaCategories(Option(false)))
+      VerticalViewModel(id = 1,
+        altText = "Get an egraph from an MLB star.",
+        urlSlug="major-league-baseball",
+        verticalName = "mlb",
+        publicName = "Major League Baseball",
+        shortName = "MLB",
+        iconUrl = "images/icon-logo-mlb.png",
+        tileUrl = "images/mlb-stadium.jpg",
+        categoryViewModels = mlbCategories(Option(false))
+      ),
+      VerticalViewModel(id = 2,
+        altText = "Get an egraph from an NBA star.",
+        urlSlug="national-basketball-association",
+        verticalName = "nba",
+        publicName = "National Basketball Association",
+        shortName = "NBA",
+        iconUrl = "images/icon-logo-nba.png",
+        tileUrl = "images/nba-stadium.jpg",
+        categoryViewModels = mlbCategories(Option(false))
+      )
     )
   }
 
@@ -90,30 +108,36 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         id = 1,
         publicName = "Team",
         categoryValues = List(
-          CategoryValueViewModel(id = 2, publicName = "Boston Red Sox", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 3, publicName = "Miami Marlins", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 4, publicName = "New York Yankees", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 5, publicName = "Tampa Bay Rays", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 6, publicName = "Oakland Athletics", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 7, publicName = "San Francisco Giants", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 8, publicName = "New York Mets", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 9, publicName = "Atlanta Braves", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 10, publicName = "Texas Rangers", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 11, publicName = "Houston Astros", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 12, publicName = "Seattle Mariners", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 13, publicName = "Washington Nationals", active = active.getOrElse(coinflip.nextBoolean))
-        )
-      ),
-      CategoryViewModel(
-        id = 2,
-        publicName = "Position",
-        categoryValues = List(
-          CategoryValueViewModel(id = 5, publicName = "Pitcher", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 6, publicName = "Shortstop", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 7, publicName = "Catcher", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 8, publicName = "1st Baseman", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 9, publicName = "2nd Baseman", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 10, publicName = "3rd Baseman", active = active.getOrElse(coinflip.nextBoolean))
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/ari.png", publicName = "Arizona Diamondbacks", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/atl.png", publicName ="Atlanta Braves", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/bal.png", publicName ="Baltimore Orioles", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/bos.png", publicName = "Boston Red Sox", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/chc.png", publicName ="Chicago Cubs", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/cws.png", publicName ="Chicago White Sox", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/cin.png", publicName ="Cincinnati Reds", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/cle.png", publicName ="Cleveland Indians", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/col.png", publicName ="Colorado Rockies", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/det.png", publicName ="Detroit Tigers", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/hou.png", publicName = "Houston Astros", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/kc.png",  publicName ="Kansas City Royals", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/laa.png", publicName ="Los Angeles Angels of Anaheim", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/lad.png", publicName ="Los Angeles Dodgers", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/mia.png", publicName = "Miami Marlins", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/mil.png", publicName ="Milwuakee Brewers", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/min.png", publicName ="Minnesota Twins", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/nym.png", publicName ="New York Mets", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/nyy.png", publicName ="New York Yankees", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/as.png",  publicName = "Oakland Athletics", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/phi.png", publicName = "Philadelphia Phillies", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/pit.png", publicName ="Pittsburgh Pirates", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/sd.png",  publicName ="San Diego Padres", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/sf.png",  publicName = "San Francisco Giants", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/sea.png", publicName = "Seattle Mariner", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/stl.png", publicName ="St. Louis Cardinals", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/tb.png",  publicName ="Tampa Bay Rays", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/tex.png", publicName ="Texas Rangers", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/tor.png", publicName ="Toronto Blue Jays", active = active.getOrElse(coinflip.nextBoolean)),
+          CategoryValueViewModel(url = "#", iconUrl = "images/icons/was.png", publicName ="Washington Nationals", active = active.getOrElse(coinflip.nextBoolean))
         )
       )
     )
@@ -131,17 +155,6 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
           CategoryValueViewModel(id = 5, publicName = "Los Angeles Clippers", active = active.getOrElse(coinflip.nextBoolean)),
           CategoryValueViewModel(id = 6, publicName = "Golden State Warriors", active = active.getOrElse(coinflip.nextBoolean)),
           CategoryValueViewModel(id = 7, publicName = "New York Knicks", active = active.getOrElse(coinflip.nextBoolean))
-        )
-      ),
-      CategoryViewModel(
-        id = 4,
-        publicName = "Position",
-        categoryValues = List(
-          CategoryValueViewModel(id = 5, publicName = "Center", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 6, publicName = "Point Guard", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 7, publicName = "Power Forward", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 8, publicName = "Small Forward", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 9, publicName = "Shooting Guard", active = active.getOrElse(coinflip.nextBoolean))
         )
       )
     )

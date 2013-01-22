@@ -1,0 +1,75 @@
+// Styles for the dark-gray announcement bar that usually appears on the landing page between
+// the nav bar and the masthead.
+#announcement-bar-a {
+  background-color: @grayDarker;
+  text-transform: uppercase;
+  color: #ececec;
+  text-shadow: 0px -1px 0px black;
+  font-size: 16px;
+  text-align: center;
+  position:relative;
+  font-weight:300;
+  z-index:1;
+
+  a {
+    margin-left: 7px;
+    text-transform: capitalize;
+    color: @orange;
+    font-weight: 800;
+    border-bottom: 1px dotted @orange;
+    cursor: pointer;
+  }
+
+  strong {
+    font-weight: 800;
+    color:white;
+  }
+
+  .announcement-container {
+    max-width: 1551px;
+    margin: 0 auto;
+    padding-top:10px;
+    padding-bottom:10px;
+    padding-left:20px;
+    padding-right:20px;
+
+    .box-shadow(inset 0px 0px 15px 0px rgba(26,26,26,1)); // rgba(0,0,0,.8); // rgba(255, 255, 255, .15)); // .15    
+    background: @grayDark;
+    background: -moz-radial-gradient(center, circle farthest-side, @grayDark 52%, rgba(26,26,26,1) 600px); /* FF3.6+ */
+    background: -webkit-radial-gradient(center, circle farthest-side, @grayDark 52%, rgba(26,26,26,1) 600px); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, circle farthest-side, @grayDark 52%, rgba(26,26,26,1) 600px); /* Opera 12+ */
+    background: -ms-radial-gradient(center, circle farthest-side, @grayDark 52%, rgba(26,26,26,1) 600px); /* IE10+ */
+    background: radial-gradient(circle at center, @grayDark 52%, rgba(26,26,26,1) 600px); /* W3C */
+
+  }
+}
+
+.announcement-translucent-separator {
+  position:relative;
+  margin-bottom:-1px;
+  height:1px;
+  z-index:1;
+
+  @gradientLight: rgba(255,255,255,.15);
+  @gradientGone: rgba(255,255,255,0);
+  background: -moz-radial-gradient(center, circle farthest-side, @gradientLight 52%, @gradientGone 600px); /* FF3.6+ */
+  background: -webkit-radial-gradient(center, circle farthest-side, @gradientLight 52%, @gradientGone 600px); /* Chrome10+,Safari5.1+ */
+  background: -o-radial-gradient(center, circle farthest-side, @gradientLight 52%, @gradientGone 600px); /* Opera 12+ */
+  background: -ms-radial-gradient(center, circle farthest-side, @gradientLight 52%, @gradientGone 600px); /* IE10+ */
+  background: radial-gradient(circle at center, @gradientLight 52%, @gradientGone 600px); /* W3C */
+}
+
+
+@media (max-width: 940px) { #announcement-bar-a {
+  line-height: 20px;
+
+  a {
+    display: inline-block;
+    height: 20px;
+  }
+}}
+
+
+@media (max-width: 767px) { #announcement-bar-a {
+  font-size: 14px;   
+}}

@@ -7,6 +7,7 @@ import play.api.data._
 import play.api.data.Forms._
 import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
+import services.mvc.marketplace.MarketplaceServices
 import services.http.ControllerMethod
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
@@ -28,6 +29,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def dbSession: DBSession
   protected def featured: Featured
   protected def verticalStore: VerticalStore
+  protected def marketplaceServices: MarketplaceServices
 
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
@@ -56,36 +58,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         })
       (id.toLong, categoryValueIds.filter(_ > -1))
     }
-  }
-
-  private def getVerticalViewModels(maybeSelectedVertical: Option[Vertical], activeCategoryValues: Set[Long]) : List[VerticalViewModel] = {
-    verticalStore.verticals.map { v =>
-      val categories = for {
-        category <- v.categories
-      } yield {
-        CategoryViewModel(
-          id = category.id,
-          publicName = category.publicName,
-          // TODO(sbilstein) think about making this more efficient.
-          categoryValues = category.categoryValues.map( cv =>
-            CategoryValueViewModel(
-              publicName = cv.publicName,
-              id = cv.id,
-              active = activeCategoryValues.contains(cv.id)
-            )
-          ).toList)
-      }
-      VerticalViewModel(
-        verticalName = v.categoryValue.name,
-        publicName = v.categoryValue.publicName,
-        shortName = v.shortName,
-        urlSlug = v.urlSlug,
-        iconUrl = v.iconUrl,
-        active = v.urlSlug == maybeSelectedVertical.map(_.urlSlug).getOrElse(""),
-        id = v.categoryValue.id,
-        categoryViewModels = categories
-      )
-    }.toList
   }
 
   private def buildSubtitle(queryOption: Option[String], celebrities: Iterable[MarketplaceCelebrity]) : String = {
@@ -157,7 +129,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         } yield { categoryValue }
       }.toSet
 
-      val verticalViewModels = getVerticalViewModels(maybeSelectedVertical, activeCategoryValues)
+      val verticalViewModels = marketplaceServices.getVerticalViewModels(maybeSelectedVertical, activeCategoryValues)
 
       // Check if any search options have been defined
       if(queryOption.isDefined || !verticalAndCategoryValues.isEmpty) {
