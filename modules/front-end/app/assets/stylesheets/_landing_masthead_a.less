@@ -48,12 +48,17 @@
     margin-bottom: 10px; 
     margin-top: 25px;
   }
-
+  
   form {
-    .celebrity-searchbox-container2();
-    margin-bottom: 10px;
-    margin-top: 25px;
-    width: 85%;
+    margin-left: 0;
+    .search-control {
+      .celebrity-searchbox-container2();
+      border: 1px solid @orange;
+    }
+    .help-block {
+      font-size: 12px;
+      color: @white;
+    }
   }
 }
 
@@ -62,6 +67,8 @@
 @media (min-width: 1080px) {
   #masthead-home-a {
     height: 400px;
+    background-size: auto 90%; // scale responsively with masthead height
+
 
     h1 {
       max-width: 440px;
@@ -118,13 +125,11 @@
     min-height: 250px;
 
     form {
-      margin-top: 20px;
-      width : 70%;
-      margin-bottom: 20px;
+      display: none;
     }
 
     h1 {
-      margin-top: .75em;
+      margin-top: 1.25em;
       font-size: 25px;
     }
   }

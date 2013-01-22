@@ -1,8 +1,10 @@
-@(url: String, autofocus:Boolean=false)
+@(url: String, autofocus:Boolean=false, helper: Boolean=true)
 <form action="@url" class="form-inline span5">
   <div class="search-control input-append">
     <input type="search" name="query" @if(autofocus) {autofocus="autofocus"} class="" placeholder="Find your star"></input>
     <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
   </div>  
+  @if(helper) {
   <span class="help-block">Search for names or teams.</span>
+  }
 </form>

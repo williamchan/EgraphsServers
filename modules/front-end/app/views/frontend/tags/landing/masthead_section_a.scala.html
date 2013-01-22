@@ -17,12 +17,20 @@
 <section id="masthead-home-a" role="banner" style="background-image: url(@mastheadImageUrl);">
   <div class="banner-gradient">
     <div class="container">
-
       <div class="row">
 
         <div class="span6 header-parent">
             <h1>Get an egraph from your favorite star</h1>
             <a class="helper" href="#">What is an egraph? &gt;&gt;</a>
+            @getStartedUrl.map{ url =>
+            @{
+              celebrityPublicName match {
+                case None => tags.landing.searchbox(url, autofocus=true, helper=false)
+                case Some(name) => tags.landing.get_started(url)
+              }
+            }
+          }
+
         </div>
 
       </div>

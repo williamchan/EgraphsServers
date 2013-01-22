@@ -80,7 +80,7 @@
 
     #verticals {
       .vertical-select {
-        margin-bottom: 2.5em;
+        margin-bottom: 1.0em;
         
         .backdrop { 
           .glowborder();
@@ -159,7 +159,6 @@
     }
 
     #browse {
-
       a.vertical-button {            
 
         .border-radius(2px);
@@ -253,8 +252,16 @@
     #landing-stars {
 
       .row {
+        > div {
+          background: none;
+        }
         margin-bottom: 10px;
+
+        &:first-of-type {
+          margin-top: -10px;
+        }
       }
+
 
       p.stars-link {
         position: absolute;
@@ -265,7 +272,7 @@
     } // end #landing-stars
 
     .celebrities {
-        &:last-of-type{
+        &:last-of-type {
           margin-bottom: 0;
         }
         article {
