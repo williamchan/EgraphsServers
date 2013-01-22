@@ -1,7 +1,12 @@
 /* Scripting for the landing page */
-define(["Egraphs", "pages/marketplace", "bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover", "bootstrap/bootstrap-tab", "bootstrap/bootstrap-carousel"],
+define(["Egraphs", "pages/marketplace", "bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover"],
 function (Egraphs, marketplace) {
-  
+  /**
+   * Functions for the new landing page that share dependencies with the marketplace.
+   * Marketplace.js contains mixpanel tracking events.
+   **/
+
+  // Select a vertical
   var verticalFunction = function(e) {
     var vertical = $(this);
     var slug =  vertical.attr("data-vertical");
@@ -10,6 +15,7 @@ function (Egraphs, marketplace) {
     marketplace.reloadPage();
   };
 
+  // Select a category value.
   var categoryFunction = function(e) {
       var link = $(this);
       var category = window.Egraphs.page.categories["c" + link.attr("data-category")];
@@ -32,7 +38,7 @@ function (Egraphs, marketplace) {
         $(".celebrities h4>a").click(function() {
           mixpanel.track("Celebrity clicked");
         });
-
+        
         $(".switcher-tab").click(function(e){
           var tab = $(this);
           var parent = tab.parent();
@@ -47,7 +53,6 @@ function (Egraphs, marketplace) {
         $("a.helper").click(function() {
           $("#learn-switch").click();
         });
-
         $(".vertical-button").click(verticalFunction);
         $(".all-teams").click(verticalFunction);
         $(".vertical-tile").click(verticalFunction);
