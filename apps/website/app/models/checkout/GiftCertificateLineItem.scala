@@ -1,12 +1,9 @@
 package models.checkout
 
 import models.{GiftCertificateStore, GiftCertificate}
-import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
-import org.joda.money.{CurrencyUnit, Money}
 import services.AppConfig
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import scalaz.Lens
-import org.squeryl.PrimitiveTypeMode._
 import com.google.inject.Inject
 
 

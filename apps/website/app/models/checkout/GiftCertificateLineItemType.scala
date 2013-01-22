@@ -1,14 +1,12 @@
 package models.checkout
 
 import models.GiftCertificate
-import models.enums.{CodeType, LineItemNature, CouponType, CouponDiscountType, CouponUsageType}
-import org.joda.money.{CurrencyUnit, Money}
+import models.enums.{CodeType, LineItemNature}
+import org.joda.money.Money
 import services.AppConfig
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import scalaz.Lens
-import org.squeryl.PrimitiveTypeMode._
 import com.google.inject.Inject
-import play.api.libs.json.Json
 
 
 case class GiftCertificateLineItemType (

@@ -1,10 +1,10 @@
 package models.checkout
 
 import java.sql.Timestamp
-import services.db.KeyedCaseClass
 import models.HasCreatedUpdated
-import org.squeryl.annotations.Transient
 import models.enums.{CodeType, LineItemNature}
+import org.squeryl.annotations.Transient
+import services.db.KeyedCaseClass
 import services.Time
 
 /**

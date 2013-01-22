@@ -1,7 +1,6 @@
 package models.checkout
 
-import services.db.Schema
-import services.AppConfig
+
 
 /*
 class LineItemStore /*@Inject()*/ (

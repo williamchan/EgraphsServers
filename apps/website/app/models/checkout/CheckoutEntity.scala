@@ -1,9 +1,9 @@
 package models.checkout
 
-import java.sql.Timestamp
 import services.Time
 import services.db.KeyedCaseClass
 import models.HasCreatedUpdated
+import java.sql.Timestamp
 
 //
 // Entity

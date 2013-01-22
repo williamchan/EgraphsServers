@@ -2,11 +2,10 @@ package models.checkout
 
 import org.joda.money.{CurrencyUnit, Money}
 import models.enums.{CodeType, LineItemNature}
-import java.sql.Timestamp
 import scalaz.Lens
 import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
 import com.google.inject.Inject
-import services.{AppConfig, Time}
+import services.AppConfig
 import play.api.libs.json.Json
 
 /*

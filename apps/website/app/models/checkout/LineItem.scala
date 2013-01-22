@@ -1,16 +1,14 @@
 package models.checkout
 
 import org.joda.money.{CurrencyUnit, Money}
-import org.squeryl.KeyedEntity
-import java.sql.Timestamp
-import services.db.{KeyedCaseClass, InsertsAndUpdatesAsEntity, HasEntity, Schema}
-import services.{MemberLens, Time}
+import services.db.{InsertsAndUpdatesAsEntity, HasEntity, Schema}
+import services.MemberLens
 import scalaz.Lens
-import models.{HasCreatedUpdated, SavesCreatedUpdated}
-import org.squeryl.annotations.Transient
+import models.SavesCreatedUpdated
 import com.google.inject.Inject
 import models.enums._
 import scala.Some
+import java.sql.Timestamp
 
 trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with HasLineItemNature with HasCodeType {
 

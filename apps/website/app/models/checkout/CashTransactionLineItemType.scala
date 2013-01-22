@@ -1,14 +1,12 @@
 package models.checkout
 
-import models.{CashTransactionStore, CashTransaction}
-import models.enums.{CashTransactionType, CodeType, LineItemNature}
-import org.joda.money.Money
-import scalaz.{Scalaz, Lens}
-import services.db.{InsertsAndUpdatesAsEntity, QueriesAsEntity, CanInsertAndUpdateAsThroughServices, Schema}
-import org.squeryl.PrimitiveTypeMode._
-import services.AppConfig
 import com.google.inject.Inject
-import play.api.libs.json.Json
+import models.CashTransaction
+import models.checkout.checkout.Conversions._
+import models.enums.{CashTransactionType, CodeType, LineItemNature}
+import scalaz.{Scalaz, Lens}
+import services.db.Schema
+import services.AppConfig
 
 
 case class CashTransactionLineItemType (
@@ -22,7 +20,6 @@ case class CashTransactionLineItemType (
   with LineItemTypeEntityLenses[CashTransactionLineItemType]
   with LineItemTypeEntityGetters[CashTransactionLineItemType]
 {
-  import checkout._
 
   // TODO(SER-499): more Json
   override def toJson = ""
@@ -39,7 +36,7 @@ case class CashTransactionLineItemType (
             "Stripe card token required for non-zero balance."
           )
 
-          /** stripeChargeId set in Checkout transaction */
+          /** stripeChargeId set when charge is made in Checkout transaction */
           val txn = CashTransaction(
             accountId = accountId,
             billingPostalCode = billingPostalCode,

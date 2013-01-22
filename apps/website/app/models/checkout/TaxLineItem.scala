@@ -1,7 +1,6 @@
 package models.checkout
 
 import org.joda.money.Money
-import models.enums.{CodeType, LineItemNature}
 import scalaz.Lens
 import com.google.inject.Inject
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}

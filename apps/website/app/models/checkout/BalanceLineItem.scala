@@ -1,17 +1,9 @@
 package models.checkout
 
-import checkout._
-import org.joda.money.{CurrencyUnit, Money}
+import org.joda.money.Money
+import models.checkout.checkout.Conversions._
 import models.enums.{CodeType, LineItemNature}
-import services.Finance.TypeConversions._
 
-/**
- * Created with IntelliJ IDEA.
- * User: kevin
- * Date: 1/10/13
- * Time: 3:39 PM
- * To change this template use File | Settings | File Templates.
- */
 case class BalanceLineItem(amount: Money) extends LineItem[Money] {
 
   override def itemType = BalanceLineItemType
@@ -25,10 +17,10 @@ case class BalanceLineItem(amount: Money) extends LineItem[Money] {
   //
   // NOTE(SER-499): Unused
   //
-  override val id: Long = checkout.Unpersisted
+  override val id: Long = -1
   override def domainObject = amount
   override def transact(checkout: Checkout) = this
-  override def checkoutId = checkout.Unpersisted
+  override def checkoutId = -1
   override def withCheckoutId(newCheckoutId: Long) = this
   override def subItems = Nil
 
@@ -36,7 +28,7 @@ case class BalanceLineItem(amount: Money) extends LineItem[Money] {
 
 abstract class BalanceLineItemType extends LineItemType[Money]
 object BalanceLineItemType extends BalanceLineItemType {
-  override val id = checkout.Unpersisted
+  override val id: Long = -1L
   override val description = "Balance"
   override val nature = LineItemNature.Summary
   override val codeType = CodeType.Balance

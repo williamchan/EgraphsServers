@@ -1,17 +1,11 @@
 package models.checkout
 
-import java.sql.Timestamp
-import services.{MemberLens, Time}
-import org.squeryl.{Query, KeyedEntity}
-import org.squeryl.PrimitiveTypeMode._
-import org.squeryl.dsl.ast.LogicalBoolean
+import services.MemberLens
 import services.db._
 import scalaz.Lens
-
+import java.sql.Timestamp
 import models.enums._
-import models.{HasCreatedUpdated, SavesCreatedUpdated}
-import org.squeryl.annotations.Transient
-import com.google.inject.Inject
+import models.SavesCreatedUpdated
 
 
 trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {

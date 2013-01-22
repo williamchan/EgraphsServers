@@ -1,13 +1,11 @@
 package models.checkout
 
-import org.joda.money.Money
+import com.google.inject.Inject
+import models.{CashTransaction, CashTransactionStore}
 import scalaz.Lens
 import services.AppConfig
 import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
-import com.google.inject.Inject
-import models.{CashTransaction, CashTransactionStore}
-import play.api.libs.json.Json
-import services.payment.{Charge, Payment}
+import services.payment.Payment
 
 
 //
@@ -57,11 +55,11 @@ case class CashTransactionLineItem(
   override def transact(checkout: Checkout) = {
     // TODO(SER-499): persist entity and type (type entity as of now should be singleton)
     if (id <= 0) {
-      assert(checkout.account.id > 0)
+      require( checkout.accountId > 0 )
 
       val savedItem = this.withCheckoutId(checkout.id).insert()
       val savedCashTxn = domainObject.copy(
-        accountId = checkout.account.id,
+        accountId = checkout.accountId,
         lineItemId = Some(savedItem.id)
       ).save()
 
