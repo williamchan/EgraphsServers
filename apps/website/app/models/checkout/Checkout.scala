@@ -97,9 +97,13 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   def flattenLineItems: LineItems = { lineItems.flatMap(_.flatten) }
 
   def transact(txnType: Option[CashTransactionLineItemType]): FailureOrCheckout = {
-    if (pendingTypes.isEmpty){ Right(this) } else {
-      require(balance.amount.isZero || txnType.isDefined, "Need CashTransactionLineItemType for nonzero balance.")
+    if (pendingTypes.isEmpty){
+      Right(this)
 
+    } else if (!(balance.amount.isZero || txnType.isDefined)) {
+      Left(CheckoutFailedCashTransactionMissing(this))
+
+    } else {
       val conn = services.currentTxnConnectionFactory()
       val savepoint = conn.setSavepoint()
       val savedCheckout = if (isPersisted) this.update() else this.insert()
@@ -239,6 +243,8 @@ object Checkout extends Logging {
     FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem)
   ) with FailedCheckoutWithCharge
 
+  case class CheckoutFailedCashTransactionMissing(checkout: Checkout)
+    extends CheckoutFailed(FailedCheckoutData(checkout))
 
   case class CheckoutFailedError(
     checkout: Checkout,

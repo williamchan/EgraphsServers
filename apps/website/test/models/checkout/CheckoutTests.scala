@@ -10,6 +10,10 @@ import services.payment.StripeTestPayment
 import models.checkout.checkout.Conversions._
 import models.checkout.Checkout._
 import TestData._
+import models.enums.LineItemNature._
+import scala.Left
+import scala.Some
+import scala.Right
 
 
 class CheckoutTests extends EgraphsUnitTest
@@ -35,29 +39,6 @@ class CheckoutTests extends EgraphsUnitTest
     toTransform.withAdditionalTypes(Seq(giftCertificateTypeForShittyFriend))
   }
 
-
-
-
-  //
-  // Companion Object test cases
-  //
-  "Checkout" should "not add duplicate summaries" in {
-    val taxedCheckout: Checkout = Checkout(oneGiftCertificate, taxedZip, Some(newSavedCustomer()))
-    val untaxedCheckout: Checkout = Checkout(oneGiftCertificate, untaxedZip, Some(newSavedCustomer()))
-    val checkoutWithoutZip: Checkout = Checkout(oneGiftCertificate, None, Some(newSavedCustomer()))
-    val checkoutWithoutCustomer: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
-
-    // check that checkouts only have one of each summary (e.g. subtotal, total, balance)
-    taxedCheckout should notHaveDuplicateSummaries
-    untaxedCheckout should notHaveDuplicateSummaries
-    checkoutWithoutZip should notHaveDuplicateSummaries
-    checkoutWithoutCustomer should notHaveDuplicateSummaries
-  }
-
-  it should "add taxes to checkouts in taxed zipcodes" in {
-    val checkout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
-    checkout.taxes should not be (Nil)
-  }
 
 
   //
@@ -95,6 +76,27 @@ class CheckoutTests extends EgraphsUnitTest
     txnItem should haveNegatedAmountOf (total)
   }
 
+  it should "not have duplicate summaries" in {
+    val taxedCheckout: Checkout = Checkout(oneGiftCertificate, taxedZip, Some(newSavedCustomer()))
+    val untaxedCheckout: Checkout = Checkout(oneGiftCertificate, untaxedZip, Some(newSavedCustomer()))
+    val checkoutWithoutZip: Checkout = Checkout(oneGiftCertificate, None, Some(newSavedCustomer()))
+    val checkoutWithoutCustomer: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
+
+    // check that checkouts only have one of each summary (e.g. subtotal, total, balance)
+    taxedCheckout should notHaveDuplicateSummaries
+    untaxedCheckout should notHaveDuplicateSummaries
+    checkoutWithoutZip should notHaveDuplicateSummaries
+    checkoutWithoutCustomer should notHaveDuplicateSummaries
+  }
+
+  it should "add taxes for taxed zipcodes" in {
+    val taxedCheckout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
+    val untaxedCheckout: Checkout = Checkout(oneGiftCertificate, untaxedZip, None)
+
+    taxedCheckout.taxes should not be (Nil)
+    untaxedCheckout.taxes should be (Nil)  // NOTE: this should change if we have some universal tax of sorts
+  }
+
 
 
 
@@ -124,10 +126,28 @@ class CheckoutTests extends EgraphsUnitTest
   }
 
   
-  it should "have correct balance" in (pending)
-//    {val restored: Checkout = restoreModel(saveModel(newModel).id)}
+  it should "have correct balance" in {
+    val fresh: Checkout = newModel
+    val freshRestored: Checkout = restoreModel(saveModel(fresh).id).get
+    val transformed: Checkout = transformModel(freshRestored)
+    val transformedRestored: Checkout = restoreModel(saveModel(transformed).id).get
 
-  it should "require payment for update with non-zero balance" in (pending)
+    fresh.balance should haveAmount (expectedBalanceOf(fresh))
+    freshRestored.balance should haveAmount (expectedBalanceOf(freshRestored))
+    transformed.balance should haveAmount (expectedBalanceOf(transformed))
+    transformedRestored.balance should haveAmount (expectedBalanceOf(transformedRestored))
+  }
+
+  it should "require payment for only updates with non-zero balance" in {
+    // TODO(CE-16): add a checkout in which the balance is zero from discount use
+    val paymentRequired: Checkout = newModel
+    def transactFails = paymentRequired.transact(None)
+
+    transactFails match {
+      case Right(_) => fail()
+      case Left(error: CheckoutFailed) =>
+    }
+  }
 
   it should "contain same line items as after most recent update" in {
     val saved: Checkout = saveModel(newModel)
@@ -137,6 +157,10 @@ class CheckoutTests extends EgraphsUnitTest
     updated.lineItems should beContainedIn (restored.lineItems, "restored")
     restored.lineItems should beContainedIn (updated.lineItems, "updated")
   }
+
+
+
+
 
 
 
@@ -172,8 +196,9 @@ class CheckoutTests extends EgraphsUnitTest
 
 
 
-
-
+  def expectedTotalOf(checkout: Checkout) = checkout.lineItems.notOfNatures(Summary, Payment).sumAmounts
+  def totalPaymentsOf(checkout: Checkout) = checkout.payments.sumAmounts
+  def expectedBalanceOf(checkout: Checkout) = expectedTotalOf(checkout) plus totalPaymentsOf(checkout)
 
 
 

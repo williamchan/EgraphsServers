@@ -53,8 +53,8 @@ case class CashTransactionLineItem(
   }
 
   override def transact(checkout: Checkout) = {
-    // TODO(SER-499): persist entity and type (type entity as of now should be singleton)
-    if (id <= 0) {
+    if (id > 0) { this }
+    else {
       require( checkout.accountId > 0 )
 
       val savedItem = this.withCheckoutId(checkout.id).insert()
@@ -64,9 +64,6 @@ case class CashTransactionLineItem(
       ).save()
 
       savedItem.copy(_maybeCashTransaction = Some(savedCashTxn))
-
-    } else {
-      this
     }
   }
 
@@ -74,21 +71,11 @@ case class CashTransactionLineItem(
   def makeCharge(checkout: Checkout): CashTransactionLineItem = {
     require(amount.negated isEqual domainObject.cash, "Line item amount and transaction amount are out of sync")
 
-    if (amount.isZero) {
-      // DEBUG
-      println("not charging because amount is zero")
-      // END DEBUG
-
-      this
-
-    } else {
+    if (amount.isZero) { this }
+    else {
       require(checkout.id > 0, "Checkout with persisted entity required to make charge.")
       require(id <= 0, "Untransacted CashTransactionLineItem required to make charge.")
       require(_maybeCashTransaction.isDefined, "Required CashTransaction information is not present.")
-
-      // DEBUG
-      println("making charge")
-      // END DEBUG
 
       val txn = domainObject
       val charge = services.payment.charge(txn.cash, txn.stripeCardTokenId.get, "Checkout #" + checkout.id)
@@ -100,11 +87,6 @@ case class CashTransactionLineItem(
 
   protected[checkout] def abortTransaction() = {
     require(id <= 0, "Transaction has already completed. Update checkout with refund instead.")
-
-    // DEBUG
-    println("aborting and refunding charge")
-    // END DEBUG
-
     domainObject.stripeChargeId.map ( c => services.payment.refund (c) )
   }
 
@@ -120,7 +102,9 @@ case class CashTransactionLineItem(
 
 
 
-
+//
+// Companion object
+//
 object CashTransactionLineItem {
   //
   // Create
