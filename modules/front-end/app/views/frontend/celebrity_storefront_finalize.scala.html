@@ -18,12 +18,17 @@
 @import _root_.frontend.formatting.MoneyFormatting.Conversions._
 
 @headJs = {
-  Egraphs.page.finalize = {
-    paymentJsModule: "@model.billing.paymentJsModule",
-    paymentToken: "@model.billing.paymentToken",
-    paymentApiKey: "@model.billing.paymentApiKey",
-    totalAmount: @model.price.total.getAmount
-  }
+  angular.extend(Egraphs.page, {
+    finalize: {
+      paymentToken: "@model.billing.paymentToken",
+      totalAmount: @model.price.total.getAmount
+    },
+
+    payment: {
+      jsModule: "@model.billing.paymentJsModule",
+      apiKey: "@model.billing.paymentApiKey"
+    }
+  });
 }
 
 
