@@ -13,6 +13,7 @@ import services.graphics.Handwriting
 import services.http.ControllerMethod
 import services.http.EgraphsSession.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
+import java.text.SimpleDateFormat
 
 private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData { 
   this: Controller =>
@@ -38,8 +39,22 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
     Action { implicit request =>
       orderStore.findFulfilledWithId(orderId) match {
         case Some(FulfilledOrder(order, egraph)) => {
+          val product = order.product
+          val celebrity = product.celebrity
           val mp4Url = egraph.assets.audioMp4Url
-          Ok(views.html.frontend.egraph_video(mp4Url = mp4Url))
+          Ok(views.html.frontend.egraph(
+            mp4Url = mp4Url,
+            signerName = celebrity.publicName,
+            signerTagline = celebrity.roleDescription,
+            recipientName = order.recipientName,
+            privacySetting = order.privacyStatus.name,
+            messageToCelebrity = order.messageToCelebrity,
+            productIconUrl = product.iconUrl,
+            signedOnDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt),
+            shareOnFacebookLink = "",
+            shareOnTwitterLink = "",
+            isPromotional = order.isPromotional
+          ))
         }
         case None => NotFound("No Egraph exists with the provided identifier.")
       }

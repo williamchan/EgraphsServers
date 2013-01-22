@@ -16,7 +16,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
   def landscape(isPromotional: Boolean = false) = Action {
     val frame = LandscapeEgraphFrameViewModel
 
-    Ok(views.html.frontend.egraph(
+    Ok(views.html.frontend.egraph_classic(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,
@@ -42,7 +42,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
   def portrait(isPromotional: Boolean = false) = Action  {
     val frame = PortraitEgraphFrameViewModel
 
-    Ok(views.html.frontend.egraph(
+    Ok(views.html.frontend.egraph_classic(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,

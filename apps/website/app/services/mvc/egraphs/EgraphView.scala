@@ -75,7 +75,7 @@ object EgraphView {
 
     val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = thisPageLink)
 
-    views.html.frontend.egraph(
+    views.html.frontend.egraph_classic(
       signerName = celebrity.publicName,
       recipientName = order.recipientName,
       frameCssClass = frame.cssClass,
