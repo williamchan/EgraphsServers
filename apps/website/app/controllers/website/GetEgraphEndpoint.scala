@@ -60,7 +60,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val maybeGalleryLink = maybeCustomerId.map { customerId =>
             controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId).url
           }
-          Ok(EgraphView.renderEgraphPage(egraph=egraph, order=order, galleryLink = maybeGalleryLink, consumerApp = consumerApp))
+          Ok(EgraphView.renderEgraphPage(egraph=egraph, order=order, facebookAppId = facebookAppId,galleryLink = maybeGalleryLink, consumerApp = consumerApp))
         }
         case Some(FulfilledOrder(order, egraph)) => Forbidden(views.html.frontend.errors.forbidden())
         case None => NotFound("No Egraph exists with the provided identifier.")

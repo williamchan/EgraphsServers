@@ -15,7 +15,9 @@ var Egraphs = Egraphs || {};
 Egraphs.page = Egraphs.page || {};
 
 // Provide the Egraphs scope as a module to any future require() calls
+define("window", [], function() { return window; });
 define("Egraphs", [], function() { return Egraphs; });
+define("page", [], function() { return Egraphs.page; });
 
 require(Egraphs.page.jsMain, function() {
   var mainModules = arguments,
