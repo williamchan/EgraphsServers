@@ -1,6 +1,23 @@
 /* Scripting for the landing page */
-define(["bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover", "bootstrap/bootstrap-tab", "bootstrap/bootstrap-carousel"],
-function () {
+define(["Egraphs", "pages/marketplace", "bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover", "bootstrap/bootstrap-tab", "bootstrap/bootstrap-carousel"],
+function (Egraphs, marketplace) {
+  
+  var verticalFunction = function(e) {
+    var vertical = $(this);
+    var slug =  vertical.attr("data-vertical");
+    var id = vertical.attr("id");
+    marketplace.selectVertical(slug, name);
+    marketplace.reloadPage();
+  };
+
+  var categoryFunction = function(e) {
+      var link = $(this);
+      var category = window.Egraphs.page.categories["c" + link.attr("data-category")];
+      var catVal = parseInt(link.attr("data-categoryvalue"), 10);
+      marketplace.updateCategories(catVal, category, $(this).attr("data-vertical"));
+      marketplace.reloadPage();
+  };
+  
   return {
     go: function() {
       $(document).ready(function() {
@@ -31,8 +48,10 @@ function () {
           $("#learn-switch").click();
         });
 
-
-        //$('[id^="myCarousel"]').carousel();
+        $(".vertical-button").click(verticalFunction);
+        $(".all-teams").click(verticalFunction);
+        $(".vertical-tile").click(verticalFunction);
+        $(".cv-link").click(categoryFunction);
 
       });
     }

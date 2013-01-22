@@ -46,8 +46,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def verticalSet: List[VerticalViewModel] = {
     List(
-      VerticalViewModel(id = 1, urlSlug="/major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", active = true, categoryViewModels = mlbCategories()),
-      VerticalViewModel(id = 2, urlSlug="/national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png", categoryViewModels = nbaCategories() )
+      VerticalViewModel(id = 1, urlSlug="major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", active = true, categoryViewModels = mlbCategories()),
+      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png", categoryViewModels = nbaCategories() )
     )
   }
 
@@ -55,7 +55,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     List(
       VerticalViewModel(id = 1,
         altText = "Get an egraph from an MLB star.",
-        urlSlug="/major-league-baseball",
+        urlSlug="major-league-baseball",
         verticalName = "mlb",
         publicName = "Major League Baseball",
         shortName = "MLB",
@@ -65,7 +65,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       ),
       VerticalViewModel(id = 2,
         altText = "Get an egraph from an NBA star.",
-        urlSlug="/national-basketball-association",
+        urlSlug="national-basketball-association",
         verticalName = "nba",
         publicName = "National Basketball Association",
         shortName = "NBA",
