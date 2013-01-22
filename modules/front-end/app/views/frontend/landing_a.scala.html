@@ -35,7 +35,7 @@
                 </div>
               }
               <a class="glowborder" href="@star.storefrontUrl" >
-                <img src="@star.imageUrl" alt="@star.name" />              
+                <img src="@star.imageUrl" title="Purchase an egraph from @star.name" alt="@star.name"/>              
               </a>
             </figure>
             <hgroup>
@@ -89,7 +89,7 @@
       <div class="clearfix">
         @for(vertical <- verticals) {
           <div class="vertical-select span4">
-            <a class="glowborder vertical-tile" title="@vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" href="#">
+            <a class="glowborder vertical-tile" title="Shop @vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" href="#">
               <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
                 <h3>@vertical.shortName &gt;&gt;</h3>
                 <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url"/>
@@ -100,7 +100,7 @@
           <div class="vertical-select span4">
             <a class="glowborder" target="_blank" title="Egraph of the Week" href="http://www.egraphs.com/800">
               <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/crowd.jpg").url')">
-                <h3>Egraph of the Week</h3>
+                <h3>Featured Egraph</h3>
               </div>
             </a>
           </div>  
