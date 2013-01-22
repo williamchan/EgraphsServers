@@ -21,24 +21,8 @@
       <div class="row">
 
         <div class="span6 header-parent">
-@**        <h1>Lorem ipsum dolor sit amet consectetur</h1>**@
             <h1>Get an egraph from your favorite star</h1>
             <a class="helper" href="#">What is an egraph? &gt;&gt;</a>
-@**          @{
-            celebrityPublicName match {
-              case None => standardHeadline
-              case Some(name) => celebHeadline(name)
-            }
-          }
-          @getStartedUrl.map{ url =>
-            @{
-              celebrityPublicName match {
-                case None => tags.landing.searchbox(url, autofocus=true)
-                case Some(name) => tags.landing.get_started(url)
-              }
-            }
-          }
-**@
         </div>
 
       </div>

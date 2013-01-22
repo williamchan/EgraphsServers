@@ -19,6 +19,9 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   def featuredStars(count: Int) = Action {
     Ok(views.html.frontend.landing(sampleStars.slice(0, count)))
   }
+  /**
+   * Displays a new redesign of the homepage as part of the homepage explorations effort. 
+   **/
 
   def landing_a =  Action {
     Ok(views.html.frontend.landing_a(sampleStars.slice(0,8), Marketplace.landingVerticalSet))

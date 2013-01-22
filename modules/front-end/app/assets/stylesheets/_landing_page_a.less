@@ -6,13 +6,14 @@
 // Styles for the rest of the page
 .landing {
     .help-block {
-      padding-left: 5px;
       font-size: 12px;
+      padding-left: 5px;
     }
     .search-control {
-      width: 300px;
       .celebrity-searchbox-container2();
       overflow: hidden;
+      width: 300px;
+     
       input {
         width: 85%;
       }
@@ -24,6 +25,7 @@
 
   #landing-content-a {
     .switcher {
+      .box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5));
       background: none;
       display: block;
       list-style: none;
@@ -32,7 +34,6 @@
       text-align: center;
       top: -4.8em;
       width: 50%;
-      .box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5));
 
       > li {
         background: @white;
@@ -53,8 +54,8 @@
         &.active {
           .box-shadow(none);
           background: @contentBackground;
-          > a {
 
+          > a {
              &:hover {  
               color: @grayLight;
             }  
@@ -82,9 +83,9 @@
         margin-bottom: 2.5em;
         
         .backdrop { 
-          background-size: cover;
-          background-repeat: no-repeat;
           .glowborder();
+          background-repeat: no-repeat;
+          background-size: cover;
           position: relative;
           z-index: 0;
 
@@ -146,9 +147,9 @@
         }
         
         h5 {
-          text-shadow: 0 1px 0 #fff;
           display: inline-block;
           font-size: .75em;
+          text-shadow: 0 1px 0 #fff;
         }
 
         img {
@@ -180,9 +181,9 @@
         }
         
         h3 {
-          text-shadow: 0 1px 0 #fff;
           display: inline-block;
           font-size: .875em;
+          text-shadow: 0 1px 0 #fff;
         }
 
         img {
@@ -205,27 +206,24 @@
       }
 
       ul {
-
+        .content-columns(3);         
         font-size: 12px;
         list-style: none;
         margin-left: 0;          
-        .content-columns(3);         
+
         li {
           line-height: 18px;
         
           a {
+            color: @gray;
             cursor: pointer;
-          &:hover { color: @orange; }
-          color: @gray;
+            &:hover { 
+              color: @orange; 
+            }
           }
         }
         
-        
-        
         li:last-child { 
-          // position: absolute;
-          // bottom: 0;
-          // right: 0;  
           a {
             border-bottom: 1px dotted @blue;
             color: @blue;
@@ -245,11 +243,11 @@
 
     h2 {
       color: @orange;
-      font-weight: 600;
-      text-transform: uppercase;
-      line-height: 1.25em;
       font-size: 20px;
+      font-weight: 600;
+      line-height: 1.25em;
       margin-bottom: .675em;
+      text-transform: uppercase;
     }
 
     #landing-stars {
@@ -272,14 +270,14 @@
         }
         article {
           
-          text-align: left;
-          margin-bottom: 20px;
           .glowborder-link-container();
+          margin-bottom: 20px;
+          text-align: left;
           
           figure {
-            position:relative;      
             margin: 0 0 10px 0;
             padding: 0;
+            position:relative;      
 
             .ribbon {
               text-transform:uppercase;
@@ -290,20 +288,19 @@
 
               .question {
                 .box-shadow(0px 1px 0px #333);
-                position:relative;
+                background-color:white;
+                border-radius:100px;
+                color:@orange;
+                font-size:11px;
+                font-weight:600;
                 left:2px;
-                top:-1px;
-                padding-top:0px;
                 padding-bottom:0px;
                 padding-left:4px;
                 padding-right:4px;
-                border-radius:100px;
-                background-color:white;
+                padding-top:0px;
+                position:relative;
                 text-shadow: none;            
-                color:@orange;
-                
-                font-size:11px;
-                font-weight:600;
+                top:-1px;
               }
 
               .tooltip-inner {
@@ -311,18 +308,17 @@
               }
 
               i {     
-                margin-top: 1px;
                 margin-left: 5px;
+                margin-top: 1px;
               }
             }
           }
 
           hgroup {
             h4 {
-            
+              font-weight: 600;
               line-height: 1.25em;
               margin-bottom: 0;
-              font-weight: 600;
             }
             
             h5 {
@@ -340,14 +336,16 @@
         
     } // end .celebrities
   } // end #shop
-
+  
+  #learn { margin-top: 15px; }
+  
   #landing-welcome {
 
     padding-bottom: 40px;
     
     h1 {
-      font-weight: 100;
       font-size: 40px;
+      font-weight: 100;
       line-height: 1.25em;
       margin-bottom: .25em;
     }
@@ -367,12 +365,12 @@
       margin-bottom: 40px;
     
       h1 {
-        font-weight: 100;
+        border-bottom: 1px solid #e6e6e6;
         font-size: 30px;
+        font-weight: 100;
         line-height: 1.25em;
         margin-bottom: 0;
         padding-bottom: .5em;
-        border-bottom: 1px solid #e6e6e6;
       }
     
     }
@@ -380,8 +378,8 @@
     ol {
       
       list-style: none; 
-      padding: 0;
       margin: 0;
+      padding: 0;
       
       li {
       
@@ -434,11 +432,10 @@
     figure {
     
       display: none;
-      
-      text-align: center;
-      position: relative;
       margin: 0 0 40px 0;
       padding: 0;
+      position: relative;
+      text-align: center;
       
       img {
         display: block;
@@ -466,17 +463,6 @@
       
       p { margin-bottom: 0; }
 
-        form {
-          div {
-            display: inline;
-            padding-left: 20px;
-            padding-right: 20px;
-            #celebrity-searchbox {
-              width: 40%;
-            }
-            .celebrity-searchbox-container(0);
-          }
-        }
     }
 
     .actions {
@@ -519,36 +505,27 @@
       border-top: 1px solid #efefef;
       
       .callout {
-      
+             
+        line-height: 1.5em;
+        margin-bottom: 2em;
         border-top: 1px solid #fff;
+        font-size: 14px;
         padding-top: 40px;      
       
         h3 {
-    
-          font-weight: 600;
-          text-transform: uppercase;
           font-size: 14px;
+          font-weight: 600;
+          letter-spacing: .1em;
           line-height: 1.25em;
           margin-bottom: .25em;
-          letter-spacing: .1em;
+          text-transform: uppercase;
         }
-        
-        p {
-          font-size: 14px;
-          line-height: 1.5em;
-          margin-bottom: 2em;
-        }
-
+      
       }
         
     }
 
   } // #landing-more
-
-  @media (min-width: 1080px) {
-
-
-  } // end min-width: 1080px;
 
   @media (min-width: 1024px) {
     #landing-steps {
@@ -604,20 +581,20 @@
         
           .instructions {
           
-            position: relative;
-            z-index: 1;
             float: right;
-            width: 50%;
-            text-align: left; 
             min-height: 280px;
+            position: relative;
+            text-align: left; 
+            width: 50%;
+            z-index: 1;
           
           }
           
           img.positioned {
             display: block;
+            left: -40px;
             position: absolute;
             z-index: 0;
-            left: -40px;
           }
         
         } // end .step-2 
@@ -627,20 +604,20 @@
         
           .instructions {
           
-            position: relative;
-            z-index: 1;
             float: left;
-            width: 50%;
+            position: relative;
             text-align: left;   
+            width: 50%;
+            z-index: 1;
           
           }     
         
           img.positioned {
-            position:absolute;
             display: block;
-            z-index: 0;
             margin-left: 339px;
             margin-top:-101px;
+            position:absolute;
+            z-index: 0;
           }
       
         } // end .step-3 
@@ -655,14 +632,14 @@
             
       header {    
         .gradient-white;    
-        text-align: center; 
-        padding-top: 40px;
         margin-bottom: 0;
+        padding-top: 40px;
+        text-align: center; 
       }
       
       .content {
-        padding-top: 40px;    
         background: @white;
+        padding-top: 40px;    
       }
       
       small a { text-decoration: underline; }
@@ -671,10 +648,10 @@
 
     #landing-more {
       
+      background: @white;
       margin-left: -40px;
       margin-right: -40px;
       padding: 0 40px;
-      background: @white;
 
     } // end #landing-more
 
@@ -702,10 +679,10 @@
                   
           p {
             
-            text-align: left;
             font-size: 14px;
             line-height: 1.5em;
             margin-bottom: 0;
+            text-align: left;
           
             a {
               text-decoration: underline;
@@ -713,9 +690,9 @@
           
             span {
               display: block;
+              overflow: hidden;
               position: absolute;
               text-indent: -9999px;
-              overflow: hidden;
             }
             
           }
@@ -724,11 +701,10 @@
         
         .signature {
         
-          width: 160px;
-          padding-right: 10px;
-    
           left: -90px;
+          padding-right: 10px;
           top: 90px;
+          width: 160px;
           
           p {
     
@@ -748,22 +724,21 @@
         
         .name {
         
-          width: 80px;
           padding-left: 10px;
-          
           right: -25px;
           top: 347px;
+          width: 80px;
           
           p {
           
             text-align: left;
           
             span {
+              background: #29abe2;
+              height: 1px;
               right: 100%;
               top: 10px;
               width: 250px;
-              height: 1px;
-              background: #29abe2;
             }
             
           }
@@ -772,22 +747,21 @@
         
         .audio {
         
-          width: 100px;
-          padding-right: 10px;
-          
           left: -80px;
+          padding-right: 10px;
           top: 326px;
+          width: 100px;
           
           p {
           
             text-align: right;
             
             span {
+              background: #29abe2;          
+              height: 1px;
               left: 100%;
               top: 20px;
               width: 210px;
-              height: 1px;
-              background: #29abe2;          
             }
           
           }
@@ -877,15 +851,15 @@
 @media (max-width: 767px) and (min-width: 481px) {
   .landing {
     #shop #verticals .vertical-select.span4 {
+      
       float: left;
+      margin-left: 3%;
+      width: 31.333%;
       
       &:first-of-type{
         margin-left: 0;
       }  
-
-      margin-left: 3%;
       
-      width: 31.333%;
       .backdrop {
 
         max-width: 100%;
@@ -900,8 +874,8 @@
         article {
         
           float: left;
-          width: 48%;
           margin-right: 2%;
+          width: 48%;
         
         }
       
@@ -928,17 +902,18 @@
 
 @media (max-width:480px) {
   .landing {
+    #landing-content-a {
+      .switcher {
+        top: -2.32em;
+      }
+    }
     #shop {
       #verticals .vertical-select.span4 .backdrop {
         height: 168.5px;
       }
 
       #browse ul {
-
         .content-columns(2);   
-        li {
-          // width: 49.9%;
-        }
       }
     } 
     #landing-stars {
@@ -962,15 +937,11 @@
     
     }
 
-    #landing-more {
-      header form div {
-
-        #celebrity-searchbox {
-          width: 70%;
-          height: 26px;
-          position: relative;
-          top: -2px;
-            
+    form {
+      .search-control {
+        width: 270px;
+        input[type="search"] {
+          width: 83%;
         }
       }
     }

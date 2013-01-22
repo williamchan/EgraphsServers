@@ -76,10 +76,11 @@
   border-radius: 4px;
 
   input[type="search"] {
-    position: relative;
+    -webkit-appearance: none;
     font-size: 14px;
     height: 25px;
     margin-right: -1px;
+    position: relative;
 
     &:focus {
       border: 1px solid silver;
@@ -103,13 +104,13 @@
     i {
       margin-top: 2px;
     }
-    position: relative;
-    top: 0;
+    background: @mainColor;
     bottom: 0;
-    right: 0;
     margin-left: -4px;
     padding-bottom: 5px;
-    background: @mainColor;
+    position: relative;
+    right: 0;
+    top: 0;
   }
 }
 

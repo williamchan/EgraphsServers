@@ -38,6 +38,10 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
     }
   }
 
+  /**
+   * Temporary controller for forking traffic between two designs. Serves the route /new. 
+  **/
+
   def getRootConsumerEndpointA = controllerMethod.withForm() { implicit authToken =>
     Action {implicit request =>
       val featuredStars = celebrityStore.catalogStarsSearch(refinements = List(List(featured.categoryValue.id))).toList

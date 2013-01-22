@@ -24,18 +24,3 @@ case class CatalogStar(
 ) {
   def hasInventoryRemaining: Boolean = (inventoryRemaining > 0)
 }
-
-case class VerticalSelectViewModel(
-  url: String,
-  title: String,
-  longName: String,
-  tileUrl: String,
-  iconUrl: Option[String] = None
-)
-
-case class CategoryValueSelectViewModel(
-  url: String,
-  iconUrl: String,
-  name: String
-)
-
