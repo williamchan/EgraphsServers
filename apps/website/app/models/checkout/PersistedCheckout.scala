@@ -17,7 +17,8 @@ case class PersistedCheckout(
   //
   // Checkout members
   //
-  override def isPersisted: Boolean = true
+  override protected def _persisted: Boolean = true
+  override protected def _dirty: Boolean = !_addedTypes.isEmpty
 
   override lazy val customer: Option[Customer] = services.customerStore.findById(customerId)
 

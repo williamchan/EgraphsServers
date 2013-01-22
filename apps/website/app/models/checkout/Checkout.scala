@@ -77,10 +77,11 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   def itemTypes: LineItemTypes
   def pendingItems: LineItems
   def pendingTypes: LineItemTypes
-  def isPersisted: Boolean
+  protected def _persisted: Boolean
+  protected def _dirty: Boolean
 
   // types derived from zipcode and _addedTypes to be applied only to _addTypes (e.g. taxes, fees)
-  lazy val _derivedTypes: LineItemTypes = {
+  lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
     // TODO(refunds): will probably want to add the refund transaction here
     // TODO(fees): will want to add any fees we charge here
     TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
@@ -106,7 +107,7 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
     } else {
       val conn = services.currentTxnConnectionFactory()
       val savepoint = conn.setSavepoint()
-      val savedCheckout = if (isPersisted) this.update() else this.insert()
+      val savedCheckout = if (_persisted) this.update() else this.insert()
       val txnItem = txnType.flatMap(_.lineItems( Seq(balance) )) match {
         // Type-erasure on Seq(item) not an issue unless more Payment-natured line items are added
         case Some(Seq(item: CashTransactionLineItem)) => Some( item.makeCharge(savedCheckout) )

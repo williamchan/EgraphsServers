@@ -19,7 +19,6 @@ import scala.Right
 class CheckoutTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
   with CanInsertAndUpdateAsThroughServicesTests[Checkout, CheckoutEntity, Long]
-  // TODO(SER-499): create equivalent of CreatedUpdatedEntityTests[Long, CheckoutEntity] for CanInsertAndUpdate...
   with DateShouldMatchers
   with DBTransactionPerTest
 {
@@ -44,10 +43,6 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Checkout test cases
   //
-
-  // TODO(SER-499): additional save test cases
-  // -don't make zero-value charges
-
   "A checkout" should "fail to transact without a customer" in {
     val checkout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
     lazy val failedTransaction: FailureOrCheckout = checkout.transact(randomCashTxnType)
@@ -99,11 +94,6 @@ class CheckoutTests extends EgraphsUnitTest
 
 
 
-
-  // TODO(SER-499): additional test cases
-  // -require payment
-  // -make payment appropriately
-  // -do nothing without add. types
 
   "A restored checkout" should "contain same line items as saved checkout" in {
     val saved: Checkout = saveModel(newModel)
@@ -158,6 +148,15 @@ class CheckoutTests extends EgraphsUnitTest
     restored.lineItems should beContainedIn (updated.lineItems, "updated")
   }
 
+  it should "not do anything on transact without any changes being made" in {
+    val restoredUnchanged = restoreModel(saveModel(newModel).id).get
+    val transactedWithCash = restoredUnchanged.transact(None)
+    val transactedWithoutCash = restoredUnchanged.transact(cashTxnTypeFor(restoredUnchanged))
+
+    transactedWithCash should be (Right(restoredUnchanged))
+    transactedWithoutCash should be (Right(restoredUnchanged))
+
+  }
 
 
 
@@ -194,12 +193,9 @@ class CheckoutTests extends EgraphsUnitTest
     CashTransactionLineItemType(newSavedAccount().id, taxedZip, Some(token))
   )
 
-
-
   def expectedTotalOf(checkout: Checkout) = checkout.lineItems.notOfNatures(Summary, Payment).sumAmounts
   def totalPaymentsOf(checkout: Checkout) = checkout.payments.sumAmounts
   def expectedBalanceOf(checkout: Checkout) = expectedTotalOf(checkout) plus totalPaymentsOf(checkout)
-
 
 
   //

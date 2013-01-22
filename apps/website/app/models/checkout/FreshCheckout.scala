@@ -23,7 +23,8 @@ case class FreshCheckout(
   override lazy val lineItems: LineItems = resolveTypes(itemTypes)
   override def pendingTypes: LineItemTypes = _itemTypes
   override def pendingItems: LineItems = lineItems
-  override def isPersisted: Boolean = false
+  override protected def _persisted: Boolean = false
+  override protected def _dirty: Boolean = !_itemTypes.isEmpty
 
 
   //
