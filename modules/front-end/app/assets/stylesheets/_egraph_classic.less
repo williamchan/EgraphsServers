@@ -13,12 +13,30 @@
   background: radial-gradient(@arguments);
 }
 
+@storyTextMargin: 25px;
+@storyTextWidth: 215px;
 //
 // General variables
 //
 @darkestBackground: darken(#dfe5e6, 5%);
 @spotlightColor: white;
 @frameShadow: -6px 10px 12px 0px rgba(0, 0, 0, .4);
+
+//
+// Portrait variables
+//
+@portraitFrameTopMargin: 39px;
+@portraitFrameWidth: 704px;
+@portraitFrameHeight: 466px;
+
+@portraitImageWidth: 377px;
+@portraitImageHeight: 526px;
+@portraitImageLeftMargin: 44px;
+@portraitImageTopMargin:39px;
+
+@portraitPlaqueLeftMargin: 38px;
+@portraitPlaqueTopMargin: @portraitImageTopMargin + @portraitImageHeight + 12px;
+
 
 //
 // Landscape variables
@@ -50,7 +68,7 @@
   src:url('/assets/typefaces/BebasNeue.otf')
 }
 
-body.egraph-page {
+body.egraph-classic-page {
   @bgGradientStart: 5px;
 
   @step1Color: lighten(@darkestBackground, 10%);
@@ -64,7 +82,7 @@ body.egraph-page {
   @step3Color: lighten(@darkestBackground, 7%);
   @step3TransitionHeight: @step2MaintenanceHeight + 268px;
 
-  .egraph-guider {
+  .egraph-classic-guider {
     background: @white;
     border: 1px solid @gray;
     position: absolute;
@@ -189,12 +207,12 @@ body.egraph-page {
     width:1000px;
   }
 
-  .egraph-content {
+  .egraph-classic-content {
     position: relative;
   }
 
   .photo-column {
-    .egraph {
+    .egraph-classic {
       position:relative;
       background-color:#333;
 
@@ -418,7 +436,7 @@ body.egraph-page {
     }
   }
 
-  #egraph-page {
+  #egraph-classic-page {
     color:#737e83;
     font-family:Arial;
     font-size:14px;
@@ -533,7 +551,7 @@ body.egraph-page {
         padding-bottom:3px;
       }
 
-      a.egraphs-logo {
+      a.egraphs-classic-logo {
         display:block;
         position:relative;
         margin-left:30px;
@@ -588,6 +606,86 @@ body.egraph-page {
       } // End social
 
     }
+
+    //
+    // Begin portrait-specific styles
+    //
+    .portrait {
+      .story-spotlight {
+        position:absolute;
+        z-index:-2;
+        left:390px;
+        top:-350px;
+        width:550px;
+        height:600px;
+
+        background: -webkit-gradient(radial,
+                                     80% 50%, 50,
+                                     45% 45%, 275,
+                                     from(@spotlightColor),
+                                     to(rgba(255,255,255,0)));
+
+
+        .non-webkit-radial-gradient(~'334px 317px, ellipse farthest-side, @{spotlightColor} 100px, rgba(255, 255, 255, 0) 216px');
+
+      }
+      .story-text-spotlight {
+        position:absolute;
+        z-index:-2;
+        left:450px;
+        top:120px;
+        width:550px;
+        height:600px;
+
+        background: -webkit-gradient(radial,
+                                     70% 50%, 20,
+                                     50% 50%, 275,
+                                     from(fadeout(@spotlightColor, 40%)),
+                                     to(rgba(255,255,255,0)));
+
+        @gradientStartColor: fadeout(@spotlightColor, 15%);
+        .non-webkit-radial-gradient(~'229px 243px, ellipse farthest-side, @{gradientStartColor} 75px, rgba(255, 255, 255, 0) 263px');
+      }
+
+      .photo-column {
+        padding-top:@portraitFrameTopMargin;
+
+          .frame {
+            background:url(/assets/images/egraph_frame_portrait.png) no-repeat;
+            width:@portraitFrameHeight;
+            height:@portraitFrameWidth;
+          }
+
+          .plaque {
+            top:@portraitPlaqueTopMargin;
+            left:@portraitPlaqueLeftMargin;
+          }
+
+          .image-aperture {
+            left:@portraitImageLeftMargin;
+            top:@portraitImageTopMargin;
+            width:@portraitImageWidth;
+            height:@portraitImageHeight;
+
+            iframe.signed-photo {
+              width:@portraitImageWidth;
+              height:@portraitImageHeight;
+            }
+          }
+
+          .fx-glass-shine {
+            top:2px;
+            width:@portraitImageWidth - 1px;
+            height:@portraitImageHeight - 2px;
+          }
+      } // End .photo-column
+
+      .story-column {
+        padding-top:109px;
+        padding-left:50px;
+      }
+
+    } // End .portrait
 
     //
     // Begin landscape-only styles

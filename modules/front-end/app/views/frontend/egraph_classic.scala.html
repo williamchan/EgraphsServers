@@ -19,9 +19,6 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@import views.html.frontend.tags
-@import controllers._
-
 @title = {@signerName egraph for @recipientName}
 
 @headHtml = {
@@ -35,13 +32,13 @@
       mixpanel.track('Egraph viewed', {'url': window.location.href})
     </script>
     <script type="text/javascript">
-      mixpanel.track_links('#egraph-page .facebook', 'Facebook share button clicked (egraph)')
+      mixpanel.track_links('#egraph-classic-page .facebook', 'Facebook share button clicked (egraph)')
     </script>
     <script type="text/javascript">
-      mixpanel.track_links('#egraph-page .twitter', 'Tweet button clicked (egraph)');
+      mixpanel.track_links('#egraph-classic-page .twitter', 'Tweet button clicked (egraph)');
     </script>
     <script type="text/javascript">
-      mixpanel.track_links('.egraphs-logo', 'Navigate home from egraph page')
+      mixpanel.track_links('.egraphs-classic-logo', 'Navigate home from egraph page')
     </script>
 }
 
@@ -57,15 +54,15 @@
 }
 
 @baseBody = {
-    <div class="container" id="egraph-page">
-      <div class="egraph-content @frameCssClass">
+    <div class="container" id="egraph-classic-page">
+      <div class="egraph-classic-content @frameCssClass">
         <div class="left-spotlight"></div>
         <div class="right-spotlight"></div>
         <div class="story-spotlight"></div>
         <div class="story-text-spotlight"></div>
         <div class="row">
           <div class="@frameLayoutColumns photo-column" >
-            <div class="egraph">
+            <div class="egraph-classic">
               <div class="frame">
                 <div class="image-aperture">
                   <iframe src='@signedImage' class="signed-photo" alt="Signed photo"></iframe>
@@ -112,7 +109,7 @@
             <div class="story-column-element story-text">@Html(storyBody)
             </div>                        
             <div class="story-column-element">
-              <a href="@galleryLink.getOrElse("/")" class="egraphs-logo">
+              <a href="@galleryLink.getOrElse("/")" class="egraphs-classic-logo">
                 <img class="logo-inactive" src='@EgraphsAssets.at("images/egraphs_logo_inactive.png")' alt="Egraphs Logo">
                 <img class="logo-active" src='@EgraphsAssets.at("images/egraphs_logo_active.png")' alt="Egraphs Logo">
               </a>
@@ -180,4 +177,14 @@
     </script>    
 }
 
-@base_template(title=title.toString, headHtml=headHtml, body=baseBody, headJs=headJs, jsMain="pages/egraph", suppressHeaderAndFooter=true, cssFiles=styles, bodyClasses=Seq("egraph-page"), viewportFix = false)
+@base_template(
+  title=title.toString,
+  headHtml=headHtml,
+  body=baseBody,
+  headJs=headJs,
+  jsMain="pages/egraph-classic",
+  suppressHeaderAndFooter=true,
+  cssFiles=styles,
+  bodyClasses=Seq("egraph-classic-page"),
+  viewportFix = false
+)
