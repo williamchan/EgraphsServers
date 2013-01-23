@@ -16,8 +16,8 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.egraph(
       mp4Url = "https://egraphs-demo.s3.amazonaws.com/egraphs/647/egraph.mp4",
       videoPosterUrl = "",
-      signerName = "Sergio Romo",
-      signerTagline = "San Francisco Giants",
+      celebrityName = "Sergio Romo",
+      celebrityTagline = "San Francisco Giants",
       recipientName = "Jordan",
       privacySetting = "Public",
       messageToCelebrity = Some("Hey Sergio! You throw a mean pitch. What awesome beard trimming tips do you have?"),

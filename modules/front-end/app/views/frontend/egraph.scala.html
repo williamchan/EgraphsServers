@@ -1,24 +1,22 @@
 @(mp4Url: String,
-videoPosterUrl: String,
-signerName: String,
-signerTagline: String,
-recipientName: String,
-messageToCelebrity: Option[String],
-productIconUrl: String,
-signedOnDate: String,
-shareOnFacebookLink: String,
-shareOnTwitterLink: String,
-privacySetting: String,
-isPromotional: Boolean)(implicit
-headerData: models.frontend.header.HeaderData,
-footerData: models.frontend.footer.FooterData,
-authToken: egraphs.authtoken.AuthenticityToken
+  videoPosterUrl: String,
+  celebrityName: String,
+celebrityTagline: String,
+  recipientName: String,
+  messageToCelebrity: Option[String],
+  productIconUrl: String,
+  signedOnDate: String,
+  shareOnFacebookLink: String,
+  shareOnTwitterLink: String,
+  privacySetting: String,
+  isPromotional: Boolean
+)(implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@import views.html.frontend.tags
-@import controllers._
-
-@title = {@signerName egraph for @recipientName}
+@title = {@celebrityName egraph for @recipientName}
 
 @headHtml = {
   <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
@@ -26,7 +24,7 @@ authToken: egraphs.authtoken.AuthenticityToken
 }
 
 @headJs = {
-  Egraphs.page.signerName = "@signerName";
+  Egraphs.page.celebrityName = "@celebrityName";
   Egraphs.page.isPromotional = @isPromotional;
 }
 
@@ -39,12 +37,12 @@ authToken: egraphs.authtoken.AuthenticityToken
   </video>
 
   <hr/>
-  <div>@signerName</div>
-  <div>@signerTagline</div>
+  <div>@celebrityName</div>
+  <div>@celebrityTagline</div>
   <img src='@productIconUrl' height="40" width="40"/>
   <hr/>
   <div>A message for @recipientName</div>
-  <div>from @signerName</div>
+  <div>from @celebrityName</div>
   <hr/>
   <div>@messageToCelebrity.getOrElse("")</div>
   <div>@signedOnDate</div>
@@ -53,4 +51,9 @@ authToken: egraphs.authtoken.AuthenticityToken
 </div>
 }
 
-@base_template(title=title.toString, headHtml=headHtml, body=baseBody, headJs=headJs)
+@base_template(
+  title=title.toString,
+  headHtml=headHtml,
+  body=baseBody,
+  headJs=headJs
+)

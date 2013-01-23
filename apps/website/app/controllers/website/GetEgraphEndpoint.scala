@@ -47,8 +47,8 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           Ok(views.html.frontend.egraph(
             mp4Url = mp4Url,
             videoPosterUrl = videoPosterUrl,
-            signerName = celebrity.publicName,
-            signerTagline = celebrity.roleDescription,
+            celebrityName = celebrity.publicName,
+            celebrityTagline = celebrity.roleDescription,
             recipientName = order.recipientName,
             privacySetting = order.privacyStatus.name,
             messageToCelebrity = order.messageToCelebrity,
