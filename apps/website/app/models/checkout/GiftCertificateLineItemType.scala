@@ -1,5 +1,6 @@
 package models.checkout
 
+import checkout.Conversions._
 import models.GiftCertificate
 import models.enums.{CodeType, LineItemNature}
 import org.joda.money.Money
@@ -24,7 +25,10 @@ case class GiftCertificateLineItemType (
     ""
   }
 
-  override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
+  override def lineItems(
+    resolvedItems: LineItems = Nil,
+    pendingResolution: LineItemTypes = Nil
+  ) = {
     val giftCertificate = GiftCertificate(recipient, amount)
     Some(Seq(GiftCertificateLineItem(this, giftCertificate)))
   }

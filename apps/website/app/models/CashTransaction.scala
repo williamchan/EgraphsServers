@@ -22,7 +22,7 @@ case class CashTransactionServices @Inject() (cashTransactionStore: CashTransact
  * add to our account (e.g. Egraph payments), negative amounts decrease it (e.g. Celebrity
  * Disbursements).
  */
-case class CashTransaction(
+case class  CashTransaction(
   id: Long = 0,
   accountId: Long = 0,
   orderId: Option[Long] = None,       // This should probably be a oneToMany

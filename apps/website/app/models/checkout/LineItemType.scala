@@ -1,11 +1,12 @@
 package models.checkout
 
-import services.MemberLens
-import services.db._
-import scalaz.Lens
+import checkout.Conversions._
 import java.sql.Timestamp
 import models.enums._
 import models.SavesCreatedUpdated
+import scalaz.Lens
+import services.MemberLens
+import services.db._
 
 
 trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
@@ -13,8 +14,6 @@ trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
 
   // Convenience entity-member accessors
   def description: String
-//  def nature: LineItemNature
-//  def codeType: CodeType
 
   // Serialization
   def toJson: String
@@ -40,8 +39,8 @@ trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
    *   Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
   def lineItems(
-    resolvedItems: Seq[LineItem[_]],
-    pendingResolution: Seq[LineItemType[_]]
+    resolvedItems: LineItems,
+    pendingResolution: LineItemTypes
   ): Option[Seq[LineItem[TransactedT]]] // or Seq[Option[...]]
 }
 

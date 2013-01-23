@@ -1,5 +1,6 @@
 package models.checkout
 
+import checkout.Conversions._
 import models.{GiftCertificateStore, GiftCertificate}
 import services.AppConfig
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
@@ -7,7 +8,9 @@ import scalaz.Lens
 import com.google.inject.Inject
 
 
-
+//
+// Model
+//
 case class GiftCertificateLineItem (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
@@ -21,7 +24,7 @@ case class GiftCertificateLineItem (
 
   override def itemType = GiftCertificateLineItemType(this)
 
-  override def subItems: Seq[LineItem[_]] = Nil
+  override def subItems: LineItems = Nil
 
   override def toJson: String = {
     // TODO(SER-499): implement once api nailed down
@@ -84,6 +87,9 @@ case class GiftCertificateLineItem (
 
 
 
+//
+// Companion object
+//
 object GiftCertificateLineItem {
   // Creating
   def apply(itemType: GiftCertificateLineItemType, giftCertificate: GiftCertificate) = {
@@ -108,7 +114,9 @@ object GiftCertificateLineItem {
 
 
 
-
+//
+// Services
+//
 case class GiftCertificateLineItemServices @Inject() (
   schema: Schema,
   lineItemStore: LineItemStore,

@@ -1,26 +1,26 @@
 package models.checkout
 
+import checkout.Conversions._
+import com.google.inject.Inject
+import java.sql.Timestamp
 import org.joda.money.{CurrencyUnit, Money}
+import models.enums._
+import models.SavesCreatedUpdated
+import scalaz.Lens
 import services.db.{InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
-import scalaz.Lens
-import models.SavesCreatedUpdated
-import com.google.inject.Inject
-import models.enums._
-import scala.Some
-import java.sql.Timestamp
 
 trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with HasLineItemNature with HasCodeType {
 
   def id: Long
   def itemType: LineItemType[TransactedT]
-  def subItems: Seq[LineItem[_]]
+  def subItems: LineItems
   def toJson: String                    // TODO(SER-499): Use Json type, maybe even Option
   def domainObject: TransactedT
 
 
   /** @return flat sequence of this LineItem and its sub-LineItems */
-  def flatten: Seq[LineItem[_]] = {
+  def flatten: LineItems = {
     val seqOfFlatSubItemSeqs = for(subItem <- subItems) yield subItem.flatten
     Seq(this) ++ seqOfFlatSubItemSeqs.flatten
   }
@@ -55,10 +55,12 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with Ha
     }
   }
 
-
-  def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](desiredCodeType: CodeTypeFactory[LIT, LI]) = {
+  /** Returns option of this if it has the desired code type, otherwise None */
+  protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
+    desiredCodeType: CodeTypeFactory[LIT, LI]
+  ): Option[LI] = {
     if (codeType != desiredCodeType) None
-    else Some(this.asInstanceOf[LI])
+    else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
   }
 
 }
@@ -75,7 +77,7 @@ class LineItemStore @Inject() (schema: Schema) {
   // TODO(SER-499): helper queries
   // use CodeType of LineItemType to create LineItem's of the correct type
 
-  def getItemsByCheckoutId(id: Long): Seq[LineItem[_]] = {
+  def getItemsByCheckoutId(id: Long): LineItems = {
     /**
      * Note that using toSeq instead of toList returns a Stream which causes bugs in other steps
      * of restoring a checkout
@@ -96,7 +98,26 @@ class LineItemStore @Inject() (schema: Schema) {
       where(entity.id === id) select(entity)
     ).headOption
   }
+
+  def findByIdOfCodeType[ LIT <: LineItemType[_], LI <: LineItem[_] ](
+    id: Long, codeType: CodeTypeFactory[LIT, LI]
+  ): Option[LI] = {
+
+    val maybeEntities = join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
+      select(li, lit) on (li._itemTypeId === lit.id and li.id === id)
+    ).headOption
+
+    // If the entities are of the right code type, create line item and return it, otherwise None
+    maybeEntities match {
+      case Some((itemEntity, typeEntity)) if (CodeType(typeEntity._codeType) == Some(codeType)) =>
+        Some(
+          codeType.itemInstance(itemEntity, typeEntity)
+        )
+      case None => None
+    }
+  }
 }
+
 
 
 

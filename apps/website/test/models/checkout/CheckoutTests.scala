@@ -1,32 +1,27 @@
 package models.checkout
 
 import utils._
-import org.joda.money.{CurrencyUnit, Money}
+import org.joda.money.Money
 import org.scalatest.matchers.{MatchResult, Matcher}
 import services.AppConfig
-import services.db.{Schema, TransactionSerializable, DBSession}
 import services.Finance.TypeConversions._
 import services.payment.StripeTestPayment
+import LineItemMatchers._
 import models.checkout.checkout.Conversions._
 import models.checkout.Checkout._
-import TestData._
 import models.enums.LineItemNature._
-import scala.Left
-import scala.Some
-import scala.Right
+import TestData._
 
 
 class CheckoutTests extends EgraphsUnitTest
   with ClearsCacheAndBlobsAndValidationBefore
-  with CanInsertAndUpdateAsThroughServicesTests[Checkout, CheckoutEntity, Long]
+  with CanInsertAndUpdateAsThroughServicesWithLongKeyTests[Checkout, CheckoutEntity]
   with DateShouldMatchers
   with DBTransactionPerTest
 {
   //
   // CanInsertAndUpdateAsThroughServicesTests members
   //
-  override def newIdValue: Long = 0
-  override def improbableIdValue: Long = java.lang.Integer.MAX_VALUE
   override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), taxedZip, Some(newSavedCustomer()))
   override def saveModel(toSave: Checkout): Checkout = toSave.transact(cashTxnTypeFor(toSave)) match {
     case Right(checkout: Checkout) => checkout
@@ -201,17 +196,6 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Matchers
   //
-  def beContainedIn(otherItems: LineItems, checkoutState: String = "other") = Matcher { left: LineItems =>
-    val notInOtherItems = left.filterNot { item => otherItems.exists(item equalsLineItem _) }
-    val successMessage = "All items were contained in %s checkout".format(checkoutState)
-    val failMessage = "Line items with id's (%s) were not contained in %s checkout".format(
-      notInOtherItems.map(item => item.id).mkString(", "),
-      checkoutState
-    )
-
-    MatchResult(notInOtherItems.isEmpty, failMessage, successMessage)
-  }
-
   def notHaveDuplicateSummaries = Matcher { checkout: Checkout =>
     val numSubtotals = checkout.itemTypes.filter(SubtotalLineItemType eq _).length
     val numTotals = checkout.itemTypes.filter(TotalLineItemType eq _).length
@@ -221,14 +205,4 @@ class CheckoutTests extends EgraphsUnitTest
       "Only 1 subtotal and subtotal found"
     )
   }
-
-  def haveAmount(desiredAmount: Money) = Matcher { left: LineItem[_] =>
-    MatchResult(left.amount == desiredAmount,
-      (left.amount + " did not equal " + desiredAmount),
-      "LineItem has desired amount"
-    )
-  }
-
-  def haveAmountOf(right: LineItem[_]) = haveAmount(right.amount)
-  def haveNegatedAmountOf(right: LineItem[_]) = haveAmount(right.amount.negated)
 }

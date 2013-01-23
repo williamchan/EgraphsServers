@@ -27,32 +27,29 @@ case class CashTransactionLineItemType (
   // lineItems makes line item for total from resolvedItems
   override def lineItems(resolved: LineItems, unresolved: LineItemTypes = Nil) = {
     _maybeTransaction match {
-
       case Some(txn: CashTransaction) => Some(Seq(CashTransactionLineItem(this, txn)))
 
-      case None => resolved(CodeType.Balance) match {
-        case Seq(balance: BalanceLineItem) =>
-          require(balance.amount.isZero || stripeCardTokenId.isDefined,
-            "Stripe card token required for non-zero balance."
-          )
+      case None => if (!unresolved(CodeType.Balance).isEmpty) { None } else {
+        val balance = resolved(CodeType.Balance).head
+        require(balance.amount.isZero || stripeCardTokenId.isDefined,
+          "Stripe card token required for non-zero balance."
+        )
 
-          /** stripeChargeId set when charge is made in Checkout transaction */
-          val txn = CashTransaction(
-            accountId = accountId,
-            billingPostalCode = billingPostalCode,
-            stripeCardTokenId = stripeCardTokenId
-          ) .withCashTransactionType(CashTransactionType.Checkout)
-            .withCash(balance.amount)
+        // stripeChargeId set when charge is made in Checkout transaction
+        val txn = CashTransaction(
+          accountId = accountId,
+          billingPostalCode = billingPostalCode,
+          stripeCardTokenId = stripeCardTokenId
+        ) .withCashTransactionType(CashTransactionType.Checkout)
+          .withCash(balance.amount)
 
 
-          // TODO(SER-499): this awkwardness could probably be cleaned up
-          // check for consistent use of semantics and sign of amounts
-          if (balance.amount.isNegative) require(_entity == CashTransactionLineItemType.refundEntity)
-          else require(_entity == CashTransactionLineItemType.paymentEntity)
+        // check for consistent use of semantics and sign of amounts
+        if (balance.amount.isNegative)
+          require(_entity == CashTransactionLineItemType.refundEntity)
+        else require(_entity == CashTransactionLineItemType.paymentEntity)
 
-          Some(Seq(CashTransactionLineItem(this, txn)))
-
-        case _ => None
+        Some(Seq(CashTransactionLineItem(this, txn)))
       }
     }
   }
@@ -113,24 +110,7 @@ object CashTransactionLineItemType {
       _maybeTransaction = Some(cashTransaction)
     )
   }
-
-
-  // TODO(SER-499): manage entity in a reasonably performant way, considering that it may be a singleton
-  //  type CashTxnLITServices = CashTransactionLineItemTypeServices
-  //  protected def entity(
-  //    implicit services: CashTxnLITServices = AppConfig.instance[CashTxnLITServices]
-  //  ): LineItemTypeEntity = {
-  //    LineItemTypeEntity(
-  //      desc = CodeType.CashTransaction.name + " entity",
-  //      nature = LineItemNature.Charge,
-  //      codeType = CodeType.CashTransaction
-  //    )
-  //  }
 }
-
-
-
-
 
 
 
@@ -160,6 +140,7 @@ case class CashTransactionLineItemTypeServices @Inject() (
     LineItemTypeEntity(entityDesc(nature), nature, codeType)
   }
 
+  // TODO(SER-499): this should return an Option by convention
   def findEntityByNature(nature: LineItemNature) = {
     schema.lineItemTypes.where(entity =>
       entity._codeType === codeType.name and entity._nature === nature.name
@@ -167,8 +148,6 @@ case class CashTransactionLineItemTypeServices @Inject() (
       this.insert(entityFromNature(nature))
     )
   }
-
-
 }
 
 

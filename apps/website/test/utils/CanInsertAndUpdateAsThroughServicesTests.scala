@@ -5,6 +5,16 @@ import org.scalatest.FlatSpec
 import services.db.{HasEntity, CanInsertAndUpdateAsThroughServices, KeyedCaseClass}
 
 
+trait CanInsertAndUpdateAsThroughServicesWithLongKeyTests[
+  ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT, Long],
+  EntityT <: KeyedCaseClass[Long]
+] extends CanInsertAndUpdateAsThroughServicesTests[ModelT, EntityT, Long] {
+  this: FlatSpec with ShouldMatchers =>
+
+  override def newIdValue: Long = 0L
+  override def improbableIdValue: Long = java.lang.Integer.MAX_VALUE
+}
+
 trait CanInsertAndUpdateAsThroughServicesTests[
   ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT, KeyT],
   EntityT <: KeyedCaseClass[KeyT],
@@ -50,5 +60,4 @@ trait CanInsertAndUpdateAsThroughServicesTests[
     updatedRestored._entity should be (updated._entity)
     updatedRestored._entity should not be (inserted._entity)
   }
-
 }

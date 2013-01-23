@@ -1,12 +1,13 @@
 package models.checkout
 
-import org.joda.money.{CurrencyUnit, Money}
+import checkout.Conversions._
+import com.google.inject.Inject
 import models.enums.{CodeType, LineItemNature}
+import org.joda.money.{CurrencyUnit, Money}
+import play.api.libs.json.Json
 import scalaz.Lens
 import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
-import com.google.inject.Inject
 import services.AppConfig
-import play.api.libs.json.Json
 
 /*
 TODO: Taxes can be fleshed out further with a more flexible approach to getting rates, updating rates, etc.
@@ -39,21 +40,14 @@ case class TaxLineItemType protected (
    * @return Seq(new line items) if the line item type was successfully applied.
    *         Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
-  override def lineItems(resolvedItems: Seq[LineItem[_]], pendingResolution: Seq[LineItemType[_]]) = {
-    def isDiscountType(itemType: LineItemType[_]) = itemType.nature == LineItemNature.Discount
-    def isSubtotalItem(item: LineItem[_]) = item.codeType == CodeType.Subtotal
+  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
+    import LineItemNature._
 
-    val maybeResolvedSubtotal = resolvedItems.find(isSubtotalItem(_))
-    val maybePendingDiscount = pendingResolution.find(isDiscountType(_))
-
-    (maybeResolvedSubtotal, maybePendingDiscount) match {
+    (resolvedItems(CodeType.Subtotal).headOption, pendingResolution(Discount)) match {
       // Want to have the subtotal and no pending discounts
-      case (Some(subtotal: SubtotalLineItem), None) =>
-
+      case (Some(subtotal: SubtotalLineItem), Nil) =>
         // Sum discounts since there may be multiple (eventually)
-        val totalDiscount = resolvedItems.foldLeft(Money.zero(CurrencyUnit.USD)) { (acc, next) =>
-          if (isDiscountType(next.itemType)) acc plus next.amount else acc
-        }
+        val totalDiscount = resolvedItems(Discount).sumAmounts
 
         // (subtotal - discounts) * tax rate
         val taxAmount = (subtotal.amount minus totalDiscount) multipliedBy (taxRate.bigDecimal, java.math.RoundingMode.UP)
@@ -167,7 +161,7 @@ object TaxLineItemType {
 
 
 
-
+// TODO(taxes): add helpers for getting taxes from a tax table when it is implemented
 case class TaxLineItemTypeServices @Inject() (schema: Schema)
   extends SavesAsLineItemTypeEntity[TaxLineItemType]
 {

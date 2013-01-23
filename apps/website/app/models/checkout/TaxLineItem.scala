@@ -1,8 +1,9 @@
 package models.checkout
 
+import checkout.Conversions._
+import com.google.inject.Inject
 import org.joda.money.Money
 import scalaz.Lens
-import com.google.inject.Inject
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import services.AppConfig
 
@@ -22,7 +23,7 @@ case class TaxLineItem private (
 
   override def itemType: TaxLineItemType = TaxLineItemType(_typeEntity, _entity)
   override def domainObject: Money = amount
-  override def subItems: Seq[LineItem[_]] = Nil
+  override def subItems: LineItems = Nil
 
   override def toJson: String = {
     // TODO(SER-499): Use Json type, maybe even Option
