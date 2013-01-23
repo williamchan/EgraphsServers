@@ -1,4 +1,5 @@
 @(mp4Url: String,
+videoPosterUrl: String,
 signerName: String,
 signerTagline: String,
 recipientName: String,
@@ -17,15 +18,22 @@ authToken: egraphs.authtoken.AuthenticityToken
 @import views.html.frontend.tags
 @import controllers._
 
+@title = {@signerName egraph for @recipientName}
+
 @headHtml = {
-<link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
-<script src="https://vjs.zencdn.net/c/video.js"></script>
+  <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+  <script src="https://vjs.zencdn.net/c/video.js"></script>
+}
+
+@headJs = {
+  Egraphs.page.signerName = "@signerName";
+  Egraphs.page.isPromotional = @isPromotional;
 }
 
 @baseBody = {
 <div class="container" id="egraph-page">
   <video id="my_video_1" class="video-js vjs-default-skin" controls
-         preload="auto" width="595" height="376"
+         preload="auto" width="595" height="376" poster="@videoPosterUrl"
          data-setup="{}">
     <source src="@mp4Url" type='video/mp4'>
   </video>
@@ -45,4 +53,4 @@ authToken: egraphs.authtoken.AuthenticityToken
 </div>
 }
 
-@base_template(title="Concept", headHtml=headHtml, body=baseBody)
+@base_template(title=title.toString, headHtml=headHtml, body=baseBody, headJs=headJs)
