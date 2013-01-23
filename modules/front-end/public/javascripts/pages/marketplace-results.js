@@ -1,5 +1,7 @@
 /*global angular console */
-define(["Egraphs", "pages/marketplace", "libs/angular", "libs/waypoints.min"], function (Egraphs, marketplace) {
+define(["Egraphs", "pages/marketplace", "services/logging", "module", "libs/angular", "libs/waypoints.min"],
+function (Egraphs, marketplace, logging, requireModule) {
+  var log = logging.namespace(requireModule.id);
   /**
    * Define controller for marketplace
    * @param $scope Global Angular Scope
@@ -33,6 +35,7 @@ define(["Egraphs", "pages/marketplace", "libs/angular", "libs/waypoints.min"], f
         $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + incr));
         count += incr;
         atBottom = false;
+        log("Loading celebrities");
         mixpanel.track("Loaded more results");
         if(count >= $scope.total) {
           mixpanel.track("Loaded all results");
