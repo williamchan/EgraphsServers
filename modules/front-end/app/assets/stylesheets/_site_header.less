@@ -7,6 +7,8 @@
   height: 67px;
 }
 
+@navbarZIndex: 9001; // over 9000
+
 #top {
   .clearfix();
 
@@ -18,7 +20,7 @@
   right: 0;
   text-shadow: 0 1px 1px @white;
   top: 0;
-  z-index: 2;
+  z-index: @navbarZIndex;
   
   p {
     font-size: 14px;
