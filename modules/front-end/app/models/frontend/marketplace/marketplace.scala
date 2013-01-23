@@ -119,7 +119,9 @@ case class CategoryViewModel(
   **/
 case class CategoryValueViewModel (
   id: Long = 0,
-  publicName: String, 
+  url: String = "",
+  publicName: String,
+  iconUrl: String = "",
   active: Boolean
 ) extends Ordered[CategoryValueViewModel] {
   override def compare(that: CategoryValueViewModel) = {
@@ -141,11 +143,13 @@ case class SortOptionViewModel(
  *
  **/ 
 case class VerticalViewModel(
+  altText: String = "",
   verticalName: String, 
   publicName: String,
   shortName: String,
   urlSlug: String,
   iconUrl: String,
+  tileUrl: String = "",
   active: Boolean = false,
   id: Long,
   categoryViewModels : Iterable[CategoryViewModel]

@@ -2,7 +2,8 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import models.frontend.landing.CatalogStar
+import models.frontend.landing.{CatalogStar}
+import models.frontend.marketplace.{CategoryValueViewModel, VerticalViewModel}
 import helpers.DefaultImplicitTemplateParameters
 import models.frontend.header.HeaderData
 
@@ -17,6 +18,13 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
    **/
   def featuredStars(count: Int) = Action {
     Ok(views.html.frontend.landing(sampleStars.slice(0, count)))
+  }
+  /**
+   * Displays a new redesign of the homepage as part of the homepage explorations effort. 
+   **/
+
+  def landing_a =  Action {
+    Ok(views.html.frontend.landing_a(sampleStars.slice(0,8), Marketplace.landingVerticalSet))
   }
 
   /**
@@ -79,5 +87,6 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
     makeSampleStar(7, "Frodo Baggins", Some("Savior of Middle Earth")),
     makeSampleStar(8, "Sauron Himself", None)
   )
+
 }
 

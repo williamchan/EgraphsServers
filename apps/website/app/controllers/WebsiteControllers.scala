@@ -17,6 +17,7 @@ import services.http.filters._
 import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory}
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import services.mvc.celebrity.CatalogStarsQuery
+import services.mvc.marketplace._
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.config.ConfigFileProxy
 import services.db.Schema
@@ -72,6 +73,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val verticalStore = instance[VerticalStore]
   override protected val videoAssetStore = instance[VideoAssetStore]
   override protected val videoAssetCelebrityStore = instance[VideoAssetCelebrityStore]
+  override protected val marketplaceServices = instance[MarketplaceServices]
   
   override protected val couponQueryFilters = instance[CouponQueryFilters]
   override protected val egraphQueryFilters = instance[EgraphQueryFilters]

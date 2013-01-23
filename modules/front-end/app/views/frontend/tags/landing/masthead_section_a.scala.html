@@ -1,0 +1,42 @@
+@(celebrityPublicName: Option[String] = None,
+  mastheadMessage: Option[String] = None,
+  mastheadImageUrl: String, 
+  getStartedUrl: Option[String] = None
+)
+
+@import controllers._
+@import views.html.frontend.tags
+
+@celebHeadline(name:String) = {
+  <h1>Connect with @name in a whole new way</h1>
+}
+
+@standardHeadline = {
+  <h1>The NBA stars have arrived.</h1>
+}
+<section id="masthead-home-a" role="banner" style="background-image: url(@mastheadImageUrl);">
+  <div class="banner-gradient">
+    <div class="container">
+      <div class="row">
+
+        <div class="span6 header-parent">
+            <h1>Get an egraph from your favorite star</h1>
+            <a class="helper" href="#">What is an egraph? &gt;&gt;</a>
+            @getStartedUrl.map{ url =>
+            @{
+              celebrityPublicName match {
+                case None => tags.landing.searchbox(url, autofocus=true, helper=false)
+                case Some(name) => tags.landing.get_started(url)
+              }
+            }
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section> <!-- end #masthead-home -->
