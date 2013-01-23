@@ -1,6 +1,5 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 import models.frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
 import helpers.DefaultImplicitTemplateParameters
@@ -13,7 +12,24 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
   //
   // Public members
   //
-  def landscape(isPromotional: Boolean = false) = Action {
+  def egraph() = Action {
+    Ok(views.html.frontend.egraph(
+      mp4Url = "https://egraphs-demo.s3.amazonaws.com/egraphs/647/egraph.mp4",
+      videoPosterUrl = "",
+      signerName = "Sergio Romo",
+      signerTagline = "San Francisco Giants",
+      recipientName = "Jordan",
+      privacySetting = "Public",
+      messageToCelebrity = Some("Hey Sergio! You throw a mean pitch. What awesome beard trimming tips do you have?"),
+      productIconUrl = "https://egraphs-demo.s3.amazonaws.com/product/17/icon_20120503025254786/master.png",
+      signedOnDate = "2013-01-01",
+      shareOnFacebookLink = "",
+      shareOnTwitterLink = "",
+      isPromotional = false
+    ))
+  }
+
+  def classicLandscape(isPromotional: Boolean = false) = Action {
     val frame = LandscapeEgraphFrameViewModel
 
     Ok(views.html.frontend.egraph_classic(
@@ -39,7 +55,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
     ))
   }
 
-  def portrait(isPromotional: Boolean = false) = Action  {
+  def classicPortrait(isPromotional: Boolean = false) = Action  {
     val frame = PortraitEgraphFrameViewModel
 
     Ok(views.html.frontend.egraph_classic(

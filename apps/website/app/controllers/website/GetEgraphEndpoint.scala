@@ -42,8 +42,11 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.assets.audioMp4Url
+          // TODO(wchan): This should point to a jpg. (svzg renders the signature before the image, which is weird.)
+          val videoPosterUrl = ""
           Ok(views.html.frontend.egraph(
             mp4Url = mp4Url,
+            videoPosterUrl = videoPosterUrl,
             signerName = celebrity.publicName,
             signerTagline = celebrity.roleDescription,
             recipientName = order.recipientName,

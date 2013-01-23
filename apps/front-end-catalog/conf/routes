@@ -47,8 +47,9 @@ GET     /ChoosePhoto/withRecentEgraphs                            controllers.Ch
 
 GET     /Complete/index                                           controllers.Complete.index
 
-GET     /Egraph/landscape                                         controllers.Egraph.landscape(isPromotional: Boolean ?= false)
-GET     /Egraph/portrait                                          controllers.Egraph.portrait(isPromotional: Boolean ?= false)
+GET     /Egraph/index                                             controllers.Egraph.egraph()
+GET     /Egraph/landscape                                         controllers.Egraph.classicLandscape(isPromotional: Boolean ?= false)
+GET     /Egraph/portrait                                          controllers.Egraph.classicPortrait(isPromotional: Boolean ?= false)
 
 GET     /Email/confirm                                            controllers.Email.confirm
 GET     /Email/mlbStatic                                          controllers.Email.mlbStatic
