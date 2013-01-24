@@ -1,6 +1,6 @@
 package models.checkout
 
-import utils.{DBTransactionPerTest, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import utils.{DBTransactionPerTest, EgraphsUnitTest}
 import LineItemMatchers._
 import checkout.Conversions._
 import LineItemTestData._
@@ -8,7 +8,6 @@ import LineItemTestData._
 
 class BalanceTests extends EgraphsUnitTest
   with LineItemTests[BalanceLineItemType, BalanceLineItem]
-  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
 {
   //

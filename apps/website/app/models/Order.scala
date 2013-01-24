@@ -212,7 +212,7 @@ case class Order(
         inventoryBatchId = newInventoryBatch.id,
         amountPaidInCurrency = newProduct.priceInCurrency
       )
-    val newOrder = services.store.create(newOrderUnsaved)
+    val newOrder = services.store.insert(newOrderUnsaved)
 
     // mark old order invalid
     val oldOrder = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()

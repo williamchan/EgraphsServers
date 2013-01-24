@@ -6,7 +6,6 @@ import services.AppConfig
 
 
 class GiftCertificateTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
   with CanInsertAndUpdateAsThroughServicesTests[GiftCertificate, GiftCertificateEntity, Long]
   with DateShouldMatchers
   with DBTransactionPerTest

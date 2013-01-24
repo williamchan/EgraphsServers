@@ -5,7 +5,6 @@ import org.joda.money.Money
 import org.scalatest.matchers.{MatchResult, Matcher}
 import services.AppConfig
 import services.Finance.TypeConversions._
-import services.payment.StripeTestPayment
 import LineItemMatchers._
 import models.checkout.checkout.Conversions._
 import models.checkout.Checkout._
@@ -15,7 +14,6 @@ import LineItemTestData._
 
 
 class CheckoutTests extends EgraphsUnitTest
-  with ClearsCacheAndBlobsAndValidationBefore
   with CanInsertAndUpdateAsThroughServicesWithLongKeyTests[Checkout, CheckoutEntity]
   with DateShouldMatchers
   with DBTransactionPerTest

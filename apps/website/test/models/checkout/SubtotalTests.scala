@@ -1,13 +1,12 @@
 package models.checkout
 
-import utils.{DBTransactionPerTest, ClearsCacheAndBlobsAndValidationBefore, EgraphsUnitTest}
+import utils.{DBTransactionPerTest, EgraphsUnitTest}
 import LineItemMatchers._
 import models.checkout.checkout.Conversions._
 import LineItemTestData._
 
 class SubtotalTests extends EgraphsUnitTest
   with LineItemTests[SubtotalLineItemType, SubtotalLineItem]
-  with ClearsCacheAndBlobsAndValidationBefore
   with DBTransactionPerTest
 { 
   //

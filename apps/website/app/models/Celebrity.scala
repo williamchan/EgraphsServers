@@ -374,7 +374,7 @@ class CelebrityStore @Inject() (
   dbSession: DBSession,
   catalogStarsQuery: CatalogStarsQuery,
   celebrityCategoryValueStore: CelebrityCategoryValueStore
-) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long, Celebrity] {
+) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Celebrity] {
 
   import org.squeryl.PrimitiveTypeMode._
   import CelebrityViewConversions._

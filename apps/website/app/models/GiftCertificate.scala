@@ -37,6 +37,7 @@ case class GiftCertificateServices @Inject() (
 // Entity
 //
 case class GiftCertificateEntity (
+  id: Long = 0L,
   _couponId: Long = 0L,
   _lineItemId: Long = 0L,
   _lineItemTypeId: Long = 0L,
@@ -46,7 +47,6 @@ case class GiftCertificateEntity (
  ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
 
   /** id has to be a val or else Squeryl doesn't ~see~ it and can't update */
-  override val id = _couponId
   override def unapplied = GiftCertificateEntity.unapply(this)
 
   def couponId = idLens(_couponId, id => copy(_couponId = id))

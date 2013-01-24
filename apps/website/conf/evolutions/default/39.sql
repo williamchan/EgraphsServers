@@ -1,3 +1,4 @@
+# --- !Ups
 CREATE TABLE Checkout (
     id bigint primary key NOT NULL,
     customerId bigint NOT NULL,
@@ -28,34 +29,15 @@ CREATE TABLE LineItemType (
 );
 CREATE SEQUENCE s_LineItemType_id;
 
+CREATE TABLE GiftCertificate (
+    id bigint primary key NOT NULL,
+    _couponId bigint NOT NULL,
+    _lineItemId bigint NOT NULL,
+    _lineItemTypeId bigint NOT NULL,
+    recipient text,
+    created timestamp NOT NULL,
+    updated timestamp NOT NULL
+);
+CREATE SEQUENCE s_GiftCertificate_id;
 
-
-
---New columns and foreing keys (partially complete list, need to check FK's)
---NOTE: tables for things that don't use the new purchase flow should have nullable lineItem/lineItemType ids
-
---ALTER TABLE Product ADD COLUMN _itemTypeId bigint NOT NULL;
---ALTER TABLE Product ADD CONSTRAINT ProductFK1 FOREIGN KEY (_itemTypeId)
---    REFERENCES LineItemType(id) NOT NULL;
---
---ALTER TABLE CashTransaction ADD COLUMN lineItemId bigint NOT NULL;
---ALTER TABLE CashTransaction ADD CONSTRAINT CashTransactionFK1 FOREIGN KEY (lineItemId)
---    REFERENCES LineItem(id) NOT NULL;
---
---ALTER TABLE Coupon ADD COLUMN _itemTypeId bigint NOT NULL;
---ALTER TABLE Coupon ADD COLUMN lineItemId bigint NOT NULL;
---ALTER TABLE Coupon ADD CONSTRAINT CouponFK1 FOREIGN KEY (_itemTypeId)
---    REFERENCES LineItemType(id) NOT NULL;
---ALTER TABLE Coupon ADD CONSTRAINT CouponFK2 FOREIGN KEY (lineItemId)
---    REFERENCES LineItem(id) NOT NULL;
---
---ALTER TABLE Orders ADD COLUMN lineItemId bigint NOT NULL;
---ALTER TABLE Orders ADD CONSTRAINT OrdersFK1 FOREIGN KEY (lineItemId) REFERENCES LineItem(id) NOT NULL;
---
---ALTER TABLE PrintOrder ADD COLUMN lineItemId bigint NOT NULL;
---ALTER TABLE PrintOrder ADD CONSTRAINT PrintOrderFK1 FOREIGN KEY (lineItemId) REFERENCES LineItem(id) NOT NULL;
-
-
-
---ALTER TABLE _ ADD COLUMN lineItem Id bigint NOT NULL
--- ALTER TABLE Table ADD CONSTRAINT TableFK1 FOREIGN KEY (col) REFERENCES Table(col);
+# --- !Downs

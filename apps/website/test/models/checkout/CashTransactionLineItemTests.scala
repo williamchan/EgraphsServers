@@ -10,7 +10,6 @@ import LineItemTestData._
 class CashTransactionLineItemTests extends EgraphsUnitTest
   with LineItemTests[CashTransactionLineItemType, CashTransactionLineItem]
   with CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[CashTransactionLineItem]
-  with ClearsCacheAndBlobsAndValidationBefore
   with DateShouldMatchers
   with DBTransactionPerTest
 {
