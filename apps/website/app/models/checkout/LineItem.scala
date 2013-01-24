@@ -22,7 +22,7 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with Ha
 
   /**
    * When restoring a LineItem, the `itemType`'s entity and `domainObject` are generally sufficient
-   * to recreate the `itemType` so it is generaly recommended to take only the entity as a
+   * to recreate the `itemType` so it is generally recommended to take only the entity as a
    * constructor argument, rather than requiring the actual `itemType` itself.
    */
   def itemType: LineItemType[TransactedT]

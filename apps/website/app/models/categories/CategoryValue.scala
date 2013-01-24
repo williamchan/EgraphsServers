@@ -51,7 +51,7 @@ case class CategoryValue(
 class CategoryValueStore @Inject() (
   schema: Schema
 ) extends SavesWithLongKey[CategoryValue]
-  with SavesCreatedUpdated[ CategoryValue]
+  with SavesCreatedUpdated[CategoryValue]
   with Deletes[Long, CategoryValue]
 {
   import org.squeryl.PrimitiveTypeMode._

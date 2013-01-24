@@ -6,7 +6,7 @@ import java.sql.Timestamp
 
 class UsernameHistoryStore @Inject() (
   schema: Schema
-) extends SavesWithStringKey[Username] with SavesCreatedUpdated[ Username]
+) extends SavesWithStringKey[Username] with SavesCreatedUpdated[Username]
 {
   import org.squeryl.PrimitiveTypeMode._
 

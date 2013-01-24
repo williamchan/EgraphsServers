@@ -65,7 +65,7 @@ case class VideoAsset(
 }
 
 class VideoAssetStore @Inject() (schema: Schema)
-  extends SavesWithLongKey[VideoAsset] with SavesCreatedUpdated[ VideoAsset] {
+  extends SavesWithLongKey[VideoAsset] with SavesCreatedUpdated[VideoAsset] {
 
   import org.squeryl.PrimitiveTypeMode._
 
