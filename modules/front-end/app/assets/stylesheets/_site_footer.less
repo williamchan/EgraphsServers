@@ -9,6 +9,10 @@
 	padding-top: 40px;
 	padding-bottom: 40px;
 
+	.mobile-notices {
+		display: none;
+	}
+
 	a { color: @grayLighter; }
 	a:hover{ color: @gray; }
 
@@ -40,25 +44,29 @@
 		line-height: 1em;
 		color: @grayLighter;
 	}
-	.mailer {
+
+	.social {
 		float: right;
+		ul {
 
-		form {
-			.input-append {
-				.celebrity-searchbox-container2();
-				width: 254px;
-
-			}	
+			list-style-type: none; 
 			
+			form {
+				.input-append {
+					.celebrity-searchbox-container2();
+					width: 254px;
+				}	
+			}
+
 			label {
 				font-size: 12px;
 				line-height: 1.0em;
 				color: @orange;
 			}
-		}
 
-		.twitter-follow {
-			margin-top: 20px;
+			.twitter-follow {
+				margin-top: 20px;
+			}
 		}
   }		
 }
@@ -106,26 +114,40 @@
 
 		}
 
-		.social {
-
-			float: right;
-
-		}
-
 	} // end #bottom
 
 }
 
 
 @media (max-width: 767px) {
+  #bottom {
+		.mobile-notices {
+			display: block;
+		}
 
-  #bottom .social ul { float: none; }
+		.wide-notices {
+			display: none;
+		}
+
+		.social { 
+			input[type="email"] {
+				width: 210px;
+			}
+  	}
+		.site-links { 
+			float: left;
+			width: 35%;
+		}
+	}
 
 }
 
 @media (max-width: 480px) {
-	.mailer {
-		display: none;
+	#bottom {
+		.row {
+			.social { display: none; }
+		}
+
 	}
 }
 
