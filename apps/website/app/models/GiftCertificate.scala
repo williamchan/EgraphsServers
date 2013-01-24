@@ -40,7 +40,6 @@ case class GiftCertificateEntity (
   id: Long = 0L,
   _couponId: Long = 0L,
   _lineItemId: Long = 0L,
-  _lineItemTypeId: Long = 0L,
   recipient: String = "",
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
@@ -51,7 +50,6 @@ case class GiftCertificateEntity (
 
   def couponId = idLens(_couponId, id => copy(_couponId = id))
   def lineItemId = idLens(_lineItemId, id => copy(_lineItemId = id))
-  def lineItemTypeId = idLens(_lineItemTypeId, id => copy(_lineItemTypeId = id))
 
   private def idLens = MemberLens[GiftCertificateEntity, Long](this)(_,_)
 }
@@ -113,11 +111,18 @@ case class GiftCertificate protected (
     newCoupon => this.couponId.set(newCoupon.id).copy(_coupon = newCoupon)
   )
 
-  lazy val couponId = entityIdLens(entity.couponId, id => entity.set(entity.couponId.set(id)))
-  lazy val itemId = entityIdLens(entity.lineItemId, id => entity.set(entity.lineItemId.set(id)))
-  lazy val typeId = entityIdLens(entity.lineItemTypeId, id => entity.set(entity.lineItemTypeId.set(id)))
+  /** just provide getter and setter */
+  private def idLens(getter: => Long, setter: Long => GiftCertificate) = MemberLens[GiftCertificate, Long](this)(getter, setter)
+  private implicit def entityToThisWithEntity(entity: GiftCertificateEntity): GiftCertificate = this.entity.set(entity)
 
-  private def entityIdLens = MemberLens[GiftCertificate, Long](this)(_, _)
+  lazy val couponId = idLens(entity.couponId, entity.couponId.set(_))
+  lazy val itemId = idLens(entity.lineItemId, entity.lineItemId.set(_))
+
+  lazy val typeId = idLens( getter = { coupon.lineItemTypeId.getOrElse(0L) },
+    setter = { id => coupon.set( coupon.get.copy( lineItemTypeId = Some(id) )) }
+  )
+
+
 }
 
 

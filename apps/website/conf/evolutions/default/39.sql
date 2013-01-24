@@ -1,4 +1,6 @@
 # --- !Ups
+
+-- new tables
 CREATE TABLE Checkout (
     id bigint primary key NOT NULL,
     customerId bigint NOT NULL,
@@ -12,7 +14,6 @@ CREATE TABLE LineItem (
     _checkoutId bigint NOT NULL,
     _itemTypeId bigint NOT NULL,
     _amountInCurrency float NOT NULL,
-    _domainEntityId bigint,
     notes text,
     created timestamp NOT NULL,
     updated timestamp NOT NULLh
@@ -33,11 +34,27 @@ CREATE TABLE GiftCertificate (
     id bigint primary key NOT NULL,
     _couponId bigint NOT NULL,
     _lineItemId bigint NOT NULL,
-    _lineItemTypeId bigint NOT NULL,
     recipient text,
     created timestamp NOT NULL,
     updated timestamp NOT NULL
 );
 CREATE SEQUENCE s_GiftCertificate_id;
 
+
+-- these should be nullable until fully transitioned into new checkout and gift certificates
+ALTER TABLE CashTransaction ADD COLUMN lineItemId bigint;   
+ALTER TABLE Coupon ADD COLUMN lineItemTypeId bigint;
+
+-- fk constraints
+ALTER TABLE Checkout ADD CONSTRAINT CheckoutFK1 FOREIGN KEY (customerId) REFERENCES Customer(id);
+ALTER TABLE LineItem ADD CONSTRAINT LineItemFK1 FOREIGN KEY (_checkoutId) REFERENCES Checkout(id);
+ALTER TABLE LineItem ADD CONSTRAINT LineItemFK2 FOREIGN KEY (_itemTypeId) REFERENCES LineItemType(id);
+ALTER TABLE GiftCertificate ADD CONSTRAINT GiftCertificateFK1 FOREIGN KEY (_couponId) REFERENCES Coupon(id);
+ALTER TABLE GiftCertificate ADD CONSTRAINT GiftCertificateFK2 FOREIGN KEY (_lineItemId) REFERENCES LineItem(id);
+ALTER TABLE CashTransaction ADD CONSTRAINT GiftCertificateFK27 FOREIGN KEY (lineItemTypeId) REFERENCES LineItemType(id);
+ALTER TABLE Coupon ADD CONSTRAINT CouponFK1 FOREIGN KEY (lineItemTypeId) REFERENCES LineItemType(id);
+
+
 # --- !Downs
+
+-- remove any fk's added to pre-existing tables
