@@ -1,0 +1,12 @@
+@()
+<form ng-controller="MailerController" ng-cloak ng-submit="subscribe()">
+  <fieldset>
+    <div class="input-append">
+      <input name="email" type="email"  ng-model="mailer.email_address" placeholder="Your email"></input>
+      <button type="submit" class="btn"><i class="icon-envelope icon-white"></i></button>
+    </div>  
+     <label>
+      {{ message }}
+    </label>
+  </fieldset>
+</form>  
