@@ -106,8 +106,16 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
       Left(CheckoutFailedCashTransactionMissing(this))
 
     } else {
+      /**
+       * Set savepoint to rollback to if transaction fails at some point after the checkout is
+       * saved. For example, if a product is sold out, the whole checkout will be rolled back
+       * because we don't want to charge the customer for products that didn't get stored or not
+       * charge them for products that did.
+       */
       val conn = services.currentTxnConnectionFactory()
       val savepoint = conn.setSavepoint()
+
+      // save checkout and make charge
       val savedCheckout = if (_persisted) this.update() else this.insert()
       val txnItem = txnType.flatMap(_.lineItems( Seq(balance) )) match {
         // Type-erasure on Seq(item) not an issue unless more Payment-natured line items are added
