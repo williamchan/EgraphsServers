@@ -21,7 +21,5 @@ case class FooterData(
   careersPolicyLink: String="/careers",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
-  mailApiKey: String = "",
-  newsletterListId: String ="",
   mailUrl: String = "/Account/subscribe"
 )
