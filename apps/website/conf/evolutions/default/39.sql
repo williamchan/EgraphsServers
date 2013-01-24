@@ -57,4 +57,4 @@ ALTER TABLE Coupon ADD CONSTRAINT CouponFK1 FOREIGN KEY (lineItemTypeId) REFEREN
 
 # --- !Downs
 
--- remove any fk's added to pre-existing tables
+-- fk constraints on Coupon and CashTransaction can stay since they are nullable for now.
