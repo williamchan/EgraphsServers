@@ -48,6 +48,7 @@ object WebsiteBuild extends Build {
           ExclusionRule(organization = "org.mockito"),
           ExclusionRule(organization = "org.scala-lang")
       ),*/
+      "org.twitter4j" % "twitter4j-core" % "3.0.3",
       "org.squeryl" %% "squeryl" % "0.9.5-2" excludeAll(
           // Exclude DB-specific libs
           ExclusionRule(organization = "net.sourceforge.jtds"),

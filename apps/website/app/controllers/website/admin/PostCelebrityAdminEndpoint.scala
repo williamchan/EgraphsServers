@@ -84,7 +84,7 @@ trait PostCelebrityAdminEndpoint {
                   casualName = Utils.toOption(validForm.casualName),
                   organization = validForm.organization,
                   roleDescription = validForm.roleDescription,
-                  twitterUsername = Utils.toOption(validForm.twitterUsername))
+                  twitterUsername = Utils.toOption(removeAtSymbol(validForm.twitterUsername)))
                   .withPublishedStatus(publishedStatus).save()
               
               // Save Celebrity image assets
@@ -188,6 +188,38 @@ trait PostCelebrityAdminEndpoint {
             )
           }
         }
+    }
+  }
+
+  def postOfficialTwitterScreenName(celebrityId: Long) = postController() {
+    httpFilters.requireAdministratorLogin.inSession() {
+      case (admin, adminAccount) =>
+        httpFilters.requireCelebrityId(celebrityId) { celebrity =>
+          Action { implicit request =>
+            val officialTwitterScreenNameForm = Form(
+              single(
+                "officialTwitterScreenName" -> text))
+              .bindFromRequest()
+
+            officialTwitterScreenNameForm.fold(
+              e => BadRequest("No twitter screen name in request."),
+              officialScreenName => {
+                val screenName = removeAtSymbol(officialScreenName)
+                celebrity.copy(twitterUsername = Some(screenName)).save()
+                Ok(screenName)
+              })
+          }
+        }
+    }
+  }
+
+  private def removeAtSymbol(screenName: String): String = {
+    // take off the '@' if it is on there
+    val trimmed = screenName.trim
+    if (!trimmed.isEmpty && trimmed.charAt(0) == '@') {
+      trimmed.tail
+    } else {
+      trimmed
     }
   }
 
