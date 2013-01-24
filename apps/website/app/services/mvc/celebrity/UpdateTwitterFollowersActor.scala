@@ -1,32 +1,30 @@
 package services.mvc.celebrity
 
 import java.util.Random
+
 import com.google.inject.Inject
+
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.agent.Agent
 import akka.dispatch.Await
-import akka.util.duration._
-import akka.util.Timeout
 import akka.pattern.ask
+import akka.util.duration._
+import akka.util.FiniteDuration
+import akka.util.Timeout
+import models.Celebrity
 import models.CelebrityStore
-import models.frontend.landing.CatalogStar
 import play.api.Play.current
+import play.api.libs.concurrent._
 import play.api.libs.concurrent.Akka
+import services.AppConfig
 import services.cache.CacheFactory
 import services.db.DBSession
 import services.db.TransactionSerializable
-import services.logging.Logging
-import services.AppConfig
-import models.Celebrity
-import akka.util.FiniteDuration
-import akka.dispatch.Futures
-import play.api.libs.concurrent.Promise
-import play.api.libs.concurrent._
-import org.joda.time.DateTimeConstants
-import twitter4j.TwitterException
 import services.http.twitter.TwitterProvider
+import services.logging.Logging
+import twitter4j.TwitterException
 
 private[celebrity] class UpdateTwitterFollowersActor @Inject() (
   db: DBSession,
