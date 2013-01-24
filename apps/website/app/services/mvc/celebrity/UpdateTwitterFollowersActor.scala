@@ -80,9 +80,7 @@ private[celebrity] class UpdateTwitterFollowersActor @Inject() (
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
       val cache = cacheFactory.applicationCache
-      //val twitterFollowerCounts = cache.cacheing(resultsCacheKey, updatePeriod.toSeconds.toInt) {
-      //TODO FIX THIS
-      val twitterFollowerCounts = {
+      val twitterFollowerCounts = cache.cacheing(resultsCacheKey, updatePeriod.toSeconds.toInt) {
         // Due to cache miss, this instance must update from twitter.
         val celebrities = db.connected(isolation = TransactionSerializable, readOnly = true) {
           log("Updating all celebrties' twitter followers counts")
