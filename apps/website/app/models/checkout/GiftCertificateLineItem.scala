@@ -8,6 +8,9 @@ import scalaz.Lens
 import com.google.inject.Inject
 
 
+// TODO(SER-499): This stuff is mostly complete (functional, not fully tested); deferring finishing touches until done with checkout explorations
+
+
 //
 // Model
 //
@@ -26,10 +29,7 @@ case class GiftCertificateLineItem (
 
   override def subItems: LineItems = Nil
 
-  override def toJson: String = {
-    // TODO(SER-499): implement once api nailed down
-    ""
-  }
+  override def toJson: String = ""
 
 
   override def domainObject: GiftCertificate = {

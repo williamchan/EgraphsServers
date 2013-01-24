@@ -8,23 +8,10 @@ import models.enums._
 import checkout.Conversions._
 import services.AppConfig
 import services.db._
-import services.logging.Logging
 import services.payment.Charge
 
 
-// NOTE(SER-499): CashTransaction sets convention that payments to us are positive
 
-/**
- * TODO: Refunds
- * -implement a product refund type and item for the purpose of canceling out its targetted
- *  item or type in the calculation of new totals (e.g. #1 above)
- *   -refunding tax could be separate or combined into product's refund amount
- * -implement a refund charge type to represent the credit made back to the customer
- */
-
-
-
-// TODO(SER-499): look into why store isn't usually combined into services (modeling concern probs)
 //
 // Services
 //
@@ -78,9 +65,13 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   def pendingItems: LineItems
   def pendingTypes: LineItemTypes
   protected def _persisted: Boolean
-  protected def _dirty: Boolean
+  protected def _dirty: Boolean     // simplifies transaction -- does nothing if clean
 
-  // types derived from zipcode and _addedTypes to be applied only to _addTypes (e.g. taxes, fees)
+  /**
+   * Types derived from zipcode and _addedTypes to be applied only to _addTypes (e.g. taxes, fees).
+   * Needed to update things like taxes and fees, which are dependent on individual elements, when
+   * adding new elements (ex: refunding taxes or including taxes on checkout edits).
+   */
   lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
     // TODO(refunds): will probably want to add the refund transaction here
     // TODO(fees): will want to add any fees we charge here
@@ -91,12 +82,22 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   //
   // Methods
   //
+  /** add additional types to this checkout -- for updating existing checkout */
   def withAdditionalTypes(newTypes: LineItemTypes): Checkout
 
+  /** for services to return a persisted checkout as the correct type */
   def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout
 
   def flattenLineItems: LineItems = { lineItems.flatMap(_.flatten) }
 
+  /**
+   * Charges or credits customer as needed through the information in the txnType, transacts all the
+   * line items which have been added since the last transaction as well as the cash transaction
+   * of the charge or credit to the customer, and returns the resulting PersistedCheckout.
+   *
+   * @param txnType used to charge or credit customer
+   * @return failure, this if not _dirty, or the resulting PersistedCheckout
+   */
   def transact(txnType: Option[CashTransactionLineItemType]): FailureOrCheckout = {
     if (pendingTypes.isEmpty){
       Right(this)
@@ -115,8 +116,10 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
       }
 
       try {
+        // transact the new contents of the checkout, plus the cash transaction
         (txnItem ++ pendingItems).map(_.transact(savedCheckout))
       } catch {
+        // refund charge, rollback any of the newly inserted items that didn't fail, and return failure details
         case e: InsufficientInventoryException => conn.rollback(savepoint)
           return Left{ CheckoutFailedInsufficientInventory(this, txnItem, txnItem.flatMap(_.abortTransaction())) }
 
@@ -128,12 +131,25 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
     }
   }
 
+  /**
+   * Resolves the given LineItemTypes into LineItems. Complexity is proportional to the sum of
+   * unresolved types in each pass, which is O(n^2) in the worst case, but typically much better
+   * than that, and very unlikely to affect application performance since Checkouts are unlikely
+   * to become very large.
+   *
+   * @param types
+   * @param preexistingItems
+   * @return
+   */
   protected def resolveTypes(types: LineItemTypes, preexistingItems: LineItems = Nil): LineItems = {
 
     case class ResolutionPass(resolved: LineItems = preexistingItems, unresolved: LineItemTypes) {
+
+      /** execute a pass over the unresolved items, return resulting ResolutionPass */
       def execute: ResolutionPass = {
         /**
-         * Iterates over unresolved in linear time on average (only counting iteration time)
+         * Iterates over unresolved types in O(n) time (compared to O(n^2) time of simply iterating
+         * and filtering out current element to pass rest into its lineItems method).
          *
          * @param acc - accumulator of line items, should include previously resolved
          * @param before - item types preceding current type in iteration from list of all types
@@ -141,21 +157,30 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
          * @param after - remaining line item types to be iterated over
          * @return - ResolutionPass of resulting resolved items and unresolved types
          */
-        def iterate(acc: LineItems = resolved)(
-          before: LineItemTypes = Nil,
-          curr: LineItemType[_] = unresolved.head,
-          after: LineItemTypes = unresolved.tail
-          ): ResolutionPass = (after, curr.lineItems(acc, before ++ after)) match {
-          case (Nil, None) => ResolutionPass(acc, curr +: before)
-          case (Nil, Some(res)) => ResolutionPass(res ++ acc,  before)
-          case (next :: rest, None) => iterate(acc)(curr +: before, next, rest)
-          case (next :: rest, Some(res)) => iterate(res ++ acc)( before, next, rest)
+        def iterate(acc: LineItems = resolved)(     // accumulator is initially the already resolved items
+          before: LineItemTypes = Nil,              // first iteration has nothing 'before' current type
+          curr: LineItemType[_] = unresolved.head,  // current type in pass is initially the head
+          after: LineItemTypes = unresolved.tail    // naturally, tail
+        ): ResolutionPass = {
+
+          /**
+           * if current type resolves, add result to acc, otherwise add current type to before (save for next pass)
+           * if more types exist to be iterated, recurse, otherwise return as resolution pass
+           */
+          val currResolved = curr.lineItems(acc, before ++ after)
+          (after, currResolved) match {
+            case (Nil, None) => ResolutionPass(acc, curr +: before)
+            case (Nil, Some(res)) => ResolutionPass(res ++ acc,  before)
+            case (next :: rest, None) => iterate(acc)(curr +: before, next, rest)
+            case (next :: rest, Some(res)) => iterate(res ++ acc)( before, next, rest)
+          }
         }
 
         if (unresolved.isEmpty) this  // no additional to resolve
         else iterate()()              // iterate over unresolved
       }
 
+      /** fast equality check */
       override def equals(that: Any): Boolean = that match {
         case ResolutionPass(thoseResolved, thoseUnresolved) =>
           (resolved.length, unresolved.length) == (thoseResolved.length, thoseUnresolved.length)
@@ -163,6 +188,7 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
       }
     }
 
+    /** repeatedly execute ResolutionPasses until all types resolved or no change occurs (cycle found) */
     def resolve(pass: ResolutionPass): LineItems = {
       pass.execute match {
         case ResolutionPass(allItems, Nil) => allItems
@@ -210,7 +236,7 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
 //
 // Companion Object
 //
-object Checkout extends Logging {
+object Checkout {
 
   // Create
   def apply(types: LineItemTypes, maybeZipcode: Option[String], maybeCustomer: Option[Customer])
@@ -222,7 +248,6 @@ object Checkout extends Logging {
   // Restore
   def apply(id: Long)(services: CheckoutServices = AppConfig.instance[CheckoutServices])
   : PersistedCheckout = { services.findById(id).get }
-
 
 
   //
@@ -256,7 +281,6 @@ object Checkout extends Logging {
   ) with FailedCheckoutWithCharge
 }
 
-// TODO(SER-499): move me to another file, add persistance and functionality
 case class FailedCheckoutData(
   checkout: Checkout,
   cashTransactionLineItemTypes: Option[CashTransactionLineItemType] = None,

@@ -1,11 +1,9 @@
 package models.checkout
 
-import org.joda.money.Money
 import utils.{ClearsCacheAndBlobsAndValidationBefore, DBTransactionPerTest, EgraphsUnitTest}
-import utils.TestData._
-import services.Finance.TypeConversions._
 import LineItemMatchers._
 import models.checkout.checkout.Conversions._
+import LineItemTestData._
 
 
 class TotalTests extends EgraphsUnitTest
@@ -49,27 +47,14 @@ class TotalTests extends EgraphsUnitTest
   }
 
 
+
+
   //
   // Data helpers
   //
-  lazy val subtotal: SubtotalLineItem = randomSubtotal
-  lazy val subtotalWithTax: LineItems =  Seq(tax(subtotal), subtotal)
-  lazy val subtotalWithTaxes: LineItems = {
-    tax(subtotal, 0.05) +: (tax(subtotal, 0.0333) +: subtotalWithTax)
-  }
-
-  lazy val oneTaxType: LineItemTypes = Seq(taxType())
-  lazy val subtotalWithTaxTypes: LineItemTypes = Seq(taxType(), SubtotalLineItemType)
-
-  def randomSubtotal: SubtotalLineItem = SubtotalLineItem(randomMoney)
-
-  def tax(onSubtotal: SubtotalLineItem, rate: Double = 0.09): TaxLineItem = {
-    taxType(rate).lineItems(Seq(onSubtotal), Nil).get.head.asInstanceOf[TaxLineItem]
-  }
-
-  def taxType(rate: Double = 0.09): TaxLineItemType = {
-    TaxLineItemType("98888", BigDecimal(rate), Some("Test tax"))
-  }
-
-  def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
+  lazy val subtotal: SubtotalLineItem = randomSubtotalItem
+  lazy val subtotalWithTax: LineItems =  Seq(randomTaxItem, subtotal)
+  lazy val subtotalWithTaxes: LineItems = seqOf(randomTaxItem)(2) ++ subtotalWithTax
+  lazy val oneTaxType: LineItemTypes = Seq(randomTaxType)
+  lazy val subtotalWithTaxTypes: LineItemTypes = Seq(randomTaxType, SubtotalLineItemType)
 }

@@ -1,16 +1,20 @@
 package models.checkout
 
 import checkout.Conversions._
-import org.scalatest.matchers.{Matcher, MatchResult, ShouldMatchers}
+import org.scalatest.matchers.{ShouldMatchers}
 import org.scalatest.FlatSpec
 import LineItemMatchers._
 import utils.TestData._
 import utils.CanInsertAndUpdateAsThroughServicesWithLongKeyTests
 import services.db.CanInsertAndUpdateAsThroughServices
+import models.CashTransaction
+import services.payment.StripeTestPayment
+import services.AppConfig
 
 /** mixin for testing a LineItemType's lineItems method */
 trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   this: FlatSpec with ShouldMatchers =>
+  import LineItemTestData._
 
   //
   // Abstract LineItemType-related members
@@ -84,7 +88,7 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
 
   def saveLineItem(item: ItemT): ItemT = item.transact(checkout).asInstanceOf[ItemT]
 
-  lazy val checkout = Checkout(Seq(newItemType), Some("98888"), Some(newSavedCustomer())).insert()
+  lazy val checkout = newSavedCheckout
 }
 
 
@@ -96,8 +100,52 @@ trait CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[
 
   // NOTE: casting is unfortunate but seems unavoidable
   override def newModel: ItemT = newLineItem
-  override def saveModel(model: ItemT): ItemT = if (model.id > 0) model.update() else model.insert()
   override def transformModel(model: ItemT) = model.withAmount(model.amount.plus(1.0)).asInstanceOf[ItemT]
   override def restoreModel(id: Long): Option[ItemT] = restoreLineItem(id)
+  override def saveModel(model: ItemT): ItemT = {
+    if (model.id > 0) {
+      model.update()
+    } else {
+      model.insert()
+    }
+  }
 
+}
+
+
+
+
+/**
+ * Collection of helpers for generating line items and types of various sorts, primarily to use
+ * for LineItemTests. Unless named as 'saved' whatever, these are not saved.
+ */
+object LineItemTestData {
+  import services.Finance.TypeConversions._
+
+  def seqOf[T](gen: => T)(n: Int): Seq[T] = (0 to n).toSeq.map(_ => gen)
+
+  def randomGiftCertificateItem = randomGiftCertificateType.lineItems().get.head
+  def randomGiftCertificateType = GiftCertificateLineItemType(generateFullname, randomMoney)
+
+  def taxItemOn(subtotal: SubtotalLineItem): TaxLineItem = randomTaxType.lineItems(Seq(subtotal), Nil).get.head
+  def randomTaxItem: TaxLineItem = taxItemOn(randomSubtotalItem)
+  def randomTaxType: TaxLineItemType = TaxLineItemType("98888", randomTaxRate, Some("Test tax"))
+
+  def randomSubtotalItem: SubtotalLineItem = SubtotalLineItem(randomMoney)
+  def randomTotalItem = TotalLineItem(randomMoney)
+  def randomBalanceItem = BalanceLineItem(randomMoney)
+
+  def randomCashTransactionType = CashTransactionLineItemType(newSavedAccount().id, zipcode, Some(payment.testToken().id))
+  def randomCashTransactionItem = randomCashTransactionType.lineItems(Seq(randomBalanceItem)).get.head
+
+  def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
+  def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
+
+  def newSavedCheckout = Checkout(Seq(randomGiftCertificateType), zipcode, Some(newSavedCustomer())).insert()
+
+  def payment: StripeTestPayment = {
+    val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap(); pment
+  }
+
+  protected def zipcode = Some("98888")
 }

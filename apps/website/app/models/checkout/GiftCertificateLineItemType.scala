@@ -10,6 +10,11 @@ import scalaz.Lens
 import com.google.inject.Inject
 
 
+// TODO(SER-499): This stuff is mostly complete (functional, not fully tested); deferring finishing touches until done with checkout explorations
+// will come back to remove any artifacts from design changes and test
+
+
+
 case class GiftCertificateLineItemType (
   _entity: LineItemTypeEntity,
   recipient: String,
@@ -21,7 +26,6 @@ case class GiftCertificateLineItemType (
 {
 
   override def toJson: String = {
-    // TODO(SER-499): implement
     ""
   }
 
@@ -67,7 +71,6 @@ object GiftCertificateLineItemType {
     )
   }
 
-  private val entityDescBase = ""
   private def entityDescription(recipient: String, amount: Money) = {
     "Gift certificate for " ++ amount.toString ++ {
       if(recipient.isEmpty) ""

@@ -9,14 +9,9 @@ case class BalanceLineItem(amount: Money) extends LineItem[Money] {
   override def itemType = BalanceLineItemType
   override def withAmount(newAmount: Money) = this.copy(newAmount)
 
-  override def toJson = {
-    // TODO(SER-499): implement
-    ""
-  }
+  override def toJson = ""
 
-  //
-  // NOTE(SER-499): Unused
-  //
+
   override val id: Long = -1
   override def domainObject = amount
   override def transact(checkout: Checkout) = this

@@ -3,8 +3,12 @@ package models.checkout
 import models.enums._
 import org.joda.money.{CurrencyUnit, Money}
 
-// TODO(SER-499): clean out unused crap
+
 package object checkout {
+  /**
+   * Pimps some helpers on to `Seq`s of LineItem`s and `LineItemType`s and provides some
+   * type aliases for convenience
+   */
   object Conversions {
     type LineItems = Seq[LineItem[_]]
     type LineItemTypes = Seq[LineItemType[_]]

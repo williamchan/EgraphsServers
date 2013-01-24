@@ -10,16 +10,36 @@ import scalaz.Lens
 import services.db.{InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
 
+/**
+ * Represents an actual item or data within a checkout. Has the responsibility of persisting itself,
+ * its domain object, and line item type as necessary.
+ *
+ * @tparam TransactedT type of domain object
+ */
 trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with HasLineItemNature with HasCodeType {
 
   def id: Long
+
+  /**
+   * When restoring a LineItem, the `itemType`'s entity and `domainObject` are generally sufficient
+   * to recreate the `itemType` so it is generaly recommended to take only the entity as a
+   * constructor argument, rather than requiring the actual `itemType` itself.
+   */
   def itemType: LineItemType[TransactedT]
+
   def subItems: LineItems
-  def toJson: String                    // TODO(SER-499): Use Json type, maybe even Option
+
+  def toJson: String  // TODO(CE-16):
+
+  /**
+   * Often easiest to take an optional constructor argument to provide actual object directly when
+   * untransacted, then query from db when transacted so constructing a transacted LineItem
+   * requires less data from the caller.
+   */
   def domainObject: TransactedT
 
 
-  /** @return flat sequence of this LineItem and its sub-LineItems */
+  /** @return sequence of this LineItem and its sub-LineItems */
   def flatten: LineItems = {
     val seqOfFlatSubItemSeqs = for(subItem <- subItems) yield subItem.flatten
     Seq(this) ++ seqOfFlatSubItemSeqs.flatten
@@ -45,74 +65,63 @@ trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with Ha
    * implementation specific state.
    */
   def equalsLineItem(that: LineItem[_]): Boolean = {
-    if (that != null) {
+    if (that == null) { false } else {
       def unpack(item: LineItem[_]) = (item.id, item.amount, item.itemType.id, item.codeType, item.nature, item.domainObject)
 
       unpack(this) == unpack(that)
-
-    } else {
-      false
     }
   }
 
-  /** Returns option of this if it has the desired code type, otherwise None */
+  /** Returns option of this if it has the desired code type, otherwise None. */
   protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
     desiredCodeType: CodeTypeFactory[LIT, LI]
   ): Option[LI] = {
     if (codeType != desiredCodeType) None
     else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
   }
-
 }
 
 
-/**
- * Provide helper queries for getting LineItem's; persistence is provided by LineItem implementations.
- */
+
+/** Provides queries for getting `LineItem`s */
 class LineItemStore @Inject() (schema: Schema) {
   import org.squeryl.PrimitiveTypeMode._
 
   protected def table = schema.lineItems
 
-  // TODO(SER-499): helper queries
-  // use CodeType of LineItemType to create LineItem's of the correct type
-
   def getItemsByCheckoutId(id: Long): LineItems = {
-    /**
-     * Note that using toSeq instead of toList returns a Stream which causes bugs in other steps
-     * of restoring a checkout
-     */
-    join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
+    // Note that using toSeq instead of toList returns a Stream which causes bugs in other steps
+    // of restoring a checkout...
+    val entityPairs = join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
       select(li, lit) on (li._itemTypeId === lit.id and li._checkoutId === id)
-    ).toList.flatMap { case (itemEntity, itemTypeEntity) =>
-      CodeType(itemTypeEntity._codeType) match {
-        case Some(codeType: CodeTypeFactory[_, _]) => Some(codeType.itemInstance(itemEntity, itemTypeEntity))
-        case Some(_) => None // TODO(SER-499): add logging
-        case None => None
-      }
-    }
+    ).toList
+
+    // turn each pair into a LineItem through CodeType
+    for (
+      (itemEntity, typeEntity) <- entityPairs;
+      codeType: CodeType <- CodeType(typeEntity._codeType)
+    ) yield { codeType.itemInstance(itemEntity, typeEntity) }
   }
+
 
   def findEntityById(id: Long): Option[LineItemEntity] = {
-    from(table)( entity =>
-      where(entity.id === id) select(entity)
-    ).headOption
+    from(table)( entity => where(entity.id === id) select(entity) )
+      .headOption
   }
+
 
   def findByIdOfCodeType[ LIT <: LineItemType[_], LI <: LineItem[_] ](
     id: Long, codeType: CodeTypeFactory[LIT, LI]
   ): Option[LI] = {
 
-    val maybeEntities = join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
+    val entityPair = join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
       select(li, lit) on (li._itemTypeId === lit.id and li.id === id)
     ).headOption
 
-    // If the entities are of the right code type, create line item and return it, otherwise None
-    maybeEntities match {
+    // unpack entities, and return LineItem from codeType if CodeTypes match
+    entityPair match {
       case Some((itemEntity, typeEntity)) if (CodeType(typeEntity._codeType) == Some(codeType)) =>
-        Some(
-          codeType.itemInstance(itemEntity, typeEntity)
-        )
+        Some(codeType.itemInstance(itemEntity, typeEntity))
       case None => None
     }
   }

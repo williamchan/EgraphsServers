@@ -3,7 +3,6 @@ package models.checkout
 import java.sql.Timestamp
 import models.HasCreatedUpdated
 import models.enums.{CodeType, LineItemNature}
-import org.squeryl.annotations.Transient
 import services.db.KeyedCaseClass
 import services.Time
 
@@ -18,7 +17,7 @@ case class LineItemTypeEntity private (
   created: Timestamp,
   updated: Timestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-  @Transient override lazy val unapplied = LineItemTypeEntity.unapply(this)
+  override def unapplied = LineItemTypeEntity.unapply(this)
 
   def nature = LineItemNature(_nature).get
   def codeType = CodeType(_codeType).get

@@ -2,7 +2,6 @@ package models.checkout
 
 import java.sql.Timestamp
 import org.joda.money.{CurrencyUnit, Money}
-import org.squeryl.annotations.Transient
 import models.HasCreatedUpdated
 import services.db.KeyedCaseClass
 import services.Time
@@ -17,9 +16,7 @@ case class LineItemEntity(
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
-
-  @Transient override lazy val unapplied = LineItemEntity.unapply(this)
-
+  override def unapplied = LineItemEntity.unapply(this)
   def amount = Money.of(CurrencyUnit.USD, _amountInCurrency.bigDecimal)
 }
 

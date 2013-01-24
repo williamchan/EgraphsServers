@@ -57,7 +57,6 @@ trait InsertsAndUpdatesWithKey[KeyT, T <: KeyedEntity[KeyT]] extends InsertsAndU
 
 trait CanInsertAndUpdateThroughServices[T <: KeyedEntity[_]] { this: T =>
   def services: InsertsAndUpdates[T]
-
   def insert(): T = services.insert(this)
   def update(): T = services.update(this)
 }

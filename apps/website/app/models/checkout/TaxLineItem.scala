@@ -8,9 +8,12 @@ import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
 import services.AppConfig
 
 
-// TODO: see TaxLineItemType
+// TODO(SER-499): this stuff is functional, but has no tests. Will finish when done with Checkout Explorations, or possibly during the later stages of it.
 
 
+//
+// Model
+//
 case class TaxLineItem private (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
@@ -25,23 +28,15 @@ case class TaxLineItem private (
   override def domainObject: Money = amount
   override def subItems: LineItems = Nil
 
-  override def toJson: String = {
-    // TODO(SER-499): Use Json type, maybe even Option
-    ""
-  }
-
-
-
+  override def toJson: String = ""
 
 
   override def transact(checkout: Checkout): TaxLineItem = {
-    if (id <= 0) {
+    if (id > 0) { this }
+    else {
       this.withItemType(itemType.insert())
         .withCheckoutId(checkout.id)
         .insert()
-
-    } else {
-      this
     }
   }
 
@@ -62,7 +57,9 @@ case class TaxLineItem private (
 
 
 
-
+//
+// Companion object
+//
 object TaxLineItem {
   def apply(itemType: TaxLineItemType, amount: Money) = {
     new TaxLineItem(
@@ -81,7 +78,9 @@ object TaxLineItem {
 
 
 
-
+//
+// Services
+//
 case class TaxLineItemServices @Inject() (
   schema: Schema
 ) extends SavesAsLineItemEntity[TaxLineItem] {

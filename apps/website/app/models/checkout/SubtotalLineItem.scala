@@ -4,6 +4,11 @@ import models.checkout.checkout.Conversions._
 import models.enums.{CodeType, LineItemNature}
 import org.joda.money.{CurrencyUnit, Money}
 
+/**
+ * Represents the sum of all items "added"/chosen by the customer (e.g. products and refunds).
+ *
+ * @param amount
+ */
 case class SubtotalLineItem (
   amount: Money
 ) extends LineItem[Money] {
@@ -12,15 +17,8 @@ case class SubtotalLineItem (
 
   override val itemType = SubtotalLineItemType
 
-  override def toJson = {
-    // TODO(SER-499): implement, use JSON type
-    ""
-  }
+  override def toJson = ""
 
-
-  //
-  // NOTE(SER-499): unused
-  //
   override val id: Long = -1
   override def domainObject = amount
   override def transact(checkout: Checkout) = this
@@ -28,6 +26,8 @@ case class SubtotalLineItem (
   override def withCheckoutId(newCheckoutId: Long) = this
   override def subItems = Nil
 }
+
+
 
 abstract class SubtotalLineItemType extends LineItemType[Money]
 object SubtotalLineItemType extends SubtotalLineItemType {

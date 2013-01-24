@@ -9,13 +9,21 @@ import services.MemberLens
 import services.db._
 
 
+/**
+ * LineItemTypes capture domain data needed by the corresponding line item and domain object to be
+ * built. This will generally be form data.
+ *
+ * Next, the LineItemType represent the _intent_ to include an item in a checkout -- it is generally
+ * not barred from being added to a checkout, but does not guarantee it will generate anything for
+ * the checkout it belongs to (the exceptions at the moment are summaries types, which are managed
+ * within the checkout so they don't need to, and should not, be added to a checkout manually).
+ *
+ * @tparam TransactedT type of domain object
+ */
 trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
+
   def id: Long
-
-  // Convenience entity-member accessors
   def description: String
-
-  // Serialization
   def toJson: String
 
   /**
@@ -27,28 +35,27 @@ trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
    * items have been purchased in order to know the correct amount.
    *
    * Need the latter because, for example,
-   *   * to calculate a 5% discount and 10% discount would theoretically
-   *     want to know about each other in order to apply correctly to the right purchase.
+   *   * to calculate a 5% discount and 10% discount would theoretically want to know about each
+   *     other in order to apply correctly to the right purchase (e.g. should they stack or apply
+   *     in sequence, and if so what order? Or which should apply if they cannot be combined?).
    *
-   *   * To calculate the Total we would want to know that no further line items are left to calculate.
+   *   * To calculate the Total we would want to know that no needed line items are left to calculate.
    *
-   *   NOTE: IndexedSeq is an optimization for random access, which isn't really the use case here;
-   *         Using a Seq here would allow us to use the list monad instead of option + list
-   *
-   * @return Seq(new line items) if the line item type was successfully applied.
-   *   Otherwise None, to signal that the checkout will try to resolve it again on the next round.
+   * @return Some(Seq(...)) if the line item type was successfully applied. Otherwise None.
+   *         Note that a type may determine that it should not resolve any items, as opposed to not
+   *         being ready to resolve, in which case it should return Some(Nil).
    */
-  def lineItems(
-    resolvedItems: LineItems,
-    pendingResolution: LineItemTypes
-  ): Option[Seq[LineItem[TransactedT]]] // or Seq[Option[...]]
+  def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes)
+  : Option[Seq[LineItem[TransactedT]]]
 }
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+
 trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity, Long] { this: LineItemType[_] => }
 
+/** Service trait, enables saving of LineItemTypeEntities through their enclosing LineItemType */
 trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
   extends InsertsAndUpdatesAsEntity[ModelT, LineItemTypeEntity]
   with SavesCreatedUpdated[LineItemTypeEntity]
@@ -61,6 +68,7 @@ trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
   }
 }
 
+/** For adding queries for LineItemTypes by id */
 trait QueriesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
   extends QueriesAsEntity[ModelT, LineItemTypeEntity, Long]
 {
@@ -76,8 +84,8 @@ trait QueriesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
 /**
  * Gives entity-delegated accessors to LineItemTypes that use LineItemTypeEntity for persistence.
  * Generally you should mix alongside [[models.checkout.LineItemTypeEntityGetters]] and/or
- * [[models.checkout.LineItemTypeEntitySetters]], which automatically generate `description`
- * and `nature` members / mutators for you.
+ * [[models.checkout.LineItemTypeEntitySetters]], which automatically generate members / mutators
+ * for the fields below.
  */
 trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemTypeEntity =>
   import MemberLens.Conversions._

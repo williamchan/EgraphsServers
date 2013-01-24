@@ -9,13 +9,15 @@ import scalaz.Lens
 import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
 import services.AppConfig
 
+
+// TODO(SER-499): this stuff is functional, but has no tests. Will finish when done with Checkout Explorations, or possibly during the later stages of it.
+
+
 /*
 TODO: Taxes can be fleshed out further with a more flexible approach to getting rates, updating rates, etc.
 -Keeping the rate from point of transaction in type entity can help with Checkout updates when occuring after a change in tax rates.
 -Need to be able to get existing tax types by zipcode (currently creates new tax type based on rate pulled from hardcoded map
  */
-
-
 
 case class TaxLineItemType protected (
   _entity: LineItemTypeEntity,
@@ -28,10 +30,7 @@ case class TaxLineItemType protected (
   with CanInsertAndUpdateAsThroughServices[TaxLineItemType, LineItemTypeEntity]
 {
 
-  override def toJson: String = {
-    // TODO(SER-499): implement
-    ""
-  }
+  override def toJson: String = ""
 
   /**
    * Calculates tax as applied to the value of the subtotal and discounts.
@@ -40,7 +39,7 @@ case class TaxLineItemType protected (
    * @return Seq(new line items) if the line item type was successfully applied.
    *         Otherwise None, to signal that the checkout will try to resolve it again on the next round.
    */
-  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
+  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes): Option[Seq[TaxLineItem]] = {
     import LineItemNature._
 
     (resolvedItems(CodeType.Subtotal).headOption, pendingResolution(Discount)) match {

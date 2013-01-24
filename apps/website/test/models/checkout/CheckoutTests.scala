@@ -11,6 +11,7 @@ import models.checkout.checkout.Conversions._
 import models.checkout.Checkout._
 import models.enums.LineItemNature._
 import TestData._
+import LineItemTestData._
 
 
 class CheckoutTests extends EgraphsUnitTest
@@ -30,7 +31,7 @@ class CheckoutTests extends EgraphsUnitTest
   override def restoreModel(id: Long): Option[Checkout] = checkoutServices.findById(id)
 
   override def transformModel(toTransform: Checkout) = {
-    toTransform.withAdditionalTypes(Seq(giftCertificateTypeForShittyFriend))
+    toTransform.withAdditionalTypes(Seq(giftCertificateTypeForLesserFriend))
   }
 
 
@@ -40,16 +41,9 @@ class CheckoutTests extends EgraphsUnitTest
   //
   "A checkout" should "fail to transact without a customer" in {
     val checkout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
-    lazy val failedTransaction: FailureOrCheckout = checkout.transact(randomCashTxnType)
+    lazy val failedTransaction: FailureOrCheckout = checkout.transact(Some(randomCashTransactionType))
 
     failedTransaction should be ('left)
-
-    failedTransaction match {
-      case Left(error: FailedCheckoutWithCharge) =>
-        error.charge should be ('defined)
-        error.charge.get.refunded should be (true)
-      case Left(other: CheckoutFailed) => fail("Expected error with charge, received " + other.getClass)
-    }
   }
 
   it should "have a balance of zero after transaction" in {
@@ -119,8 +113,10 @@ class CheckoutTests extends EgraphsUnitTest
 
     fresh.balance should haveAmount (expectedBalanceOf(fresh))
     freshRestored.balance should haveAmount (expectedBalanceOf(freshRestored))
+    freshRestored.balance should haveAmount (zeroDollars)
     transformed.balance should haveAmount (expectedBalanceOf(transformed))
     transformedRestored.balance should haveAmount (expectedBalanceOf(transformedRestored))
+    transformedRestored.balance should haveAmount (zeroDollars)
   }
 
   it should "require payment for only updates with non-zero balance" in {
@@ -163,29 +159,21 @@ class CheckoutTests extends EgraphsUnitTest
   // Data helpers
   //
   def checkoutServices: CheckoutServices = AppConfig.instance[CheckoutServices]
-  def payment: StripeTestPayment = { val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap(); pment }
+
   def giftCertificateTypeForFriend = GiftCertificateLineItemType("My friend", BigDecimal(75).toMoney())
-  def giftCertificateTypeForShittyFriend = GiftCertificateLineItemType("My shittier friend", BigDecimal(25).toMoney())
+  def giftCertificateTypeForLesserFriend = GiftCertificateLineItemType("My lesser friend", BigDecimal(25).toMoney())
 
   def oneGiftCertificate: LineItemTypes = Seq(giftCertificateTypeForFriend)
-  def twoGiftCertificates: LineItemTypes = Seq(giftCertificateTypeForFriend, giftCertificateTypeForShittyFriend)
+  def twoGiftCertificates: LineItemTypes = Seq(giftCertificateTypeForFriend, giftCertificateTypeForLesserFriend)
 
   val taxedZip = Some("98111") // Washington
   val untaxedZip = Some("12345")  // not Washington
 
-  def token: String = payment.testToken().id
   def zeroDollars: Money = BigDecimal(0).toMoney()
 
-  // NOTE(SER-499): zipcode might benefit from being communicated to taxes and cash txn through checkout context
-
   // txn type is associated with the checkout's customer's account
-  def cashTxnTypeFor(checkout: Checkout) = Some( 
-    CashTransactionLineItemType(checkout.accountId, taxedZip, Some(token))
-  )
-
-  // txn type associated with new unused account id
-  def randomCashTxnType = Some(
-    CashTransactionLineItemType(newSavedAccount().id, taxedZip, Some(token))
+  def cashTxnTypeFor(checkout: Checkout) = Some(
+    randomCashTransactionType.copy(accountId = Some(checkout.accountId))
   )
 
   def expectedTotalOf(checkout: Checkout) = checkout.lineItems.notOfNatures(Summary, Payment).sumAmounts

@@ -1,7 +1,5 @@
 package models
 
-// TODO(SER-499): add GiftCertificate table to schema and evolutions
-
 import checkout.{GiftCertificateLineItem, LineItemEntity, LineItemStore}
 import enums.{CouponUsageType, CouponType, CouponDiscountType}
 import services.{Time, MemberLens, AppConfig}
@@ -127,7 +125,6 @@ object GiftCertificate {
   def apply(recipient: String, amount: Money) = {
     val entity = GiftCertificateEntity(recipient = recipient)
 
-    // TODO(SER-499): coupon should have some Discount-natured line item type
     val coupon = new Coupon(name = couponName(recipient), discountAmount = amount.getAmount)
       .withDiscountType(CouponDiscountType.Flat)
       .withCouponType(CouponType.GiftCertificate)

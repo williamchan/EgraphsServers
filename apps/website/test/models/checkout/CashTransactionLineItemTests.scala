@@ -2,11 +2,9 @@ package models.checkout
 
 import checkout.Conversions._
 import utils._
-import utils.TestData._
 import services.AppConfig
-import services.Finance.TypeConversions._
-import services.payment.StripeTestPayment
 import models.enums.CodeType
+import LineItemTestData._
 
 
 class CashTransactionLineItemTests extends EgraphsUnitTest
@@ -19,12 +17,10 @@ class CashTransactionLineItemTests extends EgraphsUnitTest
   //
   // LineItemTests members
   //
-  override lazy val newItemType: CashTransactionLineItemType = {
-    CashTransactionLineItemType(newSavedAccount().id, Some("98888"), Some(payment.testToken().id))
-  }
+  override lazy val newItemType: CashTransactionLineItemType = randomCashTransactionType
 
   override def resolvableItemSets: Seq[LineItems] = Seq(
-    Seq(randomBalance)
+    Seq(randomBalanceItem)
   )
 
   override def resolutionBlockingTypes: Seq[LineItemTypes] = Seq(
@@ -52,19 +48,4 @@ class CashTransactionLineItemTests extends EgraphsUnitTest
 
     true
   }
-
-
-
-
-  //
-  // Helpers
-  //
-  def payment: StripeTestPayment = {
-    val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap();
-    pment
-  }
-
-  def randomBalance = BalanceLineItem(randomMoney)
-
-  def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
 }

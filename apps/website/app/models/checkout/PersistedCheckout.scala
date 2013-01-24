@@ -36,7 +36,10 @@ case class PersistedCheckout(
   override lazy val pendingItems: LineItems = {
     // resolve added types against existing items, then filter out _lineItems
     val addedItems = resolveTypes(_addedTypes, _lineItems) filter (_addedTypes contains _.itemType)
-    val derivedTypesWithTempSummaries = summaryTypes ++ _derivedTypes // NOTE(SER-499): somewhat not happy about this
+
+    // temp summaries needed for some types to resolve...
+    val derivedTypesWithTempSummaries = summaryTypes ++ _derivedTypes
+
     resolveTypes(derivedTypesWithTempSummaries, addedItems).notOfNature(LineItemNature.Summary)
   }
 
@@ -59,5 +62,6 @@ case class PersistedCheckout(
   //
   // PersistedCheckout methods and member
   //
+  /** restored items from db */
   protected lazy val _lineItems: LineItems = services.lineItemStore.getItemsByCheckoutId(id)
 }
