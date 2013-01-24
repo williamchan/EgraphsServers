@@ -23,6 +23,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       messageToCelebrity = Some("Hey Sergio! You throw a mean pitch. What awesome beard trimming tips do you have?"),
       productIconUrl = "https://egraphs-demo.s3.amazonaws.com/product/17/icon_20120503025254786/master.png",
       signedOnDate = "2013-01-01",
+      thisPageLink = "https://www.egraphs.com/stars",
       shareOnFacebookLink = "",
       shareOnTwitterLink = "",
       isPromotional = false

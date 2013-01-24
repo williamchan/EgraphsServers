@@ -42,6 +42,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.assets.audioMp4Url
+          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
           // TODO(wchan): This should point to a jpg. (svzg renders the signature before the image, which is weird.)
           val videoPosterUrl = ""
           Ok(views.html.frontend.egraph(
@@ -54,6 +55,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
             messageToCelebrity = order.messageToCelebrity,
             productIconUrl = product.iconUrl,
             signedOnDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt),
+            thisPageLink = thisPageLink,
             shareOnFacebookLink = "",
             shareOnTwitterLink = "",
             isPromotional = order.isPromotional
