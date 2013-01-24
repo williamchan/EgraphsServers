@@ -29,31 +29,45 @@ celebrityTagline: String,
 }
 
 @baseBody = {
-<div class="container" id="egraph-page">
-  <video id="my_video_1" class="video-js vjs-default-skin" controls
-         preload="auto" width="595" height="376" poster="@videoPosterUrl"
-         data-setup="{}">
-    <source src="@mp4Url" type='video/mp4'>
-  </video>
+<section id="content" class="egraph-section" role="main">
+  <div id="main" class="egraph">
+    <div class="container">
+      <video id="egraph-player" class="video-js vjs-default-skin" controls
+             preload="auto" width="595" height="376" poster="@videoPosterUrl"
+             data-setup="{}">
+        <source src="@mp4Url" type='video/mp4'>
+      </video>
+      <div id="byline" class="row-fluid">
+        <div class="span8">
+          <h4>@celebrityName</h4>
+          <p>@celebrityTagline</p>
+        </div>
+        <div class="span4">
+          <img src='@productIconUrl' height="40" width="40"/>
+        </div>
+      </div>
+      <hr/>
+      <div id="egraph-description" class="row-fluid">
+        <div>A message for @recipientName</div>
+        <div>from @celebrityName</div>
+      </div>
+    </div>
+  </div>
 
-  <hr/>
-  <div>@celebrityName</div>
-  <div>@celebrityTagline</div>
-  <img src='@productIconUrl' height="40" width="40"/>
-  <hr/>
-  <div>A message for @recipientName</div>
-  <div>from @celebrityName</div>
-  <hr/>
+  @**
   <div>@messageToCelebrity.getOrElse("")</div>
   <div>@signedOnDate</div>
   <div>@shareOnFacebookLink</div>
   <div>@shareOnTwitterLink</div>
-</div>
+  *@
+
+</section>
 }
 
 @base_template(
   title=title.toString,
   headHtml=headHtml,
   body=baseBody,
-  headJs=headJs
+  headJs=headJs,
+  bodyClasses=Seq("egraph-page")
 )
