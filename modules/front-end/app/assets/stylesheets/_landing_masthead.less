@@ -1,6 +1,6 @@
 // Styles for the masthead of the website landing page.
 
-#masthead-home {
+.landing #masthead-home {
   .box-shadow(inset 0 -8px 8px -8px rgba(0, 0, 0, .5));
   
   // Specify all aspects of the background but the image url,
@@ -17,6 +17,7 @@
   }
 
   h1 {
+    margin-top:20px;
     color: @white;
     font-weight: 300;
     font-size: 52px;
@@ -45,7 +46,7 @@
 // Past 1340 pixels width we turn on the radial gradient that obscures the
 // photo's edge
 @media (min-width: 1340px) {
-  #masthead-home {
+  .landing #masthead-home {
     .banner-gradient {  
       background: url(../images/bg-banner-gradient.png) repeat-y 50% 0;
     }
@@ -54,7 +55,7 @@
   }
   
   // Put in a radial fade-to-dark-gray for big screens.
-  .cssgradients #masthead-home .banner-gradient { 
+  .cssgradients .landing #masthead-home .banner-gradient { 
     background: -moz-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px,  rgba(26,26,26,1) 745px); /* FF3.6+ */
     background: -webkit-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Chrome10+,Safari5.1+ */
     background: -o-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Opera 12+ */
@@ -64,7 +65,7 @@
 } // end min-width: 1340px;
 
 @media (min-width: 1080px) {
-  #masthead-home {
+  .landing #masthead-home {
     height: 556px;
 
     h1 {
@@ -80,13 +81,13 @@
 
 // Down-adjust masthead height at resolutions below 1080p
 @media (max-width: 1079px) {
-  #masthead-home {
+  .landing #masthead-home {
     min-height:400px;
   }
 }
 
 @media (max-width: 767px) {
-  #masthead-home {
+  .landing #masthead-home {
     min-height: 300px;
 
     form {
@@ -100,11 +101,11 @@
     h1 {
       font-size:38px;
     }
-  } // end #masthead-home
+  } // end .landing #masthead-home
 }
 
 @media (max-width:480px) {
-  #masthead-home {
+  .landing #masthead-home {
     min-height: 250px;
 
     form {
