@@ -1,0 +1,372 @@
+// Styles for the checkout explorations base checkout page
+
+
+body.storefront-a-checkout {
+  line-height: normal;
+
+  h2, h3, div, span {
+    line-height: normal;
+  }
+
+  // The alternate navbar
+  #top {
+    text-align:center;
+
+    .checkout-header {
+      margin-top:10px;
+      margin-bottom:5px;
+    }
+
+    .checkout-logo {
+      display:inline-block;
+
+      img {
+        max-width:120px;
+      }
+
+      a {
+        color: #999;
+
+        &:hover {
+          color: #999;
+        }
+      }
+      
+      // Logo fading effect when hovered
+      &:hover {
+        .opacity(75)
+      }
+    }
+
+    // The checkout steps navbar portion
+    .steps {
+      border-left:1px solid #ccc;
+      padding-left:12px;
+      margin-left:10px;
+      display: inline-block;
+      vertical-align:middle;
+
+      .step {
+        display: inline-block;
+        text-transform: uppercase;
+        
+        label {
+          font-size:13px;
+        }
+
+        // Standardize icon heights for more attractive layout
+        .image-container {
+          height:20px;
+        }
+
+        img {
+          display:block;
+          max-width:16px;
+          margin-left:auto;
+          margin-right:auto;
+        }
+      }
+
+      img.step-arrow {
+        position:relative;
+        margin-left:5px;
+        margin-right:5px;
+        top:-20px;
+        vertical-align: bottom; // I wish 'middle' worked instead. Why doesn't it? (Erem)
+        max-width:16px;
+      }
+    }
+  }
+
+  // What is this to-top bs? Needs to change. Evidently it's a spacer
+  // to stop content from folding up under the static masthead.
+  #to-top {
+    height:60px;
+  }
+
+  #content #main {
+    max-width:523px;
+    padding-bottom:15px;
+
+    #form {
+      margin-top:25px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    h2, h3 {
+      text-shadow:0px 1px 0px white;
+    }
+
+    // The main section headers, e.g. "Enter Delivery Details"
+    h2 {
+      margin-top:4px;
+      margin-bottom:16px;
+      text-align:center;
+      text-transform:uppercase;
+      font-size:16px;
+    }
+
+    // The icons placed inside fancy white lines above the main section headers
+    .header-icon {
+      text-align:center;
+      background-image: url("/assets/images/fancy-lines.png");
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      margin-top:30px;
+
+      img {
+        width:20px;
+      }
+    }
+
+    // Fancy headers that get an attractive squiggly above them. 
+    // e.g. "ONLINE EGRAPH DELIVERY"
+    .fancy-header {
+      text-align:center;
+      text-transform:uppercase;
+      color:#999;
+      font-size:14px;
+      line-height:normal;
+      margin-bottom:8px;
+
+      // Place the fancy squiggly using pseudoclass
+      &::before {
+        text-align:center;
+        margin-bottom:4px;
+        margin-top:12px;
+        display:block;
+        margin-left:auto;
+        margin-right:auto;
+        content:"";
+        background-image: url("/assets/images/fancy-separator-no-lines.png");
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        height:9px;
+        width:17px;
+      }
+    }
+
+    // The skeuomorphic receipt's "insertion point" into the page.
+    .summary-insertion {
+      @apertureHeight: 14px;
+
+      position:relative;
+      margin-left:auto;
+      margin-right:auto;
+      margin-bottom:-1 * @apertureHeight;
+      width:310px;
+      height:@apertureHeight;
+      background-color:#666;
+      border-radius:9px;
+
+      // Cast shadow above the summary using high z-indexed pseudoclass element
+      &::after {
+        position:absolute;
+        z-index:2;
+        width:100%;
+        height:100%;
+        .box-shadow(0px 6px 9px lighten(black, 12.5%) inset);
+        border-radius:9px;
+        content:"";
+      }
+    }
+
+    // The skeuomorphic receipt
+    .summary {
+      position:relative;
+      z-index:1;
+      width:265px;
+      margin-left:auto;
+      margin-right:auto;
+      padding-top:7px;
+      background-color:white;
+      background-image:url(/assets/images/egg_shell.png);
+      border:1px solid #ccc;
+      border-bottom:1px solid #aaa;
+      border-top:0px;
+      .box-shadow(0px 2px 8px -1px rgba(0,0,0,.2));
+
+      // The receipt section headers, e.g. "Discounts"
+      h2 {
+        position:relative;
+        text-transform:none;
+        font-weight:600;
+        margin:0 0;
+        padding:8px;
+        border-top:1px dashed #aaa;
+
+        // Slight white accent below the stippling
+        &::before {
+          position: absolute;
+          display: block;
+          content: "";
+          width: 100%;
+          height: 0px;
+          top: 0px;
+          left: 0px;
+          border-top: 1px dashed white;
+        }
+      }
+
+      .discounts {
+        position: relative; // to enable absolute positioning of redeem link
+
+        // The "redeem code" link
+        a#redeem-link {
+          text-decoration: underline;
+          color: #999;
+          display: block;
+          font-size: 11px;
+          position: absolute;
+          left: 12px;
+          bottom: 10px;
+        }
+      }
+
+      // Any contiguous series of line-items. E.g. the series of items, series of fees, etc.
+      ul.line-items {
+        list-style-type: none;
+        margin-left: 0px;
+        margin-bottom: 0px;
+
+        // Each line item in the series
+        li {
+          border-top:1px solid #efefef;
+          padding-bottom:8px;
+          padding-left:10px;
+          padding-top:8px;
+
+          // Use three-color bootstrap gradient to control height at which
+          // transition occurs
+          #gradient > .vertical-three-colors(
+            rgba(0,0,0,0),
+            rgba(0,0,0,0),
+            20%,
+            rgba(0,0,0,.017)
+          );
+          text-shadow:0px 1px 0px white;
+
+          .image-and-description {
+            .clearfix();  
+          }
+
+          // The header, e.g. "Sergio Romo egraph"
+          h3 {
+            margin:0px;
+            font-size:13px;
+            font-weight:600;
+            line-height:normal;
+            margin-bottom:4px;
+          }
+
+          // The optional line-item photo image
+          img {
+            border:1px solid transparent;
+            float:left;
+            padding:2px;
+            background-color:transparent;
+            margin-right:8px;
+            width:60px;
+
+            // Throws a thin attractive frame around the image
+            &.framed {
+              border:1px solid #ddd;
+              background-color:white;
+            }
+          }
+
+          // The line item text
+          .line-item-description {
+            line-height:normal;
+            font-size:11px;
+            margin-right:27px;
+            color:#888;
+
+            strong {
+              font-weight:inherit;
+              font-style:italic;
+            }
+          }
+
+          // The line item money quantity. The element should be
+          // placed in the lineitem's h3
+          .money {
+            float:right;
+          }
+
+          &:not(.total) .money {
+            color:@orange;
+            background-color:inherit;
+          }
+
+          &.total {
+            text-transform:uppercase;
+            background-color:transparent;
+
+            h3 { font-size:16px; }
+            .money { margin-right:5px; }
+          }
+        }
+      }
+    }
+
+    //
+    // Begin form elements
+    //
+    .control-group {
+      margin-bottom:15px;
+    }
+
+    .control-label {
+      width:140px;
+
+      a {
+        font-size:11px;
+        text-decoration: underline;
+        display:block;
+        line-height:normal;
+      }
+    }
+
+    .controls {
+      margin-left:29%;
+      margin-right:29%;
+
+      input, textarea, select {
+        width:100%;
+
+        &.half {
+          width:50%;
+        }
+
+        &.quarter {
+          width:25%;
+        }
+      }
+
+      #state {
+        margin-top:12px;
+        display:block;
+      }
+    }
+
+    .fancy-header.framed-print {
+      margin-top:22px;
+    }
+
+    #submission {
+      padding-top:15px;      
+      line-height:normal;
+      text-align:center;
+      font-size:13px;
+
+      a {
+        text-decoration: underline;
+      }
+    }
+
+    select#card-exp-month, select#card-exp-year {
+      width:60px;
+    }
+  }  
+}

@@ -1,0 +1,259 @@
+@()(
+  implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@**
+ * Template for the checkout page. See base_template.scala.html for description
+ * of implicit params.
+ *@
+
+@import views.html.frontend._
+@import models.frontend.forms.Field
+
+@headerStep(image: String, label: String, current: Boolean=false, last: Boolean=false) = {
+  <div class="step">
+    <div class="image-container">
+      <img src="@EgraphsAssets.at(image)">
+    </div>
+    <label>@label</label>
+
+  </div>
+  @if(!last) {
+    <img class="step-arrow" src="@EgraphsAssets.at("images/glyphicons-rightarrow.png")">
+  }
+}
+
+@header = {
+  <div class="checkout-header">
+    <div class="checkout-logo">
+      <a href="/">
+        <img src="@EgraphsAssets.at("images/logo-cart.png")">
+      </a>
+    </div>
+    <div class="steps">
+      @headerStep("images/glyphicons-link.png", "connect")
+      @headerStep("images/glyphicons-cart.png", "enter details", current=true)
+      @headerStep("images/glyphicons-book.png", "review")
+      @headerStep("images/glyphicons-check.png", "done", last=true)
+    </div>
+  </div>
+}
+
+@headJs = {
+  @**
+   *As a client-driven page, most data will be banged into JS rather than directly into the template 
+   *@
+  angular.extend(Egraphs.page, {
+    config: {},
+  });
+}
+
+@headerIcon(filename: String) = {
+  <div class="header-icon">
+    <img src='@EgraphsAssets.at("images/" + filename)'>
+  </div>
+}
+
+@baseBody = {
+  <div id="content" role="main">
+    <div id="main">
+      <div id="form" class="form-horizontal">
+        <section id="double-check">
+          @headerIcon("glyphicons-magnifier-orange.png")
+          <h2>Double-check your order</h2>
+          <div id="order-summary">
+            <div class="summary-insertion"></div>
+            <div class="summary">
+              <h2 id="items-header">Items</h2>
+              <ul class="line-items">
+                <li>
+                  <div class="image-and-description">
+                    <img class="framed" src="https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png"></img>
+                    <h3><div class="money">$50</div>Sergio Romo egraph</h3>
+
+                    <div class="line-item-description">
+
+                      For <strong>Herp Derpson</strong> with note <strong>I'm your biggest fan!</strong>. He will sign the photo <strong>Heart of a Warrior</strong>.
+                    </div>
+                  </div>
+                  <div class="line-item-controls clearfix">
+                    
+                  </div>
+                </li>
+
+                <li>
+                  <div class="image-and-description">
+                    <img src="@EgraphsAssets.at("images/framed-print.png")"></img>
+                    <h3><div class="money">$45</div>Framed print</h3>
+                    <div class="line-item-description">
+                      Of your Sergio Romo egraph. Shipping info to-be-provided.
+                    </div>
+                  </div>
+                  <div class="line-item-controls clearfix">
+                  </div>                  
+                </li>
+              </ul>
+              <div class="discounts clearfix">
+                <h2>Discounts</h2>
+                 <a href="#" id="redeem-link">redeem code</a>
+              </div>
+              <h2>Fees</h2>
+              <ul class="line-items">
+                <li>
+                  <h3><div class="money">free!</div>Shipping</h3>
+                </li>
+                <li>
+                  <h3><div class="money">included!</div>Sales Tax</h3>
+                </li>                
+              </ul>              
+              <ul class="line-items">
+                <li class="total summary-line">
+                  <h3><div class="money">$95</div>Total</h3>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section id="delivery-details">
+          @headerIcon("glyphicons-envelope-orange.png")
+          <h2>Enter delivery details</h2>
+          <h3 class="fancy-header">Online Egraph Delivery</h3>
+          <div class="control-group">
+            <label class="control-label" for="recipientEmail">
+              Recipient Email:
+              <a href="#" class="tooltip-link field-tooltip">Why do you need this?</a>
+            </label>
+            <div class="controls">
+              <input id="recipientEmail"
+                     name="recipientEmail">
+            </div>
+          </div> <!-- End .control-group.recipientName -->
+          <div class="control-group">
+            <label class="control-label" for="buyerEmail">Your Email:</label>
+            <div class="controls">
+              <input id="buyerEmail"
+                     name="buyerEmail">
+            </div>
+          </div> <!-- End .control-group.recipientName -->
+
+          <h3 class="fancy-header framed-print">
+            Framed print delivery
+          </h3>
+          <div class="control-group">
+            <label class="control-label" for="shippingName">Name:</label>
+            <div class="controls">
+              <input id="shippingName"
+                     name="shippingName">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="addressLine1">Address:</label>
+            <div class="controls">
+              <input id="addressLine1"
+                     name="addressLine1">
+            </div>                      
+          </div>
+          <div class="control-group">
+            <div class="controls">
+              <input id="addressLine2"
+                     name="addressLine2">
+            </div>                      
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="City">City:</label>
+            <div class="controls">
+              <input id="city"
+                     name="city"
+                     class="half">
+              <select id="state"
+                      name="state"
+                      class="half">
+                <option value>State</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="postalCode">Postal code:</label>
+            <div class="controls">
+              <input id="postalCode"
+                     name="postalCode"
+                     class="quarter">
+            </div>
+          </div>
+
+        </section>
+        <section id="payment-details">
+          @headerIcon("glyphicons-lock-orange.png")
+          <h2>Enter payment details</h2>
+          <div class="control-group">
+            <label class="control-label" for="City">Card Number:</label>
+            <div class="controls">
+              <input id="cardNumber"
+                     name="cardNumber">
+            </div>
+          </div>          
+          <div class="control-group">
+            <label class="control-label" for="City">Expiration:</label>
+            <div class="controls">
+              <select id="card-exp-month"
+                      credit-card-expiry-month
+                      name="cardExpMonth"
+                      class="inline"
+                      ng-model="order.card.expMonth"
+                      ng-options="month for month in months"
+                      required >
+                <option value>MM</option>
+              </select>
+              /
+              <select id="card-exp-year"
+                      credit-card-expiry-year
+                      name="cardExpYear"
+                      class="inline"
+                      ng-model="order.card.expYear"
+                      ng-options="year for year in years"
+                      required >
+                <option value>YY</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="City">Security code:</label>
+            <div class="controls">
+              <input id="securityCode"
+                     name="securityCode">
+            </div>                      
+          </div>          
+          <div class="control-group">
+            <label class="control-label" for="City">Zip:</label>
+            <div class="controls">
+              <input id="billingZip"
+                     name="billingZip">
+            </div>
+          </div>
+        </section>
+      </div>
+      <div id="submission">
+        @tags.arrow_button(
+          caption="Proceed to Final Step",
+          classes="button"
+        )
+        <div>or</div>      
+        <a href="#">Edit your order</a>
+      </div>
+    </div>
+  </div>
+}
+
+
+@base_template(
+  title = "Egraphs Secure Checkout",
+  headJs = headJs,
+  jsMain = "pages/storefronts/a/personalize",
+  body=baseBody,
+  headerContent=Some(header),
+  bodyClasses=Seq("storefront-a-checkout")
+)

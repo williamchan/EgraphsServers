@@ -5,6 +5,7 @@
   body: => Html,
   cssFiles: Seq[String] = Seq(),
   bodyClasses: Seq[String] = Seq(),
+  headerContent: Option[Html] = None,
   suppressHeaderAndFooter: Boolean = false,
   viewportFix: Boolean = true
 )(
@@ -107,7 +108,7 @@
       Begin base template body
     **@
     @if(!suppressHeaderAndFooter) {
-      @tags.site_header(headerData)
+      @tags.site_header(headerContent, headerData)
       @body
       @tags.site_footer(footerData)
     } else {
