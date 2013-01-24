@@ -1,7 +1,6 @@
 @(footerData: models.frontend.footer.FooterData)
 @**  
-    Renders the site footer.
-
+    Renders the site footer.      
     footerData - the data necessary to render the links in the footer.
 *@
 <!-- Begin site_footer.scala.html -->
@@ -9,42 +8,43 @@
   
   <div class="row">
     
-    <div class="span6">
+    <div class="span8">
       
-	  <nav role="navigation">
-	    
-	    <ol class="clearfix">
-        <li><a href="/">Home</a></li>
-        <li><a href="@footerData.aboutUsLink">About Us</a></li>
-        <li><a href="@footerData.faqLink">FAQ</a></li>
-        <li><a href="@footerData.affiliatesLink">Affiliates</a></li>
-        <li><a href="@footerData.termsOfUseLink">Terms of Use</a></li>
-        <li><a href="@footerData.privacyPolicyLink">Privacy Policy</a></li>
-        @** <li><a href="@footerData.careersPolicyLink">Careers</a></li> *@
-        <li><a href="#emailSignupForm" role="button" id="email-link">Sign up for our newsletter</a></li>
-	    </ol>	
+  	  <nav role="navigation">
+  	    
+  	    <ol class="clearfix">
+          <li><a href="/">Home</a></li>
+          <li><a href="@footerData.aboutUsLink">About Us</a></li>
+          <li><a href="@footerData.faqLink">FAQ</a></li>
+          <li><a href="@footerData.affiliatesLink">Affiliates</a></li>
+          <li><a href="@footerData.termsOfUseLink">Terms of Use</a></li>
+          <li><a href="@footerData.privacyPolicyLink">Privacy Policy</a></li>
+          @** <li><a href="@footerData.careersPolicyLink">Careers</a></li> *@
+  @**        <li><a href="#emailSignupForm" role="button" id="email-link">Sign up for our newsletter</a></li> **@
+  	    </ol>	
 
-	  </nav>
+  	  </nav>
       
       <p><small>Copyright 2013 Egraphs</small></p>
+      <p><small>Major League Baseball trademarks and copyrights are used with permission of MLB Advanced Media, L.P.  All rights reserved. Visit www.MLB.com, The Official Site of Major League Baseball.</small></p>
+      <p><small>The NBA and NBA member team identifications are the intellectual property of NBA Properties, Inc. and the respective member teams. &copy;2013 NBA Properties, Inc.  All Rights reserved.</small></p>
 
     </div>
-    
-    <div class="social span6">
-      
-      <ul>
-    	<li><a href="@footerData.egraphsFacebookLink" class="facebook">Facebook</a></li>
-    	<li><a href="@footerData.egraphsTwitterLink" class="twitter">Twitter</a></li>
-    	<!-- <li><a href="#" class="addthis">AddThis</a></li> -->
-      </ul>
+    <div class="span4 mailer">
+      <div class="clearfix">
+        @mailing_list_form()
+        @social()
 
-    </div> <!-- end .social -->
-    
-  </div> <!-- end .row -->
+       </div>
+    </div>
+  </div> 
 
   <div class="row">
-    <p><small>Major League Baseball trademarks and copyrights are used with permission of MLB Advanced Media, L.P.  All rights reserved. Visit www.MLB.com, The Official Site of Major League Baseball.</small></p>
-    <p><small>The NBA and NBA member team identifications are the intellectual property of NBA Properties, Inc. and the respective member teams. &copy;2013 NBA Properties, Inc.  All Rights reserved.</small></p>
+    <div class="span6">
+      <div class="clearfix">
+      
+      </div>
+    </div>
   </div>
 </footer> <!-- end #bottom -->
 <!-- End site_footer.scala.html -->

@@ -1,0 +1,25 @@
+@()
+@**
+  Configure Social Widget for Facebook
+**@
+@facebook = {
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=137222446375584";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+<div class="fb-like" data-href="https://www.facebook.com/egraphs" data-send="false" data-width="250" data-show-faces="true" data-font="arial"></div>
+}
+
+@twitter = {
+  <div class="twitter-follow">
+    <a href="https://twitter.com/egraphs" class="twitter-follow-button" data-show-count="true" data-lang="en">Follow @@Egraphs</a>
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+  </div>  
+}
+
+@facebook
+@twitter

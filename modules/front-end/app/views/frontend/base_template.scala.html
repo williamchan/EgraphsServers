@@ -97,6 +97,7 @@
       var Egraphs = Egraphs || {};
       Egraphs.page = Egraphs.page || {};
       Egraphs.page.jsMain = ["pages/base-template", "@jsMain"];
+      Egraphs.page.mail = {apikey: "@footerData.mailApiKey" , url: "@footerData.mailUrl" , id: "@footerData.newsletterListId"};
       @headJs
     </script>
     @tags.analytics()

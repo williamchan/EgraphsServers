@@ -40,31 +40,27 @@
 		line-height: 1em;
 		color: @grayLighter;
 	}
+	.mailer {
+		float: right;
 
-	.social {
+		form {
+			.input-append {
+				.celebrity-searchbox-container2();
+				width: 254px;
 
-		ul {
-			float: right;
-			padding: 0;
-			margin: 0;
-			list-style: none;
-
-			li {
-
-				float: left;
-				margin-left: 10px;
-
-				a {
-					.social-sprite(30px);
-					display: block;
-				}
+			}	
+			
+			label {
+				font-size: 12px;
+				line-height: 1.0em;
+				color: @orange;
 			}
-
-			li:first-child { margin-left: 0; }
-
 		}
 
-	}
+		.twitter-follow {
+			margin-top: 20px;
+		}
+  }		
 }
 
 
@@ -79,7 +75,7 @@
 
 			[class*=span] {
 				margin: 0;
-				width: auto;
+				// width: auto;
 			}
 
 		}
@@ -125,6 +121,12 @@
 
   #bottom .social ul { float: none; }
 
+}
+
+@media (max-width: 480px) {
+	.mailer {
+		display: none;
+	}
 }
 
 
