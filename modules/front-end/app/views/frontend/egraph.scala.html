@@ -1,11 +1,12 @@
 @(mp4Url: String,
   videoPosterUrl: String,
   celebrityName: String,
-celebrityTagline: String,
+  celebrityTagline: String,
   recipientName: String,
   messageToCelebrity: Option[String],
   productIconUrl: String,
   signedOnDate: String,
+  thisPageLink: String,
   shareOnFacebookLink: String,
   shareOnTwitterLink: String,
   privacySetting: String,
@@ -29,6 +30,16 @@ celebrityTagline: String,
 }
 
 @baseBody = {
+@** Facebook Comments plugin - https://developers.facebook.com/docs/reference/plugins/comments/ *@
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));</script>
+
 <section id="content" class="egraph-section" role="main">
   <div id="main" class="egraph">
     <div class="container">
@@ -52,6 +63,8 @@ celebrityTagline: String,
         <div>from @celebrityName</div>
       </div>
     </div>
+
+    <div class="fb-comments" data-href="@thisPageLink" data-width="595" data-num-posts="2"></div>
   </div>
 
   @**
