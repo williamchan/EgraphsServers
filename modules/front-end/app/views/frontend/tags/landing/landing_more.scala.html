@@ -2,6 +2,10 @@
 
 @import views.html.frontend.tags
 
+@searchAndEmail(url: String) = {
+  @tags.landing.searchbox(url)
+  @tags.mailing_list_form()
+}
 <section id="landing-more">
 
   <header>
@@ -20,7 +24,7 @@
       <div class="offset4 span5">
       @{
         celebrityPublicName match {
-          case None => tags.landing.searchbox(url)
+          case None => searchAndEmail(url)
           case Some(name) => tags.landing.get_started(url)
         }
       }

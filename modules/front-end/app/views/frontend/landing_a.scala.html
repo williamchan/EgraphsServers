@@ -75,7 +75,7 @@
 
                 }
                 <li>
-                  <a data-vertical="@vertical.urlSlug" name="@vertical.shortName" class="all-teams">See all @vertical.shortName Teams &gt;&gt;</a>
+                  <a data-vertical="@vertical.urlSlug" name="@vertical.shortName" class="all-teams">See all @vertical.shortName Teams &raquo;</a>
                 </li>
               </ul>
             </article>
@@ -92,7 +92,7 @@
           <div class="vertical-select span4">
             <a class="glowborder vertical-tile" title="Shop @vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" href="#">
               <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
-                <h3>@vertical.shortName &gt;&gt;</h3>
+                <h3>@vertical.shortName <i class="icon-chevron-right icon-white"></i></h3>
                 <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url"/>
               </div>
             </a>
@@ -212,8 +212,9 @@
 
           @verticalAndTeams
           <div class="row">
-            <div class="offset4 span5">
+            <div class="span12">
               @tags.landing.searchbox("/stars")
+              @tags.mailing_list_form()
             </div>
           </div>  
         </section>    

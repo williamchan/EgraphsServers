@@ -1,6 +1,27 @@
 /* Scripting for the base template page */
-define(["bootstrap/bootstrap-modal"], function() {
+define(["page", "window", "services/logging", "module", "services/ng/mail-services", "bootstrap/bootstrap-modal"],
+  function(page, window, logging, requireModule) {
   var menuStatus = "closed";
+  var log = logging.namespace(requireModule.id);
+
+  var mailerController = function($scope, subscribeService) {
+    $scope.email = "";
+    $scope.message = "Join our mailing list.";
+    $scope.subscribe = function() {
+      subscribeService($scope.email,
+        function() { $scope.message = "Thanks!";},
+        function() { $scope.message = "Sorry, there was an error. Try again later.";}
+      );
+    };
+  };
+
+  var modalController = function($scope, subscribeService) {
+    $scope.email = "";
+    $scope.subscribe = function() {
+      subscribeService($scope.email);
+      $('#emailSignupForm').modal('toggle');
+    };
+  };
 
   return {
     /**
@@ -9,8 +30,16 @@ define(["bootstrap/bootstrap-modal"], function() {
      * @return nothing
      */
     go: function () {
+
+      window.MailerController = mailerController;
+      window.ModalController =  modalController;
+      angular.element(document).ready(function() {
+        window.MailerController.$inject = ['$scope', 'subscribe'];
+        window.ModalController.$inject = ['$scope', 'subscribe'];
+        angular.bootstrap(document, ['MailServices']);
+      });
+
       $(document).ready(function(){
-        var callout = $("#signup-callout");
         var signupModal = $('#emailSignupForm');
         // highlight action on top menu
         $('#top .account').hover(function(){
@@ -46,41 +75,10 @@ define(["bootstrap/bootstrap-modal"], function() {
           e.preventDefault();
         });
 
-        $("#signup-button").click(function () {
-          $.ajax({
-            url: '/subscribe',
-            data: $("#signup-form").serialize(),
-            type: 'post',
-            statusCode : {
-              200: function(data) {
-                callout.text("Thanks!");
-                setTimeout(function() {
-                  signupModal.modal('toggle');
-                  callout.text('');
-                }, 800);
-              },
-              400: function () {
-                callout.text("That's not an email address =/");
-              },
-              500: function () {
-                callout.text("Connection error, try again later.");
-                setTimeout(function() {
-                  signupModal.modal('toggle');
-                  callout.text('');
-                }, 800);
-              },
-            }
-
-          });
-          mixpanel.track('Subscribed to newsletter');
-          return false;
-        });
-
         // set modal to visible if toggled.
         if(Egraphs.page.modalOn === true) {
           $(window).load(function(){
-              signupModal.modal({
-              });
+              signupModal.modal({});
           });
         }
       });
