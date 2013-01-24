@@ -1,7 +1,5 @@
 package services.http.twitter
 
-import org.specs2.mock.Mockito
-
 import com.google.inject.Inject
 
 import services.config.ConfigFileProxy
@@ -9,6 +7,7 @@ import services.inject.InjectionProvider
 import twitter4j.api.UsersResources
 import twitter4j.conf.ConfigurationBuilder
 import twitter4j.TwitterFactory
+import org.specs2.mock.Mockito
 
 /**
  * Provides the active Twitter to Guice, which is dictated by the "twitter" value in
