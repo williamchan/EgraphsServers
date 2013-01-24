@@ -20,20 +20,20 @@
     <br>
     <img src='@EgraphsAssets.at("images/modal-egraph.jpg")'/>
 
-    <form ng-controller="MailerController" ng-cloak ng-submit="subscribe()">
+    <form ng-controller="ModalController" ng-submit="subscribe()">
       <div>
-        <label>{{message}}</label>
-        <input class="input-xlarge" type="email" name="email" ng-model="mailer.email_address"/>
+        <label>Email:</label>
+        <input class="input-xlarge" type="email" name="email" ng-model="email"/>
       </div>
-    <div>
-      <button id="signup-button" type="submit" class="button">
-        <strong><em>Submit</em></strong>
-        <span>&raquo;</span>
-      </button>
-      <br>
-      <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true">No Thanks</a>
-    </div>
-  </form>  
+      <div>
+        <button id="signup-button" type="submit" class="button">
+          <strong><em>Submit</em></strong>
+          <span>&raquo;</span>
+        </button>
+        <br>
+        <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true">No Thanks</a>
+      </div>
+    </form>
   </div>
 </div>
       
