@@ -227,6 +227,10 @@
 
 #landing-more {
 
+	.newsletter-signup {
+		display: none; 
+	}
+
   margin-bottom: 40px;
 
 	header {
@@ -242,10 +246,24 @@
 
 	}
 
-	form {
-  	.search-control {
-    	.celebrity-searchbox-container2(); 
-  	}     
+	.search-form {
+    margin-left: auto;
+    margin-right: auto;
+    width: 290px;
+
+    .search-control {
+      .celebrity-searchbox-container2();
+      overflow: hidden;
+      width: 290px;
+       
+      input {
+        width: 244px;
+      }
+
+      button {
+        float: right;
+      }
+    }  
 
   	.help-block {
   		font-size: 12px;
@@ -672,6 +690,20 @@
 			font-size: 16px;
 			line-height: 1.5em;
 		}
-	
+
+	}
+
+	#landing-more {
+		width: 290px;
+
+		.input-append {
+			width: 290px;
+      
+      input[type="email"] {
+        width: 244px;
+      }
+
+    }
+
 	}
 }

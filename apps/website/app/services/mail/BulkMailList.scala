@@ -1,8 +1,6 @@
 package services.mail
 
-import collection.JavaConversions._
 import java.util.concurrent.TimeUnit
-import java.util.Properties
 import com.google.inject.{Inject, Provider}
 import com.google.gson.Gson
 import org.joda.time.DateTimeConstants
@@ -12,7 +10,7 @@ import play.api.libs.ws.WS
 import play.api.libs.ws.WS.{WSRequest, WSRequestHolder}
 import services.inject.InjectionProvider
 import services.config.ConfigFileProxy
-import services.Time
+
 
 /**
  * Trait that defines bulk mail lists (e.g. MailChimp, Constant Contact).
@@ -23,6 +21,7 @@ import services.Time
  */
 trait BulkMailList {
 
+  def apikey : String
   /**
    * Subscribes a user to the mailing list.
    *
@@ -57,6 +56,12 @@ trait BulkMailList {
    * @return ID of newsletter sign up mailing list.
    */
   def newsletterListId : String
+
+  /**
+   * Returns the endpoint url for AJAX services.
+   */
+  def actionUrl : String
+
 }
 
 /**
@@ -88,6 +93,10 @@ class BulkMailListProvider @Inject()(config: ConfigFileProxy) extends InjectionP
  */
 private[mail] object StubBulkMailList extends BulkMailList
 {
+  override def apikey = "derp"
+
+  override def actionUrl = "#"
+
   override def subscribeNewAsync(email: String) : Promise[Response] = {
     play.api.Logger.info("Subscribed " + email + " to email list: " + newsletterListId + "\n")
     Promise()
@@ -116,10 +125,11 @@ private[mail] object StubBulkMailList extends BulkMailList
  */
 private[mail] case class MailChimpBulkMailList (apikey: String, datacenter: String, newsletterListId: String) extends BulkMailList
 {
-  private def apiUrl = "https://" + datacenter + ".api.mailchimp.com/1.3/"
+
+  override def actionUrl = "https://" + datacenter + ".api.mailchimp.com/1.3/"
 
   override def subscribeNewAsync(email: String) : Promise[Response] = {
-    WS.url(apiUrl).withQueryString(
+    WS.url(actionUrl).withQueryString(
       ("output", "json"),
       ("apikey", apikey),
       ("method", "listSubscribe"),
@@ -146,7 +156,7 @@ private[mail] case class MailChimpBulkMailList (apikey: String, datacenter: Stri
   }
 
   override def members : String = {
-    WS.url(apiUrl).withQueryString(
+    WS.url(actionUrl).withQueryString(
       ("output", "json"),
       ("apikey", apikey),
       ("method", "listMembers"),
@@ -155,7 +165,7 @@ private[mail] case class MailChimpBulkMailList (apikey: String, datacenter: Stri
   }
 
   override def removeMember(email: String) : Promise[Response] = {
-    WS.url(apiUrl).post(
+    WS.url(actionUrl).post(
       Map(
         "output" -> Seq("json"),
         "apikey" -> Seq(apikey),

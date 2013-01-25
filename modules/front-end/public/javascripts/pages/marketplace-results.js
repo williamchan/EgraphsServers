@@ -103,8 +103,13 @@ function (Egraphs, marketplace, logging, requireModule) {
       }, {offset: 'bottom-in-view', continuous: false, triggerOnce : false});
     };
   });
+  
+  window.MarketplaceCtrl = marketplaceCtrl;
 
   return {
+    
+    ngModules:  ['marketplace'],
+
     go: function () {
       /**
        * The aim of most of the functions below is to retain the state of a search in the url bar.
@@ -113,13 +118,6 @@ function (Egraphs, marketplace, logging, requireModule) {
        * The same idea applies to removing a filter or any other changes, with the exception of the search box, since the previous
        * settings may not be applicable and give a confusing set of results.
        **/
-
-      // Angular Setup
-      window.MarketplaceCtrl = marketplaceCtrl;
-      angular.element(document).ready(function() {
-        angular.bootstrap(document, ['marketplace']);
-      });
-
 
      $(document).ready(function() {
         /**
