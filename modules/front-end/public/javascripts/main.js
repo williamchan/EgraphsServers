@@ -5,7 +5,8 @@ require.config({
   paths: {
     "bootstrap": '/assets/bootstrap/js',
     "bootstrap-modal": '/assets/bootstrap-modal/js'
-  }
+  },
+  urlArgs: "v=" + Egraphs.page.version
 });
 
 // The current page should have provided an array of javascript modules

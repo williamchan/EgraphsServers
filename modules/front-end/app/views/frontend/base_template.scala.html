@@ -98,6 +98,7 @@
       Egraphs.page.jsMain = ["pages/base-template", "@jsMain"];
       Egraphs.page.mail = {url: "@footerData.mailUrl"};
       Egraphs.page.authenticityToken = "@authToken.value";
+      Egraphs.page.version = "@headerData.deploymentInformation.map(info => info.timestamp)";
       @headJs
     </script>
     @tags.analytics()
