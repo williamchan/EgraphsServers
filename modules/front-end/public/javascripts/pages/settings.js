@@ -28,15 +28,17 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
       userObj[splitpath[splitpath.length - 1]] = angular.copy(master[splitpath[splitpath.length - 1]]);
     };
 
-    $scope.reset();
-
     $scope.cancel = function (modelString, parentID) {
       var parent = $("#" + parentID);
       parent.addClass('none');
       parent.prev().removeClass('none');
       $scope.resetVal(modelString);
     };
+
+    $scope.reset();
   };
+
+  window.Controller = Controller;
 
   return {
     /**
@@ -45,11 +47,6 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
      * @return nothing
      */
     go: function () {
-      window.Controller = Controller;
-
-      angular.element(document).ready(function() {
-        angular.bootstrap(document);
-      });
       //Bindings for edit buttons
       $(document).ready(function () {
 
@@ -60,18 +57,6 @@ define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
           thisRow.next().removeClass('none');
           e.preventDefault();
         });
-
-//        $("#user_password_confirmation").change(function (e) {
-//          var password = $("#user_password");
-//          var password_confirmation = $("#user_password_confirmation");
-//
-//          if(password.val() === password_confirmation.val()) {
-//            $("#password_message").addClass("invisible");
-//          } else {
-//            $("#password_message").removeClass("invisible");
-//          }
-//        });
-
       });
     }
   };

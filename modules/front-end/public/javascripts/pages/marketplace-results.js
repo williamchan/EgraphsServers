@@ -1,5 +1,7 @@
 /*global angular console */
-define(["Egraphs", "pages/marketplace", "libs/angular", "libs/waypoints.min"], function (Egraphs, marketplace) {
+define(["Egraphs", "pages/marketplace", "services/logging", "module", "libs/angular", "libs/waypoints.min"],
+function (Egraphs, marketplace, logging, requireModule) {
+  var log = logging.namespace(requireModule.id);
   /**
    * Define controller for marketplace
    * @param $scope Global Angular Scope
@@ -33,6 +35,7 @@ define(["Egraphs", "pages/marketplace", "libs/angular", "libs/waypoints.min"], f
         $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + incr));
         count += incr;
         atBottom = false;
+        log("Loading celebrities");
         mixpanel.track("Loaded more results");
         if(count >= $scope.total) {
           mixpanel.track("Loaded all results");
@@ -100,8 +103,13 @@ define(["Egraphs", "pages/marketplace", "libs/angular", "libs/waypoints.min"], f
       }, {offset: 'bottom-in-view', continuous: false, triggerOnce : false});
     };
   });
+  
+  window.MarketplaceCtrl = marketplaceCtrl;
 
   return {
+    
+    ngModules:  ['marketplace'],
+
     go: function () {
       /**
        * The aim of most of the functions below is to retain the state of a search in the url bar.
@@ -110,13 +118,6 @@ define(["Egraphs", "pages/marketplace", "libs/angular", "libs/waypoints.min"], f
        * The same idea applies to removing a filter or any other changes, with the exception of the search box, since the previous
        * settings may not be applicable and give a confusing set of results.
        **/
-
-      // Angular Setup
-      window.MarketplaceCtrl = marketplaceCtrl;
-      angular.element(document).ready(function() {
-        angular.bootstrap(document, ['marketplace']);
-      });
-
 
      $(document).ready(function() {
         /**

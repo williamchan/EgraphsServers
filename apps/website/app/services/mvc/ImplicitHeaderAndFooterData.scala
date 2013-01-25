@@ -27,8 +27,8 @@ trait ImplicitHeaderAndFooterData {
       aboutUsLink = controllers.routes.WebsiteControllers.getAbout.url,
       faqLink = controllers.routes.WebsiteControllers.getFAQ.url,
       termsOfUseLink = controllers.routes.WebsiteControllers.getTerms.url,
-      privacyPolicyLink = controllers.routes.WebsiteControllers.getPrivacy.url
-//      careersPolicyLink = controllers.routes.WebsiteControllers.getCareers.url
+      privacyPolicyLink = controllers.routes.WebsiteControllers.getPrivacy.url,
+      mailUrl = controllers.routes.WebsiteControllers.postSubscribeEmail.url
     )
   }
 

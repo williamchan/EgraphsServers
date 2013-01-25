@@ -20,7 +20,7 @@
       <div class="offset4 span5">
       @{
         celebrityPublicName match {
-          case None => tags.landing.searchbox(url)
+          case None =>  tags.landing.searchbox(url)
           case Some(name) => tags.landing.get_started(url)
         }
       }

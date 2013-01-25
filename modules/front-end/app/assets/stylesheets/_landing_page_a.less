@@ -9,18 +9,28 @@
       font-size: 12px;
       padding-left: 5px;
     }
-    .search-control {
-      .celebrity-searchbox-container2();
-      overflow: hidden;
-      width: 300px;
-     
-      input {
-        width: 85%;
-      }
 
-      button {
-        float: right;
-      }
+    .newsletter-signup {
+      display: none;
+    }  
+    .search-form {
+      margin-left: auto;
+      margin-right: auto;
+      width: 300px;
+
+      .search-control {
+        .celebrity-searchbox-container2();
+        overflow: hidden;
+        width: 300px;
+       
+        input {
+          width: 85%;
+        }
+
+        button {
+          float: right;
+        }
+      }  
     }
 
   #landing-content-a {
@@ -96,6 +106,9 @@
             margin-left: 10px;
             position: absolute;
             text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
+            i {
+              vertical-align: middle;
+            }
           }
 
           .icon {
@@ -790,7 +803,6 @@
   }
 
   #content.landing {
-    // top: -75px;
     margin-top: -75px;
   }
 
@@ -811,6 +823,7 @@
         }
       }
     }   
+
     #landing-content-a {
       .switcher {
         right: 0;
@@ -919,6 +932,10 @@
       #browse ul {
         .content-columns(2);   
       }
+
+      .search-form {
+        display: none;
+      }
     } 
     #landing-stars {
       p.stars-link {
@@ -941,13 +958,30 @@
     
     }
 
-    form {
-      .search-control {
-        width: 270px;
-        input[type="search"] {
-          width: 83%;
+    .newsletter-signup {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 290px;
+
+      .input-append {
+        .celebrity-searchbox-container2();
+        width: 290px;
+      
+        input[type="email"] {
+          width: 244px;
         }
+      
+        .btn {
+          float: right;
+        } 
       }
+
+      label {
+        color: @orange;
+        font-size: 12px;
+        line-height: 1.0em;
+      }  
     }
   }  
 

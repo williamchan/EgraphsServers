@@ -22,6 +22,7 @@ import play.api.mvc.AnyContent
 import services.config.ConfigFileProxy
 import services.blobs.Blobs
 import services.db.Schema
+import services.mvc.marketplace.MarketplaceServices
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -66,7 +67,8 @@ case class TestWebsiteControllers @Inject()(
   override def breadcrumbData = instance[StorefrontBreadcrumbData]
   override def checkPurchaseField = instance[PurchaseFormChecksFactory]
   override def purchaseFormFactory = instance[PurchaseFormFactory]
-  override def formReaders = instance[FormReaders]  
+  override def formReaders = instance[FormReaders]
+  override def marketplaceServices = instance[MarketplaceServices]
 
   override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
