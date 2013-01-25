@@ -17,7 +17,7 @@ private[controllers] trait GetCustomerEgraphsApiEndpoint { this: Controller =>
     httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCustomerId.inAccount(account) { customer =>
         Action {
-          val egraphBundles: Iterable[FulfilledOrderBundle] = orderStore.findFulfilledForCustomer(customer)
+          val egraphBundles = orderStore.findFulfilledForCustomer(customer)
           Ok(Serializer.SJSON.toJSON(egraphBundles.map(_.renderedForApi)))
         }
       }
