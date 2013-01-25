@@ -8,6 +8,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import utils._
 import services.AppConfig
 import services.Finance.TypeConversions._
+import org.apache.commons.lang3.RandomStringUtils
 
 class CouponTests extends EgraphsUnitTest
   with SavingEntityIdLongTests[Coupon]
@@ -50,18 +51,18 @@ class CouponTests extends EgraphsUnitTest
     Coupon(code = code.toUpperCase).save().code should be(code.toLowerCase)
   }
   
-  "save" should "throw exception if a valid coupon with the same code already exists" in {
+  it should "throw exception if a valid coupon with the same code already exists" in {
     val code = Coupon().save().code
     val exception = intercept[IllegalArgumentException] {Coupon(code = code).save()}
     exception.getLocalizedMessage should include("A valid coupon with that code already exists")
   }
   
-  "save" should "throw exception if discountType is Flat but discountAmount is not greater than 0" in {
+  it should "throw exception if discountType is Flat but discountAmount is not greater than 0" in {
     val exception = intercept[IllegalArgumentException] {Coupon(discountAmount = 0).withDiscountType(Flat).save()}
     exception.getLocalizedMessage should include("For flat coupons, discount amount must be greater than 0")
   }
   
-  "save" should "throw exception if coupon is one-use and percentage but discountAmount is outside 0-100 range" in {
+  it should "throw exception if coupon is one-use and percentage but discountAmount is outside 0-100 range" in {
     val exception0 = intercept[IllegalArgumentException] {Coupon(discountAmount = 0).withDiscountType(Percentage).withUsageType(OneUse).save()}
     exception0.getLocalizedMessage should include("Discount percentage amount must be between 0 and 100")
     
@@ -71,7 +72,7 @@ class CouponTests extends EgraphsUnitTest
     Coupon(discountAmount = 100).withDiscountType(Percentage).withUsageType(OneUse).save()
   }
   
-  "save" should "throw exception if coupon is unlimited and percentage but discountAmount is outside 0-25 range" in {
+  it should "throw exception if coupon is unlimited and percentage but discountAmount is outside 0-25 range" in {
     val exception0 = intercept[IllegalArgumentException] {Coupon(discountAmount = 0).withDiscountType(Percentage).withUsageType(Unlimited).save()}
     exception0.getLocalizedMessage should include("Discount percentage amount must be between 0 and 25 for unlimited use coupons")
     
@@ -97,7 +98,7 @@ class CouponTests extends EgraphsUnitTest
     coupon100.calculateDiscount(fiftyDollars) should be(fiftyDollars)
   }
 
-  "calculateDiscount" should "calculate percentage discounts" in {
+  it should "calculate percentage discounts" in {
     val fiveDollars = BigDecimal(5).toMoney(CurrencyUnit.USD)
     val fiftyDollars = BigDecimal(50).toMoney(CurrencyUnit.USD)
     
@@ -115,7 +116,7 @@ class CouponTests extends EgraphsUnitTest
     store.findByCode(coupon.code.toUpperCase).toList should be(List(coupon))
   }
   
-  "findByCode" should "filter by date when activeByDate is applied" in {
+  it should "filter by date when activeByDate is applied" in {
     val coupon = newEntity.save()
     val code = coupon.code
     /*expired coupon*/ Coupon(code = code, startDate = new Timestamp(TestData.jan_01_2012.getTime), endDate = new Timestamp(TestData.jan_08_2012.getTime), isActive = false).save()
@@ -125,7 +126,7 @@ class CouponTests extends EgraphsUnitTest
   
   "findValid" should "return a coupon matching code that are active by date and flag" in {
     val coupon = newEntity.save()
-    val code = "mycode"
+    val code = RandomStringUtils.randomAlphabetic(Coupon.defaultCodeLength)
     /*inactive coupon*/ Coupon(code = code, isActive = false).save()
     /*expired coupon*/ Coupon(code = code, startDate = new Timestamp(TestData.jan_01_2012.getTime), endDate = new Timestamp(TestData.jan_08_2012.getTime)).save()
     /*future coupon */ Coupon(code = code, startDate = new Timestamp(TestData.tomorrow.getTime), endDate = new Timestamp(TestData.twoDaysHence.getTime)).save()
