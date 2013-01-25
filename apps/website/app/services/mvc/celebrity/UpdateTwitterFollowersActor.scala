@@ -26,16 +26,9 @@ import services.http.twitter.TwitterProvider
 import services.logging.Logging
 import twitter4j.TwitterException
 
-private[celebrity] class UpdateTwitterFollowersActor @Inject() (
-  db: DBSession,
-  cacheFactory: CacheFactory,
-  celebrityStore: CelebrityStore) extends Actor with Logging {
-
-  import UpdateTwitterFollowersActor.{ twitter, UpdateTwitterFollowers, UpdateAllTwitterFollowers, TwitterUserLookupResponse, updatePeriod, resultsCacheKey }
-  implicit val timeout: Timeout = 30 seconds
-
-  private val TWITTER_MAX_LOOKUP = 100
-
+// for single celebrity batch
+private[celebrity] class UpdateBatchTwitterFollowersActor() extends Actor with Logging {
+  import UpdateTwitterFollowersActor.{ twitter, UpdateTwitterFollowers, TwitterUserLookupResponse }
   protected def receive = {
     case UpdateTwitterFollowers(celebritiesWithTwitter, twitterFollowersAgent) => {
       lazy val celebrityNamesAndTwitter = celebritiesWithTwitter.map(celebrity => celebrity.publicName + " (@" + celebrity.twitterUsername.get + ")").mkString(", ")
@@ -73,7 +66,21 @@ private[celebrity] class UpdateTwitterFollowersActor @Inject() (
 
       sender ! TwitterUserLookupResponse(twitterFollowers)
     }
+  }
+}
 
+// for all celebrities
+private[celebrity] class UpdateTwitterFollowersActor @Inject() (
+  db: DBSession,
+  cacheFactory: CacheFactory,
+  celebrityStore: CelebrityStore) extends Actor with Logging {
+
+  import UpdateTwitterFollowersActor.{ TwitterUserLookupResponse, UpdateTwitterFollowers, UpdateAllTwitterFollowers, updatePeriod, resultsCacheKey }
+  implicit val timeout: Timeout = 30 seconds
+
+  private val TWITTER_MAX_LOOKUP = 100
+
+  protected def receive = {
     case UpdateAllTwitterFollowers(twitterFollowersAgent) => {
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
@@ -89,18 +96,23 @@ private[celebrity] class UpdateTwitterFollowersActor @Inject() (
         val futures = for {
           celebritiesToLookup <- celebrities.sliding(TWITTER_MAX_LOOKUP, TWITTER_MAX_LOOKUP)
         } yield {
-          UpdateTwitterFollowersActor.singleton ask UpdateTwitterFollowers(celebritiesToLookup, twitterFollowersAgent)
+          val twitterBatchActor = Akka.system.actorOf(Props[UpdateBatchTwitterFollowersActor], name = "twitterbatchactor")
+          twitterBatchActor ask UpdateTwitterFollowers(celebritiesToLookup, twitterFollowersAgent)
         }
 
-        for {
-          future <- futures
-          TwitterUserLookupResponse(celebrityIdsToFollowerCounts) <- future
-        } {
-          twitterFollowersAgent.alter(map => map ++ celebrityIdsToFollowerCounts)(timeout)
-        }
+        val data = {
+          for {
+            future <- futures
+            celebrityIdToFollowerCount <- Await.result(future, 60 seconds).asInstanceOf[TwitterUserLookupResponse].celebrityIdsToFollowerCounts
+          } yield {
+            celebrityIdToFollowerCount
+          }
+        }.toMap
 
-        twitterFollowersAgent.await(5 minutes)
+        data
       }
+
+      twitterFollowersAgent.update(twitterFollowerCounts)
 
       // Send back completion. This is mostly so that the tests won't sit there waiting forever
       // for a response.
@@ -130,7 +142,7 @@ object UpdateTwitterFollowersActor extends Logging {
     Akka.system.actorOf(Props(AppConfig.instance[UpdateTwitterFollowersActor]))
   }
   private[celebrity] val updatePeriod = 1 day
-  private[celebrity] val resultsCacheKey = "twitter-followers"
+  private[celebrity] val resultsCacheKey = "twitter-followers-actor-data"
   private[celebrity] case class UpdateAllTwitterFollowers(twitterFollowersAgent: Agent[Map[Long, Int]])
   private[celebrity] case class UpdateTwitterFollowers(celebrities: Iterable[Celebrity], twitterFollowersAgent: Agent[Map[Long, Int]])
   case class TwitterUserLookupResponse(celebrityIdsToFollowerCounts: Map[Long, Int])
