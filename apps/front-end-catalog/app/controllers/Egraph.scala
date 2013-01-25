@@ -14,14 +14,14 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
   //
   def egraph() = Action {
     Ok(views.html.frontend.egraph(
-      mp4Url = "https://egraphs-demo.s3.amazonaws.com/egraphs/647/egraph.mp4",
-      videoPosterUrl = "",
+      mp4Url = EgraphsAssets.at("videos/sample_egraph_video.mp4").url,
+      videoPosterUrl = EgraphsAssets.at("images/sample_egraph_poster.jpg").url,
       celebrityName = "Sergio Romo",
       celebrityTagline = "San Francisco Giants",
       recipientName = "Jordan",
       privacySetting = "Public",
       messageToCelebrity = Some("Hey Sergio! You throw a mean pitch. What awesome beard trimming tips do you have?"),
-      productIconUrl = "https://egraphs-demo.s3.amazonaws.com/product/17/icon_20120503025254786/master.png",
+      productIconUrl = EgraphsAssets.at("images/sample_product_icon.png").url,
       signedOnDate = "January 1, 2013",
       thisPageLink = "https://www.egraphs.com/stars",
       shareOnFacebookLink = "",
