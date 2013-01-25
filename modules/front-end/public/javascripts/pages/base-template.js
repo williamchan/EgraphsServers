@@ -23,19 +23,16 @@ define(["page", "window", "services/logging", "module", "services/ng/mail-servic
     };
   };
 
-  // Define dependencies. 
+  // Define dependencies.
   mailerController.$inject = ['$scope', 'subscribe'];
   modalController.$inject = ['$scope', 'subscribe'];
   window.MailerController = mailerController;
   window.ModalController =  modalController;
-  Egraphs.page.ngModules.push('MailServices');
 
   return {
-    /**
-     * Executes all the scripts for the base template.
-     *
-     * @return nothing
-     */
+
+    ngModules: ['MailServices'],
+
     go: function () {
 
       $(document).ready(function(){

@@ -105,9 +105,11 @@ function (Egraphs, marketplace, logging, requireModule) {
   });
   
   window.MarketplaceCtrl = marketplaceCtrl;
-  Egraphs.page.ngModules.push('marketplace');
 
   return {
+    
+    ngModules:  ['marketplace'],
+
     go: function () {
       /**
        * The aim of most of the functions below is to retain the state of a search in the url bar.
