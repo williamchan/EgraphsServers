@@ -8,6 +8,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import utils._
 import services.AppConfig
 import services.Finance.TypeConversions._
+import org.apache.commons.lang3.RandomStringUtils
 
 class CouponTests extends EgraphsUnitTest
   with SavingEntityIdLongTests[Coupon]
@@ -125,7 +126,7 @@ class CouponTests extends EgraphsUnitTest
   
   "findValid" should "return a coupon matching code that are active by date and flag" in {
     val coupon = newEntity.save()
-    val code = "mycode"
+    val code = RandomStringUtils.randomAlphabetic(Coupon.defaultCodeLength)
     /*inactive coupon*/ Coupon(code = code, isActive = false).save()
     /*expired coupon*/ Coupon(code = code, startDate = new Timestamp(TestData.jan_01_2012.getTime), endDate = new Timestamp(TestData.jan_08_2012.getTime)).save()
     /*future coupon */ Coupon(code = code, startDate = new Timestamp(TestData.tomorrow.getTime), endDate = new Timestamp(TestData.twoDaysHence.getTime)).save()
