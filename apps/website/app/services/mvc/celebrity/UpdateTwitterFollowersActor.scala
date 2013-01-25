@@ -94,10 +94,10 @@ private[celebrity] class UpdateTwitterFollowersActor @Inject() (
 
         // Get all twitter follower counts
         val futures = for {
-          celebritiesToLookup <- celebrities.sliding(TWITTER_MAX_LOOKUP, TWITTER_MAX_LOOKUP)
+          celebritiesToLookup <- celebrities.sliding(TWITTER_MAX_LOOKUP, TWITTER_MAX_LOOKUP).zipWithIndex
         } yield {
-          val twitterBatchActor = Akka.system.actorOf(Props[UpdateBatchTwitterFollowersActor], name = "twitterbatchactor")
-          twitterBatchActor ask UpdateTwitterFollowers(celebritiesToLookup, twitterFollowersAgent)
+          val twitterBatchActor = Akka.system.actorOf(Props[UpdateBatchTwitterFollowersActor], name = "twitterbatchactor" + celebritiesToLookup._2)
+          twitterBatchActor ask UpdateTwitterFollowers(celebritiesToLookup._1, twitterFollowersAgent)
         }
 
         val data = {
