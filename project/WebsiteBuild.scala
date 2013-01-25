@@ -79,7 +79,7 @@ object WebsiteBuild extends Build {
     val websiteBaseDir = file(".") / "apps" / "website"
 
     val sep = java.io.File.separator
-
+    val timestamp = new java.util.Date().getTime
     val main = PlayProject(
       appName,
       appVersion,
@@ -105,7 +105,7 @@ object WebsiteBuild extends Build {
         "scala-guice" at "https://jenkins-codingwell.rhcloud.com/job/Scala-Guice/lastSuccessfulBuild/artifact/repo"
       ),
 
-      CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml -Dpidfile.path=/dev/null -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$app_dir -XX:ErrorFile=$app_dir/java_error%p.log",
+      CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml -Dpidfile.path=/dev/null -DdeploymentTime=" + timestamp + " -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$app_dir -XX:ErrorFile=$app_dir/java_error%p.log",
 
       CloudBees.deployParams := Map("jvmPermSize" -> "200")
     )
