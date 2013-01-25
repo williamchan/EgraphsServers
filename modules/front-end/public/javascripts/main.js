@@ -13,7 +13,7 @@ require.config({
 // them by executing the 'go' method which they better have.
 var Egraphs = Egraphs || {};
 Egraphs.page = Egraphs.page || {};
-
+Egraphs.page.ngModules = [];
 // Provide the Egraphs scope as a module to any future require() calls
 define("window", [], function() { return window; });
 define("Egraphs", [], function() { return Egraphs; });
@@ -29,4 +29,9 @@ require(Egraphs.page.jsMain, function() {
     mainModule = mainModules[i];
     mainModule.go();
   }
+  // Bootstrap angularJS. Any module dependecires should be registered like this in the appropiate javascript file
+  // Egraphs.page.ngModules.push('marketplace');
+  angular.element(document).ready(function() {
+   angular.bootstrap(document, Egraphs.page.ngModules);
+  });
 });
