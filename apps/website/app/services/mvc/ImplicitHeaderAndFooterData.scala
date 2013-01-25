@@ -1,6 +1,6 @@
 package services.mvc
 
-import models.frontend.header.{HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
+import models.frontend.header.{DeploymentInformation, HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
 import services.http.EgraphsSession.Conversions._
 import play.api.mvc.Session
@@ -19,7 +19,9 @@ trait ImplicitHeaderAndFooterData {
   protected def bulkMailList: BulkMailList
 
   implicit def siteHeaderData(implicit request: RequestHeader): HeaderData = {
-    HeaderData(loggedInStatus=getHeaderLoggedInStatus(request.session))
+    HeaderData(loggedInStatus=getHeaderLoggedInStatus(request.session),
+      deploymentInformation = Option(DeploymentInformation(System.getProperty("deploymentTime")))
+    )
   }
 
   implicit def siteFooterData: FooterData = {
