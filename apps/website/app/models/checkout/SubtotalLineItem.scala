@@ -1,7 +1,7 @@
 package models.checkout
 
 import models.checkout.checkout.Conversions._
-import models.enums.{CodeType, LineItemNature}
+import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.{CurrencyUnit, Money}
 
 /**
@@ -24,7 +24,7 @@ case class SubtotalLineItem (
   override def transact(checkout: Checkout) = this
   override def checkoutId = -1
   override def withCheckoutId(newCheckoutId: Long) = this
-  override def subItems = Nil
+
 }
 
 
@@ -34,7 +34,7 @@ object SubtotalLineItemType extends SubtotalLineItemType {
   override val id: Long = -1L
   override val description = "Subtotal"
   override val nature = LineItemNature.Summary
-  override val codeType = CodeType.Subtotal
+  override val codeType = CheckoutCodeType.Subtotal
   override val toJson = ""
 
   /**

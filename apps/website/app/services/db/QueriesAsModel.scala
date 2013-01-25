@@ -4,7 +4,9 @@ import org.squeryl.{Table, KeyedEntity}
 import org.squeryl.PrimitiveTypeMode._
 
 /**
- * A couple utility entities for querying [[org.squeryl.KeyedEntity]]s
+ * A couple utility methods for querying [[org.squeryl.KeyedEntity]]s. This trait is for the
+ * original stype of models which are KeyedEntities, as opposed to the new style in which
+ * the model takes a separate KeyedEntity type as an argument.
  *
  * Usage:
  * {{{
@@ -21,7 +23,7 @@ import org.squeryl.PrimitiveTypeMode._
  *   }
  * }}}
  */
-trait Queries[KeyT, T <: KeyedEntity[KeyT]] {
+trait QueriesAsModel[KeyT, ModelT <: KeyedEntity[KeyT]] {
   /**
    * Locates an object by its id.
    *
@@ -29,7 +31,7 @@ trait Queries[KeyT, T <: KeyedEntity[KeyT]] {
    *
    * @return the located object or None
    */
-  def findById(id: KeyT): Option[T]= {
+  def findById(id: KeyT): Option[ModelT]= {
     table.lookup(id)
   }
 
@@ -42,7 +44,7 @@ trait Queries[KeyT, T <: KeyedEntity[KeyT]] {
    *
    * @throws a RuntimeException with ID information if it failed to find the entity.
    */
-  def get(id: KeyT)(implicit m: Manifest[T]): T = {
+  def get(id: KeyT)(implicit m: Manifest[ModelT]): ModelT = {
     findById(id).getOrElse(
       throw new RuntimeException(
         "DB contained no instances of class " + m.erasure.getName + " with id="+id
@@ -53,5 +55,5 @@ trait Queries[KeyT, T <: KeyedEntity[KeyT]] {
   //
   // Abstract members
   //
-  protected def table: Table[T]
+  protected def table: Table[ModelT]
 }

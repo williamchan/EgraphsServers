@@ -88,7 +88,7 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
 
   def saveLineItem(item: ItemT): ItemT = item.transact(checkout).asInstanceOf[ItemT]
 
-  lazy val checkout = newSavedCheckout
+  lazy val checkout = newSavedCheckout()
 }
 
 
@@ -98,15 +98,15 @@ trait CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[
 ] extends CanInsertAndUpdateAsThroughServicesWithLongKeyTests[ItemT, LineItemEntity]
 { this: FlatSpec with ShouldMatchers with LineItemTests[_ <: LineItemType[_], ItemT] =>
 
+  import LineItemTestData._
+
   // NOTE: casting is unfortunate but seems unavoidable
   override def newModel: ItemT = newLineItem
   override def transformModel(model: ItemT) = model.withAmount(model.amount.plus(1.0)).asInstanceOf[ItemT]
   override def restoreModel(id: Long): Option[ItemT] = restoreLineItem(id)
   override def saveModel(model: ItemT): ItemT = {
-    if (model.id > 0) {
-      model.update()
-    } else {
-      model.insert()
+    if (model.id > 0) { model.update() } else {
+      model.transact(newSavedCheckout()).asInstanceOf[ItemT]
     }
   }
 
@@ -141,7 +141,9 @@ object LineItemTestData {
   def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
   def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
 
-  def newSavedCheckout = Checkout(Seq(randomGiftCertificateType), zipcode, Some(newSavedCustomer())).insert()
+  def newCheckout = Checkout(Seq(randomGiftCertificateType), zipcode, Some(newSavedCustomer()))
+  def newSavedCheckout() = newCheckout.insert()
+  def newTransactedCheckout = newCheckout.transact(Some(randomCashTransactionType))
 
   def payment: StripeTestPayment = {
     val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap(); pment

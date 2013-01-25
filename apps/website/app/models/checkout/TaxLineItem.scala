@@ -26,7 +26,7 @@ case class TaxLineItem private (
 
   override def itemType: TaxLineItemType = TaxLineItemType(_typeEntity, _entity)
   override def domainObject: Money = amount
-  override def subItems: LineItems = Nil
+
 
   override def toJson: String = ""
 

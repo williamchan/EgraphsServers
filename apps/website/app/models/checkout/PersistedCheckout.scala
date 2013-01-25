@@ -23,7 +23,7 @@ case class PersistedCheckout(
   override lazy val customer: Option[Customer] = services.customerStore.findById(customerId)
 
   override lazy val zipcode: Option[String] = {
-    _lineItems(CodeType.CashTransaction).headOption flatMap (_.domainObject.billingPostalCode)
+    _lineItems(CheckoutCodeType.CashTransaction).headOption flatMap (_.domainObject.billingPostalCode)
   }
 
   /** all LineItemTypes */
@@ -64,4 +64,12 @@ case class PersistedCheckout(
   //
   /** restored items from db */
   protected lazy val _lineItems: LineItems = services.lineItemStore.getItemsByCheckoutId(id)
+}
+
+object PersistedCheckout {
+  /** convenience constructor */
+  def apply(checkout: Checkout) = {
+    require(checkout.id > 0, "PersistedCheckout requires a saved checkout entity.")
+    new PersistedCheckout(checkout._entity)
+  }
 }

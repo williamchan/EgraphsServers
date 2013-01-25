@@ -47,13 +47,6 @@ trait InsertsAndUpdates[T <: KeyedEntity[_]] extends InsertAndUpdateHooks[T] {
   protected def table: Table[T]
 }
 
-@deprecated(
-  "SER-499",
-  """Remove after merging SER-499. This is only here for backwards-compatibility with all model
-     classes that used to unnecessarily specify both KeyT and T."""
-)
-trait InsertsAndUpdatesWithKey[KeyT, T <: KeyedEntity[KeyT]] extends InsertsAndUpdates[T]
-
 
 trait CanInsertAndUpdateThroughServices[T <: KeyedEntity[_]] { this: T =>
   def services: InsertsAndUpdates[T]

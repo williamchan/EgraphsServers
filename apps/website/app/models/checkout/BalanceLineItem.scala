@@ -2,7 +2,7 @@ package models.checkout
 
 import org.joda.money.Money
 import models.checkout.checkout.Conversions._
-import models.enums.{CodeType, LineItemNature}
+import models.enums.{CheckoutCodeType, LineItemNature}
 
 case class BalanceLineItem(amount: Money) extends LineItem[Money] {
 
@@ -17,7 +17,7 @@ case class BalanceLineItem(amount: Money) extends LineItem[Money] {
   override def transact(checkout: Checkout) = this
   override def checkoutId = -1
   override def withCheckoutId(newCheckoutId: Long) = this
-  override def subItems = Nil
+
 
 }
 
@@ -26,7 +26,7 @@ object BalanceLineItemType extends BalanceLineItemType {
   override val id: Long = -1L
   override val description = "Balance"
   override val nature = LineItemNature.Summary
-  override val codeType = CodeType.Balance
+  override val codeType = CheckoutCodeType.Balance
   override val toJson = ""
 
 
@@ -35,7 +35,7 @@ object BalanceLineItemType extends BalanceLineItemType {
 
     if (pendingResolution.ofNatures(Payment, Summary).isEmpty) {
        Some {
-        val total = resolved(CodeType.Total).head
+        val total = resolved(CheckoutCodeType.Total).head
         val payments = resolved(Payment)
         val difference = total.amount plus payments.sumAmounts // payments to us are negative
         Seq(BalanceLineItem(difference))

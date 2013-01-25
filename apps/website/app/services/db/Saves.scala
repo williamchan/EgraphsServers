@@ -5,7 +5,6 @@ import org.squeryl.dsl.ast.{LogicalBoolean, EqualityExpression, UpdateAssignment
 import org.squeryl.PrimitiveTypeMode._
 import sun.security.krb5.internal.ktab.KeyTab
 
-// TODO(SER-499): Is this usage up to date? Check others as well.
 /**
  * Gives an object the ability to save instances of the associated type, eg Person.save(personInstance).
  * Also, provides hooks to transform the entity before saving it.
@@ -55,7 +54,7 @@ trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
 
 trait Saves[KeyT, T <: KeyedEntity[KeyT]]
   extends InsertsAndUpdates[T]
-  with Queries[KeyT, T]
+  with QueriesAsModel[KeyT, T]
   with InsertAndUpdateHooks[T]
 {
 

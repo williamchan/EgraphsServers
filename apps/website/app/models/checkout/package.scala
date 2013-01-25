@@ -19,8 +19,8 @@ package object checkout {
     //
     implicit def itemTypeSeqToMemberDSL(types: LineItemTypes) =
       new HasNatureAndCodeTypeToMemberDSL(types) {
-        def apply(codeType: CodeType): LineItemTypes = ofCodeType(codeType)
-        def ofCodeType(codeType: CodeType): LineItemTypes = types.filter(_.codeType == codeType)
+        def apply(codeType: CheckoutCodeType): LineItemTypes = ofCodeType(codeType)
+        def ofCodeType(codeType: CheckoutCodeType): LineItemTypes = types.filter(_.codeType == codeType)
       }
 
     implicit def lineItemSeqToMemberDSL(items: LineItems) =
@@ -42,9 +42,9 @@ package object checkout {
       def notOfNature(nature: LineItemNature): Seq[T] = elements.filterNot(_.nature == nature)
       def notOfNatures(natures: LineItemNature*): Seq[T] = elements.filterNot(natures contains _.nature)
 
-      def ofCodeTypes(codeTypes: CodeType*): Seq[T] = elements.filter(codeTypes contains _.codeType)
-      def notOfCodeType(codeType: CodeType): Seq[T] = elements.filterNot(_.codeType == codeType)
-      def notofCodeTypes(codeTypes: CodeType*): Seq[T] = elements.filterNot(codeTypes contains _.codeType)
+      def ofCodeTypes(codeTypes: CheckoutCodeType*): Seq[T] = elements.filter(codeTypes contains _.codeType)
+      def notOfCodeType(codeType: CheckoutCodeType): Seq[T] = elements.filterNot(_.codeType == codeType)
+      def notofCodeTypes(codeTypes: CheckoutCodeType*): Seq[T] = elements.filterNot(codeTypes contains _.codeType)
     }
   }
 }

@@ -88,7 +88,6 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   /** for services to return a persisted checkout as the correct type */
   def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout
 
-  def flattenLineItems: LineItems = { lineItems.flatMap(_.flatten) }
 
   /**
    * Charges or credits customer as needed through the information in the txnType, transacts all the
@@ -99,104 +98,138 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
    * @return failure, this if not _dirty, or the resulting PersistedCheckout
    */
   def transact(txnType: Option[CashTransactionLineItemType]): FailureOrCheckout = {
-    if (pendingTypes.isEmpty){
-      Right(this)
+    def nothingToTransact = pendingTypes.isEmpty
+    def paymentMissing = !(balance.amount.isZero || txnType.isDefined)
+    def customerMissing = !customer.isDefined
 
-    } else if (!(balance.amount.isZero || txnType.isDefined)) {
-      Left(CheckoutFailedCashTransactionMissing(this))
+    if (nothingToTransact) { Right(this) }
+    else if (paymentMissing) { Left(CheckoutFailedCashTransactionMissing(this)) }
+    else if (customerMissing) { Left(CheckoutFailedCustomerMissing(this, txnType)) }
+    else {
+      // save checkout
+      val savedCheckout = this.save()
 
-    } else {
-      /**
-       * Set savepoint to rollback to if transaction fails at some point after the checkout is
-       * saved. For example, if a product is sold out, the whole checkout will be rolled back
-       * because we don't want to charge the customer for products that didn't get stored or not
-       * charge them for products that did.
-       */
-      val conn = services.currentTxnConnectionFactory()
-      val savepoint = conn.setSavepoint()
-
-      // save checkout and make charge
-      val savedCheckout = if (_persisted) this.update() else this.insert()
-      val txnItem = txnType.flatMap(_.lineItems( Seq(balance) )) match {
-        // Type-erasure on Seq(item) not an issue unless more Payment-natured line items are added
-        case Some(Seq(item: CashTransactionLineItem)) => Some( item.makeCharge(savedCheckout) )
+      // resolve transaction item and make charge (or return error)
+      val txnItem = resolveCashTransaction(txnType) match {
+        case Some(item) => Some( item.makeCharge(savedCheckout) )
         case _ => return Left{ CheckoutFailedCashTransactionResolutionError(this, txnType) }
       }
 
-      try {
-        // transact the new contents of the checkout, plus the cash transaction
-        (txnItem ++ pendingItems).map(_.transact(savedCheckout))
-      } catch {
-        // refund charge, rollback any of the newly inserted items that didn't fail, and return failure details
-        case e: InsufficientInventoryException => conn.rollback(savepoint)
-          return Left{ CheckoutFailedInsufficientInventory(this, txnItem, txnItem.flatMap(_.abortTransaction())) }
+      def refundedCharge = txnItem flatMap (_.abortTransaction())
 
-        case e: Exception => conn.rollback(savepoint)
-          return Left{ CheckoutFailedError(this, txnItem, txnItem.flatMap(_.abortTransaction())) }
+      /**
+       * Transact items with a savepoint to fall back on if transacting line items fails.
+       * Note that charge must also be refunded in error cases so that no unpaid items or
+       * payments for nonexistent item exist afterwards.
+       */
+      tryWithSavepoint {
+        val allItems = txnItem.toSeq ++ pendingItems
+        transactItemsForCheckout(allItems)(savedCheckout)
+
+        Right(PersistedCheckout(savedCheckout))
+
+      } catchAndRollback {
+        case e: InsufficientInventoryException =>
+          Left { CheckoutFailedInsufficientInventory(this, txnItem, refundedCharge) }
+
+        case e: Exception =>
+          Left { CheckoutFailedError(this, txnItem, refundedCharge) }
       }
-
-      Right(PersistedCheckout(savedCheckout._entity))
     }
   }
 
+
   /**
-   * Resolves the given LineItemTypes into LineItems. Complexity is proportional to the sum of
-   * unresolved types in each pass, which is O(n^2) in the worst case, but typically much better
-   * than that, and very unlikely to affect application performance since Checkouts are unlikely
-   * to become very large.
+   * Resolves the given LineItemTypes into LineItems. Optionally takes some line items as a context
+   * for resolving the given types. For example:
    *
-   * @param types
-   * @param preexistingItems
-   * @return
+   * {{{
+   *   // supposing fooItem is a transacted LineItem in our checkout
+   *   val refundFoo = RefundLineItemType(fooItem.id)
+   *
+   *   // generate the set of lineItems including the refund for fooItem
+   *   val itemsWithRefundedFoo = resolveItems(Seq(refundFoo), lineItems)
+   * }}}
+   *
+   * Note that resolveTypes doesn't take care of managing Summaries (total, subtotal, balance); it
+   * only handles resolution, no higher level semantics. (To update summaries, you would want to
+   * resolve the summaries' types again with the preexisting items having the old summaries filtered
+   * out.)
+   *
+   * todo(ce-16): filter out summaries from preexistingItems before resolving when summary types are
+   * being resolved if managing summaries becomes problematic. Perhaps add a way for items to
+   * declare that there should be at most one in a checkout.
+   *
+   * @param types `LineItemType`s to be resolved
+   * @param preexistingItems already resolved `LineItem`s
+   * @return newly resolved items with preexisting items
    */
   protected def resolveTypes(types: LineItemTypes, preexistingItems: LineItems = Nil): LineItems = {
-
-    case class ResolutionPass(resolved: LineItems = preexistingItems, unresolved: LineItemTypes) {
+    /**
+     * Handles the logic of a single pass over the unresolved types. Iterates over unresolved types,
+     * calling their `lineItems` method, and returns a ResolutionPass with the newly resolved items
+     * and remaining unresolved types.
+     */
+    case class ResolutionPass(resolvedItems: LineItems = preexistingItems, unresolvedTypes: LineItemTypes) {
 
       /** execute a pass over the unresolved items, return resulting ResolutionPass */
       def execute: ResolutionPass = {
+
         /**
-         * Iterates over unresolved types in O(n) time (compared to O(n^2) time of simply iterating
-         * and filtering out current element to pass rest into its lineItems method).
+         * The point of this is to reduce the amount of O(n) operations from a naive approach to
+         * get the average case less than O(n^2).
          *
-         * @param acc - accumulator of line items, should include previously resolved
-         * @param before - item types preceding current type in iteration from list of all types
-         * @param curr - current line item type being iterated over
-         * @param after - remaining line item types to be iterated over
+         * @param prevResolved accumulator of items resolved over iteration
+         * @param prevAttempted attempted but unresolved types
+         * @param current currently attempting to resolve
+         * @param unattempted yet to be tried
          * @return - ResolutionPass of resulting resolved items and unresolved types
          */
-        def iterate(acc: LineItems = resolved)(     // accumulator is initially the already resolved items
-          before: LineItemTypes = Nil,              // first iteration has nothing 'before' current type
-          curr: LineItemType[_] = unresolved.head,  // current type in pass is initially the head
-          after: LineItemTypes = unresolved.tail    // naturally, tail
+        def iterate(prevResolved: LineItems = resolvedItems)(
+          prevAttempted: LineItemTypes = Nil,
+          current: LineItemType[_] = unresolvedTypes.head,
+          unattempted: LineItemTypes = unresolvedTypes.tail
         ): ResolutionPass = {
+          def merge(a: LineItemTypes, b: LineItemTypes) = if (a.length < b.length) {a ++ b} else {b ++ a}
 
-          /**
-           * if current type resolves, add result to acc, otherwise add current type to before (save for next pass)
-           * if more types exist to be iterated, recurse, otherwise return as resolution pass
-           */
-          val currResolved = curr.lineItems(acc, before ++ after)
-          (after, currResolved) match {
-            case (Nil, None) => ResolutionPass(acc, curr +: before)
-            case (Nil, Some(res)) => ResolutionPass(res ++ acc,  before)
-            case (next :: rest, None) => iterate(acc)(curr +: before, next, rest)
-            case (next :: rest, Some(res)) => iterate(res ++ acc)( before, next, rest)
+          val otherTypes = merge(prevAttempted, unattempted)
+          val itemsFromCurrent = current.lineItems(prevResolved, otherTypes)
+
+          val resolvedNow = itemsFromCurrent.getOrElse(Nil) ++ prevResolved
+          val attemptedNow =
+            if (itemsFromCurrent isDefined) prevAttempted
+            else current +: prevAttempted
+
+          unattempted match {
+            case next :: rest => iterate(prevResolved = resolvedNow)(
+              prevAttempted = attemptedNow,
+              current = next,
+              unattempted = rest
+            )
+            case Nil => ResolutionPass(
+              resolvedItems = resolvedNow,
+              unresolvedTypes = prevAttempted
+            )
           }
         }
 
-        if (unresolved.isEmpty) this  // no additional to resolve
-        else iterate()()              // iterate over unresolved
+        if (unresolvedTypes.isEmpty) this  // nothing to iterate over
+        else iterate()()                   // start iteration
       }
 
       /** fast equality check */
       override def equals(that: Any): Boolean = that match {
-        case ResolutionPass(thoseResolved, thoseUnresolved) =>
-          (resolved.length, unresolved.length) == (thoseResolved.length, thoseUnresolved.length)
+        case thatPass: ResolutionPass => this.argLengths == thatPass.argLengths
         case _ => false
       }
+
+      protected def argLengths = (resolvedItems.length, unresolvedTypes.length)
     }
 
-    /** repeatedly execute ResolutionPasses until all types resolved or no change occurs (cycle found) */
+    /**
+     * Handles the logic of repeated iteration of unresolved types; executes ResolutionPasses until
+     * all types resolved or no change occurs (cycle found).
+     */
     def resolve(pass: ResolutionPass): LineItems = {
       pass.execute match {
         case ResolutionPass(allItems, Nil) => allItems
@@ -206,8 +239,60 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
       }
     }
 
-    resolve(ResolutionPass(unresolved = types))
+    // initiate resolution
+    resolve(ResolutionPass(unresolvedTypes = types))
   }
+
+
+  //
+  // Helper methods
+  //
+  def save(): Checkout = if (id > 0) { this.update() } else { this.insert() }
+
+  /** get the line item of the given `CashTransactionLineItemType` as applied to this checkout */
+  private def resolveCashTransaction(txnType: Option[CashTransactionLineItemType])
+  : Option[CashTransactionLineItem] = {
+    txnType.flatMap { _.lineItems( Seq(balance) ) }
+      .flatMap { _.headOption }
+  }
+
+  /**
+   * Transact the given line items against the given checkout
+   *
+   * @param items to be transacted
+   * @param checkout a saved checkout, passed to each item's `transact`
+   * @return transacted line items
+   */
+  private def transactItemsForCheckout(items: LineItems)(checkout: Checkout) = {
+    items map (_.transact(checkout))
+  }
+
+  /**
+   * try/catch that sets a savepoint before try and rollsback if exception thrown
+   * Use:
+   * {{{
+   *   tryWithSavepoint {
+   *     // do some db stuff and other things with side effects
+   *   } catchAndRollback {
+   *     case e: Exception =>
+  *        // deal with side effects, rollback handled for you
+   *   }
+   * }}}
+   */
+  private def tryWithSavepoint(tryBlock: => FailureOrCheckout) = new {
+    def catchAndRollback (catchBlock: PartialFunction[Throwable, Left[CheckoutFailed, Nothing]]) = {
+      val conn = services.currentTxnConnectionFactory()
+      val savepoint = conn.setSavepoint()
+      try { tryBlock } catch {
+        case e: Exception =>
+          conn.rollback(savepoint)
+          catchBlock(e)
+      }
+    }
+  }
+
+
+
 
 
   //
@@ -219,11 +304,11 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   lazy val addresses = account.map(_.addresses).getOrElse(Nil)
 
   def fees: LineItems = lineItems(LineItemNature.Fee)
-  def taxes: Seq[TaxLineItem] = lineItems(CodeType.Tax)
+  def taxes: Seq[TaxLineItem] = lineItems(CheckoutCodeType.Tax)
   def payments: LineItems = lineItems(LineItemNature.Payment)
-  def balance: BalanceLineItem = lineItems(CodeType.Balance).head
-  def subtotal: SubtotalLineItem = lineItems(CodeType.Subtotal).head
-  def total: TotalLineItem = lineItems(CodeType.Total).head
+  def balance: BalanceLineItem = lineItems(CheckoutCodeType.Balance).head
+  def subtotal: SubtotalLineItem = lineItems(CheckoutCodeType.Subtotal).head
+  def total: TotalLineItem = lineItems(CheckoutCodeType.Total).head
 
   protected def summaryTypes: LineItemTypes = Seq(SubtotalLineItemType, TotalLineItemType, BalanceLineItemType)
 
@@ -263,6 +348,12 @@ object Checkout {
   //
   sealed abstract class CheckoutFailed(val failedCheckoutData: FailedCheckoutData)
   protected[checkout] trait FailedCheckoutWithCharge { def charge: Option[Charge] }
+
+
+  case class CheckoutFailedCustomerMissing(
+    checkout: Checkout,
+    cashTransactionType: Option[CashTransactionLineItemType]
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
 
   case class CheckoutFailedCashTransactionResolutionError(
     checkout: Checkout,

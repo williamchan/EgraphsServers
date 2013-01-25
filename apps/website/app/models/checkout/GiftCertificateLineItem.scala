@@ -27,7 +27,7 @@ case class GiftCertificateLineItem (
 
   override def itemType = GiftCertificateLineItemType(this)
 
-  override def subItems: LineItems = Nil
+
 
   override def toJson: String = ""
 

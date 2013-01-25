@@ -2,7 +2,7 @@ package models.checkout
 
 import checkout.Conversions._
 import models.GiftCertificate
-import models.enums.{CodeType, LineItemNature}
+import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.Money
 import services.AppConfig
 import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
@@ -53,7 +53,7 @@ object GiftCertificateLineItemType {
    * has a "Product" nature, rather than a discount nature.
    */
   val nature = LineItemNature.Product
-  val codeType = CodeType.GiftCertificate
+  val codeType = CheckoutCodeType.GiftCertificate
 
   // Create new LineItemType
   def apply(recipient: String, amountToBuy: Money): GiftCertificateLineItemType = {

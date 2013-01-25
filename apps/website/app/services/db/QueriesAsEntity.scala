@@ -3,7 +3,11 @@ package services.db
 import org.squeryl.{Table, KeyedEntity}
 import org.squeryl.PrimitiveTypeMode._
 
-trait QueriesAsEntity[ModelT, EntityT <: KeyedEntity[KeyT], KeyT] {
+/**
+ * Provides findById and get to Models with KeyedEntities; use QueriesAsModel for models that
+ * are themselves KeyedEntities.
+ */
+trait QueriesAsEntity[ModelT <: HasEntity[EntityT, KeyT], EntityT <: KeyedEntity[KeyT], KeyT] {
   protected def entityToModel(convert: EntityT): Option[ModelT]
   protected def table: Table[EntityT]
 

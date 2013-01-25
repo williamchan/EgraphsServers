@@ -152,7 +152,6 @@ class CheckoutTests extends EgraphsUnitTest
 
 
 
-
   //
   // Data helpers
   //

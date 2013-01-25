@@ -3,7 +3,7 @@ package models.checkout
 import com.google.inject.Inject
 import models.CashTransaction
 import models.checkout.checkout.Conversions._
-import models.enums.{CashTransactionType, CodeType, LineItemNature}
+import models.enums.{CashTransactionType, CheckoutCodeType, LineItemNature}
 import scalaz.{Scalaz, Lens}
 import services.db.Schema
 import services.AppConfig
@@ -48,7 +48,7 @@ case class CashTransactionLineItemType protected (
   override def lineItems(resolved: LineItems, unresolved: LineItemTypes = Nil)
   : Option[Seq[CashTransactionLineItem]] = {
 
-    (_maybeItemEntity, unresolved(CodeType.Balance)) match {
+    (_maybeItemEntity, unresolved(CheckoutCodeType.Balance)) match {
 
       // persisted, just pass along entities
       case (Some(itemEntity: LineItemEntity), _)  =>
@@ -57,7 +57,7 @@ case class CashTransactionLineItemType protected (
 
       // new line item type, create new CashTransaction
       case (None, Nil) =>
-        val balance = resolved(CodeType.Balance).head
+        val balance = resolved(CheckoutCodeType.Balance).head
 
         require(balance.amount.isZero || stripeCardTokenId.isDefined,
           "Stripe card token required for non-zero balance."
@@ -101,7 +101,7 @@ case class CashTransactionLineItemType protected (
 
 object CashTransactionLineItemType {
 
-  def codeType = CodeType.CashTransaction
+  def codeType = CheckoutCodeType.CashTransaction
   def refundEntity = entityMap(LineItemNature.Refund)
   def paymentEntity = entityMap(LineItemNature.Payment)
 

@@ -18,9 +18,9 @@ import services.db._
  * the checkout it belongs to (the exceptions at the moment are summaries types, which are managed
  * within the checkout so they don't need to, and should not, be added to a checkout manually).
  *
- * @tparam TransactedT type of domain object
+ * @tparam T type of domain object represented by this LineItemType
  */
-trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
+trait LineItemType[+T] extends HasLineItemNature with HasCodeType {
 
   def id: Long
   def description: String
@@ -46,7 +46,7 @@ trait LineItemType[+TransactedT] extends HasLineItemNature with HasCodeType {
    *         being ready to resolve, in which case it should return Some(Nil).
    */
   def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes)
-  : Option[Seq[LineItem[TransactedT]]]
+  : Option[Seq[LineItem[T]]]
 }
 
 
@@ -119,7 +119,7 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemT
     set = (nature: LineItemNature) => entity().copy(_nature=nature.name))
   private[checkout] lazy val codeTypeField = entityField(
     get = (entity: LineItemTypeEntity) => entity.codeType)(
-    set = (codeType: CodeType) => entity().copy(_codeType=codeType.name))
+    set = (codeType: CheckoutCodeType) => entity().copy(_codeType=codeType.name))
 
 
   private def entityField[PropT](get: LineItemTypeEntity => PropT)(set: PropT => LineItemTypeEntity)

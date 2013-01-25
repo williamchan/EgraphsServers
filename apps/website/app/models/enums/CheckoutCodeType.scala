@@ -4,24 +4,24 @@ import egraphs.playutils.Enum
 import models.checkout._
 import org.joda.money.{CurrencyUnit, Money}
 
-sealed abstract class CodeType(val name: String) { this: CodeTypeFactory[_, _] =>
+sealed abstract class CheckoutCodeType(val name: String) { this: CodeTypeFactory[_, _] =>
   def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): LineItem[_] =
     itemInstance(itemEntity, typeEntity)
 }
 
 /**
- * Allows CodeType to be used to retrieve the "code type" of a LineItem (LineItemType could be added
+ * Allows CheckoutCodeType to be used to retrieve the "code type" of a LineItem (LineItemType could be added
  * as well if needed).
  */
 trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): ItemT
 }
 
-object CodeType extends Enum {
+object CheckoutCodeType extends Enum {
   protected type ItemEntity = LineItemEntity
   protected type TypeEntity = LineItemTypeEntity
 
-  sealed abstract class EnumVal(name: String) extends CodeType(name) with Value {
+  sealed abstract class EnumVal(name: String) extends CheckoutCodeType(name) with Value {
     this: CodeTypeFactory[_, _] =>
   }
 
@@ -90,4 +90,4 @@ object CodeType extends Enum {
 
 
 
-trait HasCodeType { def codeType: CodeType }
+trait HasCodeType { def codeType: CheckoutCodeType }

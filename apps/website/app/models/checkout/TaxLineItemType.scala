@@ -2,7 +2,7 @@ package models.checkout
 
 import checkout.Conversions._
 import com.google.inject.Inject
-import models.enums.{CodeType, LineItemNature}
+import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.{CurrencyUnit, Money}
 import play.api.libs.json.Json
 import scalaz.Lens
@@ -42,7 +42,7 @@ case class TaxLineItemType protected (
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes): Option[Seq[TaxLineItem]] = {
     import LineItemNature._
 
-    (resolvedItems(CodeType.Subtotal).headOption, pendingResolution(Discount)) match {
+    (resolvedItems(CheckoutCodeType.Subtotal).headOption, pendingResolution(Discount)) match {
       // Want to have the subtotal and no pending discounts
       case (Some(subtotal: SubtotalLineItem), Nil) =>
         // Sum discounts since there may be multiple (eventually)
@@ -68,7 +68,7 @@ case class TaxLineItemType protected (
 object TaxLineItemType {
   val basicTaxName = "Tax"
   val nature = LineItemNature.Tax
-  val codeType = CodeType.Tax
+  val codeType = CheckoutCodeType.Tax
   val noZipcode = ""
 
   /**

@@ -2,7 +2,7 @@ package models.checkout
 
 import java.sql.Timestamp
 import models.HasCreatedUpdated
-import models.enums.{CodeType, LineItemNature}
+import models.enums.{CheckoutCodeType, LineItemNature}
 import services.db.KeyedCaseClass
 import services.Time
 
@@ -20,14 +20,14 @@ case class LineItemTypeEntity private (
   override def unapplied = LineItemTypeEntity.unapply(this)
 
   def nature = LineItemNature(_nature).get
-  def codeType = CodeType(_codeType).get
+  def codeType = CheckoutCodeType(_codeType).get
 }
 
 object LineItemTypeEntity {
   def apply(
     desc: String = "",
     nature: LineItemNature,
-    codeType: CodeType,
+    codeType: CheckoutCodeType,
     id: Long = 0,
     created: Timestamp = Time.defaultTimestamp,
     updated: Timestamp = Time.defaultTimestamp

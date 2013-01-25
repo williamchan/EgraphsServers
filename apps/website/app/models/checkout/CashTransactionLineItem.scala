@@ -67,7 +67,7 @@ case class CashTransactionLineItem(
     CashTransactionLineItemType(_typeEntity, _entity)
 
   override def toJson = ""
-  override def subItems = Nil
+
 
   override lazy val domainObject: CashTransaction = _maybeCashTransaction.getOrElse {
     services.cashTransactionStore.findByLineItemId(id).getOrElse (

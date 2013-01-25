@@ -9,68 +9,56 @@ import models.SavesCreatedUpdated
 import scalaz.Lens
 import services.db.{InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
+import org.squeryl.Query
 
 /**
  * Represents an actual item or data within a checkout. Has the responsibility of persisting itself,
  * its domain object, and line item type as necessary.
  *
- * @tparam TransactedT type of domain object
+ * Future considerations:
+ * * `subItems` removed since it was unused, but could be utilized in the future here or in
+ *   `LineItemType` for a more structured resolution scheme...
+ * * Could some of these members be refactored into traits
+ *
+ * @tparam T type of domain object represented by this LineItem
+ * @see
  */
-trait LineItem[+TransactedT] extends Transactable[LineItem[TransactedT]] with HasLineItemNature with HasCodeType {
+trait LineItem[+T] extends HasLineItemNature with HasCodeType {
 
+  //
+  // LineItem Members
+  //
   def id: Long
-
-  /**
-   * When restoring a LineItem, the `itemType`'s entity and `domainObject` are generally sufficient
-   * to recreate the `itemType` so it is generally recommended to take only the entity as a
-   * constructor argument, rather than requiring the actual `itemType` itself.
-   */
-  def itemType: LineItemType[TransactedT]
-
-  def subItems: LineItems
-
-  def toJson: String  // TODO(CE-16):
-
-  /**
-   * Often easiest to take an optional constructor argument to provide actual object directly when
-   * untransacted, then query from db when transacted so constructing a transacted LineItem
-   * requires less data from the caller.
-   */
-  def domainObject: TransactedT
-
-
-  /** @return sequence of this LineItem and its sub-LineItems */
-  def flatten: LineItems = {
-    val seqOfFlatSubItemSeqs = for(subItem <- subItems) yield subItem.flatten
-    Seq(this) ++ seqOfFlatSubItemSeqs.flatten
-  }
-
-  //
-  // Entity member accessors and mutators
-  //
-  def amount: Money
   def checkoutId: Long
-  def withAmount(newAmount: Money): LineItem[TransactedT]
-  def withCheckoutId(newCheckoutId: Long): LineItem[TransactedT]
+  def amount: Money
+
+  /** instance T represented by this LineItem */
+  def domainObject: T
+
+  /** `LineItemType` that resolved/produced this `LineItem` */
+  def itemType: LineItemType[T]
+
 
   //
   // HasLineItemNature and HasCodeType members
   //
-  override def codeType: CodeType = itemType.codeType
+  override def codeType: CheckoutCodeType = itemType.codeType
   override def nature: LineItemNature = itemType.nature
 
 
-  /**
-   * Rough approximation for equality between line items; does not detect difference in
-   * implementation specific state.
-   */
-  def equalsLineItem(that: LineItem[_]): Boolean = {
-    if (that == null) { false } else {
-      def unpack(item: LineItem[_]) = (item.id, item.amount, item.itemType.id, item.codeType, item.nature, item.domainObject)
+  //
+  // LineItem Methods
+  //
+  def toJson: String  // TODO(CE-16):
+  def withAmount(newAmount: Money): LineItem[T]
+  def withCheckoutId(newCheckoutId: Long): LineItem[T]
 
-      unpack(this) == unpack(that)
-    }
-  }
+  /** Transforms and persists a T and potentially any objects it contains, as needed. */
+  def transact(checkout: Checkout): LineItem[T]
+
+  /** Rough approximation for equality between line items based on  */
+  def equalsLineItem(that: LineItem[_]) = { that != null && this.unpacked == that.unpacked }
+  protected def unpacked = (id, amount, itemType.id, codeType, nature, domainObject)
 
   /** Returns option of this if it has the desired code type, otherwise None. */
   protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
@@ -90,17 +78,15 @@ class LineItemStore @Inject() (schema: Schema) {
   protected def table = schema.lineItems
 
   def getItemsByCheckoutId(id: Long): LineItems = {
-    // Note that using toSeq instead of toList returns a Stream which causes bugs in other steps
-    // of restoring a checkout...
-    val entityPairs = join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
-      select(li, lit) on (li._itemTypeId === lit.id and li._checkoutId === id)
-    ).toList
+    /** get entities and turn them into `LineItem`s through their `CheckoutCodeType`s */
+    val items = for (
+      (itemEntity, typeEntity) <- findEntityPairsByCheckoutId(id);
+      codeType: CheckoutCodeType <- CheckoutCodeType(typeEntity._codeType)
+    ) yield {
+      codeType.itemInstance(itemEntity, typeEntity)
+    }
 
-    // turn each pair into a LineItem through CodeType
-    for (
-      (itemEntity, typeEntity) <- entityPairs;
-      codeType: CodeType <- CodeType(typeEntity._codeType)
-    ) yield { codeType.itemInstance(itemEntity, typeEntity) }
+    items.toSeq
   }
 
 
@@ -110,21 +96,41 @@ class LineItemStore @Inject() (schema: Schema) {
   }
 
 
-  def findByIdOfCodeType[ LIT <: LineItemType[_], LI <: LineItem[_] ](
-    id: Long, codeType: CodeTypeFactory[LIT, LI]
-  ): Option[LI] = {
+  def findById(id: Long): Option[LineItem[Any]] = {
+    val entityPair = findEntityPairById(id).headOption
 
-    val entityPair = join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
-      select(li, lit) on (li._itemTypeId === lit.id and li.id === id)
-    ).headOption
-
-    // unpack entities, and return LineItem from codeType if CodeTypes match
     entityPair match {
-      case Some((itemEntity, typeEntity)) if (CodeType(typeEntity._codeType) == Some(codeType)) =>
-        Some(codeType.itemInstance(itemEntity, typeEntity))
       case None => None
+      case Some((itemEntity, typeEntity)) => Some(
+        typeEntity.codeType.itemInstance(itemEntity, typeEntity)
+      )
     }
   }
+
+
+  /** Specifying the CheckoutCodeType allows the item to be fetched as its actual type safely */
+  def findByIdWithCodeType[ LIT <: LineItemType[_], LI <: LineItem[_] ](
+    id: Long, codeType: CodeTypeFactory[LIT, LI]
+  ): Option[LI] = {
+    findById(id) flatMap (_.asCodeTypeOption(codeType))
+  }
+
+
+  //
+  // Helper methods
+  //
+  protected type EntityPair = (LineItemEntity, LineItemTypeEntity)
+  protected def findEntityPairsByCheckoutId(id: Long): Query[EntityPair] = {
+    join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
+      select(li, lit) on (li._itemTypeId === lit.id and li._checkoutId === id)
+    )
+  }
+  protected def findEntityPairById(id: Long): Query[EntityPair] = {
+    join( schema.lineItems, schema.lineItemTypes ) ( (li, lit) =>
+      select(li, lit) on (li._itemTypeId === lit.id and li.id === id)
+    )
+  }
+
 }
 
 

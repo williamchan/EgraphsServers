@@ -3,7 +3,7 @@ package models.checkout
 import checkout.Conversions._
 import utils._
 import services.AppConfig
-import models.enums.CodeType
+import models.enums.CheckoutCodeType
 import LineItemTestData._
 
 
@@ -34,7 +34,7 @@ class CashTransactionLineItemTests extends EgraphsUnitTest
 
 
   override def restoreLineItem(id: Long): Option[CashTransactionLineItem] = {
-    AppConfig.instance[LineItemStore].findByIdOfCodeType(id, CodeType.CashTransaction)
+    AppConfig.instance[LineItemStore].findByIdWithCodeType(id, CheckoutCodeType.CashTransaction)
   }
 
   override def hasExpectedRestoredDomainObject(lineItem: CashTransactionLineItem): Boolean = {

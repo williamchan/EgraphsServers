@@ -1,7 +1,7 @@
 package models.checkout
 
 import models.checkout.checkout.Conversions._
-import models.enums.{CodeType, LineItemNature}
+import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.Money
 
 /**
@@ -24,7 +24,7 @@ case class TotalLineItem (amount: Money) extends LineItem[Money] {
   override def transact(checkout: Checkout) = this
   override def checkoutId = -1
   override def withCheckoutId(newCheckoutId: Long) = this
-  override def subItems = Nil
+
 
 }
 
@@ -34,7 +34,7 @@ object TotalLineItemType extends TotalLineItemType {
   override val id: Long = -1L
   override val description = "Total"
   override val nature = LineItemNature.Summary
-  override val codeType = CodeType.Total
+  override val codeType = CheckoutCodeType.Total
   override val toJson = ""
 
 
@@ -52,8 +52,8 @@ object TotalLineItemType extends TotalLineItemType {
   override def lineItems(resolvedItems: LineItems, pendingTypes: LineItemTypes) = {
     import LineItemNature._
 
-    def pendingNeeded = pendingTypes.ofCodeType(CodeType.Subtotal) ++ pendingTypes.ofNatures(Tax, Fee)
-    def maybeSubtotal = resolvedItems(CodeType.Subtotal).headOption.map(_.amount)
+    def pendingNeeded = pendingTypes.ofCodeType(CheckoutCodeType.Subtotal) ++ pendingTypes.ofNatures(Tax, Fee)
+    def maybeSubtotal = resolvedItems(CheckoutCodeType.Subtotal).headOption.map(_.amount)
 
     (pendingNeeded, maybeSubtotal) match {
       case (Nil, Some(subtotal: Money)) => Some {
