@@ -42,7 +42,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.assets.audioMp4Url
-          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
           // TODO(wchan): This should point to a jpg. (svzg renders the signature before the image, which is weird.)
           val videoPosterUrl = ""
           Ok(views.html.frontend.egraph(
@@ -53,6 +53,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
             recipientName = order.recipientName,
             privacySetting = order.privacyStatus.name,
             messageToCelebrity = order.messageToCelebrity,
+            // productIcon should be sized down to the final display dimensions.
             productIconUrl = product.iconUrl,
             signedOnDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt),
             thisPageLink = thisPageLink,
@@ -91,7 +92,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
 
   /** Redirects the old egraph url /egraph/{orderId} to the current url */
   def getEgraphRedirect(orderId: Long) = Action {
-    Redirect(controllers.routes.WebsiteControllers.getEgraph(orderId))
+    Redirect(controllers.routes.WebsiteControllers.getEgraphClassic(orderId))
   }
 
   private def isViewable(order: Order)(implicit session: Session): Boolean = {

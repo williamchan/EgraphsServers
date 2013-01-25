@@ -64,7 +64,8 @@ case class EgraphActor @Inject() (
               val testedEgraph = egraph.verifyBiometrics.save()
 
               egraph.assets.generateAndSaveMp3()
-              egraph.assets.generateAndSaveMp4()
+              // TODO(egraph-exploration): Work in progress. Not finalized.
+//              egraph.assets.generateAndSaveMp4()
 
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
               if (config.adminreviewSkip) {

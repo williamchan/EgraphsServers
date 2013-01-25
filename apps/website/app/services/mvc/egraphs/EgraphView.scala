@@ -66,7 +66,7 @@ object EgraphView {
     val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
 
     // Social links
-    val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+    val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
 
     val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
     fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
