@@ -33,8 +33,7 @@ private[controllers] trait GetTwitterDataAdminEndpoint extends ImplicitHeaderAnd
             (a, b) => a.celebrityId < b.celebrityId).sortWith(
               (a, b) => a.twitterFollowersCount > b.twitterFollowersCount)
 
-          Ok(
-            views.html.Application.admin.admin_celebrities_twitter(celebrityTwitterData))
+          Ok(views.html.Application.admin.admin_celebrities_twitter(celebrityTwitterData))
         }
     }
   }
