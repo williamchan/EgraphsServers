@@ -20,5 +20,6 @@ case class FooterData(
   privacyPolicyLink: String="/privacy",
   careersPolicyLink: String="/careers",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
-  egraphsFacebookLink: String = "http://www.facebook.com/egraphs"
+  egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
+  mailUrl: String = "/Account/subscribe"
 )

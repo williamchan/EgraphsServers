@@ -96,6 +96,8 @@
       var Egraphs = Egraphs || {};
       Egraphs.page = Egraphs.page || {};
       Egraphs.page.jsMain = ["pages/base-template", "@jsMain"];
+      Egraphs.page.mail = {url: "@footerData.mailUrl"};
+      Egraphs.page.authenticityToken = "@authToken.value";
       @headJs
     </script>
     @tags.analytics()

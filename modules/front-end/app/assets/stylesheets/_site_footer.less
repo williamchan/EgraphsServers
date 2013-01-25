@@ -9,6 +9,10 @@
 	padding-top: 40px;
 	padding-bottom: 40px;
 
+	.mobile-notices {
+		display: none;
+	}
+
 	a { color: @grayLighter; }
 	a:hover{ color: @gray; }
 
@@ -42,29 +46,29 @@
 	}
 
 	.social {
-
+		float: right;
 		ul {
-			float: right;
-			padding: 0;
-			margin: 0;
-			list-style: none;
 
-			li {
-
-				float: left;
-				margin-left: 10px;
-
-				a {
-					.social-sprite(30px);
-					display: block;
-				}
+			list-style-type: none; 
+			
+			form {
+				.input-append {
+					.celebrity-searchbox-container2();
+					width: 254px;
+				}	
 			}
 
-			li:first-child { margin-left: 0; }
+			label {
+				color: @orange;
+				font-size: 12px;
+				line-height: 1.0em;
+			}
 
+			.twitter-follow {
+				margin-top: 20px;
+			}
 		}
-
-	}
+  }		
 }
 
 
@@ -79,7 +83,7 @@
 
 			[class*=span] {
 				margin: 0;
-				width: auto;
+				// width: auto;
 			}
 
 		}
@@ -110,21 +114,41 @@
 
 		}
 
-		.social {
-
-			float: right;
-
-		}
-
 	} // end #bottom
 
 }
 
 
 @media (max-width: 767px) {
+  #bottom {
+		.mobile-notices {
+			display: block;
+		}
 
-  #bottom .social ul { float: none; }
+		.wide-notices {
+			display: none;
+		}
 
+		.social { 
+			input[type="email"] {
+				width: 210px;
+			}
+  	}
+		.site-links { 
+			float: left;
+			width: 35%;
+		}
+	}
+
+}
+
+@media (max-width: 480px) {
+	#bottom {
+		.row {
+			.social { display: none; }
+		}
+
+	}
 }
 
 

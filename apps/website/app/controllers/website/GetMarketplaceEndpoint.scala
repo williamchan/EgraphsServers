@@ -78,7 +78,11 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   private def sortCelebrities(sortingType : CelebritySortingTypes.EnumVal, unsortedCelebrities: Iterable[MarketplaceCelebrity]) :
   Iterable[MarketplaceCelebrity] = {
     sortingType match {
-      case MostRelevant => unsortedCelebrities
+      case MostRelevant =>
+        // by twitter follower count desc
+        import services.mvc.celebrity.TwitterFollowersAgent
+        val celebrityIdToFollowersCount = TwitterFollowersAgent.singleton().withDefaultValue(0)
+        unsortedCelebrities.toList.sortWith((a,b) => celebrityIdToFollowersCount(a.id) > celebrityIdToFollowersCount(b.id))
       case PriceAscending => unsortedCelebrities.toList.sortWith((a,b) => a.minPrice < b.minPrice)
       case PriceDescending => unsortedCelebrities.toList.sortWith((a,b) => a.maxPrice > b.maxPrice)
       case Alphabetical => unsortedCelebrities.toList.sortWith((a,b) => a.publicName < b.publicName)
