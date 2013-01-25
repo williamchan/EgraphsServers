@@ -117,7 +117,7 @@ class Schema @Inject() (
       columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed))
 
   val lineItems = table[LineItemEntity]("LineItem")
-  // TODO(SER-499): Index declarations
+  on(lineItems)(lineItem => declare(lineItem._amountInCurrency is monetaryDbType))
 
   val lineItemTypes = table[LineItemTypeEntity]("LineItemType")
   // TODO(SER-499): Index declarations
@@ -224,6 +224,15 @@ class Schema @Inject() (
   val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches)
     .via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
 
+
+  val checkoutToLineItem = oneToManyRelation(checkouts, lineItems)
+    .via((checkout, lineItem) => checkout.id === lineItem._checkoutId)
+
+  val couponToGiftCertificate = oneToManyRelation(coupons, giftCertificates)
+    .via((coupon, giftCertificate) => coupon.id === giftCertificate._couponId)
+
+  val customerToCheckout = oneToManyRelation(customers, checkouts)
+    .via((customer, checkout) => customer.id === checkout.customerId)
   val customerToUsernameHistory = oneToManyRelation(customers, usernameHistories)
     .via((customer, usernameHistory) => customer.id === usernameHistory.customerId)
 
@@ -237,6 +246,17 @@ class Schema @Inject() (
 
   val inventoryBatchToOrders = oneToManyRelation(inventoryBatches, orders)
     .via((inventoryBatch, order) => inventoryBatch.id === order.inventoryBatchId)
+
+  val lineItemToCashTransaction = oneToManyRelation(lineItems, cashTransactions)
+    .via((lineItem, cashTransaction) => lineItem.id === cashTransaction.lineItemId)
+  val lineItemToGiftCertificate = oneToManyRelation(lineItems, giftCertificates)
+    .via((lineItem, giftCertificate) => lineItem.id === giftCertificate._lineItemId)
+
+  val lineItemTypeToCoupon = oneToManyRelation(lineItemTypes, coupons)
+    .via((lineItemType, coupon) => lineItemType.id === coupon.lineItemTypeId)
+
+  val lineItemTypeToLineItem = oneToManyRelation(lineItemTypes, lineItems)
+    .via((lineItemType, lineItem) => lineItemType.id === lineItem._itemTypeId)
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
