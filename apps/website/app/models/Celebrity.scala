@@ -187,26 +187,36 @@ case class Celebrity(id: Long = 0,
   }
 
   def saveWithImageAssets(/*profileImage: Option[BufferedImage], */ landingPageImage: Option[BufferedImage], logoImage: Option[BufferedImage]): Celebrity = {
-    import ImageUtil.Conversions._
-    // todo: refactor profile image saving to here
-    var celebrity = landingPageImage match {
+    //TODO: refactor profile image saving to here
+    saveWithLandingPageImage(landingPageImage).saveWithLogoImage(logoImage)
+  }
+
+  private def saveWithLandingPageImage(landingPageImage: Option[BufferedImage]): Celebrity = {
+    landingPageImage match {
       case None => this
       case Some(image) => {
-        // todo(wchan): crop image?
-        val landingPageImageBytes = image.asByteArray(ImageAsset.Jpeg)
+        val landingPageImageBytes = {
+          import ImageUtil.Conversions._
+
+          val croppedImage = ImageUtil.crop(image, Celebrity.defaultLandingPageImageDimensions)
+          croppedImage.asByteArray(ImageAsset.Jpeg)
+        }
         withLandingPageImage(landingPageImageBytes).save().celebrity
       }
     }
-    celebrity = logoImage match {
-      case None => this
-      case Some(image) => {
-        val iconImageBytes = image.asByteArray(ImageAsset.Jpeg)
-        celebrity.withLogoImage(iconImageBytes).save().celebrity
-      }
-    }
-    celebrity
   }
 
+  private def saveWithLogoImage(logoImage: Option[BufferedImage]): Celebrity = {
+    logoImage match {
+      case None => this
+      case Some(image) => {
+        import ImageUtil.Conversions._
+
+        val iconImageBytes = image.asByteArray(ImageAsset.Jpeg)
+        withLogoImage(iconImageBytes).save().celebrity
+      }
+    }
+  }
 
   /**Creates a new Product associated with the celebrity. The product is not yet persisted. */
   def newProduct: Product = {
@@ -305,14 +315,14 @@ case class Celebrity(id: Long = 0,
     services=services.imageAssetServices.get
   )
   lazy val defaultLandingPageImage = ImageAsset(
-    IOUtils.toByteArray(current.resourceAsStream("images/1500x556_blank.jpg").get),
+    IOUtils.toByteArray(current.resourceAsStream("images/1550x556.jpg").get),
     keyBase="defaults/celebrity",
     name="landingPageImage",
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
   lazy val defaultLogoImage = ImageAsset(
-    IOUtils.toByteArray(current.resourceAsStream("images/40x40_blank.jpg").get),
+    IOUtils.toByteArray(current.resourceAsStream("images/40x40.jpg").get),
     keyBase="defaults/celebrity",
     name="logoImage",
     imageType=ImageAsset.Png,
@@ -321,7 +331,8 @@ case class Celebrity(id: Long = 0,
 }
 
 object Celebrity {
-  val minLandingPageImageWidth = 1500
+  val minProfileImageWidth = 100
+  val minLandingPageImageWidth = 1550
   val minLandingPageImageHeight = 556
   val minLogoWidth = 40
 

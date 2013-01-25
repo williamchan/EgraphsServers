@@ -103,11 +103,11 @@
           <div class="span12">    
             <fieldset>
               <legend>Images</legend>
-              @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some("Must be square dimensions of at least 100x100."), fields=fields)
+              @formField(id="profileImage", label="Profile Photo", inputType="file", width="span8", help=Some("Must be square dimensions of at least " + Celebrity.minProfileImageWidth + "x" + Celebrity.minProfileImageWidth + "."), fields=fields)
 
-              @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some("Must be JPG at least 1500x556. Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity."), fields=fields)
+              @formField(id="landingPageImage", label="Landing Page Image", inputType="file", width="span8", help=Some("Must be JPG at least " + Celebrity.minLandingPageImageWidth + "x" + Celebrity.minLandingPageImageHeight + ". Keep that 2.7 aspect ratio for best results. Should be center-balanced photo of celebrity. Server will crop in an unartistic way if needed."), fields=fields)
 
-              @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some("Must be PNP of square dimensions of at least 40x40. Logo of team or organization."), fields=fields)
+              @formField(id="logoImage", label="Team/Org Logo", inputType="file", width="span8", help=Some("Must be PNP of square dimensions of at least " + Celebrity.minLogoWidth + "x" + Celebrity.minLogoWidth + ". Logo of team or organization."), fields=fields)
 
             </fieldset>
           </div>
