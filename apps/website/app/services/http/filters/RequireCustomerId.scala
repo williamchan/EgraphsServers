@@ -34,13 +34,12 @@ class RequireCustomerId @Inject() (customerStore: CustomerStore) extends Filter[
 
   def inAccount[A](account: Account, parser: BodyParser[A] = parse.anyContent)(actionFactory: Customer => Action[A]): Action[A] = {
     Action(parser) { implicit request =>
-      val maybeResult = account.customerId.map { customerId =>
-        val action = this(customerId, parser)(actionFactory)
-
-        action(request)
+      account.customerId match {
+        case None => noCustomerIdResult
+        case Some(customerId) =>
+          val action = this(customerId, parser)(actionFactory)
+          action(request)
       }
-
-      maybeResult.getOrElse(noCustomerIdResult)
     }
   }
 

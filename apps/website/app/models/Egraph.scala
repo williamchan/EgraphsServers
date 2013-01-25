@@ -438,12 +438,9 @@ case class Egraph(
 //      generateAndSaveMp4()
 //      blobs.getUrl((mp4Key))
 
-      blobs.getUrlOption((mp4Key)) match {
-        case None => {
-          generateAndSaveMp4()
-          blobs.getUrl((mp4Key))
-        }
-        case Some(url) => url
+      blobs.getUrlOption((mp4Key)).getOrElse {
+        generateAndSaveMp4()
+        blobs.getUrl((mp4Key))
       }
     }
 
@@ -472,6 +469,7 @@ case class Egraph(
 
       // build final aac file
       Utils.saveToFile(audioMp3.asByteArray, sourceMp3TempFile)
+      // FIXME: this should go wav >> aac
       Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
       VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
 
@@ -514,7 +512,7 @@ case class Egraph(
       videoNoAudioFile.delete()
       videoWithAudioFile.delete()
       finalMp4TempFile.delete()
-      // also need to delete png, which apparently is also saved to disk
+      //TODO also need to delete png, which apparently is also saved to disk
 
       blobs.put(mp4Key, mp4Bytes, access = AccessPolicy.Public)
     }

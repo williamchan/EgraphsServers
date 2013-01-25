@@ -38,7 +38,8 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   def getEgraph(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       orderStore.findFulfilledWithId(orderId) match {
-        case Some(FulfilledOrder(order, egraph)) => {
+        case None => NotFound("No Egraph exists with the provided identifier.")
+        case Some(FulfilledOrder(order, egraph)) =>
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.assets.audioMp4Url
@@ -61,8 +62,6 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
             shareOnTwitterLink = "",
             isPromotional = order.isPromotional
           ))
-        }
-        case None => NotFound("No Egraph exists with the provided identifier.")
       }
     }
   }

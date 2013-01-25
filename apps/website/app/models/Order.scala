@@ -393,7 +393,7 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
-case class FulfilledOrderBundle(egraph: Egraph, order:Order, product: Product, celebrity: Celebrity) {
+case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, celebrity: Celebrity) {
   private val desiredWidth = 480
   def renderedForApi: Map[String, Any] = {
     val imageUrl = egraph.image(product.photoImage).rasterized.scaledToWidth(595).getSavedUrl(accessPolicy = AccessPolicy.Public)
