@@ -14,5 +14,6 @@ case class HeaderData(
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
   ourStarsLink: String = "/stars",
-  giftCertificateLink: Option[String] = None
+  giftCertificateLink: Option[String] = None,
+  deploymentInformation: Option[DeploymentInformation] = None
 )
