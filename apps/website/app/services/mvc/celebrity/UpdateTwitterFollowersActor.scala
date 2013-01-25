@@ -130,7 +130,7 @@ object UpdateTwitterFollowersActor extends Logging {
     Akka.system.actorOf(Props(AppConfig.instance[UpdateTwitterFollowersActor]))
   }
   private[celebrity] val updatePeriod = 1 day
-  private[celebrity] val resultsCacheKey = "twitter-stars"
+  private[celebrity] val resultsCacheKey = "twitter-followers"
   private[celebrity] case class UpdateAllTwitterFollowers(twitterFollowersAgent: Agent[Map[Long, Int]])
   private[celebrity] case class UpdateTwitterFollowers(celebrities: Iterable[Celebrity], twitterFollowersAgent: Agent[Map[Long, Int]])
   case class TwitterUserLookupResponse(celebrityIdsToFollowerCounts: Map[Long, Int])
