@@ -459,12 +459,13 @@ class OrderStore @Inject() (
 
   /**
    * These are 5 "good" egraphs and 5 "bad" ones based on audio.
+   * This is only used by the consumer-app exploration.
    */
-  def findTenSpecificFulfilled(): Iterable[FulfilledOrderBundle] = {
+  def findSpecificFulfilled(orderIds: List[Int]): Iterable[FulfilledOrderBundle] = {
     import schema.{egraphs, orders, products, celebrities}
     from(egraphs, orders, products, celebrities)((egraph, order, product, celebrity) =>
       where(
-        order.id in List(400,493,794,1403,2703,2708,1886,1621,3329,2552,981) and
+        order.id in orderIds and
           egraph.orderId === order.id and
           egraph._egraphState === EgraphState.Published.name and
           order.productId === product.id and
