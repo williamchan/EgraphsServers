@@ -40,33 +40,32 @@
   fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));</script>
 
-<section id="content" class="egraph-section" role="main">
+<section id="content" class="egraph-page" role="main">
   <div id="main" class="egraph">
     <div class="container">
-      <video id="egraph-player" class="video-js vjs-default-skin" controls
-             preload="auto" width="595" height="376" poster="@videoPosterUrl"
-             data-setup="{}">
-        <source src="@mp4Url" type='video/mp4'>
-      </video>
-      <div id="byline" class="row-fluid">
-        <div class="span8">
-          <h4>@celebrityName</h4>
-          <p>@celebrityTagline</p>
+      <div class="egraph-container">
+        <div class="egraph-player-container">
+          <video id="egraph-player" class="video-js vjs-default-skin" controls
+                 preload="auto" width="100%" height="100%" poster="@videoPosterUrl"
+                 data-setup="{}">
+            <source src="@mp4Url" type='video/mp4'>
+          </video>
         </div>
-        <div class="span4">
-          <img src='@productIconUrl' height="40" width="40"/>
+        <div class="byline-container">
+          <img class="byline-icon" src='@productIconUrl' height="50" width="50"/>
+          <h3 class="byline-text">@celebrityName</h3>
+          <p class="byline-text">@celebrityTagline</p>
         </div>
-      </div>
-      <hr/>
-      <div id="egraph-description" class="row-fluid">
-        <div>A message for @recipientName</div>
-        <div>from @celebrityName</div>
+        <hr/>
+        <div id="egraph-description">
+          <div>A message for @recipientName</div>
+          <div>from @celebrityName</div>
+        </div>
+        <hr/>
+        <div class="fb-comments" data-href="@thisPageLink" data-num-posts="2"></div>
       </div>
     </div>
-
-    <div class="fb-comments" data-href="@thisPageLink" data-width="595" data-num-posts="2"></div>
   </div>
-
   @**
   <div>@messageToCelebrity.getOrElse("")</div>
   <div>@signedOnDate</div>
