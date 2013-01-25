@@ -272,7 +272,7 @@ case class Order(
 
     email.addReplyTo("webserver@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(id).url)
+    val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(id).url)
     val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
@@ -400,7 +400,7 @@ case class FulfilledOrderBundle(egraph: Egraph, order:Order, product: Product, c
     Map(
       "orderId" -> order.id,
       "egraphId" -> egraph.id,
-      "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url),
+      "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url),
       "image" -> imageUrl,
       "audio" -> egraph.assets.audioMp3Url,
       "video" -> "",
@@ -767,7 +767,7 @@ object GalleryOrderFactory {
         .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
         .scaledToWidth(product.frame.thumbnailWidthPixels)
       val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
 
       val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
         fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),

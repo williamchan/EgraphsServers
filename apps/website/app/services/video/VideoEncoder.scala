@@ -14,13 +14,14 @@ import services.blobs.Blobs
 
 object VideoEncoder {
 
-  val canvasWidth = 598
-  val canvasHeight = 398
+  val canvasWidth = 592
+  val canvasHeight = 374
 
   def generateFinalAudio(sourceAacFile: File,
                          targetFile: File) {
     val fos = new FileOutputStream(targetFile)
-//    fos.write(IOUtils.toByteArray(current.resourceAsStream("audio/4sec.aac").get))
+    // TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4
+    //    fos.write(IOUtils.toByteArray(current.resourceAsStream("audio/4sec.aac").get))
     fos.write(Blobs.Conversions.fileToByteArray(sourceAacFile))
     fos.flush()
     fos.close()
@@ -31,7 +32,8 @@ object VideoEncoder {
                                   recipientName: String,
                                   celebrityName: String,
                                   audioDuration: Int) {
-//    val preambleImg = generatePreamble(recipientName, celebrityName)
+    // TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4
+    //    val preambleImg = generatePreamble(recipientName, celebrityName)
 
     val egraphImg = getEgraphImg(egraphImageFile)
 
@@ -40,11 +42,12 @@ object VideoEncoder {
 
     val startTime = System.nanoTime()
 
+    // TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4
     // show preamble for 4 seconds
-//    for (i <- 0 until 4) {
-//      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ preambleImg, /*timeStamp*/ System.nanoTime() - startTime, /*timeUnit*/ TimeUnit.NANOSECONDS)
-//      Thread.sleep(1000)
-//    }
+    //    for (i <- 0 until 4) {
+    //      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ preambleImg, /*timeStamp*/ System.nanoTime() - startTime, /*timeUnit*/ TimeUnit.NANOSECONDS)
+    //      Thread.sleep(1000)
+    //    }
 
     // show egraph image for duration of egraph audio
     for (i <- 0 until audioDuration) {

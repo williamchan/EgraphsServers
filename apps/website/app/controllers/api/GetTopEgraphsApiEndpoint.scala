@@ -7,6 +7,7 @@ import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import sjson.json.Serializer
 
+// TODO(egraph-exploration): Work in progress. Not finalized. Used for rapid prototyping.
 private[controllers] trait GetTopEgraphsApiEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
   protected def orderStore: OrderStore

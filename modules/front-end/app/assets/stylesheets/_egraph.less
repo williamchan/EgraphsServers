@@ -14,6 +14,7 @@
     .container {
       margin: 30px 0px 0px 0px;
       max-width: 100%;
+      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 
       #egraph-player {
         width: 100%;
@@ -40,13 +41,12 @@
        */
       @media (min-width: 641px) {
         .egraph-container {
-          width: 595px;
+          width: 592px;
         }
         .egraph-player-container {
-          height: 376px;
+          height: 374px;
         }
       }
-
       @media (max-width: 640px) {
         .egraph-container {
           width: 400px;
@@ -55,7 +55,6 @@
           height: 252px;
         }
       }
-
       @media (max-width: 320px) {
         .egraph-container {
           width: 280px;
@@ -65,18 +64,54 @@
         }
       }
 
-      #egraph-description {
-        text-align: center;
-      }
-
       .byline-container {
-        margin-top: 10px;
+        margin: 10px 0 5px 0;
       }
-      .byline-text {
+      .byline-name {
         text-align: left;
+        font-size: 24px;
+      }
+      .byline-tagline {
+        text-align: left;
+        font-size: 18px;
       }
       .byline-icon {
         float: right;
+      }
+
+      #egraph-description {
+        margin: 15px 0 20px 0;
+        text-align: center;
+        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+      }
+      .description-line {
+        font-size: 24px;
+        color: rgb(51, 51, 51);
+      }
+      .description-line i {
+        font-size: 24px;
+        color: rgb(128, 128, 128);
+      }
+
+      #social {
+        margin: 10px 0 10px 0;
+        display:inline-block;
+
+        ul {
+          margin: 0;
+          list-style: none;
+          li {
+            float: left;
+          }
+        }
+      }
+
+      #comments {
+        margin: 10px 0 0px 0;
+      }
+
+      .separator {
+        margin: 0 0 0 0;
       }
     }
   }

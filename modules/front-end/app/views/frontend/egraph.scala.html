@@ -36,9 +36,13 @@
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=156115741184892";
   fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));</script>
+@** Twitter tweet plugin - https://dev.twitter.com/docs/tweet-button *@
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+@** Pinterest pin button - http://pinterest.com/about/goodies/ *@
+<script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
 
 <section id="content" class="egraph-page" role="main">
   <div id="main" class="egraph">
@@ -53,24 +57,39 @@
         </div>
         <div class="byline-container">
           <img class="byline-icon" src='@productIconUrl' height="50" width="50"/>
-          <h3 class="byline-text">@celebrityName</h3>
-          <p class="byline-text">@celebrityTagline</p>
+          <h3 class="byline-name">@celebrityName</h3>
+          <p class="byline-tagline">@celebrityTagline</p>
         </div>
-        <hr/>
+        <hr class="separator"/>
         <div id="egraph-description">
-          <div>A message for @recipientName</div>
-          <div>from @celebrityName</div>
+          <p class="description-line"><i>A message for</i> @recipientName</p>
+          <p class="description-line"><i>from</i> @celebrityName</p>
+          @** <p class="description-date">@signedOnDate</p> *@
         </div>
-        <hr/>
-        <div class="fb-comments" data-href="@thisPageLink" data-num-posts="2"></div>
+        <hr class="separator"/>
+        <div id="social">
+          <ul class="clearfix">
+            <li>
+              @** Replace with data-href with @thisPageLink *@
+              <div class="fb-like" data-href="https://www.egraphs.com" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false"></div>
+            </li>
+            <li>
+              @** Replace with data-url with @thisPageLink *@
+              <a href="https://twitter.com/share" class="twitter-share-button" data-url="https://dev.twitter.com" data-via="your_screen_name" data-lang="en">Tweet</a>
+            </li>
+            <li>
+              <a href="http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fwww.egraphs.com&media=https%3A%2F%2Fd3kp0rxeqzwisk.cloudfront.net%2Fassets%2Fimages%2Fcrowd-fp-2054508835.jpg&description=Share%20a%20moment%20with%20your%20star" class="pin-it-button" count-layout="horizontal"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
+            </li>
+          </ul>
+        </div>
+        <div id="comments">
+          <div class="fb-comments" data-href="@thisPageLink" data-num-posts="2"></div>
+        </div>
       </div>
     </div>
   </div>
   @**
   <div>@messageToCelebrity.getOrElse("")</div>
-  <div>@signedOnDate</div>
-  <div>@shareOnFacebookLink</div>
-  <div>@shareOnTwitterLink</div>
   *@
 
 </section>

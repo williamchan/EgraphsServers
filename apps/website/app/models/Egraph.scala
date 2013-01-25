@@ -455,6 +455,7 @@ case class Egraph(
       blobs.put(mp3Key, mp3, access=AccessPolicy.Public)
     }
 
+    // TODO(egraph-exploration): Work in progress. Not finalized.
     override def generateAndSaveMp4() {
       val wavTempFile = TempFile.named(blobKeyBase + "/temp.wav")
       val sourceMp3TempFile = TempFile.named(blobKeyBase + "/source.mp3")
@@ -478,7 +479,7 @@ case class Egraph(
       val thisOrder = order
       val product = order.product
       val egraphImage = image(product.photoImage).withPenWidth(Handwriting.defaultPenWidth).withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-        .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY).scaledToWidth(598).rasterized
+        .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY).scaledToWidth(VideoEncoder.canvasWidth).rasterized
       val imageBytes = egraphImage.transformAndRender.graphicsSource.asByteArray
       val pngBufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes))
       val convertedImg = new BufferedImage(pngBufferedImage.getWidth, pngBufferedImage.getHeight, BufferedImage.TYPE_3BYTE_BGR)
