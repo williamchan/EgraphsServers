@@ -1,7 +1,6 @@
 package services.audio
 
 import services.{SampleRateConverter, Utils, TempFile}
-import com.xuggle.mediatool.ToolFactory
 import services.blobs.Blobs
 import java.io.File
 import javax.sound.sampled.{AudioSystem, AudioFormat}
@@ -35,9 +34,10 @@ object AudioConverter {
     audioAsMp3
   }
 
+  // TODO(egraph-exploration): Should convert from wav to aac, not from lossy format to lossy format.
   def convertToAAC(sourceAudio: Array[Byte], tempFilesId: String): Array[Byte] = {
     // save sourceAudio to temp file
-    val sourceTempFile = TempFile.named(tempFilesId + "/audio.mp3")
+    val sourceTempFile = TempFile.named(tempFilesId + "/audio.mp3") // Change to wav
     val targetTempFile = TempFile.named(tempFilesId + "/audio.aac")
     Utils.saveToFile(sourceAudio, sourceTempFile)
 
@@ -49,7 +49,10 @@ object AudioConverter {
     audioAsAAC
   }
 
-  def getDurationOfWav(file: File): Int = {
+  /**
+   * @return Returns the duration of the wav in seconds, rounded up.
+   */
+  def getDurationOfWavInSeconds(file: File): Int = {
     val format: AudioFormat = AudioSystem.getAudioInputStream(/*also accepts inputStream*/ file).getFormat
     (file.length / format.getSampleRate / format.getFrameSize / format.getChannels + 1).toInt
   }

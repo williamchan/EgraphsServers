@@ -13,7 +13,7 @@ import services.graphics.Handwriting
 import services.http.ControllerMethod
 import services.http.EgraphsSession.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
-import java.text.SimpleDateFormat
+import _root_.frontend.formatting.DateFormatting.Conversions._
 
 private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData { 
   this: Controller =>
@@ -56,7 +56,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
             messageToCelebrity = order.messageToCelebrity,
             // productIcon should be sized down to the final display dimensions.
             productIconUrl = product.iconUrl,
-            signedOnDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt),
+            signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
             thisPageLink = thisPageLink,
             shareOnFacebookLink = "",
             shareOnTwitterLink = "",

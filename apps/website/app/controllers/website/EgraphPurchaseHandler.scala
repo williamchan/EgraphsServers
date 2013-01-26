@@ -6,7 +6,6 @@ import models.enums._
 import play.api.mvc._
 import services.mail.TransactionalMail
 import services.mvc.OrderConfirmationEmail
-import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
 import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
@@ -15,9 +14,6 @@ import exception.InsufficientInventoryException
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.http.ServerSessionFactory
-import java.util.Date
-import java.text.SimpleDateFormat
-import org.apache.commons.mail.HtmlEmail
 import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
 import controllers.routes.WebsiteControllers.getFAQ
