@@ -8,7 +8,6 @@ import services.db.DBSession
 import akka.actor.ActorRef
 import models.{EnrollmentBatchStore, EnrollmentBatchServices, OrderQueryFilters, OrderStore}
 import services.blobs.Blobs
-import services.AppConfig._
 import services.http.filters.HttpFilters
 import services.ConsumerApplication
 
@@ -19,6 +18,9 @@ object ApiControllers extends Controller
   with GetCelebrityMobileAppInfoEndpoint
   with GetCelebrityProductsApiEndpoint
   with GetCelebrityOrdersApiEndpoint
+  with GetCustomerApiEndpoint
+  with GetCustomerEgraphsApiEndpoint
+  with GetTopEgraphsApiEndpoint
   with PostCelebrityOrderApiEndpoint
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint

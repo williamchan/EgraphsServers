@@ -7,7 +7,7 @@ import models.ImageAsset
 import org.apache.batik.dom.GenericDOMImplementation
 import java.awt.{RenderingHints, Dimension, Graphics2D}
 import java.util.zip.GZIPOutputStream
-import services.{Utils, Dimensions}
+import services.Dimensions
 import org.apache.batik.svggen.{SVGGeneratorContext, SVGGraphics2D}
 
 /**

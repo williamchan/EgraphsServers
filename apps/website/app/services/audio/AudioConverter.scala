@@ -1,8 +1,9 @@
 package services.audio
 
 import services.{SampleRateConverter, Utils, TempFile}
-import com.xuggle.mediatool.ToolFactory
 import services.blobs.Blobs
+import java.io.File
+import javax.sound.sampled.{AudioSystem, AudioFormat}
 
 object AudioConverter {
 
@@ -25,7 +26,7 @@ object AudioConverter {
     val targetTempFile = TempFile.named(tempFilesId + "/audio.mp3")
     Utils.saveToFile(sourceWav, sourceTempFile)
 
-    convertToMp3(sourceTempFile.getPath, targetTempFile.getPath)
+    Utils.convertMediaFile(sourceTempFile, targetTempFile)
     val audioAsMp3 = Blobs.Conversions.fileToByteArray(targetTempFile)
 
     sourceTempFile.delete()
@@ -33,17 +34,26 @@ object AudioConverter {
     audioAsMp3
   }
 
+  // TODO(egraph-exploration): Should convert from wav to aac, not from lossy format to lossy format.
+  def convertToAAC(sourceAudio: Array[Byte], tempFilesId: String): Array[Byte] = {
+    // save sourceAudio to temp file
+    val sourceTempFile = TempFile.named(tempFilesId + "/audio.mp3") // Change to wav
+    val targetTempFile = TempFile.named(tempFilesId + "/audio.aac")
+    Utils.saveToFile(sourceAudio, sourceTempFile)
+
+    Utils.convertMediaFile(sourceTempFile, targetTempFile)
+    val audioAsAAC = Blobs.Conversions.fileToByteArray(targetTempFile)
+
+    sourceTempFile.delete()
+    targetTempFile.delete()
+    audioAsAAC
+  }
+
   /**
-   * Code taken from http://wiki.xuggle.com/MediaTool_Introduction. We should explore ways to convert to mp3 without
-   * the use of files, which are required by ToolFactory.makeReader and ToolFactory.makeWriter.
-   *
-   * @param sourceTempFileLoc file location that contains the source audio
-   * @param targetTempFileLoc target file location to store the converted mp3 data
+   * @return Returns the duration of the wav in seconds, rounded up.
    */
-  private def convertToMp3(sourceTempFileLoc: String, targetTempFileLoc: String) {
-    val reader = ToolFactory.makeReader(sourceTempFileLoc)
-    val writer = ToolFactory.makeWriter(targetTempFileLoc, reader)
-    reader.addListener(writer)
-    while (reader.readPacket() == null) {}
+  def getDurationOfWavInSeconds(file: File): Int = {
+    val format: AudioFormat = AudioSystem.getAudioInputStream(/*also accepts inputStream*/ file).getFormat
+    (file.length / format.getSampleRate / format.getFrameSize / format.getChannels + 1).toInt
   }
 }

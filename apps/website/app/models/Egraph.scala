@@ -19,9 +19,12 @@ import com.google.inject.{Provider, Inject}
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 import org.squeryl.Query
 import print.{StandaloneCertificatePrint, LandscapeFramedPrint}
+import video.VideoEncoder
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import controllers.website.consumer.{StorefrontChoosePhotoConsumerEndpoints, CelebrityLandingConsumerEndpoint}
 import java.util.Date
+import java.io.{File, ByteArrayInputStream}
+import javax.imageio.ImageIO
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -218,7 +221,7 @@ case class Egraph(
           celebFullName = celebrity.publicName,
           celebCasualName = celebrity.casualName.getOrElse(celebrity.publicName),
           productName = product.name,
-          signedAtDate = new Date(getSignedAt.getTime),
+          signedAtDate = getSignedAt,
           egraphUrl = "https://www.egraphs.com/" + orderId
         )
 
@@ -246,7 +249,7 @@ case class Egraph(
           celebFullName = celebrity.publicName,
           celebCasualName = celebrity.casualName.getOrElse(celebrity.publicName),
           productName = product.name,
-          signedAtDate = new Date(getSignedAt.getTime),
+          signedAtDate = getSignedAt,
           egraphUrl = "https://www.egraphs.com/" + orderId
         )
 
@@ -319,7 +322,7 @@ case class Egraph(
    * fail biometrics, but are published anyway. We want those Egraphs to still
    * be considered pending. In other words, the Customer should have no way of 
    * knowing whether their Egraph passed or failed biometrics.
-   * 
+   *
    * @return Whether an egraph is on its way to a user
    */
   def isPendingEgraph: Boolean = {
@@ -375,10 +378,10 @@ case class Egraph(
    * Convenience method to return signedAt if it exists, otherwise created
    * @return signedAt if it exists, otherwise created
    */
-  def getSignedAt: Timestamp = {
+  def getSignedAt: Date = {
     signedAt match {
-      case Some(signedAtTimestamp) => signedAtTimestamp
-      case None => created
+      case Some(signedAtTimestamp) => new Date(signedAtTimestamp.getTime)
+      case None => new Date(created.getTime)
     }
   }
 
@@ -406,9 +409,7 @@ case class Egraph(
   override def unapplied = { Egraph.unapply(this) }
 
 
-  override def withEgraphState(enum: EnumVal) = {
-    copy(_egraphState = enum.name)
-  }
+  override def withEgraphState(enum: EnumVal) = { copy(_egraphState = enum.name) }
 
   private object Assets extends EgraphAssets {
     val blobs = services.blobs
@@ -416,17 +417,11 @@ case class Egraph(
     //
     // EgraphAssets members
     //
-    override def signature: String = {
-      blobs.get(signatureJsonKey).get.asString
-    }
+    override def signature: String = { blobs.get(signatureJsonKey).get.asString }
 
-    override def audioWav: Blob = {
-      blobs.get(wavKey).get
-    }
+    override def audioWav: Blob = { blobs.get(wavKey).get }
 
-    override def audioMp3: Blob = {
-      blobs.get(mp3Key).get
-    }
+    override def audioMp3: Blob = { blobs.get(mp3Key).get }
 
     override def audioMp3Url = {
       blobs.getUrlOption((mp3Key)) match {
@@ -438,12 +433,88 @@ case class Egraph(
       }
     }
 
+    override def audioMp4Url = {
+//      println("Generating mp4 file for " + mp4Key + "...")
+//      generateAndSaveMp4()
+//      blobs.getUrl((mp4Key))
+
+      blobs.getUrlOption((mp4Key)).getOrElse {
+        generateAndSaveMp4()
+        blobs.getUrl((mp4Key))
+      }
+    }
+
     /**
      * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
      */
     override def generateAndSaveMp3() {
       val mp3 = AudioConverter.convertWavToMp3(audioWav.asByteArray, blobKeyBase)
       blobs.put(mp3Key, mp3, access=AccessPolicy.Public)
+    }
+
+    // TODO(egraph-exploration): Work in progress. Not finalized.
+    override def generateAndSaveMp4() {
+      val wavTempFile = TempFile.named(blobKeyBase + "/temp.wav")
+      val sourceMp3TempFile = TempFile.named(blobKeyBase + "/source.mp3")
+      val sourceAacTempFile = TempFile.named(blobKeyBase + "/source.aac")
+      val finalAacTempFile = TempFile.named(blobKeyBase + "/final.aac")
+      val egraphImageTempFile = TempFile.named(blobKeyBase + "/egraph.jpg")
+      val videoNoAudioFile = TempFile.named(blobKeyBase + "/no-audio.mp4")
+      val videoWithAudioFile = TempFile.named(blobKeyBase + "/with-audio.mp4")
+      val finalMp4TempFile = TempFile.named(blobKeyBase + "/final.mp4")
+
+      // get audio duration
+      Utils.saveToFile(audioWav.asByteArray, wavTempFile)
+      val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
+
+      // build final aac file
+      Utils.saveToFile(audioMp3.asByteArray, sourceMp3TempFile)
+      // FIXME: this should go wav >> aac
+      Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
+      VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
+
+      // get egraph image jpg
+      val thisOrder = order
+      val product = order.product
+      val egraphImage = image(product.photoImage).withPenWidth(Handwriting.defaultPenWidth).withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+        .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY).scaledToWidth(VideoEncoder.canvasWidth).rasterized
+      val imageBytes = egraphImage.transformAndRender.graphicsSource.asByteArray
+      val bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes))
+      val convertedImg = new BufferedImage(bufferedImage.getWidth, bufferedImage.getHeight, BufferedImage.TYPE_3BYTE_BGR)
+      convertedImg.getGraphics.drawImage(bufferedImage, 0, 0, null)
+      import ImageUtil.Conversions._
+      val jpgBytes = convertedImg.asByteArray(ImageAsset.Jpeg)
+      Utils.saveToFile(jpgBytes, egraphImageTempFile)
+
+      val videoNoAudioFileName = videoNoAudioFile.getPath
+      VideoEncoder.generateMp4_no_audio_xuggle(
+        targetFileName = videoNoAudioFileName,
+        egraphImageFile = egraphImageTempFile,
+        recipientName = thisOrder.recipientName,
+        celebrityName = product.celebrity.publicName,
+        audioDuration = audioDuration
+      )
+
+      VideoEncoder.muxVideoWithAAC_mp4parser(
+        videoFile = new File(videoNoAudioFileName),
+        audioFile = finalAacTempFile,
+        targetFile = videoWithAudioFile
+      )
+
+      Utils.convertMediaFile(videoWithAudioFile, finalMp4TempFile)
+      val mp4Bytes = Blobs.Conversions.fileToByteArray(finalMp4TempFile)
+
+      wavTempFile.delete()
+      sourceMp3TempFile.delete()
+      sourceAacTempFile.delete()
+      finalAacTempFile.delete()
+      egraphImageTempFile.delete()
+      videoNoAudioFile.delete()
+      videoWithAudioFile.delete()
+      finalMp4TempFile.delete()
+      //TODO also need to delete png, which apparently is also saved to disk
+
+      blobs.put(mp4Key, mp4Bytes, access = AccessPolicy.Public)
     }
 
     override def message: Option[String] = {
@@ -464,6 +535,8 @@ case class Egraph(
 
     lazy val wavKey = blobKeyBase + "/audio.wav"
     lazy val mp3Key = blobKeyBase + "/audio.mp3"
+    lazy val mp4Key = blobKeyBase + "/egraph.mp4"
+    lazy val webmKey = blobKeyBase + "/egraph.webm"
     lazy val signatureJsonKey = signatureKey + ".json"
     lazy val messageJsonKey = messageKey + ".json"
 
@@ -639,6 +712,7 @@ trait EgraphAssets {
   /**
    * Retrieves the bytes of mp3 audio from the blobstore.
    * Also lazily initializes the mp3 from the wav, though EgraphActor should have handled that.
+   * TODO(wchan): This method does not need to be here.
    */
   def audioMp3: Blob
 
@@ -649,9 +723,20 @@ trait EgraphAssets {
   def audioMp3Url: String
 
   /**
+   * Retrieves the url of the mp4 in the blobstore.
+   * Also lazily initializes the mp4, though EgraphActor should have handled that.
+   */
+  def audioMp4Url: String
+
+  /**
    * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
    */
   def generateAndSaveMp3()
+
+  /**
+   * Encodes an mp4 and stores it to the blobstore.
+   */
+  def generateAndSaveMp4()
 
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])

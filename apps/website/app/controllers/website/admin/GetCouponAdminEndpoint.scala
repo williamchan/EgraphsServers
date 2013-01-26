@@ -2,17 +2,11 @@ package controllers.website.admin
 
 import egraphs.authtoken.AuthenticityToken
 import java.text.SimpleDateFormat
-import java.util.TimeZone
 import models.{Coupon, CouponStore}
-import models.enums.PublishedStatus
-import models.categories._
-import controllers.WebsiteControllers
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import play.api.mvc._
-import play.api.mvc.Results.{Ok, Redirect, NotFound}
 import services.mvc.ImplicitHeaderAndFooterData
-import org.apache.commons.lang3.StringEscapeUtils
 
 private[controllers] trait GetCouponAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>

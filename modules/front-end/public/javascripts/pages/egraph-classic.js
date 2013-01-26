@@ -1,4 +1,4 @@
-/* Scripting for the egraph page */
+/* Scripting for the egraph classic page */
 define(["Egraphs", "libs/guiders"], function (Egraphs, guiders) {
 	return {
     go: function () {
@@ -11,12 +11,12 @@ define(["Egraphs", "libs/guiders"], function (Egraphs, guiders) {
 
       $(document).ready(function () {
       /**
-       * Create a guider to highlight the Play button on the Egraph page.
+       * Create a guider to highlight the Play button on the Egraph classic page.
        **/
         if(Egraphs.page.isPromotional === true) {
           guiders.createGuider({
             attachTo: "#360player",
-            classString: "egraph-guider",
+            classString: "egraph-classic-guider",
             description: "<strong id='clickortouch'>Click or touch</strong> to hear a special message from " + Egraphs.page.signerName,
             id: "first",
             offset: {
