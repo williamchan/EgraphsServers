@@ -221,7 +221,7 @@ case class Egraph(
           celebFullName = celebrity.publicName,
           celebCasualName = celebrity.casualName.getOrElse(celebrity.publicName),
           productName = product.name,
-          signedAtDate = new Date(getSignedAt.getTime),
+          signedAtDate = getSignedAt,
           egraphUrl = "https://www.egraphs.com/" + orderId
         )
 
@@ -249,7 +249,7 @@ case class Egraph(
           celebFullName = celebrity.publicName,
           celebCasualName = celebrity.casualName.getOrElse(celebrity.publicName),
           productName = product.name,
-          signedAtDate = new Date(getSignedAt.getTime),
+          signedAtDate = getSignedAt,
           egraphUrl = "https://www.egraphs.com/" + orderId
         )
 
@@ -378,10 +378,10 @@ case class Egraph(
    * Convenience method to return signedAt if it exists, otherwise created
    * @return signedAt if it exists, otherwise created
    */
-  def getSignedAt: Timestamp = {
+  def getSignedAt: Date = {
     signedAt match {
-      case Some(signedAtTimestamp) => signedAtTimestamp
-      case None => created
+      case Some(signedAtTimestamp) => new Date(signedAtTimestamp.getTime)
+      case None => new Date(created.getTime)
     }
   }
 
@@ -465,7 +465,7 @@ case class Egraph(
 
       // get audio duration
       Utils.saveToFile(audioWav.asByteArray, wavTempFile)
-      val audioDuration = AudioConverter.getDurationOfWav(wavTempFile)
+      val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
 
       // build final aac file
       Utils.saveToFile(audioMp3.asByteArray, sourceMp3TempFile)
@@ -479,9 +479,9 @@ case class Egraph(
       val egraphImage = image(product.photoImage).withPenWidth(Handwriting.defaultPenWidth).withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
         .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY).scaledToWidth(VideoEncoder.canvasWidth).rasterized
       val imageBytes = egraphImage.transformAndRender.graphicsSource.asByteArray
-      val pngBufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes))
-      val convertedImg = new BufferedImage(pngBufferedImage.getWidth, pngBufferedImage.getHeight, BufferedImage.TYPE_3BYTE_BGR)
-      convertedImg.getGraphics.drawImage(pngBufferedImage, 0, 0, null)
+      val bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes))
+      val convertedImg = new BufferedImage(bufferedImage.getWidth, bufferedImage.getHeight, BufferedImage.TYPE_3BYTE_BGR)
+      convertedImg.getGraphics.drawImage(bufferedImage, 0, 0, null)
       import ImageUtil.Conversions._
       val jpgBytes = convertedImg.asByteArray(ImageAsset.Jpeg)
       Utils.saveToFile(jpgBytes, egraphImageTempFile)

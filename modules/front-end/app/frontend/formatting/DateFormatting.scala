@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat
 object DateFormatting {
   object Conversions {
     class FormattableDate(date: util.Date) {
-      /** Formats the date thusly: May 10, 2012. September 4, 2012. Etc. */
+      /** Formats the date thusly: "May 10, 2012." "September 4, 2012." Etc. */
       def formatDayAsPlainLanguage = {
         new SimpleDateFormat("MMMM dd, yyyy").format(date)
       }

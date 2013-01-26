@@ -1,13 +1,11 @@
 package services.social
 
-import com.google.inject.{Provider, Inject}
-import controllers.website.GetFacebookLoginCallbackEndpoint
 import play.api.libs.ws.WS
 import play.api.mvc.RequestHeader
 import sjson.json.Serializer
 import models.FulfilledOrder
-import java.text.SimpleDateFormat
 import play.api.http.Status
+import _root_.frontend.formatting.DateFormatting.Conversions._
 import controllers.routes.WebsiteControllers.getFacebookLoginCallback
 
 object Facebook {
@@ -96,7 +94,7 @@ object Facebook {
     val order = fulfilledOrder.order
     val egraph = fulfilledOrder.egraph
     val celebName = order.product.celebrity.publicName
-    val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
+    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage
     views.frontend.Utils.getFacebookShareLink(
       appId = fbAppId,
       picUrl = thumbnailUrl,

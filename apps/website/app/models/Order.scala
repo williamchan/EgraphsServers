@@ -27,6 +27,7 @@ import org.joda.time.DateMidnight
 import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 import org.joda.time.DateTime
+import controllers.api.FulfilledOrderBundle
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -54,7 +55,7 @@ object Order {
   }
 
   def addMinutesAndRoundUpToNextDay(date: DateTime, minutesToAdd: Int): Date = {
-    val dateSum = date.plusMinutes(minutesToAdd).toDate()
+    val dateSum = date.plusMinutes(minutesToAdd).toDate
 
     // Make sure to round up to nearest day
     val truncatedDate = DateUtils.truncate(dateSum, Calendar.DATE)
@@ -392,30 +393,6 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 
 /** Thin semantic wrapper around a tuple for product order and egraph */
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
-
-case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, celebrity: Celebrity) {
-  private val desiredWidth = 480
-  def renderedForApi: Map[String, Any] = {
-    val imageUrl = egraph.image(product.photoImage).rasterized.scaledToWidth(595).getSavedUrl(accessPolicy = AccessPolicy.Public)
-    Map(
-      "orderId" -> order.id,
-      "egraphId" -> egraph.id,
-      "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url),
-      "image" -> imageUrl,
-      "audio" -> egraph.assets.audioMp3Url,
-      "video" -> "",
-      "icon" -> product.iconUrl,
-      "signedAt" -> new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt),
-      "messageToCelebrity" -> order.messageToCelebrity.getOrElse(""),
-      "celebrityName" -> celebrity.publicName,
-      "celebritySubtitle" -> celebrity.roleDescription,
-      "celebrityMasthead" -> celebrity.landingPageImage.resizedWidth(desiredWidth).getSaved(AccessPolicy.Public, Some(0.8f)).url,
-      "productTitle" -> product.name,
-      "recipientName" -> order.recipientName,
-      "recipientId" -> order.recipientId
-    )
-  }
-}
 
 class OrderStore @Inject() (
   schema: Schema

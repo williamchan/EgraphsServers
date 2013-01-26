@@ -1,6 +1,6 @@
 package utils
 
-import services.{AppConfig, Time}
+import services.Time
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
