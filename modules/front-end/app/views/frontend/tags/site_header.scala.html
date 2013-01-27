@@ -1,4 +1,6 @@
-@(headerData: models.frontend.header.HeaderData, landingVersion: String ="")
+@(headerContent: Option[Html], 
+  headerData: models.frontend.header.HeaderData, 
+  landingVersion: String ="")
 @**   Renders the default header using the provided header data. *@
 
 @import models.frontend.header.HeaderLoggedIn
@@ -26,52 +28,54 @@
 
 <!-- Begin site_header.scala.html -->
 <header id="top" role="navigation">
-  <div class="container">
-    <div class="row">
-      <div id="logo-account-social">
-        <div class="logo span">
-      	
-        	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
-      	
-        </div>
-      
-        <div id="account-social">
-          <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
-            <ul>
-              @{headerData.loggedInStatus match {
-                case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
-                case Right(loggedIn) => loggedInHeader(loggedIn)
-              }}
-            </ul>
-          </nav>
-        </div> <!-- end #account-social -->
-      </div> <!-- end #logo-account-social -->
-      
-      <div class="linkz">
-        <div class="navbar-item our-stars">
-          <p><a class="separator-after" href="@headerData.ourStarsLink">Enter store</a></p>
-          
-        </div> <!-- end .our-stars -->
-              
-        <div class="navbar-item">
-          
-          <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
-          
-        </div> <!-- end .explore -->
-
-        <div class="navbar-item">
-          <div>
-            <form action="/stars">
-              <div class="search-control input-append">
-                <input name="query" type="search" class="span2" placeholder="Search names, teams"></input>
-                <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
-              </div>
-            </form>  
+  @headerContent.getOrElse {
+    <div class="container">
+      <div class="row">
+        <div id="logo-account-social">
+          <div class="logo span">
+        	
+          	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
+        	
           </div>
-        </div>  <!-- end .search-control -->
-      </div> <!-- end .linkz -->
-    </div> <!-- end .row -->
-  </div> <!-- end .container -->
+        
+          <div id="account-social">
+            <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
+              <ul>
+                @{headerData.loggedInStatus match {
+                  case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
+                  case Right(loggedIn) => loggedInHeader(loggedIn)
+                }}
+              </ul>
+            </nav>
+          </div> <!-- end #account-social -->
+        </div> <!-- end #logo-account-social -->
+        
+        <div class="linkz">
+          <div class="navbar-item our-stars">
+            <p><a class="separator-after" href="@headerData.ourStarsLink">Enter store</a></p>
+            
+          </div> <!-- end .our-stars -->
+                
+          <div class="navbar-item">
+            
+            <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
+            
+          </div> <!-- end .explore -->
+
+          <div class="navbar-item">
+            <div>
+              <form action="/stars">
+                <div class="search-control input-append">
+                  <input name="query" type="search" class="span2" placeholder="Search names, teams"></input>
+                  <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
+                </div>
+              </form>  
+            </div>
+          </div>  <!-- end .search-control -->
+        </div> <!-- end .linkz -->
+      </div> <!-- end .row -->
+    </div> <!-- end .container -->
+  }
 
 </header> <!-- end #top -->
 
