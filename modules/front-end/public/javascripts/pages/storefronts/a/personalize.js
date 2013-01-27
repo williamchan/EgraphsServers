@@ -2,19 +2,22 @@
 /*global angular */
 define([
   "page",
+  "libs/tooltip",
   "window",
   "services/logging",
   "module",
   "services/responsive-modal",
   "bootstrap/bootstrap-button"
 ],
-function(page, window, logging, requireModule) {
+function(page, tooltip, window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
   var forEach = angular.forEach;
 
   return {
     go: function() {
-
+      $(document).ready(function() {
+        tooltip.apply();
+      });
       log("All systems are go.");
     }
   };

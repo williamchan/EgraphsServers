@@ -17,6 +17,7 @@ a, a:link, a:visited {
 	}
 }
 
+// For bootstrap-style tooltips.
 .tooltip {
 	&.in {
 		.opacity(90);		
@@ -32,6 +33,19 @@ a, a:link, a:visited {
 		font-weight:400;
 	}
 }
+
+// For osvaldas-style tooltips. Styles used by views/tags/tooltip.scala.html. 
+.tooltip-link {
+  cursor: help;
+  text-decoration:underline;
+  font-size:11px;
+  font-style:italic;
+
+  &:hover {
+  	text-decoration:underline;
+  }
+}
+
 /* !Ribbons */
 div.ribbon {	
 	position: absolute;

@@ -11,6 +11,7 @@
  *@
 
 @import views.html.frontend._
+@import tags.tooltip
 @import models.frontend.forms.Field
 
 @headerStep(image: String, label: String, current: Boolean=false, last: Boolean=false) = {
@@ -124,7 +125,9 @@
           <div class="control-group">
             <label class="control-label" for="recipientEmail">
               Recipient Email:
-              <a href="#" class="tooltip-link field-tooltip">Why do you need this?</a>
+              @tooltip("Why do you need this?") {
+                <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit            
+              }
             </label>
             <div class="controls">
               <input id="recipientEmail"
@@ -241,7 +244,7 @@
           caption="Proceed to Final Step",
           classes="button"
         )
-        <div>or</div>      
+        <div>or</div>
         <a href="#">Edit your order</a>
       </div>
     </div>

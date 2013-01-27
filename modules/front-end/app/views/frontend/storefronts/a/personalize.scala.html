@@ -11,7 +11,12 @@
  *@
 
 @import views.html.frontend._
+@import tags.tooltip
 @import models.frontend.forms.Field
+
+@fieldTooltip(link: String)(body: => Html) = {
+  @tooltip(link, Seq("field-tooltip"))(body)
+}
 
 @headJs = {
   @**
@@ -20,6 +25,10 @@
   angular.extend(Egraphs.page, {
     config: {},
   });
+}
+
+@loremTipsum = {
+  <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit
 }
 
 @mastheadImageUrl = {https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg}
@@ -111,7 +120,9 @@
               <div class="control-group note-to-star">
                 <label class="control-label" for="note-to-star">
                   What do you want to say to @name?
-                  <a href="#" class="tooltip-link field-tooltip">What will he do with my message?</a>
+                  @fieldTooltip("What will he do with my message?") {
+                    <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit
+                  }
                 </label>
                 <div class="controls">
                   <div class="visitor-profile">
@@ -128,7 +139,9 @@
                   @* <img src='@EgraphsAssets.at("images/glyphish-circle-bothways.png")' class="connection-arrows">
                   <img src='@profileImageUrl' class="star-profile-image"> *@
                   <div>
-                    <a href="#" class="tooltip-link field-tooltip">Not sure what to say? Don't panic! Here are some great examples.</a>
+                    @fieldTooltip("Not sure what to say? Don't panic! Here are some great examples.") {
+                      @loremTipsum
+                    }
                     <div class="explanatory-text char-remaining">130 left</div>
                   </div>
                 </div>
@@ -137,7 +150,9 @@
               <div class="control-group">
                 <label class="control-label" for="recipientOption">
                   Who is this egraph for?
-                  <a href="#" class="tooltip-link field-tooltip">How does gifting work?</a>
+                  @fieldTooltip("How does gifting work?") {
+                    @loremTipsum
+                  }
                 </label>
                 <div class="controls">
                   <div id="message-options" 
@@ -166,7 +181,9 @@
               <div class="control-group">
                 <label class="control-label" for="recipientName">
                   Your name:
-                  <a href="#" class="tooltip-link field-tooltip">Why do you need this?</a>
+                  @fieldTooltip("Why do you need this?") {
+                    @loremTipsum
+                  }
                 </label>
                 <div class="controls">
                   <input id="recipientName"
@@ -191,8 +208,13 @@
               <div class="control-group photo-choice">
                 <label class="control-label" for="photoChoice">
                   What photo should he sign?
-                  <a href="#" class="tooltip-link field-tooltip">Wait, it's not just audio?</a>
-                  <a href="#" class="tooltip-link field-tooltip">What's with the different prices?</a>
+                  @fieldTooltip("Wait, it's not just audio?") {
+                    @loremTipsum
+                  }
+                  @fieldTooltip("What's with the different prices?") {
+                    @loremTipsum
+                  }
+
                 </label>
                 <div class="controls">
                   <div class="selected-photo">
@@ -245,8 +267,12 @@
               <div class="control-group">
                 <label class="control-label" for="egraphFormat">
                   In what format would you like the egraph delivered?
-                  <a href="#" class="tooltip-link field-tooltip">What's the difference?</a>
-                  <a href="#" class="tooltip-link field-tooltip">What if I want the framed print later?</a>
+                  @fieldTooltip("What's the difference?") {
+                    @loremTipsum
+                  }
+                  @fieldTooltip("What if I want the framed print later?") {
+                    @loremTipsum
+                  }
                 </label>
                 <div class="controls">
                   <div id="message-options" 
@@ -287,11 +313,14 @@
           </section>
           <div class="separator"></div>
           <section id="preview-proceed">
-            <span class="step-count one">3</span><a href="#preview" class="tooltip-link">Preview your egraph</a> then 
-              @tags.arrow_button(
-                caption="Proceed to Secure Checkout",
-                classes="button"
-              )
+            <span class="step-count one">3</span>
+            @tooltip("Preview your egraph") {
+              @loremTipsum
+            }
+            @tags.arrow_button(
+              caption="Proceed to Secure Checkout",
+              classes="button"
+            )
             <div class="price">Product price: <span class="money">$95</span>
           </section>
         </div> <!-- end container -->
