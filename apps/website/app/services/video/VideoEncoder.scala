@@ -10,6 +10,8 @@ import java.io._
 import java.util.concurrent.TimeUnit
 import java.awt.image.BufferedImage
 import java.awt.{Color, Font, RenderingHints}
+import org.apache.commons.io.IOUtils
+import play.api.Play.current
 import services.blobs.Blobs
 
 object VideoEncoder {
@@ -20,8 +22,7 @@ object VideoEncoder {
   def generateFinalAudio(sourceAacFile: File,
                          targetFile: File) {
     val fos = new FileOutputStream(targetFile)
-    // TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4
-    //    fos.write(IOUtils.toByteArray(current.resourceAsStream("audio/4sec.aac").get))
+    fos.write(IOUtils.toByteArray(current.resourceAsStream("audio/4sec.aac").get))
     fos.write(Blobs.Conversions.fileToByteArray(sourceAacFile))
     fos.flush()
     fos.close()

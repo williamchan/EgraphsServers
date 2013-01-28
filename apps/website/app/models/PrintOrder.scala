@@ -9,6 +9,7 @@ import services.Finance.TypeConversions._
 import org.joda.money.Money
 import org.squeryl.Query
 import services.print.{PrintManufacturingInfo, LandscapeFramedPrint}
+import services.blobs.AccessPolicy
 
 case class PrintOrderServices @Inject() (store: PrintOrderStore,
                                          orderStore: OrderStore,
@@ -50,7 +51,7 @@ case class PrintOrder(id: Long = 0,
    */
   def getPngUrl: Option[String] = {
     services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
-      egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
+      egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth).asPng.getSavedUrl(AccessPolicy.Public)
     }
   }
 

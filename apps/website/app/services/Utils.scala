@@ -193,8 +193,8 @@ object Utils extends Utils {
   /**
    * Code taken from http://wiki.xuggle.com/MediaTool_Introduction.
    *
-   * @param sourceFile file that contains the source audio
-   * @param targetFile target file to store the converted mp3 data
+   * @param sourceFile file that contains the source media
+   * @param targetFile target file to store the converted media
    */
   def convertMediaFile(sourceFile: File, targetFile: File) {
     val reader = ToolFactory.makeReader(sourceFile.getPath)

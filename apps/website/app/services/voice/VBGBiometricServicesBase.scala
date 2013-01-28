@@ -270,7 +270,6 @@ trait VBGBiometricServicesBase {
 
   // ========================== HELPERS
 
-  // Depends on iPad issue 49.
   final protected[voice] def convertWavTo8kHzBase64(wavBinary: Array[Byte]): String = {
     if (wavBinary.length == 0) return ""
     val wavBinary_8kHz: Array[Byte] = SampleRateConverter.convert(8000f, wavBinary)

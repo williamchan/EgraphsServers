@@ -58,7 +58,7 @@ case class EgraphImage (
    * Returns a version of this EgraphImage that will render as a rasterized PNG rather than
    * the default vector
    **/
-  def rasterized: EgraphImage = {
+  def asPng: EgraphImage = {
     this.copy(graphicsSource = services.rasterGraphicsSourceFactory())
   }
 

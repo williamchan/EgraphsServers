@@ -2,24 +2,20 @@ package models
 
 import enums.PublishedStatus.EnumVal
 import enums.{PublishedStatus, HasPublishedStatus}
-import frontend.landing.CatalogStar
 import java.sql.Timestamp
 import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import org.apache.commons.io.IOUtils
 import org.joda.money.Money
 import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
-import services.blobs.Blobs.Conversions._
 import java.awt.image.BufferedImage
-import play.api.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
-import mvc.celebrity.CelebrityViewConversions
 import org.squeryl.Query
 import play.api.Play.current
 import graphics.GraphicsSource
-import org.squeryl.dsl.{GroupWithMeasures, ManyToMany}
+import org.squeryl.dsl.ManyToMany
 import java.util.Date
 import ImageUtil.Conversions._
 
@@ -178,39 +174,6 @@ case class Product(
 
   def photoAtPurchasePreviewSize: ImageAsset = {
     photo.resizedWidth(frame.purchasePreviewWidth)
-  }
-
-// This is pretty crappy. This would be much better done on the browser-side. Left this disabled.
-  // Enable it by using productPhotoPreview instead of productPhoto on admin_celebrityproductdetail.scala.html.
-  def signingAreaPreview(width: Int = 600): String = {
-    import graphics.{Handwriting, HandwritingPen}
-    val _photo = photo
-    val ingredients = () => {
-      EgraphImageIngredients(
-        signatureJson = Product.signingAreaSignatureStr,
-        messageJsonOption = Some(Product.signingAreaMessageStr),
-        pen = HandwritingPen(width = Handwriting.defaultPenWidth),
-        photo = _photo.renderFromMaster,
-        photoDimensionsWhenSigned = Dimensions(signingScaleW, signingScaleH),
-        signingOriginX = signingOriginX,
-        signingOriginY = signingOriginY
-      )
-    }
-
-    val signingAreaPreviewImage = EgraphImage(
-      ingredientFactory = ingredients, 
-      graphicsSource = services.graphicsSourceFactory(),
-      blobPath = _photo.key
-    )
-    val rendered = signingAreaPreviewImage
-      .withSigningOriginOffset(signingOriginX.toDouble, signingOriginY.toDouble)
-      .scaledToWidth(width)
-      .transformAndRender
-    val bytes = rendered.graphicsSource.asByteArray
-    val blobs = rendered.services.blobs
-    val blobKey = keyBase + "/signingareapreview.svgz"
-    blobs.put(blobKey, bytes, AccessPolicy.Public)
-    blobs.getUrlOption(blobKey).get
   }
 
   def signingScalePhoto: ImageAsset = {

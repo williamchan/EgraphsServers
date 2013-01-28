@@ -211,11 +211,15 @@ case class Egraph(
         val thisOrder = order
         val product = thisOrder.product
         val celebrity = product.celebrity
-        val egraphImage = getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._2
+
+        // Generate and save print-sized egraph image, and get it as a BufferedImage to be passed to LandscapeFramedPrint
+        val egraphImageAsPng = getEgraphImage(LandscapeFramedPrint.targetEgraphWidth).asPng
+        egraphImageAsPng.getSavedUrl(AccessPolicy.Public)
+        val egraphImage = egraphImageAsPng.transformAndRender.graphicsSource.asInstanceOf[RasterGraphicsSource].image
 
         val framedPrintImage = LandscapeFramedPrint().assemble(
           orderNumber = orderId.toString,
-          egraphImage = egraphImage(),
+          egraphImage = egraphImage,
           teamLogoImage = product.icon.renderFromMaster,
           recipientName = thisOrder.recipientName,
           celebFullName = celebrity.publicName,
@@ -262,9 +266,9 @@ case class Egraph(
   /**
    * @param width the desired width of the egraph image. If this width is larger than the width of the master egraph
    *              image, then the master egraph image's width will be used instead.
-   * @return url of the egraph image in PNG format, along with the image data
+   * @return the egraph image asset
    */
-  def getSavedEgraphUrlAndImage(width: Int): (String, () => BufferedImage) = {
+  def getEgraphImage(width: Int): EgraphImage = {
     val product = order.product
     val rawSignedImage = image(product.photoImage)
     // targetWidth is either the default width, or the width of the master if necessary to avoid upscaling
@@ -272,11 +276,10 @@ case class Egraph(
       val masterWidth = product.photoImage.getWidth
       if (masterWidth < width) masterWidth else width
     }
-    val egraphImage = rawSignedImage
+    rawSignedImage
       .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+      .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY)
       .scaledToWidth(targetWidth)
-      .rasterized
-    (egraphImage.getSavedUrl(AccessPolicy.Public), () => egraphImage.transformAndRender.graphicsSource.asInstanceOf[RasterGraphicsSource].image)
   }
 
   /**
@@ -467,17 +470,17 @@ case class Egraph(
       Utils.saveToFile(audioWav.asByteArray, wavTempFile)
       val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
 
-      // build final aac file
+      /**
+       * Generate aac audio file. This should not have to go through an intermediate step of generating an mp3,
+       * but Xuggle seems to complain when converting a wav to an aac.
+       */
       Utils.saveToFile(audioMp3.asByteArray, sourceMp3TempFile)
-      // FIXME: this should go wav >> aac
       Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
       VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
 
       // get egraph image jpg
       val thisOrder = order
-      val product = order.product
-      val egraphImage = image(product.photoImage).withPenWidth(Handwriting.defaultPenWidth).withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-        .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY).scaledToWidth(VideoEncoder.canvasWidth).rasterized
+      val egraphImage = getEgraphImage(VideoEncoder.canvasWidth).asPng
       val imageBytes = egraphImage.transformAndRender.graphicsSource.asByteArray
       val bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes))
       val convertedImg = new BufferedImage(bufferedImage.getWidth, bufferedImage.getHeight, BufferedImage.TYPE_3BYTE_BGR)
@@ -491,7 +494,7 @@ case class Egraph(
         targetFileName = videoNoAudioFileName,
         egraphImageFile = egraphImageTempFile,
         recipientName = thisOrder.recipientName,
-        celebrityName = product.celebrity.publicName,
+        celebrityName = order.product.celebrity.publicName,
         audioDuration = audioDuration
       )
 
@@ -501,6 +504,7 @@ case class Egraph(
         targetFile = videoWithAudioFile
       )
 
+      // This step is needed to create a correctly formatted mp4.
       Utils.convertMediaFile(videoWithAudioFile, finalMp4TempFile)
       val mp4Bytes = Blobs.Conversions.fileToByteArray(finalMp4TempFile)
 
@@ -510,8 +514,8 @@ case class Egraph(
       finalAacTempFile.delete()
       egraphImageTempFile.delete()
       videoNoAudioFile.delete()
-      videoWithAudioFile.delete()
-      finalMp4TempFile.delete()
+//      videoWithAudioFile.delete()
+//      finalMp4TempFile.delete()
       //TODO also need to delete png, which apparently is also saved to disk
 
       blobs.put(mp4Key, mp4Bytes, access = AccessPolicy.Public)
@@ -712,7 +716,6 @@ trait EgraphAssets {
   /**
    * Retrieves the bytes of mp3 audio from the blobstore.
    * Also lazily initializes the mp3 from the wav, though EgraphActor should have handled that.
-   * TODO(wchan): This method does not need to be here.
    */
   def audioMp3: Blob
 
@@ -1023,7 +1026,10 @@ object EgraphFrame {
   }
 }
 
-/** The default egraph portrait frame */
+/**
+ * The default egraph portrait frame
+ * @deprecated With video-fied egraphs, we are dropping support for portrait-oriented egraphs.
+ */
 object PortraitEgraphFrame extends EgraphFrame {
   override val name: String = "Default Portrait"
 

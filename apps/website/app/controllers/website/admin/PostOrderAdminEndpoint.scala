@@ -11,6 +11,7 @@ import play.api.data._
 import play.api.data.Forms._
 import services.print.{ PrintManufacturingInfo, LandscapeFramedPrint }
 import play.api.templates.Html
+import services.blobs.AccessPolicy
 
 trait PostOrderAdminEndpoint { this: Controller =>
 
@@ -61,7 +62,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
                 egraphStore.findByOrder(orderId, egraphQueryFilters.publishedOrApproved).headOption match {
                   case None => Ok(<html><body>A published or approved egraph is required.</body></html>)
                   case Some(egraph) => {
-                    val pngUrl = egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
+                    val pngUrl = egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth).asPng.getSavedUrl(AccessPolicy.Public)
                     val framedPrintImageUrl = egraph.getFramedPrintImageUrl
                     val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
                       shippingAddress = "",

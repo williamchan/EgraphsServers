@@ -8,12 +8,14 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Session
 import services._
+import blobs.AccessPolicy
 import mvc.egraphs.EgraphView
 import services.graphics.Handwriting
 import services.http.ControllerMethod
 import services.http.EgraphsSession.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import _root_.frontend.formatting.DateFormatting.Conversions._
+import social.Pinterest
 
 private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData { 
   this: Controller =>
@@ -43,23 +45,27 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.assets.audioMp4Url
+          // TODO(wchan): egraphStillUrl should point to a jpg. (svzg renders the signature before the image, which is weird.)
+          val egraphStillUrl = ""
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-          // TODO(wchan): This should point to a jpg. (svzg renders the signature before the image, which is weird.)
-          val videoPosterUrl = ""
+          val tweetText = "An egraph for " + order.recipientName + " from " + celebrity.twitterUsername.getOrElse(celebrity.publicName)
+          val shareOnPinterestLink = Pinterest.getPinterestShareLink(
+            url = thisPageLink,
+            media = egraphStillUrl,
+            description = celebrity.publicName + " egraph for " + order.recipientName)
           Ok(views.html.frontend.egraph(
             mp4Url = mp4Url,
-            videoPosterUrl = videoPosterUrl,
+            videoPosterUrl = egraphStillUrl,
             celebrityName = celebrity.publicName,
             celebrityTagline = celebrity.roleDescription,
             recipientName = order.recipientName,
             privacySetting = order.privacyStatus.name,
             messageToCelebrity = order.messageToCelebrity,
-            // productIcon should be sized down to the final display dimensions.
-            productIconUrl = product.iconUrl,
+            productIconUrl = product.icon.resized(50, 50).getSaved(AccessPolicy.Public).url,
             signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
             thisPageLink = thisPageLink,
-            shareOnFacebookLink = "",
-            shareOnTwitterLink = "",
+            shareOnPinterestLink = shareOnPinterestLink,
+            tweetText = tweetText,
             isPromotional = order.isPromotional
           ))
       }

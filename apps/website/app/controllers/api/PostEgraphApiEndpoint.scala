@@ -74,9 +74,6 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
                 celeb <- httpFilters.requireCelebrityId.filterInAccount(account).right;
                 order <- httpFilters.requireOrderIdOfCelebrity.filter(orderId, celeb.id).right
               ) yield {
-                // validate signature for issue #104
-                val message = validForm.message
-  
                 val savedEgraph = order.newEgraph
                   .copy(
                     latitude = validForm.latitude, 
