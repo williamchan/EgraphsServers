@@ -23,7 +23,7 @@ case class CategoryServices @Inject() (
  *
  * @param id
  * @param name Unique name to simplify management for Administrators
- * @param publicname Publicly facing name displayed in the marketplace to users
+ * @param publicName Publicly facing name displayed in the marketplace to users
  * @param created
  * @param updated
  * @param services
@@ -62,7 +62,7 @@ case class Category(
 class CategoryStore @Inject() (
   schema: Schema
 ) extends SavesWithLongKey[Category] with Deletes[Long, Category]
-  with SavesCreatedUpdated[Long,Category]
+  with SavesCreatedUpdated[Category]
 {
   import org.squeryl.PrimitiveTypeMode._
   
@@ -97,17 +97,10 @@ class CategoryStore @Inject() (
   //
   override val table = schema.categories
 
-  override def defineUpdate(theOld: Category, theNew: Category) = {
-    updateIs(
-      theOld.publicName := theNew.publicName,
-      theOld.name := theNew.name,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,Category] methods
+  // SavesCreatedUpdated[Category] methods
   //
   override def withCreatedUpdated(toUpdate: Category, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

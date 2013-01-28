@@ -41,25 +41,17 @@ case class VBGStartVerification(id: Long = 0,
 
 }
 
-class VBGStartVerificationStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartVerification] with SavesCreatedUpdated[Long,VBGStartVerification] {
+class VBGStartVerificationStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartVerification] with SavesCreatedUpdated[VBGStartVerification] {
 
   //
   // SavesWithLongKey[VBGStartVerification] methods
   //
   override val table = schema.vbgStartVerificationTable
 
-  override def defineUpdate(theOld: VBGStartVerification, theNew: VBGStartVerification) = {
-    updateIs(
-      theOld.egraphId := theNew.egraphId,
-      theOld.errorCode := theNew.errorCode,
-      theOld.vbgTransactionId := theNew.vbgTransactionId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,VBGStartVerification] methods
+  // SavesCreatedUpdated[VBGStartVerification] methods
   //
   override def withCreatedUpdated(toUpdate: VBGStartVerification, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

@@ -39,7 +39,7 @@ case class Address(id: Long = 0,
   override def unapplied = Address.unapply(this)
 }
 
-class AddressStore @Inject()(schema: Schema) extends SavesWithLongKey[Address] with SavesCreatedUpdated[Long,Address] {
+class AddressStore @Inject()(schema: Schema) extends SavesWithLongKey[Address] with SavesCreatedUpdated[Address] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -55,21 +55,10 @@ class AddressStore @Inject()(schema: Schema) extends SavesWithLongKey[Address] w
   //
   override val table = schema.addresses
 
-  override def defineUpdate(theOld: Address, theNew: Address) = {
-    updateIs(
-      theOld.accountId := theNew.accountId,
-      theOld.addressLine1 := theNew.addressLine1,
-      theOld.addressLine2 := theNew.addressLine2,
-      theOld.city := theNew.city,
-      theOld._state := theNew._state,
-      theOld.postalCode := theNew.postalCode,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,Address] methods
+  // SavesCreatedUpdated[Address] methods
   //
   override def withCreatedUpdated(toUpdate: Address, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

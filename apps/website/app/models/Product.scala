@@ -337,7 +337,7 @@ object Product {
   }
 }
 
-class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Long,Product] {
+class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Product] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -392,32 +392,10 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   //
   def table = schema.products
 
-  override def defineUpdate(theOld: Product, theNew: Product) = {
-    updateIs(
-      theOld.celebrityId := theNew.celebrityId,
-      theOld.priceInCurrency := theNew.priceInCurrency,
-      theOld.name := theNew.name,
-      theOld.urlSlug := theNew.urlSlug,
-      theOld.photoKey := theNew.photoKey,
-      theOld.description := theNew.description,
-      theOld._defaultFrameName := theNew._defaultFrameName,
-      theOld._iconKey := theNew._iconKey,
-      theOld.storyTitle := theNew.storyTitle,
-      theOld.storyText := theNew.storyText,
-      theOld.signingScaleW := theNew.signingScaleW,
-      theOld.signingScaleH := theNew.signingScaleH,
-      theOld.signingOriginX := theNew.signingOriginX,
-      theOld.signingOriginY := theNew.signingOriginY,
-      theOld.signingAreaW := theNew.signingAreaW,
-      theOld.signingAreaH := theNew.signingAreaH,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated,
-      theOld._publishedStatus := theNew._publishedStatus
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,Product] methods
+  // SavesCreatedUpdated[Product] methods
   //
   override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

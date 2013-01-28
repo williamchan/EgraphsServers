@@ -77,7 +77,7 @@ object EnrollmentSample {
   }
 }
 
-class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[EnrollmentSample] with SavesCreatedUpdated[Long,EnrollmentSample] {
+class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[EnrollmentSample] with SavesCreatedUpdated[EnrollmentSample] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -85,16 +85,10 @@ class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[E
   //
   override val table = schema.enrollmentSamples
 
-  override def defineUpdate(theOld: EnrollmentSample, theNew: EnrollmentSample) = {
-    updateIs(
-      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,EnrollmentSample] methods
+  // SavesCreatedUpdated[EnrollmentSample] methods
   //
   override def withCreatedUpdated(toUpdate: EnrollmentSample, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

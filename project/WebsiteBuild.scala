@@ -60,6 +60,7 @@ object WebsiteBuild extends Build {
           ExclusionRule(organization = "org.scalatest")
       ),
       "com.typesafe.akka" % "akka-agent" % "2.0.2",
+      "org.scalaz" %% "scalaz-core" % "6.0.4",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
       //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6
