@@ -82,7 +82,7 @@
 }
 
 // A search box that doesn't use images.  It's borders glow.
-.celebrity-searchbox-container2(@mainColor: @orange, @borderColor: @offWhite) {
+.celebrity-searchbox-container(@mainColor: @orange, @borderColor: @offWhite) {
   .border-radius(3px 3px 3px 3px);
   .glowborder(@mainColor);
   border: 1px solid @borderColor;
@@ -142,48 +142,6 @@
   }
 
   a { color: @orange; }
-}
-
-/* !Celebrity Search Box */
-.celebrity-searchbox-container(@margin-override: 1px) {
-
-
-  position: relative;
-  input[type=search] {
-    .inline-block;
-    vertical-align: middle;
-    font-size: 20px;
-    width: 90%;
-    color: @orange;
-    margin: 0;
-    -webkit-appearance : none;
-    border-radius: 0;
-    .glowborder();
-
-    &::-webkit-input-placeholder {
-      color: @orange;
-    }
-
-    &::-moz-placeholder {
-      color: @orange;
-    }
-
-    &::-ms-placeholder {
-      color: @orange;
-    }
-
-  }
-  input[type=submit] {
-    position: absolute;
-    background: @white url(../images/bg-icon-magnify.png) no-repeat 94% 50%;
-    border: none;
-    width: 20%;
-    vertical-align: middle;
-    right: 10%;
-    -webkit-appearance: none;
-    margin-top: @margin-override;
-    .box-shadow(none);
-  }
 }
 
 //
