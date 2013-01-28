@@ -70,7 +70,6 @@ GET     /GiftCertificateCheckout/index                            controllers.Gi
 GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
 GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory
 GET     /Landing/giftMessaging                                    controllers.Landing.giftMessaging
-GET     /Landing/landing_a                                        controllers.Landing.landing_a
 GET     /Landing/signupOn                                         controllers.Landing.signupOn
 GET     /Landing/singleCelebrity                                  controllers.Landing.singleCelebrity(publicName:String ?= "David Price", casualName:String ?= "David", isMale: Boolean ?= true)
 

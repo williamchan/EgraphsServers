@@ -1,53 +1,180 @@
-@(stars:Iterable[models.frontend.landing.CatalogStar], signup:Boolean = false
+@(stars:Iterable[models.frontend.landing.CatalogStar],
+  verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
+  signup:Boolean = false,
+  marketplaceRoute : String = "/stars"
 )(
   implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@**   Consumer landing page
-
+@**   Consumer landing page variant A. Intended to replace the default landing page. 
       stars - the list of all featured stars celebrities.
 *@
 
 @import models.frontend.landing.CatalogStar
 @import views.html.frontend.tags
+@import play.api.libs.json._
 
+@loremIpsum = {
+  <h2> Lorem ipsum dolor sit amet</h2>
+}
 @starsBlock(stars: Iterable[CatalogStar], clearFix: Boolean) = {
-  @for(starRow <- stars.grouped(4).toList) {
-    <div class="celebrities row">
-      @if(clearFix) {<div class="clearfix">}
+  <div id="landing-stars" class="module">
+    <h2>Featured Stars</h2>
+    @for(starRow <- stars.grouped(4).toList) {
+      <div class="celebrities row">
+        @if(clearFix) {<div class="clearfix">}
 
-      @for(star <- starRow) {
-        <article class="span3">
-          <figure>
-            @if(!star.hasInventoryRemaining) {
-              <div class="ribbon simple">
-                <a class="soldout-tooltip" href="/faq#how-many" rel="tooltip" title="More available soon!">Sold out <span class="question">?</span>
-                </a>
-              </div>
-            }
-            <a class="glowborder" href="@star.storefrontUrl" >
-              <img src="@star.imageUrl" alt="@star.name" />              
-            </a>
-          </figure>
-
-          <h4><a href="@star.storefrontUrl">@star.name &rsaquo;</a></h4>
-
-          <p>@star.secondaryText</p>
-
-        </article>        
-      }
-
-      @if(clearFix) {</div>}
-    </div>
-  }
+        @for(star <- starRow) {
+          <article class="span3">
+            <figure>
+              @if(!star.hasInventoryRemaining) {
+                <div class="ribbon simple">
+                  <a class="soldout-tooltip" href="/faq#how-many" rel="tooltip" title="More available soon!">Sold out <span class="question">?</span>
+                  </a>
+                </div>
+              }
+              <a class="glowborder" href="@star.storefrontUrl" >
+                <img src="@star.imageUrl" title="Purchase an egraph from @star.name" alt="@star.name"/>              
+              </a>
+            </figure>
+            <hgroup>
+              <p class="price">$@if(star.minPrice > 0 && star.minPrice != star.maxPrice){@star.minPrice - @star.maxPrice} else { @star.maxPrice }</p>
+              <h4><a href="@star.storefrontUrl">@star.name</a></h4>
+              <h5>@star.secondaryText</h5>
+            </hgroup>
+          </article>        
+        }
+        @if(clearFix) {</div>}
+      </div>
+    }
+    @tags.landing.get_started("/stars", "See All Stars", "stars-link")
+  </div>  
 }
 
-@modalJs = {
+@verticalAndTeams = {
+  <div class="module" id="browse">
+    <h2>Find your team on Egraphs</h2>
+      <div class="row">
+        <div class="clearfix">
+          @for(vertical <- verticalViewModels) {
+
+            <article class="span6">
+              <a id="@vertical.shortName" class="vertical-button" name="@vertical.shortName" data-vertical="@vertical.urlSlug"><img src="@EgraphsAssets.at(vertical.iconUrl)"/>
+                <h3>@vertical.shortName</h3>
+              </a>
+              <ul>
+              @for(category <- vertical.categoryViewModels;
+                   categoryValue <- category.categoryValues.sorted) {
+                <li>
+                  <a data-vertical="@vertical.urlSlug" data-category="@category.id" data-categoryvalue="@categoryValue.id" class="cv-link">
+                    @categoryValue.publicName&nbsp;
+                  </a>
+                </li>
+
+                }
+                <li>
+                  <a data-vertical="@vertical.urlSlug" name="@vertical.shortName" class="all-teams">See all @vertical.shortName Teams &raquo;</a>
+                </li>
+              </ul>
+            </article>
+          }
+          </div>
+        </div>
+    </div>
+}
+@verticalsRow(verticals: Iterable[models.frontend.marketplace.VerticalViewModel])= {
+  <div id="verticals" class="module">
+    <div class="row">
+      <div class="clearfix">
+        @for(vertical <- verticals) {
+          <div class="vertical-select span4">
+            <a class="glowborder vertical-tile" title="Shop @vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" href="#">
+              <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
+                <h3>@vertical.shortName &gt;&gt;</i></h3>
+                <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url"/>
+              </div>
+            </a>
+          </div> 
+        }
+          <div class="vertical-select span4">
+            <a class="glowborder" target="_blank" title="Egraph of the Week" href="https://www.egraphs.com/3608">
+              <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/crowd.jpg").url')">
+                <h3>Featured Egraph</h3>
+              </div>
+            </a>
+          </div>  
+        </div>
+      </div>
+    </div>
+}
+
+@testimonials = {
+   <div id="testimonials" class="module">
+    @loremIpsum
+    <div class="row">
+      <div class="clearfix">
+      @for(i <- 0 until 3){
+        <div class="span4">
+        <blockquote class=".pull-right">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula magna dui, mattis eleifend sapien. Proin imperdiet, odio id tincidunt venenatis, risus enim auctor nisl, vel malesuada libero sapien in urna.
+          </p>
+          <small>Aphrodite, <cite title="Mt Olympus, WA 11/18/1941">Mt. Olympus, WA</cite></small>
+        </blockquote>
+        </div>
+      }  
+      </div>
+    </div>  
+  </div>
+}
+
+@teams = {
+  <div id="teams" class="module">
+  @loremIpsum
+    <div class="row">
+      <div class="clearfix">
+        @for(vertical <- verticalViewModels) {
+        <div class="carousel slide span12" id="@vertical.shortName-carousel">
+          <div class="carousel-inner">
+            @for(category <- vertical.categoryViewModels;
+                 (categoryValue, index) <- category.categoryValues.zipWithIndex) {
+              @if(index % 10 == 0) {
+              <div class="item @if(index == 0){active}">
+                <ul class="thumbnails">
+                    <li class="span1"></li>
+              }  
+                  <li class="span1">
+                    <div class="thumbnail">
+                      <img src="@EgraphsAssets.at(categoryValue.iconUrl).url"/>
+                    </div>  
+                  </li>
+              @if(index % 10 == 9 || index == category.categoryValues.size - 1) {
+                <li class="span1"></li>
+                </ul>
+              </div>
+              }
+            }  
+          </div>
+          <a data-slide="prev" href="#@vertical.shortName-carousel" class="left carousel-control">‹</a>
+          <a data-slide="next" href="#@vertical.shortName-carousel" class="right carousel-control">›</a>
+        </div>
+        }
+      </div>
+    </div>
+  </div>   
+}
+@headJs = {
   @if(signup) {
     Egraphs.page.modalOn = true;
   }
+  Egraphs.page.categories =  @Html(
+    Json.toJson(verticalViewModels.flatMap{v =>
+      v.categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
+        (a, b) => a ++ b.asActiveMap)
+    }.toMap).toString());
+  Egraphs.page.queryUrl = "@marketplaceRoute";
 }
 
 @baseBody = {
@@ -55,31 +182,45 @@
   @tags.landing.masthead_section(
     celebrityPublicName=None,
     mastheadMessage=None,
-    mastheadImageUrl=EgraphsAssets.at("images/landing-masthead.jpg").url,
+    mastheadImageUrl=EgraphsAssets.at("images/landing-masthead-a.jpg").url,
     getStartedUrl=Some("/stars")
   )
 
-  <section id="content" role="main">
+  <section id="content" role="main" class="landing">
 
     <div id="main">
+      <div id ="landing-content" class="container">
+        
+        <ul id="tabs" data-tab="tabs"class="switcher">
+          <li class="active left-tab"><a class="switcher-tab" href="#shop">Shop</a></li>
+          <li class="right-tab"><a id="learn-switch" class="switcher-tab" href="#learn">Learn</a></li>
+        </ul>
+        
+        <section id="learn" class="tab" style="display: none">
+          @tags.landing.welcome_header()
 
-      <div class="container">
+          @tags.landing.landing_steps()
 
-        <footer id="landing-stars">
-          <h3><a href="#featured-stars">Featured Stars <span>+</span></a></h3>
+          @tags.landing.landing_details()
+
+          @tags.landing.landing_more(None, Some("/stars"))
+        </section>        
+        <section id="shop" class="tab">
+          @verticalsRow(verticalViewModels)
+          
           @starsBlock(stars, clearFix=true)
-        </footer> <!-- end #landing-stars -->
 
-        @tags.landing.welcome_header()
+          @verticalAndTeams
+          <div class="row">
+            <div class="span12">
+              @tags.landing.searchbox("/stars")
+              @tags.mailing_list_form()
+            </div>
+          </div>  
+        </section>    
+        
 
-        @tags.landing.landing_steps()
-
-        @tags.landing.landing_details()
-
-        @tags.landing.landing_more(None, Some("/stars"))
-
-        <p class="to-top"><a href="#top">Back to Top</a></p>
-
+          <p class="to-top"><a href="#to-top">Back to Top</a></p>  
       </div> <!-- end .container -->
 
     </div> <!-- end #main -->
@@ -87,9 +228,10 @@
   </section> <!-- end #content -->
 }
 
+
 @base_template(
   title="Share a moment with your favorite star",
-  jsMain="pages/landing",
-  headJs=modalJs,
+  jsMain="pages/landing-a",
+  headJs=headJs,
   body=baseBody
 )

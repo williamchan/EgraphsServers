@@ -26,23 +26,8 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   //
 
   var marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
+
   def getRootConsumerEndpoint = controllerMethod.withForm() { implicit authToken =>
-    Action { implicit request =>
-      val featuredStars = celebrityStore.catalogStarsSearch(refinements = List(List(featured.categoryValue.id))).toList
-      val html = request.queryString.get("signup") match {
-        case Some(Seq("true")) => views.html.frontend.landing(stars=featuredStars, signup = true)
-        case _  =>  views.html.frontend.landing(stars=featuredStars, signup = false)
-      }
-      
-      Ok(html)
-    }
-  }
-
-  /**
-   * Temporary controller for forking traffic between two designs. Serves the route /new. 
-  **/
-
-  def getRootConsumerEndpointA = controllerMethod.withForm() { implicit authToken =>
     Action {implicit request =>
       val featuredStars = celebrityStore.catalogStarsSearch(refinements = List(List(featured.categoryValue.id))).toList
       val verticals = marketplaceServices.getVerticalViewModels()
