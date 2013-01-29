@@ -1,7 +1,10 @@
 package controllers.website.admin
 
-import models._
-import enums.PublishedStatus
+import models.CelebrityStore
+import models.AccountStore
+import models.Celebrity
+import models.Account
+import models.enums.PublishedStatus
 import play.api.mvc.Controller
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters

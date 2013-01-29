@@ -1,6 +1,7 @@
 package controllers.website.admin
 
-import models._
+import models.CelebrityStore
+import models.AccountStore
 import services.mail.TransactionalMail
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
