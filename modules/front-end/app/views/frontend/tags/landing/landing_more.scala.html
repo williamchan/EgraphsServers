@@ -17,11 +17,11 @@
   </header>
   @getStartedUrl.map{ url =>
     <div class="row">
-      <div class="offset4 span5">
+      <div class="span12">
       @{
         celebrityPublicName match {
           case None =>  tags.landing.searchbox(url)
-          case Some(name) => tags.landing.get_started(url)
+          case Some(name) => tags.landing.get_started(url = url, classString="get-started")
         }
       }
       </div>

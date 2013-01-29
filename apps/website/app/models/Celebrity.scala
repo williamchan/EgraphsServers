@@ -118,6 +118,14 @@ case class Celebrity(id: Long = 0,
   }
 
   /**
+   * If twitterUsername is not set, they might have a twitter account.
+   * But if it is set to "none", we have checked, and they don't have one.
+   */
+  def doesNotHaveTwitter = {
+    twitterUsername.map(name => name.toLowerCase) == Some("none")
+  }
+  
+  /**
    * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
    * by the API (e.g. JSON)
    */
