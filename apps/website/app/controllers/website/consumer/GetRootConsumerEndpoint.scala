@@ -32,8 +32,8 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
       val featuredStars = celebrityStore.catalogStarsSearch(refinements = List(List(featured.categoryValue.id))).toList
       val verticals = marketplaceServices.getVerticalViewModels()
       val html = request.queryString.get("signup") match {
-        case Some(Seq("true")) => views.html.frontend.landing_a(stars=featuredStars, verticalViewModels = verticals, marketplaceRoute = marketplaceRoute, signup = true)
-        case _  =>  views.html.frontend.landing_a(stars=featuredStars, verticalViewModels = verticals, marketplaceRoute = marketplaceRoute, signup = false)
+        case Some(Seq("true")) => views.html.frontend.landing(stars=featuredStars, verticalViewModels = verticals, marketplaceRoute = marketplaceRoute, signup = true)
+        case _  =>  views.html.frontend.landing(stars=featuredStars, verticalViewModels = verticals, marketplaceRoute = marketplaceRoute, signup = false)
       }
 
       Ok(html)

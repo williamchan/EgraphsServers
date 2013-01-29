@@ -211,10 +211,9 @@
 
   form {
     margin-bottom: 0px;
+    margin-left: 5px;
     .search-control {
-      .celebrity-searchbox-container();
-      margin-left: 15px;
-      margin-right: 15px;
+      .celebrity-searchbox-container(@orange, @inputBorder, 180px);
     }
   }
 } // end #top
@@ -254,10 +253,6 @@
      margin-right: 5px;
     }
 
-    // This keeps the search box from shrinking
-    input.span2, textarea.span2, .uneditable-input.span2 {
-      width: 140px;
-    }
   } // end #top
 }
 
@@ -337,10 +332,8 @@
     }
 
     .search-control {
-      margin-left: 0;
-      margin-right: 5px;
       input[type="search"] {
-        height: 35px;
+        width: 133px;
       }
     }
 

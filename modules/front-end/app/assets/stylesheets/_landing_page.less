@@ -26,16 +26,6 @@
 
       .search-control {
         .celebrity-searchbox-container();
-        overflow: hidden;
-        width: 300px;
-       
-        input {
-          width: 85%;
-        }
-
-        button {
-          float: right;
-        }
       }  
     }
 
@@ -971,17 +961,13 @@
       width: 290px;
 
       .input-append {
-        .celebrity-searchbox-container();
-        width: 290px;
-      
+        .celebrity-searchbox-container(@orange, @inputBorder, 290px);
+    
         input[type="email"] {
-          width: 244px;
-        }
-      
-        .btn {
-          float: right;
+          width: 243px;
         } 
       }
+    }
 
       label {
         color: @orange;
