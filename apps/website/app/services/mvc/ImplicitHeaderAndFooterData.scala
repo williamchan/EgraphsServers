@@ -62,9 +62,4 @@ trait ImplicitHeaderAndFooterData {
       customer
     }
   }
-
-  private def userUrl(user: String, lastPart: String):String = {
-    "users/" + user + "/" + lastPart
-  }
-
 }

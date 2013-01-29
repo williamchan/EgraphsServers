@@ -135,11 +135,11 @@ object Customer {
     val (textMsg: String, htmlMsg: Html) = if (verificationNeeded) {
       val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
       val html = views.html.frontend.email_account_verification(verifyPasswordUrl = verifyPasswordUrl)
-      val text = views.html.frontend.email_account_verification_text(verifyPasswordUrl).toString()
+      val text = views.html.frontend.email_account_verification_text(verifyPasswordUrl).toString
       (text, html)
     } else {
       val html = views.html.frontend.email_account_confirmation()
-      val text = views.html.frontend.email_account_confirmation_text.toString()
+      val text = views.html.frontend.email_account_confirmation_text.toString
       (text, html)
     }
 
