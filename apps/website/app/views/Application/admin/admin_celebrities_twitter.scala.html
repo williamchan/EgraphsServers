@@ -35,7 +35,7 @@
             <th>Google Results for "twitter <publicName>"</th>
           </tr>
         </thead>  
-      @celebrityTwitterData.map { case CelebrityTwitterData(celebrityId, publicName, officialScreenName, twitterFollowersCount) =>
+      @celebrityTwitterData.map { case CelebrityTwitterData(celebrityId, publicName, officialScreenName, twitterFollowersCount, _) =>
         <tr>
           <td>
             <a class="preview-link" href="@controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId)">@celebrityId</a>

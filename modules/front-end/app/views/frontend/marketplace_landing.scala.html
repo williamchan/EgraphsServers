@@ -10,6 +10,7 @@
 @import models.frontend.egraphs._
 @import play.api.libs.json._
 @import models.frontend.marketplace.MarketplaceConversions._
+@import views.html.frontend.tags
 
 @**
   Default landing page for the marketplace. Supports displaying multiple sets of results w/o any special scrolling behavior. 
@@ -39,14 +40,7 @@
     <div class="row-fluid">
     
       <div class="span12 masthead" role="masthead">
-
-        <form action="@marketplaceRoute" method="get">
-          <div>
-            <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" autofocus>
-            <input name="submit" type="submit" value="" title="Click here to search for your star">
-          </div>
-        </form>
-
+        @tags.landing.searchbox("/stars")
         <img src='@EgraphsAssets.at("images/marketplace-masthead.jpg")'/>
       
       </div>

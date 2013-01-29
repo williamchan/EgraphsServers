@@ -17,15 +17,9 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
    * 0 <= n <= sampleStars.length
    **/
   def featuredStars(count: Int) = Action {
-    Ok(views.html.frontend.landing(sampleStars.slice(0, count)))
+    Ok(views.html.frontend.landing(sampleStars.slice(0, count),verticalViewModels = Marketplace.landingVerticalSet, marketplaceRoute  = marketplaceRoute))
   }
-  /**
-   * Displays a new redesign of the homepage as part of the homepage explorations effort. 
-   **/
 
-  def landing_a =  Action {
-    Ok(views.html.frontend.landing_a(sampleStars.slice(0,8), Marketplace.landingVerticalSet))
-  }
 
   /**
    * Displays a permutation of the page with gift certificate messaging up top. 
@@ -33,18 +27,17 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
 
    def giftMessaging = Action {
     implicit val headerData = HeaderData(giftCertificateLink = Some("/gift"))
-
-    Ok(views.html.frontend.landing(sampleStars)(headerData, defaultFooterData, authenticityToken)) 
+    Ok(views.html.frontend.landing(sampleStars, Marketplace.landingVerticalSet, signup = false, marketplaceRoute)(headerData, defaultFooterData, authenticityToken))
    }
 
   def signupOn = Action {
     val stars = sampleStars.map(star => star.copy(inventoryRemaining = 0))
-    Ok(views.html.frontend.landing(stars, signup=true))
+    Ok(views.html.frontend.landing(sampleStars, Marketplace.landingVerticalSet, signup = true, marketplaceRoute))
   }
 
   def featuredStarsWithNoInventory() = Action {
     val stars = sampleStars.map(star => star.copy(inventoryRemaining = 0))
-    Ok(views.html.frontend.landing(stars))
+    Ok(views.html.frontend.landing(stars, Marketplace.landingVerticalSet, signup = false, marketplaceRoute))
   }
 
   def singleCelebrity(publicName: String,
@@ -76,7 +69,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
 
   private val sampleImageUrl = "http://placehold.it/440x157"
   private val sampleMarketplaceImageUrl = EgraphsAssets.at("images/660x350.gif").url
-
+  private val marketplaceRoute = "/stars"
   private val sampleStars = Seq(
     makeSampleStar(1, "David Price", Some("Tampa Bay Rays")),
     makeSampleStar(2, "Josh Hamilton", Some("Texas Rangers")),

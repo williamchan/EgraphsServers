@@ -46,17 +46,14 @@
 	}
 
 	.social {
-		float: right;
-		ul {
 
+		ul {
+			float: right;
 			list-style-type: none; 
 			
-			form {
-				.input-append {
-					.celebrity-searchbox-container2();
-					width: 254px;
-				}	
-			}
+			.input-append {
+				.celebrity-searchbox-container(@orange, @inputBorder, 270px);
+			}	
 
 			label {
 				color: @orange;
@@ -129,17 +126,11 @@
 			display: none;
 		}
 
-		.social { 
-			input[type="email"] {
-				width: 210px;
-			}
-  	}
 		.site-links { 
 			float: left;
 			width: 35%;
 		}
 	}
-
 }
 
 @media (max-width: 480px) {
