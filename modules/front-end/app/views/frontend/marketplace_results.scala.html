@@ -49,13 +49,14 @@
     
       <div class="span12 masthead" role="masthead">
 
-        <form action="@marketplaceRoute" method="get">
-        <div>
-            <input name="query" id="celebrity-searchbox" type="search" placeholder="Find Your Star" value="@query" @if(query.length == 0 && !verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active))){autofocus}/>
-            <input class="submit" type="submit" value="" title="Click here to search for your star"/>
+        <form class="search-form" action="@marketplaceRoute" method="get" class="form-inline span5">
+          <div class="search-control input-append">
+            <input type="search" name="query" class="" placeholder="Find your star" @if(query.length == 0 && !verticalViewModels.exists(v => v.categoryViewModels.exists(c => c.active))) {autofocus}/>
+            <button class="btn" type="submit" title="Click here to search for a name or team."><i class="icon-search icon-white"></i></button>
             <input name="view" type="hidden" value="@if(viewAsList){list}"/>
             <input type="hidden" name="sort" value="@sortOptions.find(v => v.active).map(v => v.name)"/>
-        </div>
+          </div>  
+          <span class="help-block">Search for names or teams.</span>
         </form>
 
         <img src='@EgraphsAssets.at("images/marketplace-masthead.jpg")'/>

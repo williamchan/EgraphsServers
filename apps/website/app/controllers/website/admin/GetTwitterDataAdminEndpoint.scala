@@ -26,12 +26,13 @@ private[controllers] trait GetTwitterDataAdminEndpoint extends ImplicitHeaderAnd
           val celebrityTwitterDataUnsorted = for {
             celebrity <- celebrities
           } yield {
-            CelebrityTwitterData(celebrity.id, celebrity.publicName, celebrity.twitterUsername, twitterFollowersCounts(celebrity.id))
+            CelebrityTwitterData(celebrity.id, celebrity.publicName, celebrity.twitterUsername, twitterFollowersCounts(celebrity.id), celebrity.doesNotHaveTwitter)
           }
 
           val celebrityTwitterData = celebrityTwitterDataUnsorted.toList.sortWith(
             (a, b) => a.celebrityId < b.celebrityId).sortWith(
-              (a, b) => a.twitterFollowersCount > b.twitterFollowersCount)
+              (a, b) => a.twitterFollowersCount > b.twitterFollowersCount).sortWith(
+                (a, b) => !a.doesNotHaveTwitter)
 
           Ok(views.html.Application.admin.admin_celebrities_twitter(celebrityTwitterData))
         }
@@ -43,4 +44,5 @@ case class CelebrityTwitterData(
   celebrityId: Long,
   publicName: String,
   officialScreenName: Option[String],
-  twitterFollowersCount: Int)
+  twitterFollowersCount: Int,
+  doesNotHaveTwitter: Boolean)
