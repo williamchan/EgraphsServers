@@ -143,7 +143,7 @@ object Account {
  */
 case class AccountServices @Inject() (accountStore: AccountStore, customerStore: CustomerStore, addressStore: AddressStore)
 
-class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] with SavesCreatedUpdated[Long,Account] {
+class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] with SavesCreatedUpdated[Account] {
   import org.squeryl.PrimitiveTypeMode._
 
   def authenticate(email: String, passwordAttempt: String): Either[AccountAuthenticationError, Account] = {
@@ -209,21 +209,7 @@ class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] 
   //
   override val table = schema.accounts
 
-  override def defineUpdate(theOld: Account, theNew: Account) = {
-    updateIs(
-      theOld.email := theNew.email,
-      theOld.passwordHash := theNew.passwordHash,
-      theOld.passwordSalt := theNew.passwordSalt,
-      theOld.resetPasswordKey := theNew.resetPasswordKey,
-      theOld.fbUserId := theNew.fbUserId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated,
-      theOld.celebrityId := theNew.celebrityId,
-      theOld.customerId := theNew.customerId,
-      theOld.administratorId := theNew.administratorId,
-      theOld.emailVerified := theNew.emailVerified
-    )
-  }
+
 
   beforeInsertOrUpdate(withEmailInLowerCase)
 
@@ -232,7 +218,7 @@ class AccountStore @Inject() (schema: Schema) extends SavesWithLongKey[Account] 
   }
 
   //
-  // SavesCreatedUpdated[Long,Account] methods
+  // SavesCreatedUpdated[Account] methods
   //
   override protected def withCreatedUpdated(toUpdate: Account,
                                             created: Timestamp,

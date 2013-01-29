@@ -15,6 +15,8 @@ object CashTransactionType extends Enum {
   val PurchaseRefund = new EnumVal {val name = "PurchaseRefund"}
 
   val CelebrityDisbursement = new EnumVal {val name = "CelebrityDisbursement"}
+
+  val Checkout = new EnumVal {val name = "Checkout"}
 }
 
 trait HasCashTransactionType[T] {

@@ -65,9 +65,5 @@ class VideoAssetCelebrityStore @Inject() (schema: Schema) extends SavesWithLongK
   //
   def table = schema.videoAssetsCelebrity
 
-  override def defineUpdate(theOld: VideoAssetCelebrity, theNew: VideoAssetCelebrity) = {
-    updateIs(
-      theOld.celebrityId := theNew.celebrityId,
-      theOld.videoId := theNew.videoId)
-  }
+
 }

@@ -67,6 +67,8 @@ GET     /Finalize/index                                           controllers.Fi
 GET     /Finalize/portrait                                        controllers.Finalize.portrait
 
 GET     /GiftCertificateCheckout/index                            controllers.GiftCertificateCheckout.index
+GET     /Storefront-A/personalize                                 controllers.StorefrontA.personalize
+GET     /Storefront-A/checkout                                    controllers.StorefrontA.checkout
 
 GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
 GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory

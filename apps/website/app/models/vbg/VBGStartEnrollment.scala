@@ -41,25 +41,17 @@ case class VBGStartEnrollment(id: Long = 0,
 
 }
 
-class VBGStartEnrollmentStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartEnrollment] with SavesCreatedUpdated[Long,VBGStartEnrollment] {
+class VBGStartEnrollmentStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGStartEnrollment] with SavesCreatedUpdated[VBGStartEnrollment] {
 
   //
   // SavesWithLongKey[VBGStartEnrollment] methods
   //
   override val table = schema.vbgStartEnrollmentTable
 
-  override def defineUpdate(theOld: VBGStartEnrollment, theNew: VBGStartEnrollment) = {
-    updateIs(
-      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
-      theOld.errorCode := theNew.errorCode,
-      theOld.vbgTransactionId := theNew.vbgTransactionId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,VBGStartEnrollment] methods
+  // SavesCreatedUpdated[VBGStartEnrollment] methods
   //
   override def withCreatedUpdated(toUpdate: VBGStartEnrollment, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

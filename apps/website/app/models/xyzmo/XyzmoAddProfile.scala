@@ -64,27 +64,17 @@ case class XyzmoAddProfile(id: Long = 0,
 
 }
 
-class XyzmoAddProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoAddProfile] with SavesCreatedUpdated[Long,XyzmoAddProfile] {
+class XyzmoAddProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoAddProfile] with SavesCreatedUpdated[XyzmoAddProfile] {
 
   //
   // SavesWithLongKey[XyzmoAddProfile] methods
   //
   override val table = schema.xyzmoAddProfileTable
 
-  override def defineUpdate(theOld: XyzmoAddProfile, theNew: XyzmoAddProfile) = {
-    updateIs(
-      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
-      theOld.baseResult := theNew.baseResult,
-      theOld.error := theNew.error,
-      theOld.errorMsg := theNew.errorMsg,
-      theOld.xyzmoProfileId := theNew.xyzmoProfileId,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,XyzmoAddProfile] methods
+  // SavesCreatedUpdated[XyzmoAddProfile] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoAddProfile, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

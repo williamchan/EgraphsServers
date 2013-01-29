@@ -22,7 +22,7 @@ case class FailedPurchaseData(
 
 case class FailedPurchaseDataServices @Inject()(store: FailedPurchaseDataStore)
 
-class FailedPurchaseDataStore @Inject()(schema: Schema) extends SavesWithLongKey[FailedPurchaseData] with SavesCreatedUpdated[Long,FailedPurchaseData] {
+class FailedPurchaseDataStore @Inject()(schema: Schema) extends SavesWithLongKey[FailedPurchaseData] with SavesCreatedUpdated[FailedPurchaseData] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -30,14 +30,7 @@ class FailedPurchaseDataStore @Inject()(schema: Schema) extends SavesWithLongKey
   //
   def table = schema.failedPurchaseData
 
-  override def defineUpdate(theOld: FailedPurchaseData, theNew: FailedPurchaseData) = {
-    updateIs(
-      theOld.purchaseData := theNew.purchaseData,
-      theOld.errorDescription := theNew.errorDescription,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
   // SavesCreatedUpdated methods

@@ -33,7 +33,7 @@ case class BlobKey(id: Long = 0L,
 
 }
 
-class BlobKeyStore @Inject()(schema: Schema) extends SavesWithLongKey[BlobKey] with SavesCreatedUpdated[Long,BlobKey] {
+class BlobKeyStore @Inject()(schema: Schema) extends SavesWithLongKey[BlobKey] with SavesCreatedUpdated[BlobKey] {
   import org.squeryl.PrimitiveTypeMode._
 
   def findByKey(key: String): Option[BlobKey] = {
@@ -45,14 +45,7 @@ class BlobKeyStore @Inject()(schema: Schema) extends SavesWithLongKey[BlobKey] w
   //
   def table = schema.blobKeys
 
-  override def defineUpdate(theOld: BlobKey, theNew: BlobKey) = {
-    updateIs(
-      theOld.key := theNew.key,
-      theOld.url := theNew.url,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
   // SavesCreatedUpdated methods

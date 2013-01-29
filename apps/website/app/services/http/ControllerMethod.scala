@@ -34,8 +34,6 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
    * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
    *                   lifecycle of this controller method, as well as the transaction isolation level and
    *                   whether the transaction is read-only.
-   * @param operation the code block to execute after setting up the connection resources
-   * @param request the request being served
    * @return the result of the `operation` code block.
    */
   def apply[A](dbSettings: ControllerDBSettings = WithDBConnection())
@@ -88,9 +86,6 @@ class POSTControllerMethod @Inject()(
    * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
    *                   lifecycle of this controller method, as well as the transaction isolation level and
    *                   whether the transaction is read-only.
-   * @param operation the operation to perform
-   * @param request the current request
-   * @param session the current session
    * @tparam A return type of Operation
    * @return either the return value of the `operation` code block or a [[play.api.mvc.Results.Forbidden]]
    */
@@ -125,9 +120,6 @@ class POSTApiControllerMethod @Inject()(postControllerMethod: POSTControllerMeth
    * @param dbSettings the ControllerDBSettings that specify whether a database connection coincides with the
    *                   lifecycle of this controller method, as well as the transaction isolation level and
    *                   whether the transaction is read-only.
-   * @param operation operation to perform
-   * @param request the current request
-   * @param session the current session
    * @tparam A return type of `operation`
    *
    * @return the return value of the `operation` code block or the error state of postControllerMethod
