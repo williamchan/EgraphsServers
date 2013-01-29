@@ -1,5 +1,22 @@
+.absolute-container {
+  position: absolute;
+  margin-left:40px;
+  width:940px;
+}
+
+@media (max-width:767px) { 
+  .absolute-container {
+    width: 100%;
+    margin-left:0;
+  }
+}
 
 .storefront-a-personalize {
+
+  h2, .callout {
+    font-size:1.2em;
+  }
+
   .separator {
     display:block;
     border-top: 1px solid #ccc;
@@ -7,9 +24,11 @@
     border-bottom: 1px solid white;
   }
 }
+
 // Styles for the masthead of the storefront personalize page
-.storefront-a-personalize #masthead-home {
-  .box-shadow(inset 0 -8px 8px -8px rgba(0, 0, 0, .5));
+.storefront-a-personalize #personalize-masthead {
+  overflow:hidden;
+  .box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5) inset);
   
   // Specify all aspects of the background but the image url,
   // which is specified in the actual page.
@@ -17,19 +36,48 @@
   background-repeat: no-repeat;
   background-position: 50% 0; // center align
   background-size: auto 100%; // scale responsively with masthead height
+  text-align:right;
 
-  .banner-gradient {
-    max-width: 1551px;
-    margin: 0 auto;
-    height: 100%;
+  &:before {
+    position:absolute;
+    top:0px;
+    left:0px;
+    content: "";
+    height:100%;
+    width:100%;
+
+    @start: 100%;
+    @grad1: 64%;
+    @grad2: 66.66666%;
+
+    //background: -moz-radial-gradient(@start, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) @grad1,  rgba(26,26,26,1) @grad2); /* FF3.6+ */
+    //background: -webkit-radial-gradient(@start, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) @grad1, rgba(26,26,26,1) @grad2); /* Chrome10+,Safari5.1+ */
+    //background: -o-radial-gradient(@start, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) @grad1, rgba(26,26,26,1) @grad2); /* Opera 12+ */
+    //background: -ms-radial-gradient(@start, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) @grad1, rgba(26,26,26,1) @grad2); /* IE10+ */
+    //background: radial-gradient(circle at @start, rgba(26,26,26,0) 0%, rgba(26,26,26,0) @grad1, rgba(26,26,26,1) @grad2); /* W3C */
+    // .box-shadow(0px 0px 100px 20px black inset);
+    border-bottom:1px solid white;
+  }
+
+  img {
+    // width:66.6666%;
+    width:100%;
+    z-index:-1;
+  }
+
+  .masthead-content {
+    top:15%;
   }
 
   h1 {
+    text-align: left;
+    width:40%;
+    margin-top:0;
+    margin-bottom:10px;
     color: @white;
-    margin-top:10px;
+    line-height:1em;
     font-weight: 300;
-    font-size: 42px;
-    line-height: 1.17em;
+    font-size: 2.6em;
     text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
   }
 
@@ -41,91 +89,35 @@
   }
 }
 
-// Past 1340 pixels width we turn on the radial gradient that obscures the
-// photo's edge
-@media (min-width: 1340px) {
-  .storefront-a-personalize #masthead-home {
-    .banner-gradient {  
-      background: url(/assets/images/bg-banner-gradient.png) repeat-y 50% 0;
-    }
-
-    .row { margin-left: -60px; }
+@media (max-width: 767px) { .storefront-a-personalize #personalize-masthead {
+  
+  h1 {
+    width:40%;
+    font-size:2.4em;
   }
   
-  // Put in a radial fade-to-dark-gray for big screens.
-  .cssgradients .storefront-a-personalize #masthead-home .banner-gradient { 
-    background: -moz-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px,  rgba(26,26,26,1) 745px); /* FF3.6+ */
-    background: -webkit-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Chrome10+,Safari5.1+ */
-    background: -o-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Opera 12+ */
-    background: -ms-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* IE10+ */
-    background: radial-gradient(circle at center, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* W3C */
+  .masthead-content {
+    padding-left:20px;
   }
-} // end min-width: 1340px;
-
-@media (min-width: 1080px) {
-  .storefront-a-personalize #masthead-home {
-    height: 286px;
-
-    h1 {
-      max-width:440px;
-    }   
-
-    .header-parent {
-      padding:0px; // overwrite unattractive bootstrap padding
-    }
-  }
-} // end min-width: 1080px;
-
-// Down-adjust masthead height at resolutions below 1080p
-@media (max-width: 1079px) {
-  .storefront-a-personalize #masthead-home {
-    min-height:286px;
-  }
-}
-
-@media (max-width: 767px) {
-  .storefront-a-personalize #masthead-home {
-    min-height: 200px;
-
-    form {
-      width: 45%;
-    }
-
-    h1 {
-      max-width:45%;
-      font-size:28px;
-    }
-  } // end .storefront-a-personalize #masthead-home
-}
-
-@media (max-width:480px) {
-  .storefront-a-personalize #masthead-home {
-    min-height: 150px;
-
-    h1 {
-      font-size:25px;
-    }
-  }
-}
-
-
-///////////////////////////////////////////////////////
-// Styles for occluding column containing testimonials and main content
-//////////////////////////////////////////////////////
-.storefront-a-personalize #occluding-column {
-  position:relative;
-  max-width:@standardContentMaxWidth;
-  margin-left:auto;
-  margin-right:auto;
-
-  top:-90px;
-}
-
-// Down-adjust masthead height at resolutions below 1080p
-@media (max-width: 767px) { .storefront-a-personalize #occluding-column {
-  top: 0px;
 }}
 
+@media (max-width: 480px) { .storefront-a-personalize #personalize-masthead {
+  
+  h1 {
+    font-size:1.6em;
+  }
+  
+  .masthead-content {
+    padding-left:20px;
+  }
+}}
+
+
+@media (max-width: 320px) { .storefront-a-personalize #personalize-masthead {
+  h1 {
+    font-size: 1.1em;
+  }
+}}
 
 ///////////////////////////////////////////////////////
 // Styles for testimonials
@@ -136,24 +128,26 @@
   z-index:10;
   background-color:rgba(0,0,0,0.8);
   color:white;
-  padding-top:15px;
-  // padding-bottom:10px;
+  padding-top:10px;
+  padding-left:7px;
+  padding-right:7px;
   font-weight:100;
   font-style:italic;
   font-size:.9em;
-  border-top:1px solid rgba(255,255,255,0.15);
-  line-height:normal;
-  padding-left:20px;
+  margin-top:5px;
+  // border-top:1px solid rgba(255,255,255,0.15);
+  border-radius:5px;
+  .box-shadow(0px 0px 8px black inset);
 
   .testimonial {
-    display:inline;
-    margin-left:50px;
+    margin-left:20px;
+    margin-bottom:10px;
 
-    &:before {
+    &:after {
       position:absolute;
-      display:inline;
-      left:-6px;
-      top:-7px;
+      height:0px;
+      left:0px;
+      top:-4px;
       content: '“';
       color:#ccc;
       font-size:48px;
@@ -161,7 +155,12 @@
     }
   }
 
+  .quote {
+    display:inline;
+  }
+
   .attribution {
+    display:inline-block;
     color:#CCC;
   }
 
@@ -177,17 +176,32 @@
 // Styles for main content
 //////////////////////////////////////////////////////
 .storefront-a-personalize #content #main {
+  h1, h2, h3, div, span, input, label, textarea, .tooltip-link {
+    line-height: normal;
+  }
+
+  border-top:1px solid #333;
+  padding-top:0px;
   top:0px;
-  line-height:normal;
-  padding-top:25px;
+
+  .value-propositions {
+    padding-top:10px;
+  }
+
+  .value-icon-holder {
+    float: left;
+    width: 50px;
+    text-align: center; 
+    margin-right: 7px;
+  }
+
 
   .value-propositions div {
     padding-bottom:10px;
     line-height:.9em;
 
     img {
-      float:left;
-      margin-right:7px;
+      
     }
 
     strong {
@@ -213,11 +227,6 @@
     text-align:center;
     padding-right:32px;
 
-    h2 {
-      font-size:24px;
-      line-height:33px;
-      margin:0px;
-    }
 
     img {
       position:relative;
@@ -227,9 +236,6 @@
     }
 
   }
-
-  // Style form-elements differently than bootstrap standard
-  input, label, textarea, .tooltip-link { line-height:normal; }
 
   // Placeholder styling
   input, textarea {
@@ -243,11 +249,18 @@
       font-style: @placeholderFontStyle;
     }
 
+    &:-moz-placeholder {
+      color: @placeholderColor;
+      font-size: @placeholderFontSize;
+      font-style: @placeholderFontStyle;
+    }
+
     &::-moz-placeholder {
       color: @placeholderColor;
       font-size: @placeholderFontSize;
       font-style: @placeholderFontStyle;
     }
+
 
     &::-ms-placeholder {
       color: @placeholderColor;
@@ -379,6 +392,12 @@
     }
   }
 
+  #make-the-connection, #look-and-feel {
+    h2 {
+      margin-top:10px;
+      margin-bottom:15px;
+    }
+  }
 
   #make-the-connection {
     .controlColumnLayout(240px);
@@ -443,7 +462,6 @@
           border-bottom-width:0px;
 
           .image-label h3 {
-            line-height: normal;
             margin-top: 10px;
             color: #333;
           }
@@ -463,7 +481,6 @@
           border-bottom:1px solid white;
 
           h3 {
-            line-height:normal;
             padding-top:10px;
             padding-bottom:4px;
             color:white;
@@ -541,8 +558,6 @@
     padding-right:@gridGutterWidth;
     
     h2 {
-      font-size:24px;
-      line-height:27px;
       margin:0px;
     }
 
@@ -557,16 +572,23 @@
   }
 
   #preview-proceed {
-    margin-top:15px;
+    margin-top:25px;
     font-size:13px;
+
+    .button strong {
+      padding:0 15px;
+    }
 
     .step-count {
       top:0px;
     }
 
     .price {
-      margin-top:6px;
-      margin-left:162px;
+      margin-top:4px;
+    }
+
+    .preview {
+      padding-top:4px;
     }
   }
 
@@ -599,7 +621,7 @@
       padding-right:6px;
     }
 
-    // The circle that appears inside the "Review Order" button
+    // The circle that appears inside the checkout button
     &.in-button {
       text-indent:0px;
       cursor:pointer;
@@ -627,3 +649,46 @@
     }
   }
 }
+
+@media (max-width:480px) { .storefront-a-personalize {
+  #content #main {
+
+    .value-icon-holder {
+      float: left;
+      width: 30px;
+      text-align: center; 
+      margin-right: 7px;
+    }
+
+    .control-group {
+      //padding-right: 19px;
+      //padding-left: 10px;
+    }
+    
+    .controls {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      max-width:none;
+    }
+    
+    .control-label {
+      width:auto;
+      .clearfix();
+    }
+
+    .field-tooltip {
+      display:inline;
+    }
+
+    #make-the-connection, #look-and-feel {
+      .controls {
+        max-width:none;
+      }
+
+      input, textarea {
+        width:100%;
+      }
+    }
+  }
+}};
