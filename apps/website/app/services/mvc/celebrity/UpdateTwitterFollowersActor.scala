@@ -23,6 +23,7 @@ import services.db.TransactionSerializable
 import services.http.twitter.TwitterProvider
 import services.logging.Logging
 import twitter4j.TwitterException
+
 import akka.routing.SmallestMailboxRouter
 
 // for single celebrity batch
@@ -90,6 +91,7 @@ private[celebrity] class UpdateTwitterFollowersActor @Inject() (
   implicit val timeout: Timeout = 30 seconds
 
   private val TWITTER_MAX_LOOKUP = 100
+
 
   def cache = cacheFactory.applicationCache
 
@@ -159,6 +161,7 @@ object UpdateTwitterFollowersActor extends Logging {
   val singleton = {
     Akka.system.actorOf(Props(AppConfig.instance[UpdateTwitterFollowersActor]))
   }
+
 
   // Many twitter batch actors to handle the spike of requests
   val updateTwitterBatchActor = Akka.system.actorOf(Props[UpdateBatchTwitterFollowersActor].withRouter(SmallestMailboxRouter(5)), "twitterbatchrouter")

@@ -1,0 +1,13 @@
+@(text: String, classes: Seq[String]=Seq.empty[String])(body: => Html)
+
+@** 
+  Tooltip library adapted from http://osvaldas.info/elegant-css-and-jquery-tooltip-responsive-mobile-friendly 
+
+  Usage:
+
+  @tooltip("What is this?", classes=Seq("my-special-class")) {
+    <strong>Hey Dummy</strong>, it's a tooltip of course!
+  }
+*@
+
+<a class="tooltip-link @classes.mkString(" ")" title="@body" rel="tooltip">@text</a>

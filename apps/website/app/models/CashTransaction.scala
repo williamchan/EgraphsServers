@@ -22,7 +22,7 @@ case class CashTransactionServices @Inject() (cashTransactionStore: CashTransact
  * add to our account (e.g. Egraph payments), negative amounts decrease it (e.g. Celebrity
  * Disbursements).
  */
-case class CashTransaction(
+case class  CashTransaction(
   id: Long = 0,
   accountId: Long = 0,
   orderId: Option[Long] = None,       // This should probably be a oneToMany
@@ -33,6 +33,7 @@ case class CashTransaction(
   _cashTransactionType: String = "",
   stripeCardTokenId: Option[String] = None,
   stripeChargeId: Option[String] = None,
+  lineItemId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CashTransactionServices = AppConfig.instance[CashTransactionServices]
@@ -73,7 +74,9 @@ case class CashTransaction(
   }
 }
 
-class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[Long,CashTransaction] {
+class CashTransactionStore @Inject() (schema: Schema)
+  extends SavesWithLongKey[CashTransaction] with SavesCreatedUpdated[CashTransaction]
+{
 
   def findByOrderId(orderId: Long): List[CashTransaction] = {
     from(schema.cashTransactions)(txn =>
@@ -89,8 +92,15 @@ class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[C
     )
   }
 
+  def findByLineItemId(lineItemId: Long): Option[CashTransaction] = {
+    from(schema.cashTransactions)(txn =>
+      where(txn.lineItemId === Some(lineItemId))
+        select (txn)
+    ).headOption
+  }
+
   //
-  // SavesCreatedUpdated[Long,CashTransaction] members
+  // SavesCreatedUpdated[CashTransaction] members
   //
   override protected def withCreatedUpdated(toUpdate: CashTransaction, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
@@ -101,19 +111,4 @@ class CashTransactionStore @Inject() (schema: Schema) extends SavesWithLongKey[C
   //
   protected def table = schema.cashTransactions
 
-  def defineUpdate(theOld: CashTransaction, theNew: CashTransaction) = {
-
-    updateIs(
-      theOld.accountId := theNew.accountId,
-      theOld.orderId := theNew.orderId,
-      theOld.printOrderId := theNew.printOrderId,
-      theOld.amountInCurrency := theNew.amountInCurrency,
-      theOld.billingPostalCode := theNew.billingPostalCode,
-      theOld.currencyCode := theNew.currencyCode,
-      theOld._cashTransactionType := theNew._cashTransactionType,
-      theOld.stripeCardTokenId := theNew.stripeCardTokenId,
-      theOld.stripeChargeId := theNew.stripeChargeId,
-      theOld.updated := theNew.updated
-    )
-  }
 }

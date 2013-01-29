@@ -112,7 +112,7 @@ GET      /admin/videoasset                                                contro
 POST     /admin/videoasset                                                controllers.WebsiteControllers.postVideoAssetAdmin
 GET      /admin/videoassets                                               controllers.WebsiteControllers.getVideoAssetsAdmin
 GET      /admin/videoassets/:status                                       controllers.WebsiteControllers.getVideoAssetsWithStatusAdmin(status: String)
-POST     /admin/videoassets/$id<[0-9]+>                                   controllers.WebsiteControllers.postProcessVideoAdmin(action: String, id: Long)											
+POST     /admin/videoassets/$id<[0-9]+>                                   controllers.WebsiteControllers.postProcessVideoAdmin(action: String, id: Long)                      
 
 ##
 ## Consumer Website

@@ -55,10 +55,5 @@ class CelebrityCategoryValueStore @Inject() (
   //
   override val table = schema.celebrityCategoryValues
 
-  override def defineUpdate(theOld: CelebrityCategoryValue, theNew: CelebrityCategoryValue) = {
-    updateIs(
-      theOld.celebrityId := theNew.celebrityId,
-      theOld.categoryValueId := theNew.categoryValueId
-    )
-  }
+
 }

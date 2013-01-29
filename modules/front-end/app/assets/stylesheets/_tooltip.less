@@ -1,0 +1,55 @@
+// Styles for tooltip library adapted from http://osvaldas.info/elegant-css-and-jquery-tooltip-responsive-mobile-friendly
+#tooltip {
+  text-align: center;
+  color: #fff;
+  position: absolute;
+  z-index: 100;
+  padding: 15px;
+  #gradient > .vertical(lighten(black, 25%), lighten(black, 15%));
+  text-shadow:0px 1px 0px white;
+
+  font-size:0.875em;
+  line-height:normal;
+  .border-radius(5px);
+  border-bottom:1px solid #111;
+  border-top:1px solid black;
+  .box-shadow(0 3px 5px rgba(0,0,0,.3));
+  text-shadow: 0px -1px black;
+
+  strong {
+    color: lighten(@orange, 2%);
+    font-weight:inherit;
+  }
+
+  &:after /* triangle decoration */ {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #222;
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    margin-left: -10px;
+    -webkit-transform: rotate(360deg); // smooth the triangle in safari
+  }
+
+  &.top:after {
+    border-top-color: transparent;
+    border-bottom: 10px solid #111;
+    top: -20px;
+    bottom: auto;
+  }
+
+  &.left:after {
+    left: 10px;
+    margin: 0;
+  }
+
+  &.right:after {
+    right: 10px;
+    left: auto;
+    margin: 0;
+  }  
+}

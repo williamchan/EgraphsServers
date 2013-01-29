@@ -3,25 +3,23 @@ package models.enums
 import services.Utils
 import egraphs.playutils.Enum
 
-object CouponDiscountType extends Enum {
-  sealed trait EnumVal extends Value
+sealed abstract class CouponDiscountType(val name: String)
 
-  val Flat = new EnumVal {
-    val name = "Flat"
-  }
-  val Percentage = new EnumVal {
-    val name = "Percentage"
-  }
+object CouponDiscountType extends Enum {
+  sealed abstract class EnumVal(name: String) extends CouponDiscountType(name) with Value
+
+  val Flat = new EnumVal("Flat"){}
+  val Percentage = new EnumVal("Percentage"){}
 }
 
 trait HasCouponDiscountType[T] {
   def _discountType: String
 
-  def discountType: CouponDiscountType.EnumVal = {
+  def discountType: CouponDiscountType = {
     CouponDiscountType(_discountType).getOrElse(
       throw new IllegalArgumentException(_discountType)
     )
   }
 
-  def withDiscountType(value: CouponDiscountType.EnumVal): T
+  def withDiscountType(value: CouponDiscountType): T
 }

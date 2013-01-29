@@ -35,7 +35,7 @@ case class EgraphPurchaseHandlerServices @Inject() (
  * objects. Having it as a separate case class makes it more testable.
  * 
  * @param totalAmountPaid the amount to charge the credit card. All discounts should already be figured into totalAmountPaid
- * @coupon coupon applied, if any
+ * @param coupon coupon applied, if any
  */
 // TODO(erem): Refactor this class to be injected
 case class EgraphPurchaseHandler(
@@ -80,7 +80,7 @@ case class EgraphPurchaseHandler(
    * @return A Redirect to either an order confirmation page or some error page.
    */
   def execute(): Result = {
-    val errorOrOrder = performPurchase
+    val errorOrOrder = performPurchase()
 
     errorOrOrder.fold(
       (error) => error match {
