@@ -43,6 +43,7 @@ trait ImplicitHeaderAndFooterData {
 
       HeaderLoggedIn(
         name=customer.name,
+        email=customer.account.email,
         profileUrl="",
         accountSettingsUrl=getAccountSettings.url,
         galleryUrl=url,
