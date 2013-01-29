@@ -19,11 +19,9 @@ import com.google.inject.{Provider, Inject}
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 import org.squeryl.Query
 import print.{StandaloneCertificatePrint, LandscapeFramedPrint}
-import video.VideoEncoder
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import controllers.website.consumer.{StorefrontChoosePhotoConsumerEndpoints, CelebrityLandingConsumerEndpoint}
 import java.util.Date
-import java.io.File
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -84,10 +82,12 @@ case class Egraph(
   import EgraphState._
 
   private lazy val blobKeyBase = "egraphs/" + id
+  private def imageAssetBlobKeyBase = blobKeyBase + "/image"
+  private def videoAssetBlobKeyBase = blobKeyBase + "/video"
+
   private def framedPrintVersion = "v" + LandscapeFramedPrint.currentVersion
   private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintVersion + "/" + framedPrintFilename
   def framedPrintFilename = "order" + orderId + ".jpg" // this cannot change it is linked to printer specifications
-
   private def standaloneCertPrintVersion = "v" + StandaloneCertificatePrint.currentVersion
   private def standaloneCertPrintBlobKey = blobKeyBase + "/certificate/" + standaloneCertPrintVersion + "/" + standaloneCertPrintFilename
   def standaloneCertPrintFilename = "order" + orderId + "-cert.jpg"
@@ -174,7 +174,7 @@ case class Egraph(
     EgraphImage(
       ingredientFactory=imageIngredientFactory(order.product, productPhoto),
       graphicsSource=services.graphicsSourceFactory(),
-      blobPath=blobKeyBase + "/image"
+      blobPath=imageAssetBlobKeyBase
     )
   }
 
@@ -279,6 +279,10 @@ case class Egraph(
       .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
       .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY)
       .scaledToWidth(targetWidth)
+  }
+
+  def getVideoAsset: EgraphVideoAsset = {
+    EgraphVideoAsset(blobPath = videoAssetBlobKeyBase, egraph = this)
   }
 
   /**
@@ -441,83 +445,6 @@ case class Egraph(
     override def generateAndSaveMp3() {
       val mp3 = AudioConverter.convertWavToMp3(audioWav.asByteArray, blobKeyBase)
       blobs.put(mp3Key, mp3, access=AccessPolicy.Public)
-    }
-
-    // TODO(egraph-exploration): Work in progress. Not finalized.
-    lazy val mp4Key = blobKeyBase + "/egraph.mp4"
-    override def audioMp4Url = {
-//      println("Generating mp4 file for " + mp4Key + "...")
-//      generateAndSaveMp4()
-//      blobs.getUrl((mp4Key))
-      blobs.getUrlOption((mp4Key)).getOrElse {
-        generateAndSaveMp4()
-        blobs.getUrl((mp4Key))
-      }
-    }
-    override def generateAndSaveMp4() {
-      /* Xuggle uses intermediate files. So, prep a bunch of temp files. */
-      val wavTempFile = TempFile.named(blobKeyBase + "/temp.wav")
-      val sourceMp3TempFile = TempFile.named(blobKeyBase + "/source.mp3")
-      val finalAacTempFile = TempFile.named(blobKeyBase + "/final.aac")
-      val egraphImageTempFile = TempFile.named(blobKeyBase + "/egraph.jpg")
-      val videoNoAudioFile = TempFile.named(blobKeyBase + "/no-audio.mp4")
-      val videoWithAudioFile = TempFile.named(blobKeyBase + "/with-audio.mp4")
-      val finalMp4TempFile = TempFile.named(blobKeyBase + "/final.mp4")
-
-      /* Get audio duration in seconds */
-      Utils.saveToFile(audioWav.asByteArray, wavTempFile)
-      val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
-
-      /**
-       * Generate aac audio file. This should not have to go through an intermediate step of generating an mp3,
-       * but Xuggle seems to complain when converting a wav to an aac.
-       */
-      Utils.saveToFile(audioMp3.asByteArray, sourceMp3TempFile)
-      Utils.convertMediaFile(sourceMp3TempFile, finalAacTempFile)
-      /**
-       * Enable the following code to generate an aac appropriate with a video with preamble:
-       * val sourceAacTempFile = TempFile.named(blobKeyBase + "/source.aac")
-       * Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
-       * VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
-       */
-
-      /* Get egraph image as a jpg */
-      val egraphImage = getEgraphImage(VideoEncoder.canvasWidth).asJpg
-      egraphImage.getSavedUrl(AccessPolicy.Public)
-      Utils.saveToFile(egraphImage.transformAndRender.graphicsSource.asByteArray, egraphImageTempFile)
-
-      /* Generate an mp4 without sound */
-      val thisOrder = order
-      val videoNoAudioFileName = videoNoAudioFile.getPath
-      VideoEncoder.generateMp4SansAudio(
-        targetFilePath = videoNoAudioFileName,
-        egraphImageFile = egraphImageTempFile,
-        recipientName = thisOrder.recipientName,
-        celebrityName = thisOrder.product.celebrity.publicName,
-        audioDuration = audioDuration
-      )
-
-      /* Mux the soundless mp4 with the aac audio to create an mp4 with sound */
-      VideoEncoder.muxVideoWithAudio(
-        videoFile = new File(videoNoAudioFileName),
-        audioFile = finalAacTempFile,
-        targetFile = videoWithAudioFile
-      )
-
-      /* This step may be needed to create a correctly formatted mp4. Xuggle is weird. */
-      Utils.convertMediaFile(videoWithAudioFile, finalMp4TempFile)
-      val mp4Bytes = Blobs.Conversions.fileToByteArray(finalMp4TempFile)
-
-      wavTempFile.delete()
-      sourceMp3TempFile.delete()
-      finalAacTempFile.delete()
-      egraphImageTempFile.delete()
-      videoNoAudioFile.delete()
-      videoWithAudioFile.delete()
-      finalMp4TempFile.delete()
-      //      sourceAacTempFile.delete()
-
-      blobs.put(mp4Key, mp4Bytes, access = AccessPolicy.Public)
     }
 
     override def message: Option[String] = {
@@ -688,7 +615,6 @@ case class EgraphStory(
   }
 }
 
-
 /**
  * Visual and audio assets associated with the Egraph entity. These are stored in the blobstore
  * rather than the relational database. Access this class via the assets method
@@ -726,17 +652,6 @@ trait EgraphAssets {
    * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
    */
   def generateAndSaveMp3()
-
-  /**
-   * Retrieves the url of the mp4 in the blobstore.
-   * Also lazily initializes the mp4, though EgraphActor should have handled that.
-   */
-  def audioMp4Url: String
-
-  /**
-   * Encodes an mp4 and stores it to the blobstore.
-   */
-  def generateAndSaveMp4()
 
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])

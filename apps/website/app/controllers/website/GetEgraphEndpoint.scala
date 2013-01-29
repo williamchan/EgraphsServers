@@ -45,7 +45,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
         case Some(FulfilledOrder(order, egraph)) =>
           val product = order.product
           val celebrity = product.celebrity
-          val mp4Url = egraph.assets.audioMp4Url
+          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
           val egraphStillUrl = egraph.getEgraphImage(VideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
           val tweetText = "An egraph for " + order.recipientName + " from " + celebrity.twitterUsername.getOrElse(celebrity.publicName)

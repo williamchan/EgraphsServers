@@ -34,27 +34,22 @@ object VideoEncoder {
                            recipientName: String,
                            celebrityName: String,
                            audioDuration: Int) {
-    // TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4
-    //    val preambleImg = generatePreamble(recipientName, celebrityName)
-
     val egraphImg = ImageIO.read(egraphImageFile)
-
     val writer = ToolFactory.makeWriter(targetFilePath)
     writer.addVideoStream(/*inputIndex*/ 0, /*streamId*/ 0, /*codecId*/ ICodec.ID.CODEC_ID_MPEG4, /*width*/ egraphImg.getWidth, /*height*/ egraphImg.getHeight)
 
-    val startTime = System.nanoTime()
-
-    // TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4
-    // show preamble for 4 seconds
-    //    for (i <- 0 until 4) {
-    //      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ preambleImg, /*timeStamp*/ System.nanoTime() - startTime, /*timeUnit*/ TimeUnit.NANOSECONDS)
-    //      Thread.sleep(1000)
-    //    }
+    /**
+     * TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4, and adjust t on egraphImg screens
+     * val preambleImg = generatePreamble(recipientName, celebrityName)
+     *    // show preamble for 4 seconds
+     *    for (i <- 0 until 4) {
+     *      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ preambleImg, /*timeStamp*/ t * 1000000, /*timeUnit*/ TimeUnit.NANOSECONDS)
+     *    }
+     */
 
     // show egraph image for duration of egraph audio
-    for (i <- 0 until audioDuration) {
-      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ egraphImg, /*timeStamp*/ System.nanoTime() - startTime, /*timeUnit*/ TimeUnit.NANOSECONDS)
-      Thread.sleep(1000)
+    for (t <- 0 until audioDuration) {
+      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ egraphImg, /*timeStamp*/ t * 1000000, /*timeUnit*/ TimeUnit.NANOSECONDS)
     }
 
     writer.close()

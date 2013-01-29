@@ -102,7 +102,7 @@ case class EgraphImage (
   /**
    * Renders the image, writes it to the blobstore, and returns its URL.
    */
-  def saveAndGetUrl(accessPolicy: AccessPolicy): String = {
+  protected[models] def saveAndGetUrl(accessPolicy: AccessPolicy): String = {
     log("Rendering EgraphImage with key \"" + blobKey + "\"")
     val (url, durationSecs) = Time.stopwatch {
       val rendered = transformAndRender
