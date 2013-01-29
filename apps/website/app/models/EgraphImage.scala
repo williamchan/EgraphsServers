@@ -55,11 +55,17 @@ case class EgraphImage (
   }
 
   /**
-   * Returns a version of this EgraphImage that will render as a rasterized PNG rather than
-   * the default vector
+   * Returns a version of this EgraphImage that will render as a rasterized PNG rather than the default vector
    **/
   def asPng: EgraphImage = {
     this.copy(graphicsSource = services.rasterGraphicsSourceFactory())
+  }
+
+  /**
+   * Returns a version of this EgraphImage that will render as a rasterized JPG rather than the default vector
+   **/
+  def asJpg: EgraphImage = {
+    this.copy(graphicsSource = new RasterGraphicsSource(0, 0, imageType = ImageAsset.Jpeg))
   }
 
   /** Returns a copy of this image with the supplied transform applied */
@@ -117,7 +123,7 @@ case class EgraphImage (
    *
    * @return the transformed and rendered EgraphImage
    */
-  /*private*/ def transformAndRender: EgraphImage = {
+  protected[models] def transformAndRender: EgraphImage = {
     // Perform the transforms
     val transformedImage = transforms.foldLeft(this) { (currentImage, nextTransform) =>
       nextTransform(currentImage)

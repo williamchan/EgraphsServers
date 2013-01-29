@@ -16,6 +16,7 @@ import services.http.EgraphsSession.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import _root_.frontend.formatting.DateFormatting.Conversions._
 import social.Pinterest
+import video.VideoEncoder
 
 private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData { 
   this: Controller =>
@@ -45,8 +46,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.assets.audioMp4Url
-          // TODO(wchan): egraphStillUrl should point to a jpg. (svzg renders the signature before the image, which is weird.)
-          val egraphStillUrl = ""
+          val egraphStillUrl = egraph.getEgraphImage(VideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
           val tweetText = "An egraph for " + order.recipientName + " from " + celebrity.twitterUsername.getOrElse(celebrity.publicName)
           val shareOnPinterestLink = Pinterest.getPinterestShareLink(
@@ -61,7 +61,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
             recipientName = order.recipientName,
             privacySetting = order.privacyStatus.name,
             messageToCelebrity = order.messageToCelebrity,
-            productIconUrl = product.icon.resized(50, 50).getSaved(AccessPolicy.Public).url,
+            productIconUrl = product.iconUrl,
             signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
             thisPageLink = thisPageLink,
             shareOnPinterestLink = shareOnPinterestLink,
@@ -101,8 +101,8 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   }
 
   private def isViewable(order: Order)(implicit session: Session): Boolean = {
-    val customerIdOption = session.customerId.map(customerId => customerId.toLong)
-    val adminIdOption = session.adminId.map(adminId => adminId.toLong)
+    val customerIdOption = session.customerId.map(customerId => customerId)
+    val adminIdOption = session.adminId.map(adminId => adminId)
 
     order.isPublic ||
       order.isBuyerOrRecipient(customerIdOption) ||

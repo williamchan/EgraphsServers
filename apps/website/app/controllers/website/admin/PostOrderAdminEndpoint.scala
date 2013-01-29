@@ -57,7 +57,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
                 order.withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
                 Redirect(GetOrderAdminEndpoint.url(orderId))
               }
-              // TODO(wchan): This should go away once there is exactly one PrintOrder record for every print order
+              // TODO(SER-645): This should go away once there is exactly one PrintOrder record for every print order
               case "generateImages" => {
                 egraphStore.findByOrder(orderId, egraphQueryFilters.publishedOrApproved).headOption match {
                   case None => Ok(<html><body>A published or approved egraph is required.</body></html>)

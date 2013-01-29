@@ -6,20 +6,13 @@ import egraphs.playutils.Encodings.Base64
 import org.apache.commons.mail.HtmlEmail
 import org.squeryl.PrimitiveTypeMode._
 import models._
-import categories.CategoryValue
 import play.api.mvc.Results.Redirect
-import controllers.WebsiteControllers
 import enums._
-import services.{Utils, AppConfig}
+import services.AppConfig
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
-import controllers.website.GetAccountSettingsEndpoint
 import services.http.EgraphsSession._
-import scala.Some
-import models.Administrator
-import models.InventoryBatch
-import models.Order
 import play.api.Play
 import play.api.Play.current
 import utils.{TestData, TestConstants}
@@ -146,7 +139,8 @@ class Scenarios extends DeclaresScenarios {
       val celebrity = Celebrity(
         publicName = "Wizzle",
         bio = "Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
-        organization = "Major League Baseball"
+        organization = "Major League Baseball",
+        roleDescription = "Egraphs"
       ).withPublishedStatus(PublishedStatus.Published).save()
       Account(email = Scenarios.willsEmail,
         celebrityId = Some(celebrity.id)
@@ -276,7 +270,6 @@ class Scenarios extends DeclaresScenarios {
   apiCategory,
   """Will fulfills Erem's gift order for Myyk""", {
     () =>
-      val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
       val order = orderStore.findByBuyerCustomerId(Scenarios.getEremCustomerAccount.id).filter { order => order.recipient == Scenarios.getMyykCustomerAccount }.head
       order
         .withPaymentStatus(PaymentStatus.Charged).save()

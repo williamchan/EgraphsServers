@@ -75,7 +75,6 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
     error.getOrElse(None) == WebServiceBiometricPartStub.ErrorStatus.ProfileAlreadyEnrolled.getValue
   }
 
-  //    todo(wchan): Implement once we get rid of SignatureSample
   //  private def getSignatureSampleIds(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): Option[String] = {
   //    None
   //  }
