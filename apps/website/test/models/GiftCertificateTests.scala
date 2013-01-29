@@ -5,12 +5,13 @@ import services.Finance.TypeConversions._
 import services.AppConfig
 
 
+
 class GiftCertificateTests extends EgraphsUnitTest
-  with CanInsertAndUpdateAsThroughServicesTests[GiftCertificate, GiftCertificateEntity, Long]
+//  with CanInsertAndUpdateAsThroughServicesTests[GiftCertificate, GiftCertificateEntity, Long]
   with DateShouldMatchers
   with DBTransactionPerTest
 {
-  def store = AppConfig.instance[GiftCertificateStore]
+  /*def store = AppConfig.instance[GiftCertificateStore]
 
   override def newIdValue: Long = 0L
   override def improbableIdValue: Long = java.lang.Integer.MAX_VALUE
@@ -20,7 +21,7 @@ class GiftCertificateTests extends EgraphsUnitTest
   override def transformModel(toTransform: GiftCertificate): GiftCertificate = {
     val coupon = toTransform.coupon.get
     toTransform.coupon.set(coupon use BigDecimal(25).toMoney())
-  }
+  }*/
 
 
   /**
