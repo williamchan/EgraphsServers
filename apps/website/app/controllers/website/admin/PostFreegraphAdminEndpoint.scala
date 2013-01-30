@@ -1,8 +1,6 @@
 package controllers.website.admin
 
-import models.CustomerStore
-import models.Order
-import models.enums.OrderType
+import models._
 import play.api.mvc.Results.{Ok, Redirect}
 import controllers.WebsiteControllers
 import play.api.mvc.Controller
@@ -15,6 +13,7 @@ import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
+import enums.OrderType
 
 trait PostFreegraphAdminEndpoint {
   this: Controller =>

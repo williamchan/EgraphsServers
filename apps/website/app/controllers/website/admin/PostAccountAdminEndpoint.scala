@@ -1,7 +1,6 @@
 package controllers.website.admin
 
-import models.AccountStore
-import models.Password
+import models._
 import play.api.mvc.Results.{Ok, Redirect}
 import controllers.WebsiteControllers
 import play.api.mvc.Controller
