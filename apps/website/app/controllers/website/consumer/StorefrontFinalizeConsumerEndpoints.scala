@@ -190,11 +190,10 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           totalAmountPaid=forms.total(subtotal = subtotal, discount = discount),
           coupon=maybeCoupon,
           billingPostalCode=billing.postalCode,
-          flash=request.flash,
           printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
           shippingForm=shipping,
           writtenMessageRequest=personalization.writtenMessageRequest
-        ).execute()        
+        ).execute()
       }
       
       failureOrSuccessRedirects.merge

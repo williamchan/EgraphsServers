@@ -16,7 +16,11 @@ case class EgraphsSession(session: Session) {
   def adminId: Option[Long] = {
     getLong(Key.AdminId.name)
   }
-  
+
+  def isUsernameChanged: Option[Boolean] = {
+    getBoolean(Key.UsernameChanged.name)
+  }
+
   def withAdminId(id: Long): Session = {
     session + (Key.AdminId.name -> id.toString)
   }
@@ -29,12 +33,20 @@ case class EgraphsSession(session: Session) {
     session + (Key.CustomerId.name -> id.toString)
   }
 
+  def withUsernameChanged: Session = {
+    session + (Key.UsernameChanged.name -> true.toString)
+  }
+
   def getLong(key: String): Option[Long] = {
     try {
       session.get(key).map(value => value.toLong)
     } catch {
       case _: NumberFormatException => None
     }
+  }
+
+  def getBoolean(key: String): Option[Boolean] = {
+    session.get(key).map(value => java.lang.Boolean.valueOf(value))
   }
 }
 
@@ -51,6 +63,7 @@ object EgraphsSession {
 
     val AdminId = new EnumVal("admin") {}
     val CustomerId = new EnumVal("customer") {}
+    val UsernameChanged = new EnumVal("username_changed") {}
   }
 
   object Conversions {

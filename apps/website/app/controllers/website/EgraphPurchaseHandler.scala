@@ -18,7 +18,8 @@ import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
 import controllers.routes.WebsiteControllers.getFAQ
 import services._
-
+import services.http.EgraphsSession.Conversions._
+            
 case class EgraphPurchaseHandlerServices @Inject() (
   mail: TransactionalMail,
   customerStore: CustomerStore,
@@ -51,7 +52,6 @@ case class EgraphPurchaseHandler(
   totalAmountPaid: Money,
   billingPostalCode: String,
   coupon: Option[Coupon] = None,
-  flash: Flash,
   printingOption: PrintingOption = PrintingOption.DoNotPrint,
   shippingForm: Option[CheckoutShippingForm.Valid] = None,
   writtenMessageRequest: WrittenMessageRequest = WrittenMessageRequest.SpecificMessage,
@@ -99,13 +99,21 @@ case class EgraphPurchaseHandler(
         case _: PurchaseFailedError =>
           Redirect(controllers.routes.WebsiteControllers.getStorefrontPurchaseError(celebrity.urlSlug, product.urlSlug))
       },
-      (successfulOrder) =>
-        //A redirect to the order confirmation page
-        Redirect(controllers.routes.WebsiteControllers.getOrderConfirmation(successfulOrder.id)).flashing(flash + ("orderId" -> successfulOrder.id.toString))
+      (successful) => successful match {
+        case (successfulOrder, didCreateBuyer) =>
+          //A redirect to the order confirmation page
+          val successResult = Redirect(controllers.routes.WebsiteControllers.getOrderConfirmation(successfulOrder.id))
+            .flashing(request.flash + ("orderId" -> successfulOrder.id.toString))
+          if(didCreateBuyer) {
+            successResult.withSession(request.session.withUsernameChanged)
+          } else {
+            successResult
+          }
+      }
     )
   }
 
-  def performPurchase(): Either[PurchaseFailed, Order] = {
+  def performPurchase(): Either[PurchaseFailed, (Order, Boolean /*Did create buyer*/)] = {
     val charge = try {
       if (totalAmountPaid.isZero) {
         None
@@ -126,7 +134,7 @@ case class EgraphPurchaseHandler(
     // Persist the Order. This is executed in its own database transaction.
     // cashTransaction can be None if the order was free (due to coupons).
     // maybePrintOrder can be Some if printingOption is "HighQualityPrint".
-    val (order: Order, _: Customer, _: Customer, cashTransaction: Option[_], maybePrintOrder: Option[_]) = try {
+    val (order: Order, _: Customer, _: Customer, cashTransaction: Option[_], maybePrintOrder: Option[_], didCreateBuyer: Boolean) = try {
       persistOrder(buyerEmail = buyerEmail,
         buyerName = buyerName,
         recipientEmail = recipientEmail,
@@ -182,7 +190,7 @@ case class EgraphPurchaseHandler(
 
     // Clear out the shopping cart and redirect
     services.serverSessions.celebrityStorefrontCart(celebrity.id)(request.session).emptied.save()
-    Right(order)
+    Right((order, didCreateBuyer))
   }
 
   private def persistOrder(buyerEmail: String,
@@ -201,10 +209,15 @@ case class EgraphPurchaseHandler(
                            shippingForm: Option[CheckoutShippingForm.Valid],
                            writtenMessageRequest: WrittenMessageRequest,
                            isDemo: Boolean,
-                           celebrity: Celebrity): (Order, Customer, Customer, Option[CashTransaction], Option[PrintOrder]) = {
+                           celebrity: Celebrity): (Order, Customer, Customer, Option[CashTransaction], Option[PrintOrder], Boolean /*Did create buyer*/) = {
     services.dbSession.connected(TransactionSerializable) {
       // Get buyer and recipient accounts and create customer face if necessary
-      val buyer = services.customerStore.findOrCreateByEmail(buyerEmail, buyerName)
+      val (buyer, didCreateBuyer) = {
+        val maybeBuyer = services.customerStore.findByEmail(buyerEmail)
+        val maybeBuyerAndDidCreateBuyer = maybeBuyer.map(buyer => (buyer, false))
+        maybeBuyerAndDidCreateBuyer.getOrElse((services.customerStore.createByEmail(buyerEmail, buyerName), true))
+      }
+
       val recipient = if (buyerEmail == recipientEmail) {
         buyer
       } else {
@@ -261,7 +274,7 @@ case class EgraphPurchaseHandler(
         case Some(cashTxn) => services.cashTransactionStore.findById(cashTxn.id)
       }
 
-      (finalOrder, buyer, recipient, finalCashTransaction, maybePrintOrder)
+      (finalOrder, buyer, recipient, finalCashTransaction, maybePrintOrder, didCreateBuyer)
     }
   }
 

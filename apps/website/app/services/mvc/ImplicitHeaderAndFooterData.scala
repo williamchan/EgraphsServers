@@ -1,6 +1,6 @@
 package services.mvc
 
-import models.frontend.header.{DeploymentInformation, HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
+import models.frontend.header.{AnalyticsData, DeploymentInformation, HeaderNotLoggedIn, HeaderLoggedIn, HeaderData}
 import models.frontend.footer.FooterData
 import services.http.EgraphsSession.Conversions._
 import play.api.mvc.Session
@@ -14,13 +14,17 @@ import services.mail.BulkMailList
  * Provides implicit data necessary to render the header and footer of the website's
  * base template. See front-end module `app/views/base_template.scala.html`
  */
+//TODO and analytics rename
 trait ImplicitHeaderAndFooterData {
   protected def customerStore: CustomerStore
   protected def bulkMailList: BulkMailList
 
   implicit def siteHeaderData(implicit request: RequestHeader): HeaderData = {
-    HeaderData(loggedInStatus=getHeaderLoggedInStatus(request.session),
-      deploymentInformation = Option(DeploymentInformation(System.getProperty("deploymentTime")))
+    HeaderData(
+      loggedInStatus = getHeaderLoggedInStatus(request.session),
+      deploymentInformation = Option(DeploymentInformation(System.getProperty("deploymentTime"))),
+      //TODO: move into it's own implicit object
+      updateMixpanelAlias = shouldUpdateMixpanelAlias(request.session)
     )
   }
 
@@ -34,6 +38,12 @@ trait ImplicitHeaderAndFooterData {
     )
   }
 
+  //TODO probably should create a new combination of Header,Footer and Analytics object
+  //so each template won't need to change every time this happens.
+//  implicit def analyticsData(implicit request: RequestHeader): AnalyticsData = {
+//    AnalyticsData(updateMixpanelAlias = shouldUpdateMixpanelAlias(request.session))
+//  }
+
   //
   // Private methods
   //
@@ -43,11 +53,11 @@ trait ImplicitHeaderAndFooterData {
 
       HeaderLoggedIn(
         name=customer.name,
-        email=customer.account.email,
+        username=customer.username,
         profileUrl="",
         accountSettingsUrl=getAccountSettings.url,
         galleryUrl=url,
-        logoutUrl="/logout"
+        logoutUrl="/logout"  //TODO: this should be reverse routed
       )
     }
 
@@ -61,5 +71,9 @@ trait ImplicitHeaderAndFooterData {
     ) yield {
       customer
     }
+  }
+
+  private def shouldUpdateMixpanelAlias(session: Session): Boolean = {
+    session.isUsernameChanged.getOrElse(false)
   }
 }

@@ -1,11 +1,11 @@
-@(implicit headerData: models.frontend.header.HeaderData)
+@()(implicit headerData: models.frontend.header.HeaderData)
 
 @import models.frontend.header.HeaderData
 
-@customerEmail(header: HeaderData) = @{
+@customerUsername(header: HeaderData) = @{
   headerData.loggedInStatus match {
-    case Left(notLoggedIn) =>
-    case Right(loggedIn) => loggedIn.email
+    case Left(notLoggedIn) => None
+    case Right(loggedIn) => Some(loggedIn.username)
   }
 }
 
@@ -51,5 +51,11 @@
   )(document,window.mixpanel||[]);
 
   mixpanel.init(mixpanelToken);
-  mixpanel.identify("@customerEmail(headerData)");
+  @if(customerUsername(headerData).isDefined) {
+    @if(headerData.updateMixpanelAlias) {
+      mixpanel.alias("@customerUsername(headerData)");
+    } else {
+      mixpanel.identify("@customerUsername(headerData)");
+    }
+  }
 </script>

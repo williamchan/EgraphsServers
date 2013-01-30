@@ -171,30 +171,31 @@ class CustomerStore @Inject() (
    * @return a persisted Customer with a valid ID.
    */
   def findOrCreateByEmail(email: String, name: String): Customer = {
+    findByEmail(email).getOrElse(createByEmail(email, name))
+  }
+
+  def createByEmail(email: String, name: String): Customer = {
+    val accountOption = accountStore.findByEmail(email)
+    val account = accountOption.getOrElse(Account(email = email, services = accountServices.get))
+    val unsavedCustomer = account.createCustomer(name)
+    val unsavedUsernameHistory = account.createUsername()
+    val customer = unsavedCustomer.save()
+    account.copy(customerId = Some(customer.id)).save()
+    val usernameHistory = unsavedUsernameHistory.copy(customerId = customer.id).save()
+
+    customer
+  }
+  
+  def findByEmail(email: String): Option[Customer] = {
     // TODO: Optimize this using a single outer-join query to get Customer + Account all at once
 
     // Get the Account and Customer face if both exist.
-    val accountOption = accountStore.findByEmail(email)
-    val customerOption = accountOption.flatMap { account =>
-      account.customerId.flatMap { customerId =>
-        findById(customerId)
-      }
-    }
-
-    customerOption match {
-      // Customer already existed
-      case Some(customer) => customer
-
-      // Customer face didn't exist. Use existing or new Account to create
-      // the face and return it.
-      case None =>
-        val account = accountOption.getOrElse(Account(email=email, services=accountServices.get))
-        val unsavedCustomer = account.createCustomer(name)
-        val unsavedUsernameHistory = account.createUsername()
-        val customer = unsavedCustomer.save()
-        account.copy(customerId=Some(customer.id)).save()
-        val usernameHistory = unsavedUsernameHistory.copy(customerId=customer.id).save()
-        customer
+    for {
+      account <- accountStore.findByEmail(email)
+      customerId <- account.customerId
+      customer <- findById(customerId)
+    } yield {
+      customer
     }
   }
 

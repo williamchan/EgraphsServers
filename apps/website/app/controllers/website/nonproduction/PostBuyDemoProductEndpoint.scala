@@ -79,7 +79,6 @@ trait PostBuyDemoProductEndpoint { this: Controller =>
               product = product,
               totalAmountPaid = product.price,
               billingPostalCode = "55555",
-              flash = request.flash,
               isDemo = true
             )
             purchaseHandler.execute()

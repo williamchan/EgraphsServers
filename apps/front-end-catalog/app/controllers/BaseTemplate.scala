@@ -29,7 +29,7 @@ object BaseTemplate extends Controller with DefaultAuthenticityToken
   def loggedIn = Action {
     val loggedInStatus = HeaderLoggedIn(
       name="Herp Derpson",
-      email="derpy@herp.y"
+      username="herp4life",
       profileUrl="/users/herpderpson1",
       accountSettingsUrl="/users/herpderpson1/settings",
       galleryUrl="/users/herpderpson1/gallery",

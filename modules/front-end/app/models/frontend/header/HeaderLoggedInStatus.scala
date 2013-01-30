@@ -12,7 +12,7 @@ sealed trait HeaderLoggedInStatus
  *
  * @param name the user's name. If the name isn't available then we can default this
  *     to the username
- * @param email the user's email.
+ * @param username the user's username.
  * @param profileUrl link to the user's profile
  * @param accountSettingsUrl link to the user's account settings page.
  * @param galleryUrl link to the user's gallery.
@@ -20,7 +20,7 @@ sealed trait HeaderLoggedInStatus
  */
 case class HeaderLoggedIn (
   name: String,
-  email: String,
+  username: String,
   profileUrl: String,
   accountSettingsUrl: String,
   galleryUrl: String,
