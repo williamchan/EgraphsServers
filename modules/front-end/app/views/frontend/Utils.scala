@@ -55,6 +55,27 @@ object Utils {
     }
   }
   
+  def irregularToHave(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
+    (gender, capitalize) match {
+      case (Gender.Male, false) => "has"
+      case (Gender.Male, true) => "Has"
+      case (Gender.Female, false) => "has"
+      case (Gender.Female, true) => "Has"
+      case (Gender.Neutral, false) => "have"
+      case (Gender.Neutral, true) => "Have"
+      case _ => throw new IllegalStateException("You are a very rare gender")
+    }
+  }
+
+  def regularVerb(verb: String, gender: Gender.EnumVal): String = {
+    gender match {
+      case Gender.Male => verb + "s"
+      case Gender.Female => verb + "s"
+      case Gender.Neutral => verb
+      case _ => throw new IllegalStateException("You are a very rare gender")
+    }
+  }
+
   def egraphOrEgraphs(numberOfEgraphs: Int): String = {
     if (numberOfEgraphs == 1) "Egraph"
     else "Egraphs"
