@@ -41,6 +41,7 @@ object CelebrityLandingConsumerEndpoint {
       .getSaved(AccessPolicy.Public)
       .url
 
+    val gender = Gender.apply(celebrity.gender).getOrElse(Gender.Male) // default to male
     val getStartedUrlBase = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug).url
     val publicName = celebrity.publicName
     views.html.frontend.celebrity_landing(
@@ -48,7 +49,7 @@ object CelebrityLandingConsumerEndpoint {
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
-      celebrityGender = Gender.Male // this should not be hard-coded
+      celebrityGender = gender
     )
   }
 

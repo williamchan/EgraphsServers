@@ -28,6 +28,7 @@ import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.CatalogStarsQuery
 import java.util.Date
 import org.apache.commons.codec.binary.Base64
+import egraphs.playutils.Gender
 
 /**
  * Services used by each celebrity instance
@@ -57,6 +58,7 @@ case class Celebrity(id: Long = 0,
                      casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
                      organization: String = "",                                     // e.g. "Major League Baseball"
                      bio: String = "",
+                     gender: String = Gender.Male.name,
                      roleDescription: String = "",                                  // e.g. "Pitcher, Red Sox"
                      twitterUsername: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None, //TODO: rename to _profilePhotoKey
