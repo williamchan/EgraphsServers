@@ -26,61 +26,63 @@
   <li class="account-options"><a href="@status.loginUrl">My Account</a></li>
 }
 
-<!-- Begin site_header.scala.html -->
-<header id="top" role="navigation">
-  @headerContent.getOrElse {
-    <div class="container">
-      <div class="row">
-        <div id="logo-account-social">
-          <div class="logo span">
+@header(id: String, cssClass: String) = {
+  <!-- Begin site_header.scala.html -->
+  <header id="@id" role="navigation" class="top @cssClass">
+    @headerContent.getOrElse {
+      <div class="container">
+        <div class="row">
+          <div id="logo-account-social">
+            <div class="logo span">
 
-          	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
+              <h1><a href="/" title="Egraphs">Egraphs</a></h1>
 
 
-          </div>
-        
-          <div id="account-social">
-            <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
-              <ul>
-                @{headerData.loggedInStatus match {
-                  case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
-                  case Right(loggedIn) => loggedInHeader(loggedIn)
-                }}
-              </ul>
-            </nav>
-          </div> <!-- end #account-social -->
-        </div> <!-- end #logo-account-social -->
-        
-        <div class="linkz">
-          <div class="navbar-item our-stars">
-            <p><a class="separator-after" href="@headerData.ourStarsLink">Enter store</a></p>
-            
-          </div> <!-- end .our-stars -->
-                
-          <div class="navbar-item">
-            
-            <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
-            
-          </div> <!-- end .explore -->
-
-          <div class="navbar-item">
-            <div>
-              <form action="/stars">
-                <div class="search-control input-append">
-                  <input name="query" type="search" placeholder="Find names, teams"></input>
-                  <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
-                </div>
-              </form>  
             </div>
-          </div>  <!-- end .search-control -->
-        </div> <!-- end .linkz -->
-      </div> <!-- end .row -->
-    </div> <!-- end .container -->
-  }
+          
+            <div id="account-social">
+              <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
+                <ul>
+                  @{headerData.loggedInStatus match {
+                    case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
+                    case Right(loggedIn) => loggedInHeader(loggedIn)
+                  }}
+                </ul>
+              </nav>
+            </div> <!-- end #account-social -->
+          </div> <!-- end #logo-account-social -->
+          
+          <div class="linkz">
+            <div class="navbar-item our-stars">
+              <p><a class="separator-after" href="@headerData.ourStarsLink">Enter store</a></p>
+              
+            </div> <!-- end .our-stars -->
+                  
+            <div class="navbar-item">
+              
+              <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
+              
+            </div> <!-- end .explore -->
 
-</header> <!-- end #top -->
+            <div class="navbar-item">
+              <div>
+                <form action="/stars">
+                  <div class="search-control input-append">
+                    <input name="query" type="search" placeholder="Find names, teams"></input>
+                    <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
+                  </div>
+                </form>  
+              </div>
+            </div>  <!-- end .search-control -->
+          </div> <!-- end .linkz -->
+        </div> <!-- end .row -->
+      </div> <!-- end .container -->
+    }
 
-<!-- This just takes up as much space as the header so that other things below can appear below the header. -->
-<div id="to-top" class="header-sized-container"></div>
+  </header> <!-- end #top -->
+}
+
+@header(id="top", cssClass="fixed")
+@header(id="top-relative", cssClass="relative")
 
 <!-- End site_header.scala.html -->

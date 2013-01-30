@@ -3,13 +3,10 @@
 //
 
 // Default styles (all screen sizes)
-.header-sized-container {
-  height: 67px;
-}
 
 @navbarZIndex: 9001; // over 9000
 
-#top {
+.top {
   .clearfix();
 
   .box-shadow(0px 2px 4px rgba(0, 0, 0, .15));  
@@ -22,6 +19,11 @@
   top: 0;
   z-index: @navbarZIndex;
   
+  &.relative {
+    position:relative;
+    visibility:hidden;
+  }
+
   p {
     font-size: 14px;
     line-height: 1em;
@@ -216,14 +218,14 @@
       .celebrity-searchbox-container(@orange, @inputBorder, 180px);
     }
   }
-} // end #top
+} // end .top
 
 
 // Adjust the logo and social tools when at widest to align them with
 // the edges of the content column itself rather than the content within
 // the content column. Below this res, layout will use bootstrap's defaults.
 @media (min-width: 1340px) {
-  #top {
+  .top {
     .logo { margin-left: -20px; }
     .social { margin-right: -40px; }
   }
@@ -231,13 +233,13 @@
 
 
 @media (max-width: 979px) and (min-width: 769px) {
-  #top {
+  .top {
     .social {
       > ul {
         padding-left: 10px;     
       }
     }
-    // Bring down the padding to handle more than two links up #top   
+    // Bring down the padding to handle more than two links up .top   
     .account > ul {
       padding-left: 10px;
       padding-right: 10px;
@@ -253,7 +255,11 @@
      margin-right: 5px;
     }
 
-  } // end #top
+    // This keeps the search box from shrinking
+    input.span2, textarea.span2, .uneditable-input.span2 {
+      width: 140px;
+    }
+  } // end .top
 }
 
 
@@ -262,11 +268,8 @@
 // forward slashes as a delimiter and use smaller social links.
 //
 @media (max-width: 768px) {
-  .header-sized-container {
-    height: 47px;
-  }
 
-  #top {
+  .top {
     padding-top:5px;
     padding-bottom: 0;
           
@@ -373,22 +376,18 @@
   }
 }
 
-@media (max-width: 707px) {
-  .header-sized-container {
-    height: 77px;
-  }
-}
 
 //
 // Bump the links and search bar to the next line, and make header no longer fixed.
 //
 @media (max-width: 688px) {
-  .header-sized-container {
-    height: 47px;
-  }
+  .top {
+    display: none;
 
-  #top {
-    position: absolute;
+    &.relative {
+      display:block;
+      visibility: visible;
+    }
 
     .linkz {
       float: center;
@@ -401,22 +400,12 @@
   }
 }
 
-@media (max-width: 676px) {
-  .header-sized-container {
-    height: 71px;
-  }
-}
-
 //
 // Bump text links to the second level when the screen becomes small enough that
 // the they would run into the social tools.
 //
 @media (max-width: 600px) {
-  .header-sized-container {
-    height: 87px;
-  }
-
-  #top {
+  .top {
     // Pop the text linkz down to the second row
     #logo-account-social {
       .clearfix();      
@@ -430,7 +419,7 @@
 // iPhone width to accomodate more than two links in the top bar.
 //
 @media (max-width: 480px) {
-  #top {
+  .top {
     .linkz {
       .navbar-item {
         .separator-after:after {
@@ -446,16 +435,10 @@
   }
 }
 
-// For iPhone portrait mode
-@media (max-width: 320px) {
-  .header-sized-container {
-    height: 111px;
-  }
-}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 
-  #top {
+  .top {
   
     .logo h1 a {
       background-image: url(/assets/images/logo-ios.png);      

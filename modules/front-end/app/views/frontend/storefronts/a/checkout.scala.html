@@ -37,7 +37,6 @@
     <div class="steps">
       @headerStep("images/glyphicons-link.png", "connect")
       @headerStep("images/glyphicons-cart.png", "enter details", current=true)
-      @headerStep("images/glyphicons-book.png", "review")
       @headerStep("images/glyphicons-check.png", "done", last=true)
     </div>
   </div>
@@ -227,14 +226,16 @@
             <label class="control-label" for="City">Security code:</label>
             <div class="controls">
               <input id="securityCode"
-                     name="securityCode">
+                     name="securityCode"
+                     class="quarter">
             </div>                      
           </div>          
           <div class="control-group">
             <label class="control-label" for="City">Zip:</label>
             <div class="controls">
               <input id="billingZip"
-                     name="billingZip">
+                     name="billingZip"
+                     class="quarter">
             </div>
           </div>
         </section>

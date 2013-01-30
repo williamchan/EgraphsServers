@@ -38,295 +38,289 @@
 @profileImageUrl = {https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png}
 
 @baseBody = {
-  <section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
-    <div class="banner-gradient">
-      <div class="container">
-
-        <div class="row">
-
-          <div class="span5 header-parent">
-            <h1>You are one click away from @name</h1>
-          </div>
-
-          <img class="video-preview" src='@EgraphsAssets.at("images/egraph-video-preview.png")'>
-
-        </div>
-
-      </div>
-    </div>
-
-  </section> <!-- end #masthead-home -->
   <div id="content" role="main">
-    <div id="occluding-column">
-      <section id="testimonials">
-        <div class="testimonials">
-          <div class="testimonial">
-            <div class="quote">
-              Best gift ever! I hardly believed it was really his voice, and couldn't stop smiling all week. Love @@Egraphs!
-            </div>
-            <div class="attribution">
-              - Herp Derpson. Needham, CT
-              <span class="source">via Twitter</span>
+    <div id="main">
+      <section id="personalize-masthead" role="banner" style="">
+        <img src="@mastheadImageUrl"></img>
+        <div class="masthead-content absolute-container">
+            <h1>You are one click away from @name</h1>
+          @* <img class="video-preview" src='@EgraphsAssets.at("images/egraph-video-preview.png")'> *@
+        </div>
+      </section> <!-- end #masthead-home -->        
+      <div class="container">
+        <section id="testimonials">
+          <div class="testimonials">
+            <div class="testimonial">
+              <div class="quote">
+                Best gift ever! I hardly believed it was really his voice, and couldn't stop smiling all week. Love @@Egraphs!
+              </div>
+              <div class="attribution">
+                - Herp Derpson. Needham, CT
+                <span class="source">via Twitter</span>
+              </div>
             </div>
           </div>
-        </div>  
-      </section>
-      <div id="main">
-        <div class="container">
-          <div class="value-propositions row">
-            <div class="span3">
-              <img src='@EgraphsAssets.at("images/pencil.png")'></img>
-              <div class="description">
-                <strong>You write a note</strong>
-                <span>for @name's eyes only</span>
-              </div>
+        </section>      
+        <div class="value-propositions row">
+          <div class="span3 clearfix">
+            <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/pencil.png")'></img></div>
+            <div class="description">
+              <strong>You write a note</strong>
+              <span>for @name's eyes only</span>
             </div>
-            <div class="span3">
-              <img src='@EgraphsAssets.at("images/glyphish-microphone.png")'></img>
-              <div class="description">
-                <strong>He reads and responds</strong>
-                <span>through the mic of his personal iPad. This is your egraph.</span>
-              </div>
+          </div>
+          <div class="span3 clearfix">
+            <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-microphone.png")'></img></div>
+            <div class="description">
+              <strong>He reads and responds</strong>
+              <span>through his iPad microphone. This is your egraph.</span>
             </div>
-            <div class="span3">
-              <img src='@EgraphsAssets.at("images/glyphish-verified.png")'></img>
-              <div class="description">
-                <strong>Authenticity verified</strong>
-                <span>by signature and voice analysis</span>
-              </div>
+          </div>
+          <div class="span3 clearfix">
+            <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-verified.png")'></img></div>
+            <div class="description">
+              <strong>Authenticity verified</strong>
+              <span>by signature and voice analysis</span>
             </div>
-            <div class="span3">
-              <img src='@EgraphsAssets.at("images/glyphish-heart.png")'></img>
-              <div class="description">
-                <strong>Love your egraph</strong>
-                <span>or your money back, no questions asked</span>
-              </div>
+          </div>
+          <div class="span3 clearfix">
+            <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-heart.png")'></img></div>
+            <div class="description">
+              <strong>Love your egraph</strong>
+              <span>or your money back, no questions asked</span>
             </div>
-          </div> <!-- end value-propositions -->
-          <div class="separator"></div>
+          </div>
+        </div> <!-- end value-propositions -->
+        <div class="separator"></div>      
+        <section id="buy-an-egraph">
+          <h2 class="callout">
+            <img src='@EgraphsAssets.at("images/glyphish-circle-southwest.png")'></img>
+            Follow these steps to buy an egraph from Sergio Romo <span class="money">$50</span>
+          </h2>
+        </section>
 
-          <section id="buy-an-egraph">
-            <h2>
-              <img src='@EgraphsAssets.at("images/glyphish-circle-southwest.png")'></img>
-              Follow these steps to buy an egraph from Sergio Romo <span class="money">$50</span>
-            </h2>
-          </section>
+        <div class="separator"></div>
 
-          <div class="separator"></div>
-
-          <section id="make-the-connection">
-            <h2><span class="step-count one">1</span>Make the connection</h2>
-            <form name="makeTheConnection" class="make-the-connection form-horizontal">
-              <div class="control-group note-to-star">
-                <label class="control-label" for="note-to-star">
-                  What do you want to say to @name?
-                  @fieldTooltip("What will he do with my message?") {
-                    <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit
+        <section id="make-the-connection">
+          <h2><span class="step-count one">1</span>Make the connection</h2>
+          <form name="makeTheConnection" class="make-the-connection form-horizontal">
+            <div class="control-group note-to-star">
+              <label class="control-label" for="note-to-star">
+                What do you want to say to @name?
+                @fieldTooltip("What will he do with my message?") {
+                  <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit
+                }
+              </label>
+              <div class="controls">
+                <div class="visitor-profile">
+                  <img src='@EgraphsAssets.at("images/glyphish-user.png")'>
+                </div>
+                <div class="triangle-border left">
+                  <textarea id="egraph-message-text"
+                            name="noteToStar" 
+                            cols="1"
+                            maxlength="140"
+                            data-jq-watermark="processed"
+                            placeholder="Your note to @name here..."></textarea>
+                </div>
+                @* <img src='@EgraphsAssets.at("images/glyphish-circle-bothways.png")' class="connection-arrows">
+                <img src='@profileImageUrl' class="star-profile-image"> *@
+                <div>
+                  @fieldTooltip("Not sure what to say? Don't panic! Here are some great examples.") {
+                    @loremTipsum
                   }
-                </label>
-                <div class="controls">
-                  <div class="visitor-profile">
-                    <img src='@EgraphsAssets.at("images/glyphish-user.png")'>
-                  </div>
-                  <div class="triangle-border left">
-                    <textarea id="egraph-message-text"
-                              name="noteToStar" 
-                              cols="1"
-                              maxlength="140"
-                              data-jq-watermark="processed"
-                              placeholder="Your note to @name here..."></textarea>
-                  </div>
-                  @* <img src='@EgraphsAssets.at("images/glyphish-circle-bothways.png")' class="connection-arrows">
-                  <img src='@profileImageUrl' class="star-profile-image"> *@
-                  <div>
-                    @fieldTooltip("Not sure what to say? Don't panic! Here are some great examples.") {
-                      @loremTipsum
-                    }
-                    <div class="explanatory-text char-remaining">130 left</div>
+                  <div class="explanatory-text char-remaining">130 left</div>
+                </div>
+              </div>
+            </div> <!-- End .control-group.note-to-star -->
+            <div class="controls fancy-separator"></div>
+            <div class="control-group">
+              <label class="control-label" for="recipientOption">
+                Who is this egraph for?
+                @fieldTooltip("How does gifting work?") {
+                  @loremTipsum
+                }
+              </label>
+              <div class="controls">
+                <div id="message-options" 
+                     class="btn-group"
+                     data-toggle="buttons-radio">
+                  <button type="button"
+                          value="ForMe"
+                          class="btn btn-primary btn-custom-radio active">
+                    This is for me
+                  </button>
+                  <button type="button" 
+                          value="Gift" 
+                          class="btn btn-primary btn-custom-radio">
+                    This is a gift
+                  </button>
+                </div>                
+                <div class="errors" ng-show="makeTheConnection.recipientOption.$dirty && makeTheConnection.recipientOption.$invalid">
+                  <div class="alert alert-error hidden"
+                       ng-show="makeTheConnection.recipientOption.$error.required" >
+                    Don't you want to say something to @name?
                   </div>
                 </div>
-              </div> <!-- End .control-group.note-to-star -->
-              <div class="controls fancy-separator"></div>
-              <div class="control-group">
-                <label class="control-label" for="recipientOption">
-                  Who is this egraph for?
-                  @fieldTooltip("How does gifting work?") {
-                    @loremTipsum
-                  }
-                </label>
-                <div class="controls">
-                  <div id="message-options" 
-                       class="btn-group"
-                       data-toggle="buttons-radio">
-                    <button type="button"
-                            value="ForMe"
-                            class="btn btn-primary btn-custom-radio active">
-                      This is for me
-                    </button>
-                    <button type="button" 
-                            value="Gift" 
-                            class="btn btn-primary btn-custom-radio">
-                      This is a gift
-                    </button>
-                  </div>                
-                  <div class="errors" ng-show="makeTheConnection.recipientOption.$dirty && makeTheConnection.recipientOption.$invalid">
-                    <div class="alert alert-error hidden"
-                         ng-show="makeTheConnection.recipientOption.$error.required" >
-                      Don't you want to say something to @name?
-                    </div>
+              </div>
+            </div> <!-- End .control-group.recipientOption -->
+
+            <div class="control-group">
+              <label class="control-label" for="recipientName">
+                Your name:
+                @fieldTooltip("Why do you need this?") {
+                  @loremTipsum
+                }
+              </label>
+              <div class="controls">
+                <input id="recipientName"
+                       name="recipientName">
+                <div class="errors" ng-show="makeTheConnection.recipientName.$dirty && makeTheConnection.recipientName.$invalid">
+                  <div class="alert alert-error hidden"
+                       ng-show="makeTheConnection.recipientName.$error.required" >
+                    Don't you want to say something to @name?
                   </div>
                 </div>
-              </div> <!-- End .control-group.recipientOption -->
+              </div>
+            </div> <!-- End .control-group.recipientName -->
+          </form>
+        </section>
 
-              <div class="control-group">
-                <label class="control-label" for="recipientName">
-                  Your name:
-                  @fieldTooltip("Why do you need this?") {
-                    @loremTipsum
-                  }
-                </label>
-                <div class="controls">
-                  <input id="recipientName"
-                         name="recipientName">
-                  <div class="errors" ng-show="makeTheConnection.recipientName.$dirty && makeTheConnection.recipientName.$invalid">
-                    <div class="alert alert-error hidden"
-                         ng-show="makeTheConnection.recipientName.$error.required" >
-                      Don't you want to say something to @name?
-                    </div>
-                  </div>
-                </div>
-              </div> <!-- End .control-group.recipientName -->
-            </form>
-          </section>
+        <div class="separator"></div>
 
-          <div class="separator"></div>
+        <section id="look-and-feel">
+          <h2><span class="step-count">2</span>Customize your egraph's look and feel</h2>
+          <form name="lookAndFeel" class="form-horizontal">
+            
+            <div class="control-group photo-choice">
+              <label class="control-label" for="photoChoice">
+                What photo should he sign?
+                @fieldTooltip("Wait, it's not just audio?") {
+                  @loremTipsum
+                }
+                @fieldTooltip("What's with the different prices?") {
+                  @loremTipsum
+                }
 
-          <section id="look-and-feel">
-            <h2><span class="step-count">2</span>Customize your egraph's look and feel</h2>
-            <form name="lookAndFeel" class="form-horizontal">
-              
-              <div class="control-group photo-choice">
-                <label class="control-label" for="photoChoice">
-                  What photo should he sign?
-                  @fieldTooltip("Wait, it's not just audio?") {
-                    @loremTipsum
-                  }
-                  @fieldTooltip("What's with the different prices?") {
-                    @loremTipsum
-                  }
+              </label>
+              <div class="controls">
+                <div class="selected-photo">
+                  <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/418/20120823100534062/w575.jpg">
+                  <div class="image-label">
+                    <h3>Heart of a Warrior <div class="money right">$50</div></h3>
 
-                </label>
-                <div class="controls">
-                  <div class="selected-photo">
-                    <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/418/20120823100534062/w575.jpg">
-                    <div class="image-label">
-                      <h3>Heart of a Warrior <div class="money right">$50</div></h3>
-
-                      <div class="image-label-caption">
-                        Oakland, CA - February 12, 2012. Sergio Romo is a leader on and off the field.
-                      </div>
-                    </div>
-                  </div>
-                  <div class="photo-selector">
-                    <div class="thumbs">
-                      @* <h3>Choose a photo</h3> *@
-                      <div class="photo-thumb">
-                        <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/416/20120823100121825/w340.jpg">
-                        <div class="money">$25</div>
-                      </div><div class="photo-thumb">
-                        <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/417/20120823100254822/w340.jpg">
-                        <div class="money">$25</div>
-                      </div><div class="photo-thumb selected">
-                        <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/418/20120823100534062/w340.jpg">
-                        <div class="money">$50</div>
-                      </div><div class="photo-thumb">
-                        <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/415/20120823100004072/w340.jpg">
-                        <div class="money">$50</div>
-                      </div><div class="photo-thumb">
-                        <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/1028/20121031061225650/w340.jpg">
-                        <div class="money">$50</div>
-                      </div><div class="photo-thumb">
-                        <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/981/20121023180429667/w340.jpg">
-                        <div class="money">$50</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="errors" ng-show="makeTheConnection.photoChoice.$dirty && makeTheConnection.photoChoice.$invalid">
-                    <div class="alert alert-error hidden"
-                         ng-show="makeTheConnection.photoChoice.$error.required" >
-                      Don't you want to say something to @name?
+                    <div class="image-label-caption">
+                      Oakland, CA - February 12, 2012. Sergio Romo is a leader on and off the field.
                     </div>
                   </div>
                 </div>
-              </div> <!-- End .control-group.photoChoice -->
-
-
-              <div class="controls fancy-separator"></div>
-
-
-              <div class="control-group">
-                <label class="control-label" for="egraphFormat">
-                  In what format would you like the egraph delivered?
-                  @fieldTooltip("What's the difference?") {
-                    @loremTipsum
-                  }
-                  @fieldTooltip("What if I want the framed print later?") {
-                    @loremTipsum
-                  }
-                </label>
-                <div class="controls">
-                  <div id="message-options" 
-                       class="btn-group"
-                       data-toggle="buttons-radio">
-                    <button type="button"
-                            value="OnlineOnly"
-                            class="btn btn-primary btn-custom-radio active">
-                      Online egraph only
-                    </button>
-                    <button type="button" 
-                            value="WithFramedPrint" 
-                            class="btn btn-primary btn-custom-radio">
-                      with framed print&nbsp;&nbsp;<span class="money slapped-on">+ $45</span>
-                    </button>
-                  </div>
-                  <div class="errors" ng-show="makeTheConnection.photoChoice.$dirty && makeTheConnection.photoChoice.$invalid">
-                    <div class="alert alert-error hidden"
-                         ng-show="makeTheConnection.photoChoice.$error.required" >
-                      Don't you want to say something to @name?
+                <div class="photo-selector">
+                  <div class="thumbs">
+                    @* <h3>Choose a photo</h3> *@
+                    <div class="photo-thumb">
+                      <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/416/20120823100121825/w340.jpg">
+                      <div class="money">$25</div>
+                    </div><div class="photo-thumb">
+                      <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/417/20120823100254822/w340.jpg">
+                      <div class="money">$25</div>
+                    </div><div class="photo-thumb selected">
+                      <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/418/20120823100534062/w340.jpg">
+                      <div class="money">$50</div>
+                    </div><div class="photo-thumb">
+                      <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/415/20120823100004072/w340.jpg">
+                      <div class="money">$50</div>
+                    </div><div class="photo-thumb">
+                      <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/1028/20121031061225650/w340.jpg">
+                      <div class="money">$50</div>
+                    </div><div class="photo-thumb">
+                      <img src="https://d3kp0rxeqzwisk.cloudfront.net/product/981/20121023180429667/w340.jpg">
+                      <div class="money">$50</div>
                     </div>
                   </div>
-                  <div class="explanatory-text">
-                    This is the option that you've chosen. There are many other options, but this one is yours. Your option is your best friend. It is your life. You must master it as you must master your life.
+                </div>
+                <div class="errors" ng-show="makeTheConnection.photoChoice.$dirty && makeTheConnection.photoChoice.$invalid">
+                  <div class="alert alert-error hidden"
+                       ng-show="makeTheConnection.photoChoice.$error.required" >
+                    Don't you want to say something to @name?
                   </div>
                 </div>
-              </div> <!-- End .control-group.photoChoice -->              
-            </form>
-          </section>
+              </div>
+            </div> <!-- End .control-group.photoChoice -->
 
-          <div class="separator"></div>
 
-          <section id="egraph-arrival">
-            <h2>
-              <img src='@EgraphsAssets.at("images/glyphish-stopwatch.png")'>
-              When will you get the egraph? Sergio Romo will create it as soon as he can -- on average it takes players 2 weeks. It may be much faster, or it may be slower!
-            </h2>
-          </section>
-          <div class="separator"></div>
-          <section id="preview-proceed">
-            <span class="step-count one">3</span>
+            <div class="controls fancy-separator"></div>
+
+
+            <div class="control-group">
+              <label class="control-label" for="egraphFormat">
+                In what format would you like the egraph delivered?
+                @fieldTooltip("What's the difference?") {
+                  @loremTipsum
+                }
+                @fieldTooltip("What if I want the framed print later?") {
+                  @loremTipsum
+                }
+              </label>
+              <div class="controls">
+                <div id="message-options" 
+                     class="btn-group"
+                     data-toggle="buttons-radio">
+                  <button type="button"
+                          value="OnlineOnly"
+                          class="btn btn-primary btn-custom-radio active">
+                    Online egraph only
+                  </button>
+                  <button type="button" 
+                          value="WithFramedPrint" 
+                          class="btn btn-primary btn-custom-radio">
+                    with framed print&nbsp;&nbsp;<span class="money slapped-on">+ $45</span>
+                  </button>
+                </div>
+                <div class="errors" ng-show="makeTheConnection.photoChoice.$dirty && makeTheConnection.photoChoice.$invalid">
+                  <div class="alert alert-error hidden"
+                       ng-show="makeTheConnection.photoChoice.$error.required" >
+                    Don't you want to say something to @name?
+                  </div>
+                </div>
+                <div class="explanatory-text">
+                  This is the option that you've chosen. There are many other options, but this one is yours. Your option is your best friend. It is your life. You must master it as you must master your life.
+                </div>
+              </div>
+            </div> <!-- End .control-group.photoChoice -->              
+          </form>
+        </section>
+
+        <div class="separator"></div>
+
+        <section id="egraph-arrival">
+          <h2 class="clearfix callout">
+            <img src='@EgraphsAssets.at("images/glyphish-stopwatch.png")'>
+            When will you get the egraph? Sergio Romo will create it as soon as he can -- on average it takes players 2 weeks. It may be much faster, or it may be slower!
+          </h2>
+        </section>
+        <div class="separator"></div>
+
+        <section id="preview-proceed">
+          <button id="review-button" 
+                    type="button"
+                    class="button review"
+                    ng-click="creditCardFormSubmit(onCardInfoValidated)" >
+            <strong>
+              <span class="step-count in-button">3</span>
+              <em>Proceed to Checkout</em>
+            </strong>
+            <span>&raquo;</span>
+          </button>
+          <div class="price">Product price: <span class="money">$95</span>
+          <div class="preview">
             @tooltip("Preview your egraph") {
               @loremTipsum
-            }
-            @tags.arrow_button(
-              caption="Proceed to Secure Checkout",
-              classes="button"
-            )
-            <div class="price">Product price: <span class="money">$95</span>
-          </section>
-        </div> <!-- end container -->
-      </div> <!-- end main -->
-    </div>
-  </section>
+            } 
+          </div>
+        </section>
+      </div> <!-- end container -->
+    </div> <!-- end main -->
+  </div>
 }
 
 

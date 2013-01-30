@@ -1,7 +1,6 @@
 // Styles for the checkout explorations base checkout page
-
-
 body.storefront-a-checkout {
+  @mainContentWidth: 523px;
   line-height: normal;
 
   h2, h3, div, span {
@@ -9,8 +8,13 @@ body.storefront-a-checkout {
   }
 
   // The alternate navbar
-  #top {
+  .top {
     text-align:center;
+    padding:0px;
+
+    // Silence the fixed header during checkout
+    &.fixed { display: none; }
+    &.relative { visibility:visible; }
 
     .checkout-header {
       margin-top:10px;
@@ -18,39 +22,38 @@ body.storefront-a-checkout {
     }
 
     .checkout-logo {
+      @logoWidth: 120px;
       display:inline-block;
-
-      img {
-        max-width:120px;
-      }
+      max-width: @logoWidth;
+      width: precentage(@logoWidth / @mainContentWidth);
+      
+      img { width:100%; }
 
       a {
         color: #999;
-
-        &:hover {
-          color: #999;
-        }
+        &:hover { color: #999; }
       }
       
       // Logo fading effect when hovered
-      &:hover {
-        .opacity(75)
-      }
+      &:hover { .opacity(75) }
     }
 
     // The checkout steps navbar portion
     .steps {
+      position:relative;
       border-left:1px solid #ccc;
       padding-left:12px;
       margin-left:10px;
       display: inline-block;
-      vertical-align:middle;
+      vertical-align: middle;
 
       .step {
         display: inline-block;
+        vertical-align:top;
         text-transform: uppercase;
-        
+                
         label {
+          line-height: normal;
           font-size:13px;
         }
 
@@ -69,32 +72,40 @@ body.storefront-a-checkout {
 
       img.step-arrow {
         position:relative;
+        display:inline-block;
         margin-left:5px;
         margin-right:5px;
-        top:-20px;
-        vertical-align: bottom; // I wish 'middle' worked instead. Why doesn't it? (Erem)
+        vertical-align: middle; // I wish 'middle' worked instead. Why doesn't it? (Erem)
         max-width:16px;
+        margin-top:8px;
       }
     }
   }
 
-  // What is this to-top bs? Needs to change. Evidently it's a spacer
-  // to stop content from folding up under the static masthead.
-  #to-top {
-    height:60px;
+  #content {
+    padding-bottom:15px;
   }
 
   #content #main {
-    max-width:523px;
+    max-width:@mainContentWidth;
+    top:0px;
+    padding-top:0px;
+    margin-left:auto;
+    margin-right:auto;
     padding-bottom:15px;
+    margin-bottom:15px;
 
     #form {
-      margin-top:25px;
+      // margin-top:25px;
       border-bottom: 1px solid #ccc;
     }
 
     h2, h3 {
       text-shadow:0px 1px 0px white;
+    }
+
+    section {
+      padding-top:25px;
     }
 
     // The main section headers, e.g. "Enter Delivery Details"
@@ -112,7 +123,6 @@ body.storefront-a-checkout {
       background-image: url("/assets/images/fancy-lines.png");
       background-position: 50% 50%;
       background-repeat: no-repeat;
-      margin-top:30px;
 
       img {
         width:20px;
@@ -154,7 +164,8 @@ body.storefront-a-checkout {
       margin-left:auto;
       margin-right:auto;
       margin-bottom:-1 * @apertureHeight;
-      width:310px;
+      width:95%;
+      max-width:340px;
       height:@apertureHeight;
       background-color:#666;
       border-radius:9px;
@@ -175,7 +186,8 @@ body.storefront-a-checkout {
     .summary {
       position:relative;
       z-index:1;
-      width:265px;
+      width:80%;
+      max-width:280px;
       margin-left:auto;
       margin-right:auto;
       padding-top:7px;
@@ -371,3 +383,42 @@ body.storefront-a-checkout {
     }
   }  
 }
+
+@media (max-width:480px) { body.storefront-a-checkout {
+  .top {
+    .steps {
+      margin-top:10px;
+      margin-left:0px;
+      padding-left:0px;
+      border-left:0px;
+      font-size:11px;
+
+      img.step-arrow {
+        max-width: 8px;
+        margin-top:15px;
+      }
+
+      .step {
+        width:60px;
+      }
+    }
+  }
+
+  #content #main {
+
+    .control-group {
+       padding-right:19px;
+       padding-left:10px;
+    }
+
+    .controls {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .control-label {
+      width:auto;
+    }
+  }
+}}
