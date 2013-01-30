@@ -1,11 +1,16 @@
 /* Scripting for the landing page */
-define(["Egraphs", "pages/marketplace", "bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover"],
-function (Egraphs, marketplace) {
+define(["Egraphs",
+ "pages/marketplace",
+ "services/logging",
+ "module",
+ "bootstrap/bootstrap-tooltip",
+ "bootstrap/bootstrap-popover"],
+function (Egraphs, marketplace, logging, requireModule) {
   /**
    * Functions for the new landing page that share dependencies with the marketplace.
    * Marketplace.js contains mixpanel tracking events.
    **/
-
+  var log = logging.namespace(requireModule.id);
   // Select a vertical
   var verticalFunction = function(e) {
     var vertical = $(this);
@@ -23,7 +28,21 @@ function (Egraphs, marketplace) {
       marketplace.updateCategories(catVal, category, $(this).attr("data-vertical"));
       marketplace.reloadPage();
   };
-  
+
+  // Handler for Youtube Object
+  var player;
+  //Unfortunately the YouTube API requires this globally scoped event handler.
+  window.onYouTubeIframeAPIReady = function() {
+    player = new YT.Player('egraph-video');
+    log(player);
+  };
+
+  var tag = document.createElement('script');
+  // Insert YouTube iFrame API script asynchronously
+  tag.src = "//www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
   return {
     go: function() {
       $(document).ready(function() {
@@ -58,6 +77,10 @@ function (Egraphs, marketplace) {
         $(".vertical-tile").click(verticalFunction);
         $(".cv-link").click(categoryFunction);
 
+        $(".play-egraph").click(function() {
+          $("#egraph-container").fadeIn();
+          player.playVideo();
+        });
       });
     }
   };

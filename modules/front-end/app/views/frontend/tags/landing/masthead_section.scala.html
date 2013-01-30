@@ -13,7 +13,8 @@
 
 @standardHeadline = {
   <h1>Get an egraph from your favorite star</h1>
-  <a class="helper" href="#">What is an egraph? &gt;&gt;</a>
+  <h2>The newest way to talk to your heroes</h2>
+  @tags.landing.get_started(url = "#", text="See an egraph", classString="play-egraph")
 }
 
 <section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
@@ -31,18 +32,24 @@
             @getStartedUrl.map{ url =>
             @{
               celebrityPublicName match {
-                case None => tags.landing.searchbox(url, autofocus=true, helper=false)
+                case None => {}
                 case Some(name) => tags.landing.get_started(url)
               }
             }
           }
-
         </div>
-
+        <div class="span6">
+          <div class="clearfix">
+            <div id="egraph-container">
+              <iframe id="egraph-video" type="text/html"
+              src="https://www.youtube.com/embed/QAlrGTQc-5w?controls=0&rel=0&showinfo=0"
+              frameborder="0" allowfullscreen>
+              </iframe>
+            </div>
+          </div>  
+        </div>
       </div>
-
     </div>
-
   </div>
 
 </section> <!-- end #masthead-home -->
