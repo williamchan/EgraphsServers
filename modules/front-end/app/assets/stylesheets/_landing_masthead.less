@@ -30,6 +30,7 @@
     font-weight: 300;
     line-height: 1.15em;
     margin-top: .75em;
+    margin-bottom: 10px;
     text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
   }
 
@@ -54,6 +55,13 @@
     margin-bottom: 10px; 
     margin-top: 25px;
   }
+
+  .play-egraph {
+    i {
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+  }
   
   form {
     width: 256px;
@@ -67,23 +75,33 @@
       color: @white;
     }
   }
-  #egraph-container {
-    .box-shadow(0 8px 8px -4px rgba(0, 0, 0, .5));
-    background: @grayDarker;
-    border: 1px solid rgba(255,255,255,.15);
-    display: none;
-    float: right;
-    margin-top: 1.5em;
-    width: 400px;
-    padding: 5px 5px 0px 5px;
-    #egraph-video {
-      width: 400px;
-      height: 252.5px;
-    }
-  }
-
 }
 
+#video-modal {
+  
+  a.modal-dismissal {
+    border-bottom: 1px dotted @orange;
+    color: @orange;
+    cursor: pointer;
+    float: right;
+    text-decoration: none;
+  }
+
+  #egraph-container {
+    height: 0;
+    padding-bottom: 61.04%;  // 16:9;
+    padding-top: 25px;
+    position: relative;
+
+    iframe {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+  }
+}
 // Past 1080 pixels width we turn on the radial gradient that obscures the
 // photo's edge
 @media (min-width: 1080px) {
@@ -115,13 +133,6 @@
 @media (max-width: 1079px) and (min-width: 768px) {
   #masthead-home {
     min-height: 400px;
-    #egraph-container {
-      width: 360px;
-      #egraph-video {
-        width: 360px;
-        height: 227.5px;
-      }
-    }
   }
   
   .cssgradients #masthead-home .banner-gradient { 
@@ -133,15 +144,6 @@
   #masthead-home {
     min-height: 300px;
 
-    #egraph-container {
-      position: fixed;
-      z-index: 10;
-      margin-left: auto;
-      margin-right: auto;
-      top: 40px;
-      left: 25%;
-    }
-
     h1 {
       max-width: 75%;
     }
@@ -150,6 +152,14 @@
       font-size: 38px;
     }
   } // end #masthead-home-a
+}
+
+@media (max-width: 767px) and (min-width: 481px) {
+  #video-modal {
+    // Override Bootstrap default values. 
+    width: 480px;
+    margin-left: -240px;
+  }  
 }
 
 @media (max-width:480px) {
@@ -163,6 +173,14 @@
     h1 {
       margin-top: 1.25em;
       font-size: 25px;
+    }
+  }
+  #video-modal {
+    // Override inappropriate responsive CSS from
+    // assets/bootstrap-modal/css/bootstrap-modal.css
+    top: 70%;
+    .modal-header {
+      display: none;
     }
   }
 }
