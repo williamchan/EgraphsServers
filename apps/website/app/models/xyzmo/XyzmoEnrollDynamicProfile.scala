@@ -75,7 +75,6 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
     error.getOrElse(None) == WebServiceBiometricPartStub.ErrorStatus.ProfileAlreadyEnrolled.getValue
   }
 
-  //    todo(wchan): Implement once we get rid of SignatureSample
   //  private def getSignatureSampleIds(enrollDynamicProfile_v1Response: WebServiceBiometricPartStub.EnrollDynamicProfile_v1Response): Option[String] = {
   //    None
   //  }
@@ -112,7 +111,7 @@ case class XyzmoEnrollDynamicProfile(id: Long = 0,
 
 }
 
-class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[Long,XyzmoEnrollDynamicProfile] {
+class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends SavesWithLongKey[XyzmoEnrollDynamicProfile] with SavesCreatedUpdated[XyzmoEnrollDynamicProfile] {
 
   def findByEnrollmentBatch(enrollmentBatch: EnrollmentBatch): Option[XyzmoEnrollDynamicProfile] = {
     from(schema.xyzmoEnrollDynamicProfileTable)(xyzmoEnrollDynamicProfile =>
@@ -126,24 +125,10 @@ class XyzmoEnrollDynamicProfileStore @Inject()(schema: Schema) extends SavesWith
   //
   override val table = schema.xyzmoEnrollDynamicProfileTable
 
-  override def defineUpdate(theOld: XyzmoEnrollDynamicProfile, theNew: XyzmoEnrollDynamicProfile) = {
-    updateIs(
-      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
-      theOld.baseResult := theNew.baseResult,
-      theOld.error := theNew.error,
-      theOld.errorMsg := theNew.errorMsg,
-      theOld.enrollResult := theNew.enrollResult,
-      theOld.xyzmoProfileId := theNew.xyzmoProfileId,
-      theOld.nrEnrolled := theNew.nrEnrolled,
-      theOld.rejectedSignaturesSummary := theNew.rejectedSignaturesSummary,
-      theOld.enrollmentSampleIds := theNew.enrollmentSampleIds,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,XyzmoEnrollDynamicProfile] methods
+  // SavesCreatedUpdated[XyzmoEnrollDynamicProfile] methods
   //
   override def withCreatedUpdated(toUpdate: XyzmoEnrollDynamicProfile, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

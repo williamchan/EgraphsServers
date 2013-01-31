@@ -6,7 +6,7 @@ import java.sql.Timestamp
 
 class UsernameHistoryStore @Inject() (
   schema: Schema
-) extends SavesWithStringKey[Username] with SavesCreatedUpdated[String, Username]
+) extends SavesWithStringKey[Username] with SavesCreatedUpdated[Username]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -66,19 +66,10 @@ class UsernameHistoryStore @Inject() (
   //
   override val table = schema.usernameHistories
 
-  override def defineUpdate(theOld: Username, theNew: Username) = {
-    updateIs(
-      theOld.username  := theNew.username,
-      theOld.customerId := theNew.customerId,
-      theOld.isPermanent  := theNew.isPermanent,
-      theOld.isRemoved  := theNew.isRemoved,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,UsernameHistory] methods
+  // SavesCreatedUpdated[UsernameHistory] methods
   //
   override def withCreatedUpdated(toUpdate: Username, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

@@ -42,26 +42,17 @@ case class VBGAudioCheck(id: Long = 0,
 
 }
 
-class VBGAudioCheckStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGAudioCheck] with SavesCreatedUpdated[Long,VBGAudioCheck] {
+class VBGAudioCheckStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGAudioCheck] with SavesCreatedUpdated[VBGAudioCheck] {
 
   //
   // SavesWithLongKey[VBGAudioCheck] methods
   //
   override val table = schema.vbgAudioCheckTable
 
-  override def defineUpdate(theOld: VBGAudioCheck, theNew: VBGAudioCheck) = {
-    updateIs(
-      theOld.enrollmentBatchId := theNew.enrollmentBatchId,
-      theOld.errorCode := theNew.errorCode,
-      theOld.vbgTransactionId := theNew.vbgTransactionId,
-      theOld.usableTime := theNew.usableTime,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,VBGAudioCheck] methods
+  // SavesCreatedUpdated[VBGAudioCheck] methods
   //
   override def withCreatedUpdated(toUpdate: VBGAudioCheck, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

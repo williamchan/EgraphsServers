@@ -25,7 +25,7 @@ class VideoEncoderTests extends EgraphsUnitTest {
 ////    val aacFile = VideoEncoder.generateFinalAudio(current.getFile("test/pedro.aac"))
 //
 //    VideoEncoder.generateMp4_no_audio_xuggle(
-//      targetFileName = filenameVideoNoAudio,
+//      targetFilePath = filenameVideoNoAudio,
 //      egraphImageFile = new File(filenameImage),
 //      recipientName = "Jordan",
 //      celebrityName = "Sergio Romo",

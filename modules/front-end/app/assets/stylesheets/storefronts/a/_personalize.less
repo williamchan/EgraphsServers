@@ -1,0 +1,629 @@
+
+.storefront-a-personalize {
+  .separator {
+    display:block;
+    border-top: 1px solid #ccc;
+    height:0px;
+    border-bottom: 1px solid white;
+  }
+}
+// Styles for the masthead of the storefront personalize page
+.storefront-a-personalize #masthead-home {
+  .box-shadow(inset 0 -8px 8px -8px rgba(0, 0, 0, .5));
+  
+  // Specify all aspects of the background but the image url,
+  // which is specified in the actual page.
+  background-color: @grayDarker;
+  background-repeat: no-repeat;
+  background-position: 50% 0; // center align
+  background-size: auto 100%; // scale responsively with masthead height
+
+  .banner-gradient {
+    max-width: 1551px;
+    margin: 0 auto;
+    height: 100%;
+  }
+
+  h1 {
+    color: @white;
+    margin-top:10px;
+    font-weight: 300;
+    font-size: 42px;
+    line-height: 1.17em;
+    text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
+  }
+
+  .video-preview {
+    display:block;
+    float:right;
+    margin-top:30px;
+    max-width:250px;
+  }
+}
+
+// Past 1340 pixels width we turn on the radial gradient that obscures the
+// photo's edge
+@media (min-width: 1340px) {
+  .storefront-a-personalize #masthead-home {
+    .banner-gradient {  
+      background: url(/assets/images/bg-banner-gradient.png) repeat-y 50% 0;
+    }
+
+    .row { margin-left: -60px; }
+  }
+  
+  // Put in a radial fade-to-dark-gray for big screens.
+  .cssgradients .storefront-a-personalize #masthead-home .banner-gradient { 
+    background: -moz-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px,  rgba(26,26,26,1) 745px); /* FF3.6+ */
+    background: -webkit-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Chrome10+,Safari5.1+ */
+    background: -o-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* Opera 12+ */
+    background: -ms-radial-gradient(center, circle farthest-side, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* IE10+ */
+    background: radial-gradient(circle at center, rgba(26,26,26,0) 0%, rgba(26,26,26,0) 500px, rgba(26,26,26,1) 745px); /* W3C */
+  }
+} // end min-width: 1340px;
+
+@media (min-width: 1080px) {
+  .storefront-a-personalize #masthead-home {
+    height: 286px;
+
+    h1 {
+      max-width:440px;
+    }   
+
+    .header-parent {
+      padding:0px; // overwrite unattractive bootstrap padding
+    }
+  }
+} // end min-width: 1080px;
+
+// Down-adjust masthead height at resolutions below 1080p
+@media (max-width: 1079px) {
+  .storefront-a-personalize #masthead-home {
+    min-height:286px;
+  }
+}
+
+@media (max-width: 767px) {
+  .storefront-a-personalize #masthead-home {
+    min-height: 200px;
+
+    form {
+      width: 45%;
+    }
+
+    h1 {
+      max-width:45%;
+      font-size:28px;
+    }
+  } // end .storefront-a-personalize #masthead-home
+}
+
+@media (max-width:480px) {
+  .storefront-a-personalize #masthead-home {
+    min-height: 150px;
+
+    h1 {
+      font-size:25px;
+    }
+  }
+}
+
+
+///////////////////////////////////////////////////////
+// Styles for occluding column containing testimonials and main content
+//////////////////////////////////////////////////////
+.storefront-a-personalize #occluding-column {
+  position:relative;
+  max-width:@standardContentMaxWidth;
+  margin-left:auto;
+  margin-right:auto;
+
+  top:-90px;
+}
+
+// Down-adjust masthead height at resolutions below 1080p
+@media (max-width: 767px) { .storefront-a-personalize #occluding-column {
+  top: 0px;
+}}
+
+
+///////////////////////////////////////////////////////
+// Styles for testimonials
+//////////////////////////////////////////////////////
+
+.storefront-a-personalize #testimonials {
+  position:relative;
+  z-index:10;
+  background-color:rgba(0,0,0,0.8);
+  color:white;
+  padding-top:15px;
+  // padding-bottom:10px;
+  font-weight:100;
+  font-style:italic;
+  font-size:.9em;
+  border-top:1px solid rgba(255,255,255,0.15);
+  line-height:normal;
+  padding-left:20px;
+
+  .testimonial {
+    display:inline;
+    margin-left:50px;
+
+    &:before {
+      position:absolute;
+      display:inline;
+      left:-6px;
+      top:-7px;
+      content: '“';
+      color:#ccc;
+      font-size:48px;
+      font-family:serif;
+    }
+  }
+
+  .attribution {
+    color:#CCC;
+  }
+
+  .source {
+    font-size:10px;
+  }
+
+  .clearfix();
+}
+
+
+///////////////////////////////////////////////////////
+// Styles for main content
+//////////////////////////////////////////////////////
+.storefront-a-personalize #content #main {
+  top:0px;
+  line-height:normal;
+  padding-top:25px;
+
+  .value-propositions div {
+    padding-bottom:10px;
+    line-height:.9em;
+
+    img {
+      float:left;
+      margin-right:7px;
+    }
+
+    strong {
+      display:block;
+      color:#333;
+      margin-bottom:4px;
+    }
+    span {
+      font-size:13px;
+    }
+  }
+
+  h2 {
+    margin-bottom:5px;
+  }
+
+  #buy-an-egraph {
+    padding-left:@gridGutterWidth;
+    padding-right:@gridGutterWidth;
+    padding-top:5px;
+    background-color:#eee;
+    padding-bottom:5px;
+    text-align:center;
+    padding-right:32px;
+
+    h2 {
+      font-size:24px;
+      line-height:33px;
+      margin:0px;
+    }
+
+    img {
+      position:relative;
+      max-width:20px;
+      margin-right:3px;
+      top:-1px;
+    }
+
+  }
+
+  // Style form-elements differently than bootstrap standard
+  input, label, textarea, .tooltip-link { line-height:normal; }
+
+  // Placeholder styling
+  input, textarea {
+    @placeholderColor: #999;
+    @placeholderFontSize: 13px;
+    @placeholderFontStyle: italic;
+
+    &::-webkit-input-placeholder {
+      color: @placeholderColor;
+      font-size: @placeholderFontSize;
+      font-style: @placeholderFontStyle;
+    }
+
+    &::-moz-placeholder {
+      color: @placeholderColor;
+      font-size: @placeholderFontSize;
+      font-style: @placeholderFontStyle;
+    }
+
+    &::-ms-placeholder {
+      color: @placeholderColor;
+      font-size: @placeholderFontSize;
+      font-style: @placeholderFontStyle;
+    }
+  }
+
+  // Make input widths responsive to .controls width
+  input, textarea, .btn-group {
+    width:100%;
+  }
+
+  .controls {
+    margin-left:190px;
+  }
+  
+  .control-label {
+    width:170px;
+    margin-right:20px;
+    padding-top:0px;
+  }
+
+  div.fancy-separator {
+    background-image:url("/assets/images/fancy-separator.png");
+    height: 16px;
+    background-position: 50% 0;
+    background-repeat: no-repeat;
+
+    margin-bottom:24px;
+    margin-right:auto;
+  }
+
+  .triangle-border {
+    position:relative;  
+    display:inline;
+    color:#333;
+
+    &.left {
+      float:none;
+    }     
+  }
+
+  .triangle-border:before {
+    content:"";
+    position:absolute;
+    bottom:-20px; /* value = - border-top-width - border-bottom-width */
+    left:40px; /* controls horizontal position */
+    border-width:20px 20px 0;
+    border-style:solid;
+    border-color:#5a8f00 transparent;
+    /* reduce the damage in FF3.0 */
+    display:inline; 
+    width:0;
+    .rotate(360deg); // Anti-alias the triangle
+  }
+
+  // /* creates the smaller  triangle */
+  .triangle-border:after {
+    content:"";
+    position:absolute;
+    bottom:-13px; /* value = - border-top-width - border-bottom-width */
+    left:47px; /* value = (:before left) + (:before border-left) - (:after border-left) */
+    border-width:13px 13px 0;
+    border-style:solid;
+    border-color:#000 transparent;
+    /* reduce the damage in FF3.0 */
+    display:inline; 
+    width:0;
+    .rotate(360deg); // Anti-alias the triangle
+  }
+
+  /* creates the larger triangle */
+  .triangle-border.left:before {
+    top:10px; /* controls vertical position */
+    bottom:auto;
+    left:-12px; /* value = - border-left-width - border-right-width */
+    border-width:8px 12px 8px 0px;
+    border-color:transparent #ccc;
+  }
+
+  /* creates the smaller  triangle */
+  .triangle-border.left:after {
+    top:10px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+    bottom:auto;
+    left:-10px; /* value = - border-left-width - border-right-width */
+    border-width:8px 12px 8px 0px;
+    border-color:transparent white;
+  }
+
+  .btn-group {
+    height:50px;
+  }
+
+  .btn-custom-radio {
+    height:100%;
+
+    &:active .money {
+      .activeMoneyStyle();
+    }
+  }
+
+  .explanatory-text {
+    font-size:11px;
+    font-style:italic;
+    margin-top:6px;
+  }
+
+  .char-remaining {
+    float:right;
+  }
+
+  .controlColumnLayout(@width) {
+    .controls {
+      max-width:@width;
+    }
+
+    // Allow for bootstrap's 4px of padding on text inputs
+    input, textarea {
+      width: @width - 10px;
+    }
+
+    .btn-group {
+      width:100%;
+    }
+
+    .btn-custom-radio {
+      width:50%;
+    }
+  }
+
+
+  #make-the-connection {
+    .controlColumnLayout(240px);
+
+    .note-to-star .controls {
+      height:50px;
+
+      .visitor-profile {
+        display:inline-block;
+        padding:3px;
+        border:1px solid @inputBorder;
+        background-color:white;
+        border-radius:3px;
+
+        img {
+          width:60px;
+        }
+      }
+
+      .visitor-profile {
+        display:none;
+      }
+
+      textarea {
+        height:100%;
+      }
+
+      .connection-arrows {
+        margin-left:20px;
+        margin-right:20px;
+        width:30px;
+      }
+
+      .star-profile-image {
+        width:60px;
+      }
+
+      .tooltip-link {
+        display: block;
+        float: left;
+        max-width: 180px;
+      }
+
+    }
+  }
+
+  #look-and-feel {
+    @controlColumnWidth: 365px;
+    .controlColumnLayout(@controlColumnWidth);
+
+    .photo-choice {
+      
+      .controls {
+        // max-width:none;
+
+        .selected-photo {
+          position:relative;
+          background-color:white;
+          padding:10px;
+          padding-bottom:15px;
+          border:1px solid #ccc;
+          border-bottom-width:0px;
+
+          .image-label h3 {
+            line-height: normal;
+            margin-top: 10px;
+            color: #333;
+          }
+
+          .image-label-caption {
+            margin-top:6px;
+            font-size:13px;
+            font-style:italic;
+          }
+        }
+
+        .photo-selector {
+          @selectorBorderRadius: 0px 0px 8px 8px;
+          background-image:url(/assets/images/apple-linen-bg-tile.jpg);
+          position:relative;
+          border-radius:@selectorBorderRadius;
+          border-bottom:1px solid white;
+
+          h3 {
+            line-height:normal;
+            padding-top:10px;
+            padding-bottom:4px;
+            color:white;
+          }
+
+          .thumbs {
+            position:relative;
+            z-index:1;
+            padding:18px;
+            text-align:center;
+          }
+
+          .photo-thumb {
+            position:relative;
+            margin:2px;
+            cursor:pointer;
+            display:inline-block;
+            border:2px solid #2a2a2a;
+            .box-shadow(0px 3px 4px rgba(0,0,0,.4));
+
+            img {
+              width:90px;
+            }
+
+            .money {
+              position:absolute;
+              bottom:0px;
+              right:0px;
+              border-radius: 2px 0 0 0;
+            }
+
+            &:not(.selected) .money {
+              color: #666;
+              background-color: #eee;
+            }
+
+            &.selected {
+              border:2px solid @orange;
+              // .box-shadow(0px 0px 2px @orange);                
+            }
+          }
+
+          &:before {
+            position:absolute;
+            display:block;
+            content:"";
+            width:100%;
+            height:100%;
+            .box-shadow(0px 0px 100px black inset);
+            border-radius:@selectorBorderRadius;
+          }
+
+          &:after {
+            position:absolute;
+            content:"";
+            display:inline;
+            width:0px;
+            top:-14px;
+            left:47%;
+            border-width:0px 12px 14px 12px;
+            border-style: solid;
+            border-color: lighten(black, 17%) transparent;
+            .rotate(360deg); // Anti-alias the triangle
+          }
+        }
+      }
+    }
+  }
+
+  #egraph-arrival {
+    padding-top:10px;
+    padding-bottom:10px;
+    padding-left:@gridGutterWidth;
+    background-color:#eee;
+    padding-right:@gridGutterWidth;
+    
+    h2 {
+      font-size:24px;
+      line-height:27px;
+      margin:0px;
+    }
+
+    img {
+      float:left;
+      margin-right:10px;
+    }
+  }
+
+  section .step-count {
+    margin-right:10px;
+  }
+
+  #preview-proceed {
+    margin-top:15px;
+    font-size:13px;
+
+    .step-count {
+      top:0px;
+    }
+
+    .price {
+      margin-top:6px;
+      margin-left:162px;
+    }
+  }
+
+  .field-tooltip {
+    display:block;
+    margin-top:6px;
+  }
+
+  .step-count {
+    position:relative;
+    margin-right:7px;
+    padding-top:0px;
+    padding-bottom:0px;
+    padding-left:5px;
+    padding-right:5px;
+    border-radius:100px;
+    background-color:@orange;
+    cursor:default;
+    color:@white;
+    
+    font-size:16px;
+    line-height:12px;
+    font-weight:600;
+    top:-3px;
+
+    // The first numbered circle
+    &.one {
+      position:relative;
+      padding-left:6px;
+      padding-right:6px;
+    }
+
+    // The circle that appears inside the "Review Order" button
+    &.in-button {
+      text-indent:0px;
+      cursor:pointer;
+      letter-spacing:normal;
+      background-image: none;
+      background-color: white;
+      color:darken(@orange, 5%);
+      padding-top:1px;
+      padding-bottom:1px;
+      padding-left:3px;
+      padding-right:4px;
+      line-height: 19px;
+      height: auto;
+      margin-top: 5px;
+      margin-right:10px;
+      .box-shadow(0px 1px 1px #333 inset);
+      text-shadow:0px 1px 0px #333;
+    }
+
+    &.inverted {
+      color:@orange;
+      background-color:@white;
+      border:1px solid @orange;
+      text-shadow:0px 1px 0px #333;
+    }
+  }
+}

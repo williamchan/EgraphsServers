@@ -22,10 +22,6 @@
   @product.map(p => p.photo.resizedWidth(600).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
-@productPhotoPreview = {
-  @product.map(p => p.signingAreaPreview(600))
-}
-
 @productIcon = {
   @product.map(p => p.icon.getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }

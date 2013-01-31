@@ -3,7 +3,7 @@ package models.xyzmo
 import utils._
 import services.AppConfig
 import com.xyzmo.wwww.biometricserver.WebServiceBiometricPartStub
-import models.{EnrollmentBatch, Celebrity}
+import models.EnrollmentBatch
 
 class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -66,14 +66,6 @@ class XyzmoEnrollDynamicProfileTests extends EgraphsUnitTest
     xyzmoEnrollDynamicProfile.enrollmentSampleIds should be(None)
     xyzmoEnrollDynamicProfile.isSuccessfulSignatureEnrollment should be(true)
     xyzmoEnrollDynamicProfile.isProfileAlreadyEnrolled should be(false)
-  }
-
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate enrollmentSampleIds" in new EgraphsTestApplication {
-    // todo(wchan): write this test
-  }
-
-  "withVerifyUserBySignatureDynamicToDynamic_v1Response" should "populate rejectedSignaturesSummary" in new EgraphsTestApplication {
-    // todo(wchan): write this test
   }
 
   "findByEgraph" should "return VBGVerifySample" in new EgraphsTestApplication {

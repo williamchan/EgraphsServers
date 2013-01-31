@@ -36,10 +36,5 @@ class InventoryBatchProductStore @Inject()(schema: Schema) extends SavesWithLong
   //
   def table = schema.inventoryBatchProducts
 
-  override def defineUpdate(theOld: InventoryBatchProduct, theNew: InventoryBatchProduct) = {
-    updateIs(
-      theOld.inventoryBatchId := theNew.inventoryBatchId,
-      theOld.productId := theNew.productId
-    )
-  }
+
 }

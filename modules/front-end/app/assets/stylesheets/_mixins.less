@@ -196,6 +196,36 @@
   
 }
 
+
+// Produces our standard price labels
+.money {
+  background-color: @orange;
+  font-size: 11px;
+  line-height: normal;
+  color: white;
+  padding: 3px 5px 3px 5px;
+  border-radius: 3px;
+  font-weight: 400;
+  text-shadow: none;
+  vertical-align: middle;
+  display:inline-block;
+
+  // Gives a casual sense to the price label, as if slapped on
+  &.slapped-on {
+    .rotate(-12deg);
+  }
+}
+
+// Inverts coloration on the price label, in case it's on an orange bg
+.activeMoneyStyle() {
+  color:@orange;
+  background-color:white;
+}
+
+.active .money {
+  .activeMoneyStyle();
+}
+
 .marker-left {
   .marker;
   padding-left: 8px;

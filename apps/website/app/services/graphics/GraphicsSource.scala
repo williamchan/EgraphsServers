@@ -41,7 +41,7 @@ class RasterGraphicsSource(
   imageType: ImageAsset.ImageType=ImageAsset.Png
 ) extends GraphicsSource
 {
-  lazy val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+  lazy val image = new BufferedImage(width, height, bufferedImageType)
   override lazy val graphics = {
     import scala.collection.JavaConversions._
     import RenderingHints._
@@ -82,6 +82,10 @@ class RasterGraphicsSource(
 
   override def fileExtension: String = {
     imageType.extension
+  }
+
+  private def bufferedImageType: Int = {
+    if (imageType == ImageAsset.Png) BufferedImage.TYPE_INT_ARGB else BufferedImage.TYPE_INT_RGB
   }
 }
 

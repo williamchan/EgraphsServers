@@ -3,6 +3,7 @@ package services.db
 import org.squeryl.PrimitiveTypeMode._
 import org.squeryl.{ KeyedEntity, Table }
 import models._
+import checkout.{LineItemEntity, LineItemTypeEntity, CheckoutEntity}
 import models.categories._
 import models.vbg._
 import models.xyzmo._
@@ -79,7 +80,10 @@ class Schema @Inject() (
     declare(
       celebrity.urlSlug is unique,
       celebrity.bio is dbType("text")))
-  
+
+  val checkouts = table[CheckoutEntity]("Checkout")
+  // TODO(SER-499): Index declarations
+
   val coupons = table[Coupon]
   on(coupons)(coupon => 
     declare(
@@ -103,11 +107,20 @@ class Schema @Inject() (
   val failedPurchaseData = table[FailedPurchaseData]
   on(failedPurchaseData)(datum => declare(datum.purchaseData is dbType("varchar(1000)")))
 
+  val giftCertificates = table[GiftCertificateEntity]("GiftCertificate")
+  // TODO(SER-499): Index declarations
+
   val inventoryBatches = table[InventoryBatch]
   on(inventoryBatches)(inventoryBatch =>
     declare(
       columns(inventoryBatch.startDate, inventoryBatch.endDate) are indexed,
       columns(inventoryBatch.celebrityId, inventoryBatch.startDate, inventoryBatch.endDate) are indexed))
+
+  val lineItems = table[LineItemEntity]("LineItem")
+  on(lineItems)(lineItem => declare(lineItem._amountInCurrency is monetaryDbType))
+
+  val lineItemTypes = table[LineItemTypeEntity]("LineItemType")
+  // TODO(SER-499): Index declarations
 
   val orders = table[Order]("Orders")
   on(orders)(order =>
@@ -211,6 +224,15 @@ class Schema @Inject() (
   val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches)
     .via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
 
+
+  val checkoutToLineItem = oneToManyRelation(checkouts, lineItems)
+    .via((checkout, lineItem) => checkout.id === lineItem._checkoutId)
+
+  val couponToGiftCertificate = oneToManyRelation(coupons, giftCertificates)
+    .via((coupon, giftCertificate) => coupon.id === giftCertificate._couponId)
+
+  val customerToCheckout = oneToManyRelation(customers, checkouts)
+    .via((customer, checkout) => customer.id === checkout.customerId)
   val customerToUsernameHistory = oneToManyRelation(customers, usernameHistories)
     .via((customer, usernameHistory) => customer.id === usernameHistory.customerId)
 
@@ -224,6 +246,17 @@ class Schema @Inject() (
 
   val inventoryBatchToOrders = oneToManyRelation(inventoryBatches, orders)
     .via((inventoryBatch, order) => inventoryBatch.id === order.inventoryBatchId)
+
+  val lineItemToCashTransaction = oneToManyRelation(lineItems, cashTransactions)
+    .via((lineItem, cashTransaction) => lineItem.id === cashTransaction.lineItemId)
+  val lineItemToGiftCertificate = oneToManyRelation(lineItems, giftCertificates)
+    .via((lineItem, giftCertificate) => lineItem.id === giftCertificate._lineItemId)
+
+  val lineItemTypeToCoupon = oneToManyRelation(lineItemTypes, coupons)
+    .via((lineItemType, coupon) => lineItemType.id === coupon.lineItemTypeId)
+
+  val lineItemTypeToLineItem = oneToManyRelation(lineItemTypes, lineItems)
+    .via((lineItemType, lineItem) => lineItemType.id === lineItem._itemTypeId)
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
@@ -264,6 +297,7 @@ class Schema @Inject() (
     .via((enrollmentBatch, xyzmoEnrollDynamicProfile) => enrollmentBatch.id === xyzmoEnrollDynamicProfile.enrollmentBatchId)
   val egraphToXyzmoVerifyUserTable = oneToManyRelation(egraphs, xyzmoVerifyUserTable)
     .via((egraph, xyzmoVerifyUser) => egraph.id === xyzmoVerifyUser.egraphId)
+
 
   //
   // Public methods

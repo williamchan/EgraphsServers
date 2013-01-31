@@ -2,24 +2,20 @@ package models
 
 import enums.PublishedStatus.EnumVal
 import enums.{PublishedStatus, HasPublishedStatus}
-import frontend.landing.CatalogStar
 import java.sql.Timestamp
 import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import org.apache.commons.io.IOUtils
 import org.joda.money.Money
 import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
-import services.blobs.Blobs.Conversions._
 import java.awt.image.BufferedImage
-import play.api.Play
 import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import services._
-import mvc.celebrity.CelebrityViewConversions
 import org.squeryl.Query
 import play.api.Play.current
 import graphics.GraphicsSource
-import org.squeryl.dsl.{GroupWithMeasures, ManyToMany}
+import org.squeryl.dsl.ManyToMany
 import java.util.Date
 import ImageUtil.Conversions._
 
@@ -180,39 +176,6 @@ case class Product(
     photo.resizedWidth(frame.purchasePreviewWidth)
   }
 
-// This is pretty crappy. This would be much better done on the browser-side. Left this disabled.
-  // Enable it by using productPhotoPreview instead of productPhoto on admin_celebrityproductdetail.scala.html.
-  def signingAreaPreview(width: Int = 600): String = {
-    import graphics.{Handwriting, HandwritingPen}
-    val _photo = photo
-    val ingredients = () => {
-      EgraphImageIngredients(
-        signatureJson = Product.signingAreaSignatureStr,
-        messageJsonOption = Some(Product.signingAreaMessageStr),
-        pen = HandwritingPen(width = Handwriting.defaultPenWidth),
-        photo = _photo.renderFromMaster,
-        photoDimensionsWhenSigned = Dimensions(signingScaleW, signingScaleH),
-        signingOriginX = signingOriginX,
-        signingOriginY = signingOriginY
-      )
-    }
-
-    val signingAreaPreviewImage = EgraphImage(
-      ingredientFactory = ingredients, 
-      graphicsSource = services.graphicsSourceFactory(),
-      blobPath = _photo.key
-    )
-    val rendered = signingAreaPreviewImage
-      .withSigningOriginOffset(signingOriginX.toDouble, signingOriginY.toDouble)
-      .scaledToWidth(width)
-      .transformAndRender
-    val bytes = rendered.graphicsSource.asByteArray
-    val blobs = rendered.services.blobs
-    val blobKey = keyBase + "/signingareapreview.svgz"
-    blobs.put(blobKey, bytes, AccessPolicy.Public)
-    blobs.getUrlOption(blobKey).get
-  }
-
   def signingScalePhoto: ImageAsset = {
     photo.resizedWidth(signingScaleW).getSaved(AccessPolicy.Public)
   }
@@ -337,7 +300,7 @@ object Product {
   }
 }
 
-class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Long,Product] {
+class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: InventoryBatchQueryFilters) extends SavesWithLongKey[Product] with SavesCreatedUpdated[Product] {
   import org.squeryl.PrimitiveTypeMode._
 
   //
@@ -392,32 +355,10 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   //
   def table = schema.products
 
-  override def defineUpdate(theOld: Product, theNew: Product) = {
-    updateIs(
-      theOld.celebrityId := theNew.celebrityId,
-      theOld.priceInCurrency := theNew.priceInCurrency,
-      theOld.name := theNew.name,
-      theOld.urlSlug := theNew.urlSlug,
-      theOld.photoKey := theNew.photoKey,
-      theOld.description := theNew.description,
-      theOld._defaultFrameName := theNew._defaultFrameName,
-      theOld._iconKey := theNew._iconKey,
-      theOld.storyTitle := theNew.storyTitle,
-      theOld.storyText := theNew.storyText,
-      theOld.signingScaleW := theNew.signingScaleW,
-      theOld.signingScaleH := theNew.signingScaleH,
-      theOld.signingOriginX := theNew.signingOriginX,
-      theOld.signingOriginY := theNew.signingOriginY,
-      theOld.signingAreaW := theNew.signingAreaW,
-      theOld.signingAreaH := theNew.signingAreaH,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated,
-      theOld._publishedStatus := theNew._publishedStatus
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,Product] methods
+  // SavesCreatedUpdated[Product] methods
   //
   override def withCreatedUpdated(toUpdate: Product, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

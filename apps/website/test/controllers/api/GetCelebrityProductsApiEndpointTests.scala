@@ -1,7 +1,7 @@
 package controllers.api
 
 import sjson.json.Serializer
-import utils.{ClearsCacheBefore, EgraphsUnitTest, TestConstants, FunctionalTestUtils}
+import utils.{ClearsCacheBefore, EgraphsUnitTest}
 import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
 import controllers.routes.ApiControllers.getCelebrityProducts
 import utils.TestData
@@ -22,7 +22,7 @@ class GetCelebrityProductsApiEndpointTests
     val (product, account, celeb) = dbSession.connected(TransactionSerializable) {
       val product = TestData.newSavedProduct()
       val celeb = product.celebrity
-      val account = celeb.account.withPassword(TestData.defaultPassword).right.get.save()
+      celeb.account.withPassword(TestData.defaultPassword).right.get.save()
 
       (product, celeb.account, celeb)
     }

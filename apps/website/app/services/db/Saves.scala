@@ -14,16 +14,10 @@ import sun.security.krb5.internal.ktab.KeyTab
  *
  * Usage:
  * {{{
- *    case class Person(id: Long = 0L, name: String = "") extends Keyed[Long]
+ *    case class Person(id: Long = 0L, name: String = "") extends KeyedEntity[Long]
  *
  *    object Person extends SavesWithLongKey[Person] {
  *       override val table = MySquerylDb.people
- *
- *       override def defineUpdate (theOld: person, theNew: person) = {
- *         updateIs(
- *           theOld.name := theNew.name
- *         )
- * }
  * }
  *
  *    // Later on in application code...
@@ -31,29 +25,8 @@ import sun.security.krb5.internal.ktab.KeyTab
  *
  * }}}
  *
- * You can also modify the contents either just before an insert or just before an update:
- * {{{
- *   case class Person(id: Long = 0L, name: String = "", created: Date = new Date(0L))
- *
- *   object Person extends SavesWithLongKey[Person] {
- *     beforeInsert((personToTransform) => personToTransform.copy(created=new Date()))
- *
- *     override val table: Table[Person] = MySquerylDb.people
- *
- *     override def defineUpdate (theOld: Person, theNew: Person) {
- *       updateIs(
- *         theOld.name := theNew.name
- *         theOld.version := theNew.version
- *       )
- * }
- * }
- * }}}
  */
 trait SavesWithLongKey[T <: KeyedEntity[Long]] extends Saves[Long, T] {
-  override protected final def keysEqual(id: Long, otherId: Long): LogicalBoolean = {
-    id === otherId
-  }
-
   override final def save(toSave: T): T = {
     toSave.id match {
       case n if n <= 0 =>
@@ -66,10 +39,6 @@ trait SavesWithLongKey[T <: KeyedEntity[Long]] extends Saves[Long, T] {
 }
 
 trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
-  override protected final def keysEqual(id: String, otherId: String): LogicalBoolean = {
-    id === otherId
-  }
-
   override final def save(toSave: T): T = {
     val maybeSaved = findById(toSave.id)
 
@@ -83,48 +52,11 @@ trait SavesWithStringKey[T <: KeyedEntity[String]] extends Saves[String, T] {
   }
 }
 
-trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
-
-  //
-  // Abstract members
-  //
-  /**The table that manages this entity in services.db.Schema  */
-  protected def table: Table[T]
-
-  /**
-   * Defines how to update an old row in the database with the new one, using the syntax
-   * that usually appears in a Squeryl set() clause. Usually this will be just a matter of taking
-   * all the persisted properties and setting them.
-   *
-   * For example:
-   * {{{
-   *   case class Fruit(id: Long, name: String) Keyed[Long]
-   *
-   *   object Fruit extends SavesWithLongKey[Fruit] {
-   *     override def defineUpdate(theOld: Fruit, theNew: Fruit) = {
-   *        import org.squeryl.PrimitiveTypeMode._
-   *        updateIs(
-   *          theOld.name := theNew.name
-   *        )
-   * }
-   * }
-   * }}}
-   *
-   * @see <a href=http://squeryl.org/inserts-updates-delete.html>Squeryl query documentation</a>
-   */
-  def defineUpdate(theOld: T, theNew: T): List[UpdateAssignment]
-
-  //
-  // Protected API
-  //
-  /**
-   * Convenience for making a list out of update assignments.
-   *
-   * @see #defineUpdate
-   */
-  protected final def updateIs(assignments: UpdateAssignment*): List[UpdateAssignment] = {
-    assignments.toList
-  }
+trait Saves[KeyT, T <: KeyedEntity[KeyT]]
+  extends InsertsAndUpdates[T]
+  with QueriesAsModel[KeyT, T]
+  with InsertAndUpdateHooks[T]
+{
 
   //
   // Public API
@@ -140,93 +72,14 @@ trait Saves[KeyT, T <: KeyedEntity[KeyT]] {
    */
   def save(toSave: T): T
 
-  /**
-   * Persist an object by inserting it.  Note: This is replaced by SER-499.
-   *
-   * @param toSave the object to save
-   *
-   * @return the final object that was saved, after all transforms
-   */
-  def create(toSave: T): T = {
-    insert(toSave)
-  }
-
-  /**
-   * Locates an object by its id.
-   *
-   * @param id the id of the object to locate
-   *
-   * @return the located object or None
-   */
-  def findById(id: KeyT): Option[T]= {
-    from(table)(row => where(keysEqual(row.id, id)) select (row)).headOption
-  }
-
-  /**
-   * Gets an object by its id, throws an exception if not found.
-   *
-   * @param id the id of the object to locate
-   *
-   * @return the located object
-   *
-   * @throws a RuntimeException with ID information if it failed to find the entity.
-   */
-  def get(id: KeyT)(implicit m: Manifest[T]): T = {
-    findById(id).getOrElse(
-      throw new RuntimeException(
-        "DB contained no instances of class " + m.erasure.getName + " with id="+id
-      )
-    )
-  }
-
-  protected def keysEqual(id: KeyT, otherId: KeyT): LogicalBoolean
-
-  /**
-   * Hook to provide an entity transform that will be applied before inserting or updating any
-   * new object.
-   *
-   * See class documentation for usage.
-   */
-  final def beforeInsertOrUpdate(transform: (T) => T) {
-    beforeInsert(transform)
-    beforeUpdate(transform)
-  }
-
-  /**
-   * Hook to provide an entity transform that will be applied before inserting any
-   * new object.
-   *
-   * See class documentation for usage.
-   */
-  final def beforeInsert(transform: (T) => T) {
-    preInsertTransforms = preInsertTransforms ++ Vector(transform)
-  }
-
-  /**
-   * Hook to provide a transform to apply before updating any new object.
-   *
-   * See class documentation for usage.
-   */
-  final def beforeUpdate(transform: (T) => T) {
-    preUpdateTransforms = preUpdateTransforms ++ Vector(transform)
-  }
 
   //
   // Private API
   //
-  private var preInsertTransforms = Vector.empty[(T) => T]
-  private var preUpdateTransforms = Vector.empty[(T) => T]
-
-  protected def insert(toInsert: T): T = {
-    table.insert(performTransforms(preInsertTransforms, toInsert))
-  }
-
   protected def updateTable(toUpdate: T): T = {
     val finalEntity = performTransforms(preUpdateTransforms, toUpdate)
-    update(table)(row =>
-      where(keysEqual((row.id), finalEntity.id))
-        set (defineUpdate(row, finalEntity): _*)
-    )
+
+    table.update(finalEntity)
 
     finalEntity
   }

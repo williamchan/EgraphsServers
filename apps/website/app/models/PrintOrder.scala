@@ -9,6 +9,7 @@ import services.Finance.TypeConversions._
 import org.joda.money.Money
 import org.squeryl.Query
 import services.print.{PrintManufacturingInfo, LandscapeFramedPrint}
+import services.blobs.AccessPolicy
 
 case class PrintOrderServices @Inject() (store: PrintOrderStore,
                                          orderStore: OrderStore,
@@ -50,7 +51,7 @@ case class PrintOrder(id: Long = 0,
    */
   def getPngUrl: Option[String] = {
     services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
-      egraph.getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._1
+      egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth).asPng.getSavedUrl(AccessPolicy.Public)
     }
   }
 
@@ -90,7 +91,7 @@ object PrintOrder {
   val pricePerPrint = BigDecimal(45)
 }
 
-class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintOrder] with SavesCreatedUpdated[Long,PrintOrder] {
+class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintOrder] with SavesCreatedUpdated[PrintOrder] {
   import org.squeryl.PrimitiveTypeMode._
 
   def findByOrderId(orderId: Long): List[PrintOrder] = {
@@ -127,20 +128,9 @@ class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintO
   //
   override val table = schema.printOrders
 
-  override def defineUpdate(theOld: PrintOrder, theNew: PrintOrder) = {
-    updateIs(
-      theOld.orderId := theNew.orderId,
-      theOld.shippingAddress := theNew.shippingAddress,
-      theOld.quantity := theNew.quantity,
-      theOld.isFulfilled := theNew.isFulfilled,
-      theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
-      theOld.pngUrl := theNew.pngUrl,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
   //
-  // SavesCreatedUpdated[Long,PrintOrder] methods
+  // SavesCreatedUpdated[PrintOrder] methods
   //
   override def withCreatedUpdated(toUpdate: PrintOrder, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

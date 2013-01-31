@@ -213,7 +213,7 @@ case class Order(
         inventoryBatchId = newInventoryBatch.id,
         amountPaidInCurrency = newProduct.priceInCurrency
       )
-    val newOrder = services.store.create(newOrderUnsaved)
+    val newOrder = services.store.insert(newOrderUnsaved)
 
     // mark old order invalid
     val oldOrder = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()
@@ -397,7 +397,7 @@ case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 class OrderStore @Inject() (
   schema: Schema
 ) extends SavesWithLongKey[Order]
-  with SavesCreatedUpdated[Long,Order]
+  with SavesCreatedUpdated[Order]
   with Deletes[Long, Order]
 {
   import org.squeryl.PrimitiveTypeMode._
@@ -611,28 +611,9 @@ class OrderStore @Inject() (
   //
   override val table = schema.orders
 
-  override def defineUpdate(theOld: Order, theNew: Order) = {
-    updateIs(
-      theOld.productId := theNew.productId,
-      theOld.inventoryBatchId := theNew.inventoryBatchId,
-      theOld.buyerId := theNew.buyerId,
-      theOld._paymentStatus := theNew._paymentStatus,
-      theOld._reviewStatus := theNew._reviewStatus,
-      theOld.rejectionReason := theNew.rejectionReason,
-      theOld._privacyStatus := theNew._privacyStatus,
-      theOld._writtenMessageRequest := theNew._writtenMessageRequest,
-      theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
-      theOld.recipientId := theNew.recipientId,
-      theOld.recipientName := theNew.recipientName,
-      theOld.messageToCelebrity := theNew.messageToCelebrity,
-      theOld.requestedMessage := theNew.requestedMessage,
-      theOld.expectedDate := theNew.expectedDate,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
   //
-  // SavesCreatedUpdated[Long,Order] methods
+  // SavesCreatedUpdated[Order] methods
   //
   override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
@@ -739,12 +720,8 @@ object GalleryOrderFactory {
     for ((order, egraph) <- orders) yield {
       val product = order.product
       val celebrity = product.celebrity
-      // TODO SER-170 this code is quite similar to that in GetEgraphEndpoint.
-      // Refactor together and put withSigningOriginOffset inside EgraphImage.
-      val rawImage = egraph.image(product.photoImage).rasterized
-        .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-        .scaledToWidth(product.frame.thumbnailWidthPixels)
-      val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
+      val rawImage = egraph.getEgraphImage(product.frame.thumbnailWidthPixels)
+      val thumbnailUrl = rawImage.asPng.getSavedUrl(accessPolicy = AccessPolicy.Public)
       val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
 
       val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
