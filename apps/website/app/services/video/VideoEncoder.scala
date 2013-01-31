@@ -23,11 +23,14 @@ object VideoEncoder {
    * Generates an audio-less mp4 using the Xuggle library. See documentation at:
    * http://wiki.xuggle.com/MediaTool_Introduction#How_To_Take_Snapshots_Of_Your_Desktop
    *
+   * For guidance on suitable frame-rates, see:
+   * http://productforums.google.com/forum/#!searchin/youtube/video$20length$20incorrect/youtube/YCKdtgFw5Zk/s-c7B8R9rXIJ
+   *
    * @param targetFilePath file path in which to store generated mp4
    * @param egraphImageFile file containing egraph still image
    * @param recipientName recipient name
    * @param celebrityName celebrity name
-   * @param audioDuration duration of egraph audio, in seconds
+   * @param audioDuration duration of egraph audio, in milliseconds
    */
   def generateMp4SansAudio(targetFilePath: String,
                            egraphImageFile: File,
@@ -38,23 +41,18 @@ object VideoEncoder {
     val writer = ToolFactory.makeWriter(targetFilePath)
     writer.addVideoStream(/*inputIndex*/ 0, /*streamId*/ 0, /*codecId*/ ICodec.ID.CODEC_ID_MPEG4, /*width*/ egraphImg.getWidth, /*height*/ egraphImg.getHeight)
 
-    val startTime = System.nanoTime()
-
     /**
      * TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4, and adjust t on egraphImg screens
      * val preambleImg = generatePreamble(recipientName, celebrityName)
      *    // show preamble for 4 seconds
-     *    for (i <- 0 until 4) {
-     *      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ preambleImg, /*timeStamp*/ System.nanoTime() - startTime, /*timeUnit*/ TimeUnit.NANOSECONDS)
-     *      Thread.sleep(1000)
+     *    for (t <- 0 to 4000 by 100) {
+     *      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ preambleImg, /*timeStamp*/ t, /*timeUnit*/ TimeUnit.MILLISECONDS)
      *    }
      */
 
-    // show egraph image for duration of egraph audio
-    for (i <- 0 until audioDuration) {
-      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ egraphImg, /*timeStamp*/ System.nanoTime() - startTime, /*timeUnit*/ TimeUnit.NANOSECONDS)
-      /* Note: I had trouble encoding the video without this sleep statement. */
-      Thread.sleep(1000)
+    /* Show egraph image for duration of egraph audio at 10fps. 8fps minimum was recommended by Google. */
+    for (t <- 0 to audioDuration by 100) {
+      writer.encodeVideo(/*streamIndex*/ 0, /*image*/ egraphImg, /*timeStamp*/ t, /*timeUnit*/ TimeUnit.MILLISECONDS)
     }
 
     writer.close()

@@ -42,7 +42,7 @@ case class EgraphVideoAsset(blobPath: String,
     try {
       /* Get audio duration in seconds */
       Utils.saveToFile(egraph.assets.audioWav.asByteArray, wavTempFile)
-      val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
+      val audioDuration = AudioConverter.getDurationOfWavInMillis(wavTempFile)
 
       /**
        * Generate aac audio file. This should not have to go through an intermediate step of generating an mp3,

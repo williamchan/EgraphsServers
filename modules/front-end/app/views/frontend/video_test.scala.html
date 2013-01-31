@@ -1,15 +1,6 @@
-@(mp4Url: String = "",
-videoPosterUrl: String = "https://egraphs-demo.s3.amazonaws.com/egraphs/647/image/signing-origin-offset-0x0_shadow-offset-3.00x3.00_global-width-592px-v1.jpg",
+@(videoPosterUrl: String = "https://egraphs-demo.s3.amazonaws.com/egraphs/647/image/signing-origin-offset-0x0_shadow-offset-3.00x3.00_global-width-592px-v1.jpg",
 celebrityName: String = "Matt Silverman",
-celebrityTagline: String = "Rays Baseball",
 recipientName: String = "Dr. Horrible",
-messageToCelebrity: Option[String] = None,
-productIconUrl: String = "https://egraphs-demo.s3.amazonaws.com/product/17/icon_20120503025254786/master.png",
-signedOnDate: String = "",
-thisPageLink: String = "https://beta.egraphs.com/624/new",
-shareOnPinterestLink: String = "http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fbeta.egraphs.com%2F624&amp;media=https%3A%2F%2Fegraphs-demo.s3.amazonaws.com%2Fegraphs%2F647%2Fimage%2Fsigning-origin-offset-0x0_shadow-offset-3.00x3.00_global-width-592px-v1.jpg&amp;description=Matt+Silverman+egraph+for+Dr.+Horrible",
-tweetText: String = "An egraph for Dr. Horrible from Matt Silverman",
-privacySetting: String = "Public",
 isPromotional: Boolean = false
 )(implicit
 headerData: models.frontend.header.HeaderData,
@@ -26,7 +17,6 @@ authToken: egraphs.authtoken.AuthenticityToken
 
 @headJs = {
 Egraphs.page.celebrityName = "@celebrityName";
-Egraphs.page.isPromotional = @isPromotional;
 }
 
 @baseBody = {
@@ -60,35 +50,6 @@ Egraphs.page.isPromotional = @isPromotional;
             <source src="https://s3.amazonaws.com/egraphs-static-resources/test-files/zencoder-test.ogg" type='video/ogg'>
           </video>
         </div>
-        @**
-        <div class="byline-container">
-          <img class="byline-icon" src='@productIconUrl' height="50" width="50"/>
-          <h3 class="byline-name">@celebrityName</h3>
-          <p class="byline-tagline">@celebrityTagline</p>
-        </div>
-        <hr class="separator"/>
-        <div id="egraph-description">
-          <p class="description-line"><i>A message for</i> @recipientName</p>
-          <p class="description-line"><i>from</i> @celebrityName</p>
-        </div>
-        <hr class="separator"/>
-        <div id="social">
-          <ul class="clearfix">
-            <li class="tweet-button">
-              <a href="https://twitter.com/share" class="twitter-share-button" data-url="@thisPageLink" data-text="@tweetText" data-lang="en">Tweet</a>
-            </li>
-            <li class="fb-button">
-              <div class="fb-like" data-href="@thisPageLink" data-send="false" data-layout="button_count" data-width="100" data-show-faces="false"></div>
-            </li>
-            <li class="pin-button">
-              <a href="@shareOnPinterestLink" class="pin-it-button" count-layout="horizontal"><img border="0" src="//assets.pinterest.com/images/PinExt.png" title="Pin It" /></a>
-            </li>
-          </ul>
-        </div>
-        <div id="comments">
-          <div class="fb-comments" data-href="@thisPageLink" data-num-posts="2"></div>
-        </div>
-        *@
       </div>
     </div>
   </div>
