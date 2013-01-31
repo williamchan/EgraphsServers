@@ -56,7 +56,7 @@ class EgraphActorTests extends EgraphsUnitTest
       val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
 
       Await.result(egraphActor ask ProcessEgraphMessage(egraph.id, FakeRequest()), 10 second)
-      
+
       egraph.assets.audioMp3.asByteArray.length should be > (0)
     }
   }

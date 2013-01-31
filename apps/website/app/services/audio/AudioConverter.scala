@@ -50,10 +50,10 @@ object AudioConverter {
   }
 
   /**
-   * @return Returns the duration of the wav in seconds, rounded up.
+   * @return Returns the duration of the wav in milliseconds
    */
-  def getDurationOfWavInSeconds(file: File): Int = {
+  def getDurationOfWavInMillis(file: File): Int = {
     val format: AudioFormat = AudioSystem.getAudioInputStream(/*also accepts inputStream*/ file).getFormat
-    (file.length / format.getSampleRate / format.getFrameSize / format.getChannels + 1).toInt
+    (file.length / format.getSampleRate * 1000.0 / format.getFrameSize / format.getChannels).toInt
   }
 }
