@@ -395,7 +395,7 @@ class CelebrityStore @Inject() (
   dbSession: DBSession,
   catalogStarsQuery: CatalogStarsQuery,
   celebrityCategoryValueStore: CelebrityCategoryValueStore
-) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Long, Celebrity] {
+) extends SavesWithLongKey[Celebrity] with SavesCreatedUpdated[Celebrity] {
 
   import org.squeryl.PrimitiveTypeMode._
   import CelebrityViewConversions._
@@ -768,29 +768,8 @@ class CelebrityStore @Inject() (
   //
   override val table = schema.celebrities
 
-  override def defineUpdate(theOld: Celebrity, theNew: Celebrity) = {
-    updateIs(
-      theOld.apiKey := theNew.apiKey,
-      theOld.bio := theNew.bio,
-      theOld.casualName := theNew.casualName,
-      theOld.organization := theNew.organization,
-      theOld.profilePhotoUpdated := theNew.profilePhotoUpdated,
-      theOld.publicName := theNew.publicName,
-      theOld.roleDescription := theNew.roleDescription,
-      theOld.twitterUsername := theNew.twitterUsername,
-      theOld.urlSlug := theNew.urlSlug,
-      theOld.expectedOrderDelayInMinutes := theNew.expectedOrderDelayInMinutes,
-      theOld._enrollmentStatus := theNew._enrollmentStatus,
-      theOld._publishedStatus := theNew._publishedStatus,
-      theOld._landingPageImageKey := theNew._landingPageImageKey,
-      theOld._logoImageKey := theNew._logoImageKey,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
-
   //
-  // SavesCreatedUpdated[Long,Celebrity] methods
+  // SavesCreatedUpdated[Celebrity] methods
   //
   override def withCreatedUpdated(toUpdate: Celebrity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

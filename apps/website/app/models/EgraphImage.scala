@@ -77,19 +77,17 @@ case class EgraphImage (
   def getSavedUrl(accessPolicy: AccessPolicy, overwrite:Boolean=false): String = {
     val blobs = services.blobs
 
-    log("Retrieving EgraphImage with key \"" + blobKey + "\"")
-    val (url, durationSecs) = Time.stopwatch {
+    val ((url, alreadyCached), durationSecs) = Time.stopwatch {
       blobs.getUrlOption(blobKey) match {
-        case Some(alreadySavedUrl) =>
-          log("Cached copy was found in blobstore. Returning it.")
-          alreadySavedUrl
-
-        case None =>
-          log("No cached copy found. Rendering the image and providing to blobstore.")
-          saveAndGetUrl(accessPolicy)
+        case Some(alreadySavedUrl) => (alreadySavedUrl, true)
+        case None => (saveAndGetUrl(accessPolicy), false)
       }
     }
-    log("Retrieved the EgraphImage URL in " + durationSecs + "s")
+    if (alreadyCached) {
+      log("Retrieving cached EgraphImage with key \"" + blobKey + "\" in " + durationSecs + "s")
+    } else {
+      log("Rendering and returning EgraphImage with key \"" + blobKey + "\" in " + durationSecs + "s")
+    }
 
     url
   }

@@ -2,7 +2,7 @@ package models
 
 import enums.OrderReviewStatus
 import java.sql.Timestamp
-import services.{Utils, Time, AppConfig}
+import services.{Time, AppConfig}
 import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
@@ -13,7 +13,6 @@ import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
-import org.joda.time.DateTimeConstants
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -107,6 +106,9 @@ case class Customer(
     )
   }
 
+  def renderedForApi: Map[String, Any] = {
+    Map("id" -> id, "name" -> name)
+  }
 
   //
   // KeyedCaseClass[Long] methods
@@ -151,7 +153,7 @@ class CustomerStore @Inject() (
   accountStore: AccountStore,
   customerServices: Provider[CustomerServices],
   accountServices: Provider[AccountServices]
-) extends SavesWithLongKey[Customer] with SavesCreatedUpdated[Long,Customer]
+) extends SavesWithLongKey[Customer] with SavesCreatedUpdated[Customer]
 {
   import org.squeryl.PrimitiveTypeMode._
 
@@ -206,19 +208,10 @@ class CustomerStore @Inject() (
   //
   override val table = schema.customers
 
-  override def defineUpdate(theOld: Customer, theNew: Customer) = {
-    updateIs(
-      theOld.name  := theNew.name,
-      theOld.username  := theNew.username,
-      theOld.isGalleryVisible  := theNew.isGalleryVisible,
-      theOld.notice_stars := theNew.notice_stars,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,Customer] methods
+  // SavesCreatedUpdated[Customer] methods
   //
   override def withCreatedUpdated(toUpdate: Customer, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)

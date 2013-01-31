@@ -48,7 +48,7 @@ case class VBGVerifySample(id: Long = 0,
 
 }
 
-class VBGVerifySampleStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGVerifySample] with SavesCreatedUpdated[Long,VBGVerifySample] {
+class VBGVerifySampleStore @Inject()(schema: Schema) extends SavesWithLongKey[VBGVerifySample] with SavesCreatedUpdated[VBGVerifySample] {
 
   def findByEgraph(egraph: Egraph): Option[VBGVerifySample] = {
     from(schema.vbgVerifySampleTable)(vbgVerifySample =>
@@ -62,21 +62,10 @@ class VBGVerifySampleStore @Inject()(schema: Schema) extends SavesWithLongKey[VB
   //
   override val table = schema.vbgVerifySampleTable
 
-  override def defineUpdate(theOld: VBGVerifySample, theNew: VBGVerifySample) = {
-    updateIs(
-      theOld.egraphId := theNew.egraphId,
-      theOld.errorCode := theNew.errorCode,
-      theOld.vbgTransactionId := theNew.vbgTransactionId,
-      theOld.score := theNew.score,
-      theOld.success := theNew.success,
-      theOld.usableTime := theNew.usableTime,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,VBGVerifySample] methods
+  // SavesCreatedUpdated[VBGVerifySample] methods
   //
   override def withCreatedUpdated(toUpdate: VBGVerifySample, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

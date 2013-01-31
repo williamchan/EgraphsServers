@@ -65,7 +65,7 @@ case class VideoAsset(
 }
 
 class VideoAssetStore @Inject() (schema: Schema)
-  extends SavesWithLongKey[VideoAsset] with SavesCreatedUpdated[Long, VideoAsset] {
+  extends SavesWithLongKey[VideoAsset] with SavesCreatedUpdated[VideoAsset] {
 
   import org.squeryl.PrimitiveTypeMode._
 
@@ -83,17 +83,9 @@ class VideoAssetStore @Inject() (schema: Schema)
   //
   override val table = schema.videoAssets
 
-  override def defineUpdate(theOld: VideoAsset, theNew: VideoAsset) = {
-    updateIs(
-      theOld._urlKey := theNew._urlKey,
-      theOld._videoStatus := theNew._videoStatus,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
 
   //
-  // SavesCreatedUpdated[Long,Address] methods
+  // SavesCreatedUpdated[Address] methods
   //
   override def withCreatedUpdated(toUpdate: VideoAsset, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

@@ -1,8 +1,6 @@
 package actors
 
 import akka.actor.Actor
-import Actor._
-import play.api.libs.concurrent.Akka
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
 import models.{EgraphQueryFilters, EgraphStore}
@@ -65,8 +63,9 @@ case class EgraphActor @Inject() (
             else if (egraph.egraphState == EgraphState.AwaitingVerification) {
               val testedEgraph = egraph.verifyBiometrics.save()
 
-              // Initializes the mp3 from the wav.
               egraph.assets.generateAndSaveMp3()
+              // TODO(egraph-exploration): Work in progress. Not finalized.
+//              egraph.assets.generateAndSaveMp4()
 
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
               if (config.adminreviewSkip) {

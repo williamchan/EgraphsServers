@@ -18,6 +18,7 @@ object WebsiteBuild extends Build {
    // Application dependencies. Keep these in alphabetical order.
       "batik" % "batik-rasterizer" % "1.6",
       "batik" % "batik-svggen" % "1.6",
+      "com.googlecode.mp4parser" % "isoparser" % "1.0-RC-15", 
       "com.google.zxing" % "core" % "2.0",
       "com.google.zxing" % "javase" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
@@ -61,6 +62,7 @@ object WebsiteBuild extends Build {
           ExclusionRule(organization = "org.scalatest")
       ),
       "com.typesafe.akka" % "akka-agent" % "2.0.2",
+      "org.scalaz" %% "scalaz-core" % "6.0.4",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
       //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6

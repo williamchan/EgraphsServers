@@ -18,4 +18,12 @@ class AudioConverterTests extends EgraphsUnitTest {
     TempFile.named(tempFilesId + "/audio.wav").isFile should be(false)
     TempFile.named(tempFilesId + "/audio.mp3").isFile should be(false)
   }
+
+  "convertToAAC" should "return byte array of aac, and also leave no temp files" in new EgraphsTestApplication {
+    val mp3 = TestHelpers.fileAsBytes("test/pedro.mp3")
+    val aac = AudioConverter.convertToAAC(sourceAudio = mp3, tempFilesId = tempFilesId)
+    aac.length should be > (0)
+    TempFile.named(tempFilesId + "/audio.mp3").isFile should be(false)
+    TempFile.named(tempFilesId + "/audio.aac").isFile should be(false)
+  }
 }

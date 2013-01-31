@@ -43,11 +43,11 @@ trait SavingEntityTests[KeyT, T <: KeyedEntity[KeyT]] { this: FlatSpec with Shou
   //
   // Test cases
   //
-  "A new instance" should "have initial id equal to " + newIdValue in {
+  "A new entity instance" should "have initial id equal to " + newIdValue in {
     newEntity.id should be === (newIdValue)
   }
 
-  "A restored instance" should "be the same as the originally saved one" in {
+  "A restored entity instance" should "be the same as the originally saved one" in {
     val saved = saveEntity(newEntity)
     val maybeRestored = restoreEntity(saved.id)
 
@@ -55,13 +55,13 @@ trait SavingEntityTests[KeyT, T <: KeyedEntity[KeyT]] { this: FlatSpec with Shou
     maybeRestored.get should be (saved)
   }
 
-  "Restoring an unsaved id" should "return None" in {
+  "Restoring an unsaved entity id" should "return None" in {
     // We can only guarentee that 0 shouldn't be used as an id already if we aren't clearing the database, but max
     // probably isn't either and it makes for a more interesting test.
     restoreEntity(improbableIdValue) should be (None)
   }
 
-  "Restoring an updated instance" should "yield the updated version, not the original" in {
+  "Restoring an updated entity instance" should "yield the updated version, not the original" in {
     val inserted = saveEntity(newEntity)
     val updated = saveEntity(transformEntity(inserted))
     val updatedRestored = restoreEntity(updated.id).get

@@ -4,6 +4,7 @@
 @import "_site_footer.less";
 
 /* !Globals */
+@standardContentMaxWidth: 1020px;
 
 /* !Links */
 
@@ -16,6 +17,7 @@ a, a:link, a:visited {
 	}
 }
 
+// For bootstrap-style tooltips.
 .tooltip {
 	&.in {
 		.opacity(90);		
@@ -31,6 +33,19 @@ a, a:link, a:visited {
 		font-weight:400;
 	}
 }
+
+// For osvaldas-style tooltips. Styles used by views/tags/tooltip.scala.html. 
+.tooltip-link {
+  cursor: help;
+  text-decoration:underline;
+  font-size:11px;
+  font-style:italic;
+
+  &:hover {
+  	text-decoration:underline;
+  }
+}
+
 /* !Ribbons */
 div.ribbon {	
 	position: absolute;
@@ -187,6 +202,40 @@ button  {
 		span { background-image: url(/assets/images/bg-button-right-facebook.png); }	
 		
 	}
+}
+
+/* Nice orange button groups */
+.btn-custom-radio {
+	.defaultTextColorAndShadow() {
+		color: lighten(@gray, 10%);
+		text-shadow: 0px 1px 0px white;
+	}
+
+  .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
+  text-transform:uppercase;
+  font-size:0.75em;
+  line-height:1.3em;
+  padding-top:5px;
+  padding-bottom:5px;
+  font-weight: 400;
+  .defaultTextColorAndShadow();
+  
+  // Have to override bootstrap hover defaults because
+  // our default color and shadow look better with our
+  // color scheme.
+  &:hover {
+  	.defaultTextColorAndShadow();
+  }
+  
+  &.active,
+  &:active {
+    .gradientBar(@orange, lighten(@orange, 10%));
+    *background-color: @orange;
+    .reset-filter();
+    font-weight:400;
+    color:white;
+    text-shadow: 0px -1px 0px black;
+  }
 }
 
 .social {
@@ -402,6 +451,7 @@ section[role=banner] {
 	
 }
 
+
 /* !Media Queries */
 
 @media (min-width: 1080px) {
@@ -412,7 +462,7 @@ section[role=banner] {
 		margin-bottom: 0;
 		
 		#main {
-			max-width: 1020px;
+			max-width: @standardContentMaxWidth;
 			top: -48px;
 			padding-top: 40px;
 			margin-left: auto;

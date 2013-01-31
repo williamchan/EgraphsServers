@@ -47,8 +47,9 @@ GET     /ChoosePhoto/withRecentEgraphs                            controllers.Ch
 
 GET     /Complete/index                                           controllers.Complete.index
 
-GET     /Egraph/landscape                                         controllers.Egraph.landscape(isPromotional: Boolean ?= false)
-GET     /Egraph/portrait                                          controllers.Egraph.portrait(isPromotional: Boolean ?= false)
+GET     /Egraph/index                                             controllers.Egraph.egraph()
+GET     /Egraph/landscape                                         controllers.Egraph.classicLandscape(isPromotional: Boolean ?= false)
+GET     /Egraph/portrait                                          controllers.Egraph.classicPortrait(isPromotional: Boolean ?= false)
 
 GET     /Email/confirm                                            controllers.Email.confirm
 GET     /Email/mlbStatic                                          controllers.Email.mlbStatic
@@ -66,6 +67,8 @@ GET     /Finalize/index                                           controllers.Fi
 GET     /Finalize/portrait                                        controllers.Finalize.portrait
 
 GET     /GiftCertificateCheckout/index                            controllers.GiftCertificateCheckout.index
+GET     /Storefront-A/personalize                                 controllers.StorefrontA.personalize
+GET     /Storefront-A/checkout                                    controllers.StorefrontA.checkout
 
 GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
 GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory

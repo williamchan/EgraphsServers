@@ -6,7 +6,6 @@ import models.enums._
 import play.api.mvc._
 import services.mail.TransactionalMail
 import services.mvc.OrderConfirmationEmail
-import controllers.WebsiteControllers
 import services.payment.{Charge, Payment}
 import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
@@ -15,9 +14,6 @@ import exception.InsufficientInventoryException
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.http.ServerSessionFactory
-import java.util.Date
-import java.text.SimpleDateFormat
-import org.apache.commons.mail.HtmlEmail
 import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
 import controllers.routes.WebsiteControllers.getFAQ
@@ -39,7 +35,7 @@ case class EgraphPurchaseHandlerServices @Inject() (
  * objects. Having it as a separate case class makes it more testable.
  * 
  * @param totalAmountPaid the amount to charge the credit card. All discounts should already be figured into totalAmountPaid
- * @coupon coupon applied, if any
+ * @param coupon coupon applied, if any
  */
 // TODO(erem): Refactor this class to be injected
 case class EgraphPurchaseHandler(
@@ -84,7 +80,7 @@ case class EgraphPurchaseHandler(
    * @return A Redirect to either an order confirmation page or some error page.
    */
   def execute(): Result = {
-    val errorOrOrder = performPurchase
+    val errorOrOrder = performPurchase()
 
     errorOrOrder.fold(
       (error) => error match {

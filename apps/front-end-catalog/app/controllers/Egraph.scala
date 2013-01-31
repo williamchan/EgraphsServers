@@ -1,6 +1,5 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 import models.frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFrameViewModel}
 import helpers.DefaultImplicitTemplateParameters
@@ -13,10 +12,28 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
   //
   // Public members
   //
-  def landscape(isPromotional: Boolean = false) = Action {
+  def egraph() = Action {
+    Ok(views.html.frontend.egraph(
+      mp4Url = EgraphsAssets.at("videos/sample_egraph_video.mp4").url,
+      videoPosterUrl = EgraphsAssets.at("images/sample_egraph_poster.jpg").url,
+      celebrityName = "Sergio Romo",
+      celebrityTagline = "San Francisco Giants",
+      recipientName = "Jordan",
+      privacySetting = "Public",
+      messageToCelebrity = Some("Hey Sergio! You throw a mean pitch. What awesome beard trimming tips do you have?"),
+      productIconUrl = EgraphsAssets.at("images/sample_product_icon.png").url,
+      signedOnDate = "January 1, 2013",
+      thisPageLink = "https://www.egraphs.com/stars",
+      shareOnFacebookLink = "",
+      shareOnTwitterLink = "",
+      isPromotional = false
+    ))
+  }
+
+  def classicLandscape(isPromotional: Boolean = false) = Action {
     val frame = LandscapeEgraphFrameViewModel
 
-    Ok(views.html.frontend.egraph(
+    Ok(views.html.frontend.egraph_classic(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,
@@ -39,10 +56,10 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
     ))
   }
 
-  def portrait(isPromotional: Boolean = false) = Action  {
+  def classicPortrait(isPromotional: Boolean = false) = Action  {
     val frame = PortraitEgraphFrameViewModel
 
-    Ok(views.html.frontend.egraph(
+    Ok(views.html.frontend.egraph_classic(
       "Herp Derpson",
       "Derp Herpson",
       frame.cssClass,

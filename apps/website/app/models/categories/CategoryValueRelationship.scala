@@ -75,10 +75,5 @@ class CategoryValueRelationshipStore @Inject() (
   //
   override val table = schema.categoryValueRelationships
 
-  override def defineUpdate(theOld: CategoryValueRelationship, theNew: CategoryValueRelationship) = {
-    updateIs(
-      theOld.categoryId := theNew.categoryId,
-      theOld.categoryValueId := theNew.categoryValueId
-    )
-  }
+
 }

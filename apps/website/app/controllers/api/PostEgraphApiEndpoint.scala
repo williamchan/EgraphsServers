@@ -46,8 +46,9 @@ private[controllers] trait PostEgraphApiEndpoint { this: Controller =>
    * about the params.
    */
   def postEgraph(orderId: Long) = {
+    play.api.Logger.info("postEgraph attempt for order " + orderId)
     postApiController(dbSettings = WithoutDBConnection) {
-      Action { implicit request =>        
+      Action { implicit request =>
         val postForm = Form(
           mapping(
             "signature" -> nonEmptyText,

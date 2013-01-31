@@ -23,10 +23,11 @@ import play.api.templates.Html
 import db.Deletes
 import java.sql.Connection
 import services.db.CurrentTransaction
-import org.joda.time.{DateMidnight, DateTimeConstants}
+import org.joda.time.DateMidnight
 import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 import org.joda.time.DateTime
+import controllers.api.FulfilledOrderBundle
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -54,7 +55,7 @@ object Order {
   }
 
   def addMinutesAndRoundUpToNextDay(date: DateTime, minutesToAdd: Int): Date = {
-    val dateSum = date.plusMinutes(minutesToAdd).toDate()
+    val dateSum = date.plusMinutes(minutesToAdd).toDate
 
     // Make sure to round up to nearest day
     val truncatedDate = DateUtils.truncate(dateSum, Calendar.DATE)
@@ -212,7 +213,7 @@ case class Order(
         inventoryBatchId = newInventoryBatch.id,
         amountPaidInCurrency = newProduct.priceInCurrency
       )
-    val newOrder = services.store.create(newOrderUnsaved)
+    val newOrder = services.store.insert(newOrderUnsaved)
 
     // mark old order invalid
     val oldOrder = this.withReviewStatus(OrderReviewStatus.RejectedByAdmin).copy(rejectionReason = Some("Changed product to " + newProduct.id + " with new order " + newOrder.id)).save()
@@ -272,7 +273,7 @@ case class Order(
 
     email.addReplyTo("webserver@egraphs.com")
     email.setSubject("I just finished signing your Egraph")
-    val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(id).url)
+    val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(id).url)
     val htmlMsg = views.html.frontend.email_view_egraph(
       viewEgraphUrl = viewEgraphUrl,
       celebrityName = celebrity.publicName,
@@ -396,7 +397,7 @@ case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 class OrderStore @Inject() (
   schema: Schema
 ) extends SavesWithLongKey[Order]
-  with SavesCreatedUpdated[Long,Order]
+  with SavesCreatedUpdated[Order]
   with Deletes[Long, Order]
 {
   import org.squeryl.PrimitiveTypeMode._
@@ -416,6 +417,39 @@ class OrderStore @Inject() (
       )
         select (FulfilledOrder(order, egraph))
     ).headOption
+  }
+
+  def findFulfilledForCustomer(customer: Customer): Iterable[FulfilledOrderBundle] = {
+    import schema.{egraphs, orders, products, celebrities}
+    from(egraphs, orders, products, celebrities)((egraph, order, product, celebrity) =>
+      where(
+        order.recipientId === customer.id and
+          egraph.orderId === order.id and
+          egraph._egraphState === EgraphState.Published.name and
+          order.productId === product.id and
+          product.celebrityId === celebrity.id
+      )
+        select(FulfilledOrderBundle(egraph, order, product, celebrity))
+        orderBy (egraph.id desc)
+    ).page(0, Utils.defaultPageLength)
+  }
+
+  /**
+   * These are 5 "good" egraphs and 5 "bad" ones based on audio.
+   * This is only used by the consumer-app exploration.
+   */
+  def findSpecificFulfilled(orderIds: List[Int]): Iterable[FulfilledOrderBundle] = {
+    import schema.{egraphs, orders, products, celebrities}
+    from(egraphs, orders, products, celebrities)((egraph, order, product, celebrity) =>
+      where(
+        order.id in orderIds and
+          egraph.orderId === order.id and
+          egraph._egraphState === EgraphState.Published.name and
+          order.productId === product.id and
+          product.celebrityId === celebrity.id
+      )
+        select(FulfilledOrderBundle(egraph, order, product, celebrity))
+    ).page(0, Utils.defaultPageLength)
   }
 
   /**
@@ -577,28 +611,9 @@ class OrderStore @Inject() (
   //
   override val table = schema.orders
 
-  override def defineUpdate(theOld: Order, theNew: Order) = {
-    updateIs(
-      theOld.productId := theNew.productId,
-      theOld.inventoryBatchId := theNew.inventoryBatchId,
-      theOld.buyerId := theNew.buyerId,
-      theOld._paymentStatus := theNew._paymentStatus,
-      theOld._reviewStatus := theNew._reviewStatus,
-      theOld.rejectionReason := theNew.rejectionReason,
-      theOld._privacyStatus := theNew._privacyStatus,
-      theOld._writtenMessageRequest := theNew._writtenMessageRequest,
-      theOld.amountPaidInCurrency := theNew.amountPaidInCurrency,
-      theOld.recipientId := theNew.recipientId,
-      theOld.recipientName := theNew.recipientName,
-      theOld.messageToCelebrity := theNew.messageToCelebrity,
-      theOld.requestedMessage := theNew.requestedMessage,
-      theOld.expectedDate := theNew.expectedDate,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
   //
-  // SavesCreatedUpdated[Long,Order] methods
+  // SavesCreatedUpdated[Order] methods
   //
   override def withCreatedUpdated(toUpdate: Order, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
@@ -711,7 +726,7 @@ object GalleryOrderFactory {
         .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
         .scaledToWidth(product.frame.thumbnailWidthPixels)
       val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
 
       val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
         fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),

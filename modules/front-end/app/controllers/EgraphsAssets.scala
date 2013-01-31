@@ -15,7 +15,7 @@ trait EgraphsAssetPipeline
 object EgraphsAssets extends Controller with EgraphsAssetPipeline {
   override def assetReverseRoute(file: String) = controllers.routes.EgraphsAssets.at(file)
 
-  override val defaultPath = "/public"
+   override val defaultPath = "/public"
 
   override val remoteContentUrl = {
     val cfg = current.configuration

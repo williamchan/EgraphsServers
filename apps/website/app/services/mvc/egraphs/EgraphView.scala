@@ -10,7 +10,7 @@ import models.frontend.egraph.{LandscapeEgraphFrameViewModel, PortraitEgraphFram
 import services.blobs.AccessPolicy
 import models.Egraph
 import models.Order
-import java.text.SimpleDateFormat
+import _root_.frontend.formatting.DateFormatting.Conversions._
 import services.social.{Twitter, Facebook}
 import egraphs.authtoken.AuthenticityToken
 
@@ -63,10 +63,10 @@ object EgraphView {
     val story = egraph.story(celebrity, product, order)
 
     // Signed at date
-    val formattedSigningDate = new SimpleDateFormat("MMMM dd, yyyy").format(egraph.getSignedAt)
+    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage
 
     // Social links
-    val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+    val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
 
     val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = facebookAppId,
     fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
@@ -75,7 +75,7 @@ object EgraphView {
 
     val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = thisPageLink)
 
-    views.html.frontend.egraph(
+    views.html.frontend.egraph_classic(
       signerName = celebrity.publicName,
       recipientName = order.recipientName,
       frameCssClass = frame.cssClass,

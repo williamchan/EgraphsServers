@@ -3,8 +3,7 @@ package services.mvc
 import java.util.Date
 import org.joda.money.Money
 import java.text.SimpleDateFormat
-import org.apache.commons.mail.{Email, HtmlEmail}
-import play.api.mvc.RequestHeader
+import org.apache.commons.mail.HtmlEmail
 import services.mail.TransactionalMail
 import services.logging.Logging
 

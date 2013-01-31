@@ -95,7 +95,7 @@ object EnrollmentBatch {
   }
 }
 
-class EnrollmentBatchStore @Inject() (schema: Schema) extends SavesWithLongKey[EnrollmentBatch] with SavesCreatedUpdated[Long,EnrollmentBatch] {
+class EnrollmentBatchStore @Inject() (schema: Schema) extends SavesWithLongKey[EnrollmentBatch] with SavesCreatedUpdated[EnrollmentBatch] {
   import org.squeryl.PrimitiveTypeMode._
 
   def getOpenEnrollmentBatch(celebrity: Celebrity): Option[EnrollmentBatch] = {
@@ -132,18 +132,10 @@ class EnrollmentBatchStore @Inject() (schema: Schema) extends SavesWithLongKey[E
   //
   override val table = schema.enrollmentBatches
 
-  override def defineUpdate(theOld: EnrollmentBatch, theNew: EnrollmentBatch) = {
-    updateIs(
-      theOld.celebrityId := theNew.celebrityId,
-      theOld.isBatchComplete := theNew.isBatchComplete,
-      theOld.isSuccessfulEnrollment := theNew.isSuccessfulEnrollment,
-      theOld.created := theNew.created,
-      theOld.updated := theNew.updated
-    )
-  }
+
 
   //
-  // SavesCreatedUpdated[Long,EnrollmentBatch] methods
+  // SavesCreatedUpdated[EnrollmentBatch] methods
   //
   override def withCreatedUpdated(toUpdate: EnrollmentBatch, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

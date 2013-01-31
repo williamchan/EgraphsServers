@@ -1,5 +1,6 @@
 package models
 
+import checkout._
 import com.google.inject.{Singleton, AbstractModule}
 import models.categories.CategoryServices
 import services.mvc.marketplace.MarketplaceServices
@@ -19,12 +20,16 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[CashTransactionServices].in[Singleton]
     bind[CategoryServices].in[Singleton]
     bind[CelebrityServices].in[Singleton]
+    bind[CheckoutServices].in[Singleton]
     bind[CouponServices].in[Singleton]    
     bind[CustomerServices].in[Singleton]
     bind[EgraphServices].in[Singleton]
     bind[EnrollmentBatchServices].in[Singleton]
     bind[EnrollmentSampleServices].in[Singleton]
     bind[FailedPurchaseDataServices].in[Singleton]
+    bind[GiftCertificateServices].in[Singleton]
+    bind[GiftCertificateLineItemServices].in[Singleton]
+    bind[GiftCertificateLineItemTypeServices].in[Singleton]
     bind[ImageAssetServices].in[Singleton]
     bind[InventoryBatchServices].in[Singleton]
     bind[InventoryBatchProductServices].in[Singleton]
@@ -32,6 +37,10 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[OrderServices].in[Singleton]
     bind[PrintOrderServices].in[Singleton]
     bind[ProductServices].in[Singleton]
+    bind[CashTransactionLineItemServices].in[Singleton]
+    bind[CashTransactionLineItemTypeServices].in[Singleton]
+    bind[TaxLineItemServices].in[Singleton]
+    bind[TaxLineItemTypeServices].in[Singleton]
     bind[VideoAssetCelebrityServices].in[Singleton]
     bind[VideoAssetServices].in[Singleton]
     bind[VBGStartEnrollmentServices].in[Singleton]
