@@ -1,5 +1,5 @@
 /* Scripting for the base template page */
-define(["page", "window", "services/logging", "module", "services/ng/mail-services", "bootstrap/bootstrap-modal"],
+define(["page", "window", "services/logging", "module", "services/ng/mail-services", "services/responsive-modal"],
   function(page, window, logging, requireModule) {
   var menuStatus = "closed";
   var log = logging.namespace(requireModule.id);
