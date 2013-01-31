@@ -58,7 +58,11 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val egraphStillUrl = egraph.getEgraphImage(VideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
           val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-          val tweetText = "An egraph for " + order.recipientName + " from " + celebrity.twitterUsername.getOrElse(celebrity.publicName)
+          val celebrityNameForTweet = celebrity.twitterUsername match {
+            case Some(username) => "@" + username
+            case None => celebrity.publicName
+          }
+          val tweetText = "An egraph for " + order.recipientName + " from " + celebrityNameForTweet
           val shareOnPinterestLink = Pinterest.getPinterestShareLink(
             url = thisPageLink,
             media = egraphStillUrl,

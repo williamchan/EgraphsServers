@@ -29,7 +29,7 @@ case class EgraphVideoAsset(blobPath: String,
   import EgraphVideoAsset._
 
   /* TODO(egraph-exploration): Work in progress. Not finalized. */
-  protected[models] def encodeVideo: Array[Byte] = {
+  protected[models] def encodeVideo(): Array[Byte] = {
 
     /* Xuggle uses intermediate files. So, prep a bunch of temp files. */
     val wavTempFile = TempFile.named(blobPath + "/temp.wav")
@@ -126,7 +126,7 @@ case class EgraphVideoAsset(blobPath: String,
   protected[models] def saveAndGetUrl(accessPolicy: AccessPolicy): String = {
     log("Rendering EgraphVideoAsset with key \"" + blobKey + "\"")
     val (url, durationSecs) = Time.stopwatch {
-      val encodedBytes = encodeVideo
+      val encodedBytes = encodeVideo()
       val blobs = services.blobs
       blobs.put(blobKey, encodedBytes, accessPolicy)
       blobs.getUrlOption(blobKey).get
