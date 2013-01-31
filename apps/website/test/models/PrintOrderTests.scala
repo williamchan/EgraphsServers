@@ -41,7 +41,7 @@ class PrintOrderTests extends EgraphsUnitTest
 
     egraph = egraph.withEgraphState(EgraphState.ApprovedByAdmin).save()
     val pngUrl: Option[String] = printOrder.getPngUrl
-    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_global-width-" +
+    pngUrl.get should endWith("blob/files/egraphs/" + egraph.id + "/image/signing-origin-offset-0x0_shadow-offset-3.00x3.00_global-width-" +
         LandscapeFramedPrint.targetEgraphWidth  + "px-v1.png")
     TestHelpers.getBlobFromTestBlobUrl(pngUrl.get).get.asByteArray.length should be(13737)
   }
