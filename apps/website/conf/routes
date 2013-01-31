@@ -133,8 +133,9 @@ GET     /affiliates                                                 controllers.
 #GET     /careers                                                    controllers.WebsiteControllers.getCareers
 GET     /egraph/$orderId<[0-9]+>                                    controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
 GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
-# GET     /$orderId<[0-9]+>/new                                       controllers.WebsiteControllers.getEgraph(orderId: Long)
+GET     /$orderId<[0-9]+>/new                                       controllers.WebsiteControllers.getEgraph(orderId: Long)
 # GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
+GET     /video-test                                                 controllers.WebsiteControllers.getVideoTest
 GET     /facebooklogin/callback                                     controllers.WebsiteControllers.getFacebookLoginCallback
 GET     /faq                                                        controllers.WebsiteControllers.getFAQ
 GET     /inside-an-egraph                                           controllers.WebsiteControllers.getInsideEgraph

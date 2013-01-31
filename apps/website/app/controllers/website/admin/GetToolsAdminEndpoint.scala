@@ -109,6 +109,7 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
 //                  enrollmentBatchStore.countEnrollmentSamples(batch.id) + " enrollment samples."
 //              }
 //            }.getOrElse("")
+//            Ok
 //          }
 
           //
@@ -116,42 +117,8 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
           // at least until these actions are made self-serve for the Operations team.
           //
 
-//          case "generate-large-egraph" =>
-//            val orderStore = AppConfig.instance[OrderStore]
-//            val errorOrBlobUrl = for (
-//              orderId <- params.getLongOption("orderId").toRight("orderId param required").right;
-//              fulfilledOrder <- orderStore
-//                                  .findFulfilledWithId(orderId)
-//                                  .toRight("No fulfilled order with ID" + orderId + "found")
-//                                  .right
-//            ) yield {
-//              val FulfilledOrder(order, egraph) = fulfilledOrder
-//              val product = order.product
-//              val productPhoto = product.photoImage
-//              val targetWidth = {
-//                val masterWidth = productPhoto.getWidth
-//                if (masterWidth < PrintOrder.defaultPngWidth) masterWidth else PrintOrder.defaultPngWidth
-//              }
-//
-//              egraph.image(productPhoto)
-//                .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-//                .scaledToWidth(targetWidth)
-//                .rasterized
-//                .saveAndGetUrl(services.blobs.AccessPolicy.Public)
-//            }
-//
-//            errorOrBlobUrl.fold(error => error, url => url)
-
-//          case "unapprove-orders" => {
-//            val orderIds = List[Long]()
-//            for (orderId <- orderIds) {
-//              val order = orderStore.get(orderId)
-//              order.withReviewStatus(OrderReviewStatus.PendingAdminReview).save()
-//            }
-//            "Orders have been reset to reviewStatus = 'PendingAdminReview'"
-//          }
 //          case "create-admin" => {
-//            val adminEmail = params.get("admin-email")
+//            val adminEmail = "will@egraphs.com"
 //            val admin = administratorStore.findByEmail(adminEmail)
 //            if (admin.isEmpty) {
 //              var account = accountStore.findByEmail(adminEmail)
@@ -161,7 +128,7 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
 //              val administrator = Administrator().save()
 //              account.get.copy(administratorId = Some(administrator.id)).save()
 //            }
-//            "Admin created"
+//            Ok("Admin created")
 //          }
 //          /**
 //           * Before enrollment can be attempted using an enrollment batch, the batch must be marked as complete.
@@ -169,6 +136,7 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
 //          case "mark-enrollmentbatch-complete" => {
 //            val enrollmentBatchId = params.get("enrollmentBatchId").toLong
 //            enrollmentBatchStore.get(enrollmentBatchId).copy(isBatchComplete = true).save()
+//            Ok
 //          }
           case _ => Ok("Not a valid action")
         }
