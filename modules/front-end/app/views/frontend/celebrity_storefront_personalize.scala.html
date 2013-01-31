@@ -3,6 +3,7 @@
   messageToCelebrityCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
   orderSummary: models.frontend.storefront.StorefrontOrderSummary,
+  celebrityGender: egraphs.playutils.Gender.EnumVal,
   productPreviewUrl: String,
   orientation: String
 )(
@@ -27,6 +28,7 @@
 *@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
+@import egraphs.playutils.Grammar._
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import views.html.frontend.tags
 @import models.frontend.storefront.PersonalizeMessageOption
@@ -157,7 +159,7 @@
 	                        <button type="button" 
 	                                value="CelebrityChoosesMessage" 
 	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(CelebrityChoosesMessage)) {active}">
-                          	Anything he<br /> wants
+                          	    Anything @subjectPronoun(celebrityGender)<br /> wants
                         	</button>
 	                        <button type="button"
 	                                value="SignatureOnly"
@@ -173,7 +175,7 @@
 	      				                    cols="1"
                                             maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
                                   <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small><small> left</small></p>
-	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really him?</a></small>
+	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really @objectPronoun(celebrityGender)?</a></small>
                                   </p>
 
                                   </div>

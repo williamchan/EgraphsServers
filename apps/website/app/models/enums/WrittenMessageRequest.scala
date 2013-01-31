@@ -4,8 +4,8 @@ import egraphs.playutils.Enum
 
 /**
  * Encodes the choice by the buyer of an egraph whether to request a specific
- * hand-written message, have the celebrity write his own, or have him write
- * his signature only.
+ * hand-written message, have the celebrity write their own, or have them write
+ * their signature only.
  */
 sealed abstract class WrittenMessageRequest(val name: String)
 

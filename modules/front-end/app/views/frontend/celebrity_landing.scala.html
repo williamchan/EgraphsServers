@@ -1,4 +1,4 @@
-@(getStartedUrl: String, celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityIsMale: Boolean = true
+@(getStartedUrl: String, celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityGender: egraphs.playutils.Gender.EnumVal = egraphs.playutils.Gender.Male
 )(implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
@@ -20,11 +20,11 @@
 
       <div class="container" id="celeb-landing">
 
-        @tags.landing.welcome_header(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+        @tags.landing.welcome_header(Option(celebrityPublicName), Option(celebrityCasualName), celebrityGender)
 
-        @tags.landing.landing_steps(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+        @tags.landing.landing_steps(Option(celebrityPublicName), Option(celebrityCasualName), celebrityGender)
 
-        @tags.landing.landing_details(Option(celebrityPublicName), Option(celebrityCasualName), celebrityIsMale)
+        @tags.landing.landing_details(Option(celebrityPublicName), Option(celebrityCasualName), celebrityGender)
 
         @tags.landing.landing_more(Option(celebrityPublicName), Option(getStartedUrl))
 

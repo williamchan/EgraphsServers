@@ -107,7 +107,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
               recipientName=validPersonalizeForm.recipientName,
               messageText=PurchaseForms.makeTextForCelebToWrite(
                 validPersonalizeForm.writtenMessageRequest,
-                validPersonalizeForm.writtenMessageText
+                validPersonalizeForm.writtenMessageText,
+                celebrityGender = celeb.gender
               ),
               basePrice=product.price,
               shipping=forms.shippingPrice,

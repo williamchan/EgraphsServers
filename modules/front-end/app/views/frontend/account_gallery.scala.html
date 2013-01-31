@@ -8,9 +8,9 @@
   footerData: models.frontend.footer.FooterData
 )
 
-@import views.frontend.Utils.{egraphOrEgraphs}
 @import views.html.frontend.tags
 @import models.frontend.egraphs._
+@import _root_.egraphs.playutils.Grammar._
 
 @init = {
   Egraphs.page.authenticityToken = "@authToken.value";
