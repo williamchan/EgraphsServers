@@ -45,6 +45,10 @@ case class EgraphsSession(session: Session) {
     session + (Key.UsernameChanged.name -> true.toString)
   }
 
+  def withHasSignedUp: Session = {
+    session + (Key.HasSignedUp.name -> true.toString)
+  }
+
   def getLong(key: String): Option[Long] = {
     try {
       session.get(key).map(value => value.toLong)
@@ -72,6 +76,7 @@ object EgraphsSession {
     val AdminId = new EnumVal("admin") {}
     val CustomerId = new EnumVal("customer") {}
     val UsernameChanged = new EnumVal("username_changed") {}
+    val HasSignedUp = new EnumVal("has_signed_up") {}
   }
 
   object Conversions {

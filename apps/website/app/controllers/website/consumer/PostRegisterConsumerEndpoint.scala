@@ -57,7 +57,10 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         }
 
         Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
-          request.session.withCustomerId(customer.id).withUsernameChanged
+          request.session
+            .withCustomerId(customer.id)
+            .withUsernameChanged
+            .withHasSignedUp
         )
       }
 
