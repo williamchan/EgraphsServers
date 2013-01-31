@@ -10,7 +10,6 @@ import models.frontend.footer.FooterData
 import play.api.templates.Html
 import services.http.filters.HttpFilters
 import egraphs.authtoken.AuthenticityToken
-import egraphs.playutils.Gender
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
