@@ -1,40 +1,44 @@
 /* Scripting for the base template page */
-define(["page", "window", "services/logging", "module", "services/ng/mail-services", "bootstrap/bootstrap-modal"],
-  function(page, window, logging, requireModule) {
+define(
+["page",
+ "window",
+ "services/logging",
+ "module",
+ "services/ng/mail-services",
+ "bootstrap/bootstrap-modal"],
+function(page, window, logging, requireModule) {
   var menuStatus = "closed";
   var log = logging.namespace(requireModule.id);
 
-  var mailerController = function($scope, subscribeService) {
-    $scope.email = "";
-    $scope.message = "Join our mailing list.";
-    $scope.subscribe = function() {
-      subscribeService($scope.email,
-        function() { $scope.message = "Thanks!";},
-        function() { $scope.message = "Sorry, there was an error. Try again later.";}
-      );
-    };
-  };
-
-  var modalController = function($scope, subscribeService) {
-    $scope.email = "";
-    $scope.subscribe = function() {
-      subscribeService($scope.email);
-      $('#emailSignupForm').modal('toggle');
-    };
-  };
-
-  // Define dependencies.
-  mailerController.$inject = ['$scope', 'subscribe'];
-  modalController.$inject = ['$scope', 'subscribe'];
-  window.MailerController = mailerController;
-  window.ModalController =  modalController;
-
   return {
+    ngControllers: {
 
-    ngModules: ['MailServices'],
+      /** Controller for mail signup at bottom-right of site template */
+      MailerController: ['$scope', '$subscribe', function($scope, $subscribe) {
+        $scope.email = "";
+        $scope.message = "Join our mailing list.";
+        $scope.subscribe = function() {
+          $subscribe($scope.email,
+            function() { $scope.message = "Thanks!";},
+            function() { $scope.message = "Sorry, there was an error. Try again later.";}
+          );
+        };
+      }],
+
+      /**
+       * Controller for mail signup via the modal template occasionally available during email
+       * signup drives.
+       */
+      ModalController: ['$scope', '$subscribe', function($scope, $subscribe) {
+        $scope.email = "";
+        $scope.subscribe = function() {
+          $subscribe($scope.email);
+          $('#emailSignupForm').modal('toggle');
+        };
+      }]
+    },
 
     go: function () {
-
       $(document).ready(function(){
         var signupModal = $('#emailSignupForm');
         // highlight action on top menu
@@ -72,7 +76,7 @@ define(["page", "window", "services/logging", "module", "services/ng/mail-servic
         });
 
         // set modal to visible if toggled.
-        if(Egraphs.page.modalOn === true) {
+        if(page.modalOn === true) {
           $(window).load(function(){
               signupModal.modal({});
           });

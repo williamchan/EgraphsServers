@@ -1,3 +1,4 @@
+/*global angular*/
 // Configuration to look up correct urls to js files as opposed to relative
 // paths (require's default behavior)
 require.config({
@@ -17,25 +18,34 @@ require.config({
 
 var Egraphs = Egraphs || {};
 Egraphs.page = Egraphs.page || {};
+Egraphs.ngModules = []; // list of angularjs modules to bootstrap onto this page
 // Provide the Egraphs scope as a module to any future require() calls
 define("window", [], function() { return window; });
 define("Egraphs", [], function() { return Egraphs; });
 define("page", [], function() { return Egraphs.page; });
+define("ngModules", [], function() {
+  return {
+    add: function(name) {
+      Egraphs.ngModules = Egraphs.ngModules.concat(name);
+      return angular.module(name, []);
+    }
+  };
+});
 
 require(Egraphs.page.jsMain, function() {
   var mainModules = arguments,
     numModules = mainModules.length,
-    ngModules = [],
     i = 0,
-    mainModule;
+    mainModule,
+    initNgController = function(controller, name) { window[name] = controller; };
 
   for (i; i < numModules; i++) {
     mainModule = mainModules[i];
     mainModule.go();
-    ngModules = ngModules.concat(mainModule.ngModules || []);
+    angular.forEach(mainModule.ngControllers, initNgController);
   }
 
   angular.element(document).ready(function() {
-   angular.bootstrap(document, ngModules);
+    angular.bootstrap(document, Egraphs.ngModules);
   });
 });

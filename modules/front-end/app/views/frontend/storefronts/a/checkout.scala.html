@@ -191,60 +191,66 @@
         <section id="payment-details">
           @headerIcon("glyphicons-lock-orange.png")
           <h2>Enter payment details</h2>
-          <div class="control-group">
-            <label class="control-label" for="City">Card Number:</label>
-            <div class="controls">
-              <input id="cardNumber"
-                     name="cardNumber">
+          <form credit-card-form name="pay" novalidate>
+            <div class="control-group">
+              <label class="control-label" for="City">Card Number:</label>
+              <div class="controls">
+                <input id="cardNumber"
+                       name="cardNumber">
+              </div>
+            </div>          
+            <div class="control-group">
+              <label class="control-label" for="City">Expiration:</label>
+              <div class="controls">
+                <select id="card-exp-month"
+                        credit-card-expiry-month
+                        name="cardExpMonth"
+                        class="inline"
+                        ng-model="order.card.expMonth"
+                        ng-options="month for month in months"
+                        required >
+                  <option value>MM</option>
+                </select>
+                /
+                <select id="card-exp-year"
+                        credit-card-expiry-year
+                        name="cardExpYear"
+                        class="inline"
+                        ng-model="order.card.expYear"
+                        ng-options="year for year in years"
+                        required >
+                  <option value>YY</option>
+                </select>
+              </div>
             </div>
-          </div>          
-          <div class="control-group">
-            <label class="control-label" for="City">Expiration:</label>
-            <div class="controls">
-              <select id="card-exp-month"
-                      credit-card-expiry-month
-                      name="cardExpMonth"
-                      class="inline"
-                      ng-model="order.card.expMonth"
-                      ng-options="month for month in months"
-                      required >
-                <option value>MM</option>
-              </select>
-              /
-              <select id="card-exp-year"
-                      credit-card-expiry-year
-                      name="cardExpYear"
-                      class="inline"
-                      ng-model="order.card.expYear"
-                      ng-options="year for year in years"
-                      required >
-                <option value>YY</option>
-              </select>
+            <div class="control-group">
+              <label class="control-label" for="City">Security code:</label>
+              <div class="controls">
+                <input id="securityCode"
+                       name="securityCode"
+                       class="quarter">
+              </div>                      
+            </div>          
+            <div class="control-group">
+              <label class="control-label" for="City">Zip:</label>
+              <div class="controls">
+                <input id="billingZip"
+                       name="billingZip"
+                       class="quarter">
+              </div>
             </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="City">Security code:</label>
-            <div class="controls">
-              <input id="securityCode"
-                     name="securityCode"
-                     class="quarter">
-            </div>                      
-          </div>          
-          <div class="control-group">
-            <label class="control-label" for="City">Zip:</label>
-            <div class="controls">
-              <input id="billingZip"
-                     name="billingZip"
-                     class="quarter">
-            </div>
-          </div>
+          </form>
         </section>
       </div>
       <div id="submission">
-        @tags.arrow_button(
-          caption="Proceed to Final Step",
-          classes="button"
-        )
+        <button type="button"
+                class="button"
+                ng-click="creditCardFormSubmit(onCardInfoValidated)" >
+          <strong>
+            <em>Proceed to Final Step</em>
+          </strong>
+          <span>&raquo;</span>
+        </button>
         <div>or</div>
         <a href="#">Edit your order</a>
       </div>
