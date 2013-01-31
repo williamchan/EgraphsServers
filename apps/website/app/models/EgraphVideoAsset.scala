@@ -39,61 +39,63 @@ case class EgraphVideoAsset(blobPath: String,
     val videoNoAudioFile = TempFile.named(blobPath + "/no-audio.mp4")
     val videoWithAudioFile = TempFile.named(blobPath + "/with-audio.mp4")
     val finalMp4TempFile = TempFile.named(blobPath + "/final.mp4")
+    try {
+      /* Get audio duration in seconds */
+      Utils.saveToFile(egraph.assets.audioWav.asByteArray, wavTempFile)
+      val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
 
-    /* Get audio duration in seconds */
-    Utils.saveToFile(egraph.assets.audioWav.asByteArray, wavTempFile)
-    val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
+      /**
+       * Generate aac audio file. This should not have to go through an intermediate step of generating an mp3,
+       * but Xuggle seems to complain when converting a wav to an aac.
+       */
+      Utils.saveToFile(egraph.assets.audioMp3.asByteArray, sourceMp3TempFile)
+      Utils.convertMediaFile(sourceMp3TempFile, finalAacTempFile)
+      /**
+       * Enable the following code to generate an aac appropriate with a video with preamble:
+       * val sourceAacTempFile = TempFile.named(blobPath + "/source.aac")
+       * Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
+       * VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
+       */
 
-    /**
-     * Generate aac audio file. This should not have to go through an intermediate step of generating an mp3,
-     * but Xuggle seems to complain when converting a wav to an aac.
-     */
-    Utils.saveToFile(egraph.assets.audioMp3.asByteArray, sourceMp3TempFile)
-    Utils.convertMediaFile(sourceMp3TempFile, finalAacTempFile)
-    /**
-     * Enable the following code to generate an aac appropriate with a video with preamble:
-     * val sourceAacTempFile = TempFile.named(blobPath + "/source.aac")
-     * Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
-     * VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
-     */
+      /* Get egraph image as a jpg */
+      val egraphImage = egraph.getEgraphImage(width).asJpg
+      egraphImage.getSavedUrl(AccessPolicy.Public)
+      Utils.saveToFile(egraphImage.transformAndRender.graphicsSource.asByteArray, egraphImageTempFile)
 
-    /* Get egraph image as a jpg */
-    val egraphImage = egraph.getEgraphImage(width).asJpg
-    egraphImage.getSavedUrl(AccessPolicy.Public)
-    Utils.saveToFile(egraphImage.transformAndRender.graphicsSource.asByteArray, egraphImageTempFile)
+      /* Generate an mp4 without sound */
+      val thisOrder = egraph.order
+      val videoNoAudioFileName = videoNoAudioFile.getPath
+      VideoEncoder.generateMp4SansAudio(
+        targetFilePath = videoNoAudioFileName,
+        egraphImageFile = egraphImageTempFile,
+        recipientName = thisOrder.recipientName,
+        celebrityName = thisOrder.product.celebrity.publicName,
+        audioDuration = audioDuration
+      )
 
-    /* Generate an mp4 without sound */
-    val thisOrder = egraph.order
-    val videoNoAudioFileName = videoNoAudioFile.getPath
-    VideoEncoder.generateMp4SansAudio(
-      targetFilePath = videoNoAudioFileName,
-      egraphImageFile = egraphImageTempFile,
-      recipientName = thisOrder.recipientName,
-      celebrityName = thisOrder.product.celebrity.publicName,
-      audioDuration = audioDuration
-    )
+      /* Mux the soundless mp4 with the aac audio to create an mp4 with sound */
+      VideoEncoder.muxVideoWithAudio(
+        videoFile = new File(videoNoAudioFileName),
+        audioFile = finalAacTempFile,
+        targetFile = videoWithAudioFile
+      )
 
-    /* Mux the soundless mp4 with the aac audio to create an mp4 with sound */
-    VideoEncoder.muxVideoWithAudio(
-      videoFile = new File(videoNoAudioFileName),
-      audioFile = finalAacTempFile,
-      targetFile = videoWithAudioFile
-    )
+      /* This step may be needed to create a correctly formatted mp4. Xuggle is weird. */
+      Utils.convertMediaFile(videoWithAudioFile, finalMp4TempFile)
+      val mp4Bytes = Blobs.Conversions.fileToByteArray(finalMp4TempFile)
+      mp4Bytes
 
-    /* This step may be needed to create a correctly formatted mp4. Xuggle is weird. */
-    Utils.convertMediaFile(videoWithAudioFile, finalMp4TempFile)
-    val mp4Bytes = Blobs.Conversions.fileToByteArray(finalMp4TempFile)
+    } finally {
+      wavTempFile.delete()
+      sourceMp3TempFile.delete()
+      finalAacTempFile.delete()
+      egraphImageTempFile.delete()
+      videoNoAudioFile.delete()
+      videoWithAudioFile.delete()
+      finalMp4TempFile.delete()
+      //      sourceAacTempFile.delete()
+    }
 
-    wavTempFile.delete()
-    sourceMp3TempFile.delete()
-    finalAacTempFile.delete()
-    egraphImageTempFile.delete()
-    videoNoAudioFile.delete()
-    videoWithAudioFile.delete()
-    finalMp4TempFile.delete()
-    //      sourceAacTempFile.delete()
-
-    mp4Bytes
   }
 
   /**
@@ -108,9 +110,9 @@ case class EgraphVideoAsset(blobPath: String,
   def getSavedUrl(accessPolicy: AccessPolicy, overwrite: Boolean = false): String = {
     val blobs = services.blobs
     val ((url, alreadyCached), durationSecs) = Time.stopwatch {
-      blobs.getUrlOption(blobKey) match {
-        case Some(alreadySavedUrl) => (alreadySavedUrl, true)
-        case None => (saveAndGetUrl(accessPolicy), false)
+      (overwrite, blobs.getUrlOption(blobKey)) match {
+        case (false, Some(alreadySavedUrl)) => (alreadySavedUrl, true)
+        case (true, _) | (_, None) => (saveAndGetUrl(accessPolicy), false)
       }
     }
     if (alreadyCached) {
@@ -137,7 +139,7 @@ case class EgraphVideoAsset(blobPath: String,
 object EgraphVideoAsset extends Logging {
   // Increment this every time we improve EgraphVideoAsset rendering to avoid
   // Caches serving up old versions.
-  val Version = 1
+  val Version = 0
 }
 
 /**

@@ -10,7 +10,6 @@ import play.api.mvc.Session
 import services._
 import blobs.AccessPolicy
 import mvc.egraphs.EgraphView
-import services.graphics.Handwriting
 import services.http.ControllerMethod
 import services.http.EgraphsSession.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
@@ -30,24 +29,35 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   protected def facebookAppId: String
   protected def consumerApp: ConsumerApplication
 
-  val penWidth: Double=Handwriting.defaultPenWidth
-  val shadowX: Double=Handwriting.defaultShadowOffsetX
-  val shadowY: Double=Handwriting.defaultShadowOffsetY
-
   //
   // Controllers
   //
 
+  def getVideoTest = controllerMethod.withForm() { implicit authToken =>
+    Action { implicit request => Ok(views.html.frontend.video_test()) }
+  }
+
   def getEgraph(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
+
+    /**
+     * Sneakpeak URLs for these Egraphs:
+     * Josh Hamilton: 462
+     * Kenny Mendes's: 1033, 2404
+     * Smith Family: 46
+     * board members on beta: 624
+     * localhost test: 2
+     */
       orderStore.findFulfilledWithId(orderId) match {
         case None => NotFound("No Egraph exists with the provided identifier.")
+        case Some(FulfilledOrder(order, egraph)) if (!List(462, 1033, 2404, 46, 624, 2).contains(orderId)) => NotFound("Not available")
         case Some(FulfilledOrder(order, egraph)) =>
           val product = order.product
           val celebrity = product.celebrity
-          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
+          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public/*, overwrite = true*/)
           val egraphStillUrl = egraph.getEgraphImage(VideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
-          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
+          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+          val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
           val tweetText = "An egraph for " + order.recipientName + " from " + celebrity.twitterUsername.getOrElse(celebrity.publicName)
           val shareOnPinterestLink = Pinterest.getPinterestShareLink(
             url = thisPageLink,
@@ -64,6 +74,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
             productIconUrl = product.iconUrl,
             signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
             thisPageLink = thisPageLink,
+            classicPageLink = classicPageLink,
             shareOnPinterestLink = shareOnPinterestLink,
             tweetText = tweetText,
             isPromotional = order.isPromotional
