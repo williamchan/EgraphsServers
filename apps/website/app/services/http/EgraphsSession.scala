@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import services.Utils
 import play.api.mvc.Session
 import egraphs.playutils.Enum
+import java.util.Date
 
 case class EgraphsSession(session: Session) {
   import EgraphsSession.Key
@@ -19,6 +20,14 @@ case class EgraphsSession(session: Session) {
 
   def isUsernameChanged: Option[Boolean] = {
     getBoolean(Key.UsernameChanged.name)
+  }
+
+  def hasSignedUp: Boolean = {
+    getBoolean(Key.HasSignedUp.name).getOrElse(false)
+  }
+
+  def lastSignupModalDisplay: Option[Date] = {
+    getDate(Key.LastSignupModalDisplay.name)
   }
 
   def withAdminId(id: Long): Session = {
@@ -49,12 +58,20 @@ case class EgraphsSession(session: Session) {
     session + (Key.HasSignedUp.name -> true.toString)
   }
 
+  def withLastSignupModalDisplay: Session = {
+    session + (Key.LastSignupModalDisplay.name -> System.currentTimeMillis.toString)
+  }
+
   def getLong(key: String): Option[Long] = {
     try {
       session.get(key).map(value => value.toLong)
     } catch {
       case _: NumberFormatException => None
     }
+  }
+
+  def getDate(key: String): Option[Date] = {
+    getLong(key).map(long => new Date(long))
   }
 
   def getBoolean(key: String): Option[Boolean] = {
@@ -77,6 +94,7 @@ object EgraphsSession {
     val CustomerId = new EnumVal("customer") {}
     val UsernameChanged = new EnumVal("username_changed") {}
     val HasSignedUp = new EnumVal("has_signed_up") {}
+    val LastSignupModalDisplay = new EnumVal("last_signup_modal_display") {}
   }
 
   object Conversions {
