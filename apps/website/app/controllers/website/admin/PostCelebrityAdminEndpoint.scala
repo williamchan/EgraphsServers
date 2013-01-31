@@ -80,8 +80,8 @@ trait PostCelebrityAdminEndpoint {
             },
             validForm => {
               // Save Celebrity
-              val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
-              val gender = Gender(validForm.gender).getOrElse(Gender.Male)
+              val publishedStatus = PublishedStatus(validForm.publishedStatusString).get // must be valid
+              val gender = Gender(validForm.gender).get // must be valid
               val savedCelebrity = Celebrity().copy(
                   publicName = validForm.publicName,
                   bio = validForm.bio,
@@ -154,8 +154,8 @@ trait PostCelebrityAdminEndpoint {
 	            )
 	          },
 	          validForm => {
-	            val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
-	            val gender = Gender(validForm.gender).getOrElse(Gender.Male)
+	            val publishedStatus = PublishedStatus(validForm.publishedStatusString).get // must be valid
+	            val gender = Gender(validForm.gender).get // must be valid
 	            val savedCelebrity = celeb.copy(
 	                publicName = validForm.publicName,
 	                bio = validForm.bio,
