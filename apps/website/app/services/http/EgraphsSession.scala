@@ -24,13 +24,21 @@ case class EgraphsSession(session: Session) {
   def withAdminId(id: Long): Session = {
     session + (Key.AdminId.name -> id.toString)
   }
-  
+
+  def removedAdminId: Session = {
+    session - Key.AdminId.name
+  }
+
   def customerId: Option[Long] = {
     getLong(Key.CustomerId.name)
   }
   
   def withCustomerId(id: Long): Session = {
     session + (Key.CustomerId.name -> id.toString)
+  }
+
+  def removedCustomerId: Session = {
+    session - Key.CustomerId.name
   }
 
   def withUsernameChanged: Session = {

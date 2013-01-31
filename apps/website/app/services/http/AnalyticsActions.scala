@@ -20,7 +20,6 @@ class AnalyticsActions @Inject() {
           // if it has changed, it js needs to be run and will be triggered by ImplicitHeaderAndFooter code
           val maybeModifiedResult = for { status <- result.status if (status == Status.OK) } yield {
             // assume the alias will have changed, we don't want to do this again
-            println("REMOVING USERNAME_CHANGED FROM SESSION COOKIE ~~~~~~~~~~~~~~~~~~")
             result.removeFromSession(EgraphsSession.Key.UsernameChanged.name)
           }
           maybeModifiedResult.getOrElse(result)
