@@ -6,7 +6,7 @@
 
 @navbarZIndex: 9001; // over 9000
 
-.top {
+header.top {
   .clearfix();
 
   .box-shadow(0px 2px 4px rgba(0, 0, 0, .15));  
@@ -218,14 +218,14 @@
       .celebrity-searchbox-container(@orange, @inputBorder, 180px);
     }
   }
-} // end .top
+} // end header.top
 
 
 // Adjust the logo and social tools when at widest to align them with
 // the edges of the content column itself rather than the content within
 // the content column. Below this res, layout will use bootstrap's defaults.
 @media (min-width: 1340px) {
-  .top {
+  header.top {
     .logo { margin-left: -20px; }
     .social { margin-right: -40px; }
   }
@@ -233,13 +233,13 @@
 
 
 @media (max-width: 979px) and (min-width: 769px) {
-  .top {
+  header.top {
     .social {
       > ul {
         padding-left: 10px;     
       }
     }
-    // Bring down the padding to handle more than two links up .top   
+    // Bring down the padding to handle more than two links up top
     .account > ul {
       padding-left: 10px;
       padding-right: 10px;
@@ -259,7 +259,7 @@
     input.span2, textarea.span2, .uneditable-input.span2 {
       width: 140px;
     }
-  } // end .top
+  } // end header.top
 }
 
 
@@ -269,7 +269,7 @@
 //
 @media (max-width: 768px) {
 
-  .top {
+  header.top {
     padding-top:5px;
     padding-bottom: 0;
           
@@ -381,7 +381,7 @@
 // Bump the links and search bar to the next line, and make header no longer fixed.
 //
 @media (max-width: 688px) {
-  .top {
+  header.top {
     display: none;
 
     &.relative {
@@ -405,7 +405,7 @@
 // the they would run into the social tools.
 //
 @media (max-width: 600px) {
-  .top {
+  header.top {
     // Pop the text linkz down to the second row
     #logo-account-social {
       .clearfix();      
@@ -419,7 +419,7 @@
 // iPhone width to accomodate more than two links in the top bar.
 //
 @media (max-width: 480px) {
-  .top {
+  header.top {
     .linkz {
       .navbar-item {
         .separator-after:after {
@@ -438,7 +438,7 @@
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 
-  .top {
+  header.top {
   
     .logo h1 a {
       background-image: url(/assets/images/logo-ios.png);      
