@@ -41,13 +41,13 @@
        */
       @media (min-width: 641px) {
         .egraph-container {
-          width: 592px;
+          width: 600px;
         }
         .egraph-player-container {
-          height: 374px;
+          height: 380px;
         }
       }
-      @media (max-width: 640px) {
+      @media (max-width: 640px) and (min-width: 480px) {
         .egraph-container {
           width: 400px;
         }
@@ -55,7 +55,7 @@
           height: 252px;
         }
       }
-      @media (max-width: 320px) {
+      @media (max-width: 479px) {
         .egraph-container {
           width: 280px;
         }
@@ -124,6 +124,7 @@
       }
 
       #classic-mode {
+        text-decoration: none;
         float: right;
         margin-right: 10%;
         margin-bottom: 15px;
@@ -131,6 +132,7 @@
 
       .separator {
         margin: 0 0 0 0;
+        width: 100%;
       }
     }
   }
