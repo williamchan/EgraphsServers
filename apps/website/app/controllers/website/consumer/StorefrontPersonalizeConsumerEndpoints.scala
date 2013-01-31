@@ -94,7 +94,7 @@ trait StorefrontPersonalizeConsumerEndpoints
             tax = forms.tax,
             total = forms.total(subtotal=forms.subtotal(product.price))
           )
-  
+
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)
 
           Ok(views.html.frontend.celebrity_storefront_personalize(
@@ -103,6 +103,7 @@ trait StorefrontPersonalizeConsumerEndpoints
             writtenMessageCharacterLimit = PurchaseFormChecks.maxWrittenMessageChars,
             messageToCelebrityCharacterLimit = PurchaseFormChecks.maxNoteToCelebChars,
             orderSummary = orderSummary,
+            celebrityGender = celeb.gender,
             productPreviewUrl = product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
             orientation = product.frame.previewCssClass)
           )

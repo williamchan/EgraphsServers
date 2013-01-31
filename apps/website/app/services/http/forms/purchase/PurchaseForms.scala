@@ -12,6 +12,8 @@ import models.enums.{WrittenMessageRequest, PrintingOption}
 import services.http.forms.{Form, ReadsForm}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 import play.api.mvc.Flash
+import egraphs.playutils.Gender
+import egraphs.playutils.Grammar
 
 /**
  * Represents the cache-persisted forms in the purchase flow.
@@ -438,12 +440,11 @@ object PurchaseForms {
    *
    * @return a user-presentable string.
    */
-  def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String])
+  def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String], celebrityGender: Gender.EnumVal)
   : String = {
     messageRequest match {
-      // TODO: Make these strings respond to gender
-      case WrittenMessageRequest.SignatureOnly => "His signature only."
-      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever he wants."
+      case WrittenMessageRequest.SignatureOnly => Grammar.possessivePronoun(celebrityGender, true) + " signature only."
+      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever " + Grammar.subjectPronoun(celebrityGender) + " wants."
       case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
     }
   }

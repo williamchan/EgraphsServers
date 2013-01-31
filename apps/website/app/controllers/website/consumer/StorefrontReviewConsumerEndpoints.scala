@@ -72,7 +72,8 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
           // Everything looks good for rendering the page!
           val textCelebWillWrite = PurchaseForms.makeTextForCelebToWrite(
             validPersonalizeForm.writtenMessageRequest,
-            validPersonalizeForm.writtenMessageText
+            validPersonalizeForm.writtenMessageText,
+            celebrityGender = celeb.gender
           )
   
           val doPrint = forms.highQualityPrint
