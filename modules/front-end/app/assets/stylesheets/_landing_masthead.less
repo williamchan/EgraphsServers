@@ -31,7 +31,14 @@
     font-weight: 300;
     line-height: 1.15em;
     margin-top: .75em;
+    margin-bottom: 10px;
     text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
+  }
+
+  h2 {
+    color: @white;
+    font-weight: : 300;
+    text-shadow: 0 3px 3px rgba(0, 0, 0, .5); 
   }
 
   .helper {
@@ -50,6 +57,13 @@
     margin-top: 25px;
   }
 
+  .play-egraph {
+    i {
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+  }
+  
   form {
     width: 256px;
 
@@ -65,6 +79,31 @@
   }
 }
 
+#video-modal {
+  
+  a.modal-dismissal {
+    border-bottom: 1px dotted @orange;
+    color: @orange;
+    cursor: pointer;
+    float: right;
+    text-decoration: none;
+  }
+
+  #egraph-container {
+    height: 0;
+    padding-bottom: 61.04%;  // 16:9;
+    padding-top: 25px;
+    position: relative;
+
+    iframe {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+  }
+}
 // Past 1080 pixels width we turn on the radial gradient that obscures the
 // photo's edge
 @media (min-width: 1080px) {
@@ -119,6 +158,14 @@
   } // end #masthead-home-a
 }
 
+@media (max-width: 767px) and (min-width: 481px) {
+  #video-modal {
+    // Override Bootstrap default values. 
+    width: 480px;
+    margin-left: -240px;
+  }  
+}
+
 @media (max-width:480px) {
   .landing #masthead-home {
     min-height: 250px;
@@ -130,6 +177,14 @@
     h1 {
       margin-top: 1.25em;
       font-size: 25px;
+    }
+  }
+  #video-modal {
+    // Override inappropriate responsive CSS from
+    // assets/bootstrap-modal/css/bootstrap-modal.css
+    top: 70%;
+    .modal-header {
+      display: none;
     }
   }
 }
