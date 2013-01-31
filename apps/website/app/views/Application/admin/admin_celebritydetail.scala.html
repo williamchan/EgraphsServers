@@ -78,7 +78,12 @@
 
               @formField(id="casualName", label="Casual Name", inputType="text", width="span4", help=Some("e.g. \"David\" instead of \"David Price\""), fields=fields)
 
-              @formField(id="gender", label="Gender", inputType="text", width="span4", help=Some("Please enter either \"Male\", \"Female\", or \"Neutral\""), fields=fields)
+              <div class="clearfix">
+                <label for="gender">Gender</label>
+                <input class="gender-radio" type="radio" name="gender" value="Male" style="margin-right: 5px; margin-bottom: 5px"> Male
+                <input class="gender-radio" type="radio" name="gender" value="Female" style="margin-right: 5px; margin-bottom: 5px"> Female
+                <input class="gender-radio" type="radio" name="gender" value="Neutral" style="margin-right: 5px; margin-bottom: 5px"> Neutral
+              </div>
 
               @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some("e.g. \"Major League Baseball\""), fields=fields)
               
