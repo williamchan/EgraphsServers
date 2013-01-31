@@ -1,4 +1,4 @@
-@(selected: String="",states: List[(String, String)] = List("AL" -> "Alabama",
+@(selected: String="", formatStr: String = "html", states: List[(String, String)] = List("AL" -> "Alabama",
     "AK" -> "Alaska",
     "AZ" -> "Arizona",
     "AR" -> "Arkansas",
@@ -48,8 +48,15 @@
     "WA" -> "Washington",
     "WV" -> "West Virginia",
     "WI" -> "Wisconsin",
-    "WY" -> "Wyoming")
-)
+    "WY" -> "Wyoming"))
+@if(formatStr == "html") {
+  @for((abbreviation, name) <- states) {
+    <option value="@abbreviation" @if(abbreviation == selected) {selected}>@name</option>
+  }
+}
+@if(formatStr == "json") {
+  @states.map(state => "['" + state._1 + "','" + state._2 + "']").mkString("[", ",", "]")
+}
 
 @**   Prints <option> tags for each state.
 
@@ -58,9 +65,3 @@
 
       states - Don't touch this.
 *@
-
-<!-- Begin usstates.scala.html -->
-@for((abbreviation, name) <- states) {
-  <option value="@abbreviation" @if(abbreviation == selected) {selected}>@name</option>
-}
-<!-- End usstates.scala.html -->

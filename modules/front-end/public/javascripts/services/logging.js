@@ -18,7 +18,7 @@
  *  });
  **/
 /*global angular*/
-define(["page", "window"], function(page, window) {
+define(["page", "window", "module"], function(page, window, module) {
   var config = page.logging || {level:"all"};
   var disabled = config.level !== "all";
   var console = window.console;
@@ -28,32 +28,56 @@ define(["page", "window"], function(page, window) {
     if (console) console.log(msg);
   };
 
-  return {
-    /**
-     * A generic logging function. Writes directly to window.console if it exists, otherwise noop.
-     * 
-     * @param message a message to log, of any type.
-     */
-    log: log,
+  var lineNumber = function() {
+    try {
+      var error = (new Error());
+      var stack = error.stack;
+      var frames = stack.split("\n");
+      var numFrames = frames.length;
+      var lineNumberRegex = /:([0-9]+):[0-9+]/;
+      var i;
+      var loggingFrame;
+      var lineNumber;
 
-    /** 
-     * Returns a namespaced logging function. All logs written using the function returned
-     * will be prefaced with the namespace.
-     *
-     * See module description for more information.
-     *
-     * @param ns the namespace to apply to the function (usually the active module id)
-     **/
-    namespace: function(ns) {
-      var nsString = "[" + ns.toString() + "]";
-      return disabled? noop: function(message) {
-        if (typeof message === "object") {
-          log(nsString + " (the following object was logged ---v)");
-          log(message);
-        } else {
-          log(nsString + " " + message);
+      for (i = 1; i < numFrames && loggingFrame === undefined; i++) {
+        var frame = frames[i];
+        if (frame.indexOf(module.id) === -1) {
+          loggingFrame = frame;
+          break;
         }
-      };
+      }
+
+      var match = lineNumberRegex.exec(loggingFrame);
+      if (match !== null && match.length > 1) {
+        lineNumber = match[1];
+      }
+      return lineNumber;
+
+    } catch(err) {
+      return undefined;
     }
   };
+
+  var logModule = function(message) {
+    var source = lineNumber();
+  };
+
+  logModule.namespace = function(ns) {
+    var nsString = ns.toString();
+
+    return disabled? noop: function(message) {
+      var line = lineNumber();
+      var nsAndLine = line? (nsString + ":" + line): nsString;
+      var nsPrefix = "[" + nsAndLine + "]";
+
+      if (typeof message === "object") {
+        log(nsPrefix + " (the following object was logged ---v)");
+        log(message);
+      } else {
+        log(nsPrefix + " " + message);
+      }
+    };
+  };
+
+  return logModule;
 });

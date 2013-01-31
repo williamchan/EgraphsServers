@@ -274,34 +274,13 @@
 		  }
 		  
 	  }
-	  
-	  ul {
-		  
-		  float: left;
-		  list-style: none;
-		  margin: 0 0 0 -20px;
-		  padding: 0;
-		  
-		  li {
-			  
-			  float: left;
-			  margin-right: 10px;
-			  width: 45px;
-			  height: 60px;
-			  text-indent: -9999px;
-			  overflow: hidden;
-			  background: url(/assets/images/bg-credit-cards.png) no-repeat 0 50%;
-			  
-			  &:last-child { margin-right: 0; }
-			  
-			  &.mastercard { background-position: -45px 50%; }
-			  &.amex { background-position: -90px 50%; }
-			  &.discover { background-position: 100% 50%; }
-			  
-		  }
-		  
-	  }
-	 
+
+    ul.credit-cards {
+      margin-left:-20px;
+      float:left;
+
+      li { height: 60px; }
+    }
   }
   
 } // end #checkout

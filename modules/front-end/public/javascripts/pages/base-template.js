@@ -81,6 +81,11 @@ function(page, window, logging, requireModule) {
               signupModal.modal({});
           });
         }
+
+        // Populate social links
+        require(["services/social-links"], function(links) {
+          links.insertIntoPage();
+        });
       });
     }
   };

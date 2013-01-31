@@ -22,8 +22,8 @@
   </form>
 **/
 /*global angular, mixpanel*/
-define(["page", "services/logging", "module", "ngModules"],
-  function(page, logging, requireModule, ngModules) {
+define(["page", "ngApp", "services/logging", "module"],
+  function(page, ngApp, logging, requireModule) {
     var log = logging.namespace(requireModule.id);
     var mail = page.mail;
     var authToken = page.authenticityToken;
@@ -45,7 +45,7 @@ define(["page", "services/logging", "module", "ngModules"],
     };
 
     // Angular module for subscribing to the newsletter
-    ngModules.add('MailServices').factory('$subscribe', ["$http", subscribeFactory]);
+    ngApp.factory('$subscribe', ["$http", subscribeFactory]);
     
     return subscribeFactory;
   }

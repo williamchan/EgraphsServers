@@ -17,6 +17,71 @@ a, a:link, a:visited {
 	}
 }
 
+ul.credit-cards {
+  margin:0;	
+  list-style: none;
+  padding: 0;
+  
+  li {
+  	position:relative;
+	  float: left;
+	  margin-right: 10px;
+	  width: 45px;
+	  height: 25px;
+	  text-indent: -9999px;
+	  overflow: hidden;
+	  background: url(/assets/images/bg-credit-cards.png) no-repeat 0 50%;
+	  
+	  &:last-child { margin-right: 0; }
+	  
+	  &.mastercard { background-position: -45px 50%; }
+	  &.amex { background-position: -90px 50%; }
+	  &.discover { background-position: 100% 50%; }
+  }
+
+  &.dynamic-highlighting {
+  	li:after {
+	  	display:block;
+	  	content:"";
+	  	position:absolute;
+	  	top:0px;
+	  	left:0px;
+	  	width:100%;
+	  	height:100%;
+	  	background-color:rgba(255,255,255,0.5);
+	  }
+
+	  &.visa li.visa:after {
+	  	background-color:transparent;
+	  }
+
+	  &.amex li.amex:after {
+	  	background-color:transparent;
+	  }
+
+	  &.discover li.discover:after {
+	  	background-color:transparent;
+	  }
+
+	  &.mastercard li.mastercard:after {
+	  	background-color:transparent;
+	  }
+	}
+
+  &.dynamic-hiding {
+  	li { display:none; }
+
+	  &.visa li.visa { display:inline-block; }
+
+	  &.amex li.amex {	display:inline-block; }
+
+	  &.discover li.discover {  display:inline-block;  }
+
+	  &.mastercard li.mastercard {	display: inline-block; }
+	}
+}
+
+
 // For bootstrap-style tooltips.
 .tooltip {
 	&.in {
