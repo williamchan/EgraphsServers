@@ -42,14 +42,10 @@ function(ngPayment, page, window, logging, requireModule) {
 
   // Populate the array of certificate options ($25, $50, etc)
   var certificateOptions = [];
+
   forEach(page.certificateOptions, function(option) {
     certificateOptions.push(new GiftCertificateOption(option));
   });
-
-  // Create an angular module to manage page logic, and provide it
-  // credit-card bindings.
-  var module = angular.module('giftCertificatePurchaseApp', []);
-  ngPayment.applyDirectives(module);
 
   // For use in non-production
   var sampleData = {
@@ -68,49 +64,45 @@ function(ngPayment, page, window, logging, requireModule) {
     }
   };
 
-  // Angular controller that handles all page interaction
-  var GiftCertificatePurchaseController = function ($scope) {
-    var config = page.config;
-
-    // Bang some page configuration into the $scope
-    angular.extend($scope, {
-      certificateOptions: certificateOptions,
-      months: page.months,
-      years: page.years
-    });
-
-    if (config.useSampleData) angular.extend($scope, sampleData);
-
-    $scope.selectOption = function(certificateOption) {
-      // Toggle selected state
-      if ($scope.selectedOption !== certificateOption) {
-        certificateOption.select(true);
-        if ($scope.selectedOption) $scope.selectedOption.select(false);
-        $scope.selectedOption = certificateOption;
-      }
-    };
-
-    $scope.onCardInfoValidated = function(cardToken) {
-      log("Woot! success");
-      log($scope);
-    };
-
-    // Select the default option
-    forEach(certificateOptions, function(option) {
-      if (option.isDefault) $scope.selectOption(option);
-    });
-  };
-
   return {
-    go: function() {
-      window.GiftCertificatePurchaseController = GiftCertificatePurchaseController;
 
+    ngControllers: {
+      GiftCertificatePurchaseController: function ($scope) {
+        var config = page.config;
+
+        // Bang some page configuration into the $scope
+        angular.extend($scope, {
+          certificateOptions: certificateOptions,
+          months: page.months,
+          years: page.years
+        });
+
+        if (config.useSampleData) angular.extend($scope, sampleData);
+
+        $scope.selectOption = function(certificateOption) {
+          // Toggle selected state
+          if ($scope.selectedOption !== certificateOption) {
+            certificateOption.select(true);
+            if ($scope.selectedOption) $scope.selectedOption.select(false);
+            $scope.selectedOption = certificateOption;
+          }
+        };
+
+        $scope.onCardInfoValidated = function(cardToken) {
+          log("Woot! success");
+          log($scope);
+        };
+
+        // Select the default option
+        forEach(certificateOptions, function(option) {
+          if (option.isDefault) $scope.selectOption(option);
+        });
+      }
+    },
+
+    go: function() {
       $(".modify-order").click(function() {
         $("#review").responsivemodal("toggle");
-      });
-
-      angular.element(document).ready(function() {
-        angular.bootstrap(document, ['giftCertificatePurchaseApp']);
       });
     }
   };

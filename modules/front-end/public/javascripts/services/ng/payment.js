@@ -36,8 +36,15 @@
  *   </form>
  */
 /*global angular*/
-define(["services/payment", "services/ng/validation-directive", "services/logging", "module"],
-function(payment, validationDirective, logging, module) {
+define(
+[
+  "services/payment",
+  "services/ng/validation-directive",
+  "services/logging",
+  "module",
+  "ngModules"
+],
+function(payment, validationDirective, logging, module, ngModules) {
   var log = logging.namespace(module.id);
   var forEach = angular.forEach;
   var noop = angular.noop;
@@ -224,14 +231,14 @@ function(payment, validationDirective, logging, module) {
     ccFieldDirective(ngModule, directiveNames.expiryYear);
   };
 
-  return {
-    /** Apply to an ng.module to make payment directives available to associated page */
-    applyDirectives: function(ngModule) {
-      creditCardFormDirective(ngModule);
-      creditCardNumberDirective(ngModule);
-      creditCardCvcDirective(ngModule);
-      creditCardExpiryDirectives(ngModule);
-    }
+  var applyDirectives = function(ngModule) {
+    creditCardFormDirective(ngModule);
+    creditCardNumberDirective(ngModule);
+    creditCardCvcDirective(ngModule);
+    creditCardExpiryDirectives(ngModule);
 
+    return ngModule;
   };
+
+  return applyDirectives(ngModules.add("Payment"));
 });
