@@ -20,6 +20,7 @@ import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
 import org.joda.time.DateTimeConstants
+import egraphs.playutils.Gender
 
 trait PostCelebrityAdminEndpoint {
   this: Controller =>
@@ -43,6 +44,7 @@ trait PostCelebrityAdminEndpoint {
               "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
               "bio" -> nonEmptyText,
               "casualName" -> text,
+              "gender" -> nonEmptyText.verifying(isGender),
               "organization" -> nonEmptyText(maxLength = 128),
               "roleDescription" -> nonEmptyText(maxLength = 128),
               "twitterUsername" -> text
@@ -69,7 +71,8 @@ trait PostCelebrityAdminEndpoint {
 		        ("publicName" -> data.get("publicName").getOrElse("")), 
 		        ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
 		        ("bio" -> data.get("casualName").getOrElse("")), 
-		        ("casualName" -> data.get("casualName").getOrElse("")), 
+		        ("casualName" -> data.get("casualName").getOrElse("")),
+		        ("gender" -> data.get("gender").getOrElse("")),
 		        ("organization" -> data.get("roleDescription").getOrElse("")), 
 		        ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
 		        ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
@@ -78,6 +81,7 @@ trait PostCelebrityAdminEndpoint {
             validForm => {
               // Save Celebrity
               val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
+              val gender = Gender(validForm.gender).getOrElse(Gender.Male)
               val savedCelebrity = Celebrity().copy(
                   publicName = validForm.publicName,
                   bio = validForm.bio,
@@ -85,7 +89,8 @@ trait PostCelebrityAdminEndpoint {
                   organization = validForm.organization,
                   roleDescription = validForm.roleDescription,
                   twitterUsername = Utils.toOption(removeAtSymbol(validForm.twitterUsername)))
-                  .withPublishedStatus(publishedStatus).save()
+                  .withPublishedStatus(publishedStatus)
+                  .withGender(gender).save()
               
               // Save Celebrity image assets
               val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
@@ -116,6 +121,7 @@ trait PostCelebrityAdminEndpoint {
 	            "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
 	            "bio" -> nonEmptyText,
 	            "casualName" -> text,
+	            "gender" -> nonEmptyText.verifying(isGender),
 	            "organization" -> nonEmptyText(maxLength = 128),
 	            "roleDescription" -> nonEmptyText(maxLength = 128),
 	            "twitterUsername" -> text
@@ -140,7 +146,8 @@ trait PostCelebrityAdminEndpoint {
 			      ("publicName" -> data.get("publicName").getOrElse("")), 
 			      ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
 			      ("bio" -> data.get("casualName").getOrElse("")), 
-			      ("casualName" -> data.get("casualName").getOrElse("")), 
+			      ("casualName" -> data.get("casualName").getOrElse("")),
+			      ("gender" -> data.get("gender").getOrElse("")),
 			      ("organization" -> data.get("roleDescription").getOrElse("")), 
 			      ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
 			      ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
@@ -148,6 +155,7 @@ trait PostCelebrityAdminEndpoint {
 	          },
 	          validForm => {
 	            val publishedStatus = PublishedStatus(validForm.publishedStatusString).getOrElse(PublishedStatus.Unpublished)
+	            val gender = Gender(validForm.gender).getOrElse(Gender.Male)
 	            val savedCelebrity = celeb.copy(
 	                publicName = validForm.publicName,
 	                bio = validForm.bio,
@@ -155,7 +163,8 @@ trait PostCelebrityAdminEndpoint {
 	                organization = validForm.organization,
 	                roleDescription = validForm.roleDescription,
 	                twitterUsername = Utils.toOption(validForm.twitterUsername))
-	                .withPublishedStatus(publishedStatus).save()
+	                .withPublishedStatus(publishedStatus)
+	                .withGender(gender).save()
 	              
 	            val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
 	            profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
@@ -228,6 +237,7 @@ trait PostCelebrityAdminEndpoint {
      val publishedStatusString: String
      val bio: String
      val casualName: String
+     val gender: String
      val organization: String
      val roleDescription: String
      val twitterUsername: String
@@ -238,6 +248,7 @@ trait PostCelebrityAdminEndpoint {
      publishedStatusString: String,
      bio: String,
      casualName: String,
+     gender: String,
      organization: String,
      roleDescription: String,
      twitterUsername: String
@@ -250,6 +261,7 @@ trait PostCelebrityAdminEndpoint {
      publishedStatusString: String,
      bio: String,
      casualName: String,
+     gender: String,
      organization: String,
      roleDescription: String,
      twitterUsername: String
@@ -339,6 +351,15 @@ trait PostCelebrityAdminEndpoint {
       PublishedStatus(s) match {
         case Some(providedStatus) => Valid
         case None => Invalid("Error setting product's published status, please contact support")
+      }
+    }
+  }
+
+  private def isGender: Constraint[String] = {
+    Constraint { s: String =>
+      Gender(s) match {
+        case Some(providedStatus) => Valid
+        case None => Invalid("Error setting celebrity's gender, please contact support")
       }
     }
   }
