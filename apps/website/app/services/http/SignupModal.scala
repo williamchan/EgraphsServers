@@ -27,12 +27,13 @@ class SignupModal @Inject() {
       false
     } else {
       val maybeLastSignupModalDisplay = request.session.lastSignupModalDisplay
+      def loggedIn = request.session.customerId.isDefined
 
       val maybeNotDisplayedRecently = maybeLastSignupModalDisplay.map { date =>
         notDisplayedRecently(date)
       }
 
-      maybeNotDisplayedRecently.getOrElse(true)
+      maybeNotDisplayedRecently.getOrElse(!loggedIn)
     }
   }
 
