@@ -54,6 +54,8 @@
         registrationForm.password,
         inputType="password"
       )
+      
+      <input id="notice_stars" type="checkbox" name="notices" value="on" checked="checked" /> Be the first to know about great deals and new stars on Egraphs.<br>      
 
       @for(error <- registrationForm.generalErrors.headOption) {
         <div class="general-errors">
