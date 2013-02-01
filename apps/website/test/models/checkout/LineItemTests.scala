@@ -115,6 +115,21 @@ trait CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Collection of helpers for generating line items and types of various sorts, primarily to use
  * for LineItemTests. Unless named as 'saved' whatever, these are not saved.

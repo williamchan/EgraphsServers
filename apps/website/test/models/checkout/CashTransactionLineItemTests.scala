@@ -5,6 +5,7 @@ import utils._
 import services.AppConfig
 import models.enums.CheckoutCodeType
 import LineItemTestData._
+import services.cache.CacheFactory
 
 
 class CashTransactionLineItemTests extends EgraphsUnitTest
@@ -47,4 +48,30 @@ class CashTransactionLineItemTests extends EgraphsUnitTest
 
     true
   }
+
+
+
+}
+
+
+
+
+
+
+class CashTransactionLineItemTypeTests extends EgraphsUnitTest
+  with HasTransientServicesTests[CashTransactionLineItemType]
+  with DateShouldMatchers
+  with DBTransactionPerTest
+{
+  //
+  // CanInsertAndUpdateAsThroughTransientServicesTests members
+  //
+  override def newModel = LineItemTestData.randomCashTransactionType
+
+  override def modelsEqual(a: CashTransactionLineItemType, b: CashTransactionLineItemType) = {
+    def withoutServices(c: CashTransactionLineItemType) = c.productIterator.slice(0,c.productArity-1).toList
+    withoutServices(a) == withoutServices(b)
+  }
+
+  override def cacheInstance = AppConfig.instance[CacheFactory].applicationCache
 }

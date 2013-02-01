@@ -77,7 +77,7 @@ trait CanInsertAndUpdateAsThroughTransientServices[
   ModelT <: HasEntity[EntityT, _],
   EntityT <: KeyedCaseClass[_],
   ServiceT <: InsertsAndUpdatesAsEntity[ModelT, EntityT]
-] extends HasTransientServices[ServiceT] { this: ModelT =>
+] extends HasTransientServices[ServiceT] { this: ModelT with Serializable =>
 
   def insert()(implicit manifest: Manifest[ServiceT]): ModelT = services.insert(this)
   def update()(implicit manifest: Manifest[ServiceT]): ModelT = services.update(this)
@@ -88,7 +88,7 @@ trait CanInsertAndUpdateAsThroughTransientServices[
  * Helper for making Types that take services as an argument serializable by marking the services as `@transient`.
  * Transient fields are null on deserialization, so this defaults to the injected services instance when null.
  */
-trait HasTransientServices[T] {
+trait HasTransientServices[T] { this: Serializable =>
   /** services parameter */
   def _services: T
 

@@ -2,7 +2,9 @@ package utils
 
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FlatSpec
-import services.db.{HasEntity, CanInsertAndUpdateAsThroughServices, KeyedCaseClass}
+import services.db._
+import scala.Some
+import services.cache.Cache
 
 
 trait CanInsertAndUpdateAsThroughServicesWithLongKeyTests[
@@ -14,6 +16,8 @@ trait CanInsertAndUpdateAsThroughServicesWithLongKeyTests[
   override def newIdValue: Long = 0L
   override def improbableIdValue: Long = java.lang.Integer.MAX_VALUE
 }
+
+
 
 trait CanInsertAndUpdateAsThroughServicesTests[
   ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT, KeyT],
@@ -60,4 +64,56 @@ trait CanInsertAndUpdateAsThroughServicesTests[
     updatedRestored._entity should be (updated._entity)
     updatedRestored._entity should not be (saved._entity)
   }
+}
+
+
+
+
+
+trait HasTransientServicesTests[ModelT] {
+  this: FlatSpec with ShouldMatchers =>
+
+
+  def newModel: ModelT
+
+  def modelsEqual(a: ModelT, b: ModelT): Boolean
+  def cacheInstance: Cache
+
+
+
+
+  "A model with transient services" should "serialize and deserialize as expected" in {
+    val model = newModel
+    writeModel(model)
+    val deserialized = readModel()
+
+    assert(modelsEqual(model, deserialized), "Deserialized model did not have expected value.")
+  }
+
+  it should "be cacheable" in {
+    val model = newModel
+    val key = TestData.random.nextString(10)
+
+    cacheInstance.set(key, model, 5)
+
+    val fromCache = cacheInstance.get(key)
+
+    fromCache should be ('defined)
+    assert(modelsEqual(model, fromCache.get), "Model from cache did not have expected value.")
+  }
+
+
+  import java.io._
+  protected val objBuffer = new ByteArrayOutputStream()
+  protected def writeModel(model: ModelT) = {
+    objBuffer.reset()
+    val objWriter = new ObjectOutputStream(objBuffer);
+    objWriter.writeObject(model)
+  }
+
+  protected def readModel() = {
+    val objReader = new ObjectInputStream( new ByteArrayInputStream(objBuffer.toByteArray) )
+    objReader.readObject.asInstanceOf[ModelT]
+  }
+
 }
