@@ -263,6 +263,8 @@ case class Egraph(
   }
 
   /**
+   * TODO(SER-677): This method is slow as balls because it calls renderFrommaster no product.photoImage.
+   *
    * @param width the desired width of the egraph image. If this width is larger than the width of the master egraph
    *              image, then the master egraph image's width will be used instead.
    * @return the egraph image asset
