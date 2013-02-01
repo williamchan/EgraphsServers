@@ -55,6 +55,10 @@
   @celebrity.map(c => c.logoImage.resizedWidth(40).getSaved(services.blobs.AccessPolicy.Public).url).getOrElse("")
 }
 
+@checkedOrUncheckedRadio(gender: String) = @{
+  if (!isCreate && (fields("gender") == gender)) "checked" else ""
+}
+
 @body = {
 <section id="content" class="top" role="main">
   <div id="main" class="sub">
@@ -80,9 +84,9 @@
 
               <div class="clearfix">
                 <label for="gender">Gender</label>
-                <input class="gender-radio" type="radio" name="gender" value="Male"> Male
-                <input class="gender-radio" type="radio" name="gender" value="Female"> Female
-                <input class="gender-radio" type="radio" name="gender" value="Neutral"> Neutral
+                <input class="gender-radio" type="radio" name="gender" value="Male" @checkedOrUncheckedRadio("Male")> Male
+                <input class="gender-radio" type="radio" name="gender" value="Female" @checkedOrUncheckedRadio("Female")> Female
+                <input class="gender-radio" type="radio" name="gender" value="Neutral" @checkedOrUncheckedRadio("Neutral")> Neutral
               </div>
 
               @formField(id="organization", label="Organization", inputType="text", width="span4", help=Some("e.g. \"Major League Baseball\""), fields=fields)

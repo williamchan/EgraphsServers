@@ -6,6 +6,7 @@ import models.frontend.landing.{CatalogStar}
 import models.frontend.marketplace.{CategoryValueViewModel, VerticalViewModel}
 import helpers.DefaultImplicitTemplateParameters
 import models.frontend.header.HeaderData
+import egraphs.playutils.Gender
 
 /**
  * Permutations of the landing page
@@ -48,7 +49,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
       landingPageImageUrl = EgraphsAssets.at("images/ortiz_masthead.jpg").url,
-      celebrityIsMale = isMale)
+      celebrityGender = if (isMale) { Gender.Male } else { Gender.Female })
     )
   }
 

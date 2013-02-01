@@ -31,7 +31,8 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
               ("celebrityId" -> celebrity.id.toString) + 
               ("celebrityEmail" -> account.email) + 
               ("bio" -> celebrity.bio) + 
-              ("casualName" -> celebrity.casualName.getOrElse("")) + 
+              ("casualName" -> celebrity.casualName.getOrElse("")) +
+              ("gender" -> celebrity.gender.name) +
               ("organization" -> celebrity.organization) + 
               ("roleDescription" -> celebrity.roleDescription) + 
               ("twitterUsername" -> celebrity.twitterUsername.getOrElse("")) + 
