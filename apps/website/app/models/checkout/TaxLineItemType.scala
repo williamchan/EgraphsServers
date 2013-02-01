@@ -6,7 +6,7 @@ import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.{CurrencyUnit, Money}
 import play.api.libs.json.Json
 import scalaz.Lens
-import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
+import services.db.{CanInsertAndUpdateAsThroughTransientServices, Schema, CanInsertAndUpdateAsThroughServices}
 import services.AppConfig
 
 
@@ -24,10 +24,10 @@ case class TaxLineItemType protected (
   zipcode: String,
   taxName: String,
   taxRate: BigDecimal,
-  services: TaxLineItemTypeServices = AppConfig.instance[TaxLineItemTypeServices]
+  @transient _services: TaxLineItemTypeServices = AppConfig.instance[TaxLineItemTypeServices]
 ) extends LineItemType[Money] with HasLineItemTypeEntity
   with LineItemTypeEntityGettersAndSetters[TaxLineItemType]
-  with CanInsertAndUpdateAsThroughServices[TaxLineItemType, LineItemTypeEntity]
+  with CanInsertAndUpdateAsThroughTransientServices[TaxLineItemType, LineItemTypeEntity, TaxLineItemTypeServices]
 {
 
   override def toJson: String = ""

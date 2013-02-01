@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import models.enums._
 import models.SavesCreatedUpdated
 import scalaz.Lens
-import services.MemberLens
+import services.{AppConfig, MemberLens}
 import services.db._
 
 
@@ -54,6 +54,7 @@ trait LineItemType[+T] extends HasLineItemNature with HasCodeType {
 
 
 trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity, Long] { this: LineItemType[_] => }
+
 
 /** Service trait, enables saving of LineItemTypeEntities through their enclosing LineItemType */
 trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]

@@ -22,7 +22,7 @@ case class BalanceLineItem(amount: Money) extends LineItem[Money] {
 }
 
 abstract class BalanceLineItemType extends LineItemType[Money]
-object BalanceLineItemType extends BalanceLineItemType {
+case object BalanceLineItemType extends BalanceLineItemType {
   override val id: Long = -1L
   override val description = "Balance"
   override val nature = LineItemNature.Summary

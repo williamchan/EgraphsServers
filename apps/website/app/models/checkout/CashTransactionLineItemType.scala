@@ -5,7 +5,7 @@ import models.CashTransaction
 import models.checkout.checkout.Conversions._
 import models.enums.{CashTransactionType, CheckoutCodeType, LineItemNature}
 import scalaz.{Scalaz, Lens}
-import services.db.Schema
+import services.db.{HasTransientServices, Schema}
 import services.AppConfig
 
 /**
@@ -24,7 +24,7 @@ import services.AppConfig
  * @param billingPostalCode needed for CashTransaction, otherwise None
  * @param stripeCardTokenId needed for CashTransaction, otherwise None
  * @param _maybeItemEntity None or persisted LineItemEntity
- * @param services
+ * @param _services
  */
 case class CashTransactionLineItemType protected (
   _entity: LineItemTypeEntity,
@@ -32,10 +32,11 @@ case class CashTransactionLineItemType protected (
   billingPostalCode: Option[String],
   stripeCardTokenId: Option[String],
   _maybeItemEntity: Option[LineItemEntity],
-  services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
+  @transient _services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
 ) extends LineItemType[CashTransaction] with HasLineItemTypeEntity
   with LineItemTypeEntityLenses[CashTransactionLineItemType]
   with LineItemTypeEntityGetters[CashTransactionLineItemType]
+  with HasTransientServices[CashTransactionLineItemTypeServices]
 {
 
   override def toJson = ""

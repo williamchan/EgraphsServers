@@ -5,7 +5,7 @@ import models.GiftCertificate
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.Money
 import services.AppConfig
-import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
+import services.db.{CanInsertAndUpdateAsThroughTransientServices, CanInsertAndUpdateAsThroughServices, Schema}
 import scalaz.Lens
 import com.google.inject.Inject
 
@@ -19,10 +19,10 @@ case class GiftCertificateLineItemType (
   _entity: LineItemTypeEntity,
   recipient: String,
   amount: Money,
-  services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
+  @transient _services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
 ) extends LineItemType[GiftCertificate] with HasLineItemTypeEntity
   with LineItemTypeEntityGettersAndSetters[GiftCertificateLineItemType]
-  with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItemType, LineItemTypeEntity]
+  with CanInsertAndUpdateAsThroughTransientServices[GiftCertificateLineItemType, LineItemTypeEntity, GiftCertificateLineItemTypeServices]
 {
 
   override def toJson: String = {

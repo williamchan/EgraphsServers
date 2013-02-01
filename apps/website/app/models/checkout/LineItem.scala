@@ -141,6 +141,8 @@ class LineItemStore @Inject() (schema: Schema) {
 
 trait HasLineItemEntity extends HasEntity[LineItemEntity, Long] { this: LineItem[_] => }
 
+
+/** Allows LineItems' Services to insert and update LineItems */
 trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
   extends InsertsAndUpdatesAsEntity[ModelT, LineItemEntity]
   with SavesCreatedUpdated[LineItemEntity]
