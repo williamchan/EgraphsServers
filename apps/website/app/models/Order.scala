@@ -720,8 +720,13 @@ object GalleryOrderFactory {
     for ((order, egraph) <- orders) yield {
       val product = order.product
       val celebrity = product.celebrity
-      val rawImage = egraph.getEgraphImage(product.frame.thumbnailWidthPixels)
-      val thumbnailUrl = rawImage.asPng.getSavedUrl(accessPolicy = AccessPolicy.Public)
+
+      // TODO SER-170 this code is quite similar to that in GetEgraphEndpoint.
+      // Refactor together and put withSigningOriginOffset inside EgraphImage.
+      val rawImage = egraph.image(product.photoImage).asPng
+        .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+        .scaledToWidth(product.frame.thumbnailWidthPixels)
+      val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
       val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
 
       val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
