@@ -28,6 +28,7 @@ import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.CatalogStarsQuery
 import java.util.Date
 import org.apache.commons.codec.binary.Base64
+import egraphs.playutils.{Gender, HasGender}
 
 /**
  * Services used by each celebrity instance
@@ -61,6 +62,7 @@ case class Celebrity(id: Long = 0,
                      twitterUsername: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None, //TODO: rename to _profilePhotoKey
                      expectedOrderDelayInMinutes: Int = 30 * DateTimeConstants.MINUTES_PER_DAY,
+                     _gender: String = Gender.Male.name,
                      _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
                      _landingPageImageKey: Option[String] = None,
@@ -72,6 +74,7 @@ case class Celebrity(id: Long = 0,
   with HasCreatedUpdated
   with HasPublishedStatus[Celebrity]
   with HasEnrollmentStatus[Celebrity]
+  with HasGender[Celebrity]
 {
 
   /**
@@ -294,6 +297,10 @@ case class Celebrity(id: Long = 0,
 
   override def withEnrollmentStatus(status: EnrollmentStatus.EnumVal) = {
     this.copy(_enrollmentStatus = status.name)
+  }
+
+  override def withGender(gender: Gender.EnumVal) = {
+    this.copy(_gender = gender.name)
   }
 
   //

@@ -102,7 +102,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             recipientName = validPersonalizeForm.recipientName,
             messageText=PurchaseForms.makeTextForCelebToWrite(
               validPersonalizeForm.writtenMessageRequest,
-              validPersonalizeForm.writtenMessageText
+              validPersonalizeForm.writtenMessageText,
+              celebrityGender = celeb.gender
             ),
             editUrl = getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
           )

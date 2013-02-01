@@ -9,6 +9,8 @@ footerData: models.frontend.footer.FooterData
 @import views.html.frontend.tags.physical_preview_modal
 @import models.frontend.contents._
 @import controllers._
+@import egraphs.playutils.Grammar._
+@import egraphs.playutils.Gender
 
 @baseBody = {
 
@@ -59,7 +61,7 @@ footerData: models.frontend.footer.FooterData
                 </a>
                 What is an egraph?</h2>
               <div><p>
-                An egraph is a shared moment between you and your favorite star. It is immortalized forever with a beautiful high resolution photograph, handwritten note, signature, and personalized voice message. It's his voice, his handwriting, his time — every egraph is one-of-a-kind.
+                An egraph is a shared moment between you and your favorite star. It is immortalized forever with a beautiful high resolution photograph, handwritten note, signature, and personalized voice message. It's @possessivePronoun(Gender.Neutral) voice, @possessivePronoun(Gender.Neutral) handwriting, @possessivePronoun(Gender.Neutral) time — every egraph is one-of-a-kind.
                 </p>
 
                 <div>

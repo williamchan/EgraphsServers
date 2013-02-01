@@ -1,5 +1,4 @@
-@(videoPosterUrl: String = "https://egraphs-demo.s3.amazonaws.com/egraphs/647/image/signing-origin-offset-0x0_shadow-offset-3.00x3.00_global-width-592px-v1.jpg",
-celebrityName: String = "Matt Silverman",
+@(celebrityName: String = "Matt Silverman",
 recipientName: String = "Dr. Horrible",
 isPromotional: Boolean = false
 )(implicit
@@ -44,8 +43,9 @@ Egraphs.page.celebrityName = "@celebrityName";
         <div class="egraph-player-container">
           <video id="egraph-player" class="video-js vjs-default-skin" controls
                  preload="auto" width="100%" height="100%"
+                 poster="https://egraphs.s3.amazonaws.com/egraphs/481/image/signing-origin-offset-0x0_shadow-offset-3.00x3.00_global-width-600px-v1.jpg"
                  data-setup="{}">
-            <source src="https://egraphs-demo.s3.amazonaws.com/egraphs/647/video/width-592px-v0.mp4" type='video/mp4'>
+            <source src="https://egraphs.s3.amazonaws.com/egraphs/481/video/width-600px-v0.mp4" type='video/mp4'>
             <source src="https://s3.amazonaws.com/egraphs-static-resources/test-files/zencoder-test.webm" type='video/webm'>
             <source src="https://s3.amazonaws.com/egraphs-static-resources/test-files/zencoder-test.ogg" type='video/ogg'>
           </video>

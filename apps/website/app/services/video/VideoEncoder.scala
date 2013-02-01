@@ -8,16 +8,13 @@ import com.xuggle.xuggler._
 import javax.imageio.ImageIO
 import java.io._
 import java.util.concurrent.TimeUnit
-import java.awt.image.BufferedImage
-import java.awt.{Color, Font, RenderingHints}
 import org.apache.commons.io.IOUtils
 import play.api.Play.current
 import services.blobs.Blobs
 
 object VideoEncoder {
 
-  val canvasWidth = 592
-  val canvasHeight = 374
+  val canvasWidth = 600
 
   /**
    * Generates an audio-less mp4 using the Xuggle library. See documentation at:
@@ -101,6 +98,7 @@ object VideoEncoder {
     }
   }
 
+  /*
   /**
    * @param recipientName recipient name
    * @param celebrityName celebrity name
@@ -130,4 +128,5 @@ object VideoEncoder {
 
     canvas
   }
+  */
 }
