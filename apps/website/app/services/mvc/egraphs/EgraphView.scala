@@ -12,6 +12,7 @@ import models.Order
 import _root_.frontend.formatting.DateFormatting.Conversions._
 import services.social.{Twitter, Facebook}
 import egraphs.authtoken.AuthenticityToken
+import services.graphics.Handwriting
 
 /**
  * Object for rendering the egraph page.
@@ -38,7 +39,15 @@ object EgraphView {
       case PortraitEgraphFrame => PortraitEgraphFrameViewModel
       case LandscapeEgraphFrame => LandscapeEgraphFrameViewModel
     }
-    val frameFittedImage = egraph.getEgraphImage(frame.imageWidthPixels)
+
+    val rawSignedImage = egraph.image(product.photoImage)
+    // TODO SER-170 this code is quite similar to that in GalleryOrderFactory.
+    // Refactor together and put withSigningOriginOffset inside EgraphImage.
+    val frameFittedImage = rawSignedImage
+      .withPenWidth(Handwriting.defaultPenWidth)
+      .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+      .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY)
+      .scaledToWidth(frame.imageWidthPixels)
     val svgzImageUrl = frameFittedImage.getSavedUrl(AccessPolicy.Public)
     val pngImageUrl = frameFittedImage.asPng.getSavedUrl(AccessPolicy.Public)
 
