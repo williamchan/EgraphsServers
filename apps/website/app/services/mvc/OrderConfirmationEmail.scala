@@ -33,7 +33,7 @@ case class OrderConfirmationEmail(
     mail.addTo(buyerEmail, buyerName)
     mail.setSubject("Order Confirmation")
 
-    val htmlMsg = views.html.frontend.email_order_confirmation(
+    val htmlMsg = views.html.frontend.email.order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,
@@ -46,7 +46,7 @@ case class OrderConfirmationEmail(
       faqHowLongLink = faqHowLongLink,
       hasPrintOrder = hasPrintOrder
     )
-    val textMsg = views.html.frontend.email_order_confirmation_text(
+    val textMsg = views.txt.frontend.email.order_confirmation(
       buyerName = buyerName,
       recipientName = recipientName,
       recipientEmail = recipientEmail,

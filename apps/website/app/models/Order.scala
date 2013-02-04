@@ -28,6 +28,8 @@ import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
+import models.frontend.email.{RegularEgraphSignedEmailViewModel, GiftEgraphSignedEmailViewModel}
+import services.email.EgraphSignedEmailPreparer
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -252,39 +254,30 @@ case class Order(
   }
 
   def sendEgraphSignedMail[A](implicit request: RequestHeader) {
-    val (email, htmlMsg, textMsg) = prepareEgraphSignedEmail
+    val (email, htmlMsg, textMsg) = {
+      if (buyerId == recipientId) prepareEgraphSignedEmail
+      else prepareGiftEgraphSignedEmail
+    }
     services.mail.send(email, Some(textMsg), Some(htmlMsg))
   }
   
-  // This function exists only for testing the e-mail
-  def prepareEgraphSignedEmail(implicit request: RequestHeader)
+  // This function provides a hook for testing the email
+  def prepareEgraphSignedEmail
   : (HtmlEmail, Html, String)  = 
   {
-    val celebrity = services.celebrityStore.findByOrderId(id).get
-    val email = new HtmlEmail()
-
-    val buyingCustomer = this.buyer
-    val receivingCustomer = this.recipient
-    email.setFrom(celebrity.urlSlug + "@egraphs.com", celebrity.publicName)
-    email.addTo(receivingCustomer.account.email)
-    if (buyingCustomer != receivingCustomer) {
-      email.addCc(buyingCustomer.account.email)
-    }
-
-    email.addReplyTo("webserver@egraphs.com")
-    email.setSubject("I just finished signing your Egraph")
-    val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(id).url)
-    val htmlMsg = views.html.frontend.email_view_egraph(
-      viewEgraphUrl = viewEgraphUrl,
-      celebrityName = celebrity.publicName,
-      recipientName = recipientName
-    )
-    val textMsg = views.html.frontend.email_view_egraph_text(
-      viewEgraphUrl = viewEgraphUrl,
-      celebrityName = celebrity.publicName,
-      recipientName = recipientName
-    ).toString()
-    
+    val (viewEgraphUrl, celebrity, email, coupon) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
+    val egraphSignedEmailStack = RegularEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code)
+    val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getHtmlAndTextMsgs(egraphSignedEmailStack)
+    (email, htmlMsg, textMsg)
+  }
+  
+  // This function provides a hook for testing the gift email
+  def prepareGiftEgraphSignedEmail
+  : (HtmlEmail, Html, String)  = 
+  {
+    val (viewEgraphUrl, celebrity, email, coupon) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
+    val egraphSignedEmailStack = GiftEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code, this.buyer.name)
+    val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getGiftHtmlAndTextMsgs(egraphSignedEmailStack)
     (email, htmlMsg, textMsg)
   }
 

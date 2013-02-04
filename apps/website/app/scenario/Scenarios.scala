@@ -21,6 +21,7 @@ import scala.Some
 import models.Administrator
 import models.InventoryBatch
 import models.Order
+import models.frontend.email.RegularEgraphSignedEmailViewModel
 
 /**
  * All scenarios supported by the API.
@@ -364,11 +365,11 @@ class Scenarios extends DeclaresScenarios {
       email.addTo("will@egraphs.com")
       email.setSubject("Welcome to Egraphs!")
       val verifyPasswordUrl = "https://www.google.com"
-      val html = views.html.frontend.email_account_verification(verifyPasswordUrl = verifyPasswordUrl)
+      val html = views.html.frontend.email.account_verification(verifyPasswordUrl = verifyPasswordUrl)
       email.setHtmlMsg(html.toString())
-      val textVersion = views.html.frontend.email_account_verification_text(verifyPasswordUrl)
+      val textVersion = views.txt.frontend.email.account_verification(verifyPasswordUrl)
       email.setTextMsg(textVersion.toString())
-      mail.send(email)
+      mail.send(email, None, Some(html))
   }
   )
 
@@ -381,7 +382,7 @@ class Scenarios extends DeclaresScenarios {
       email.setFrom("webserver@egraphs.com", "Egraphs")
       email.addTo("will@egraphs.com")
       email.setSubject("Order Confirmation")
-      val html = views.html.frontend.email_order_confirmation(
+      val html = views.html.frontend.email.order_confirmation(
         buyerName = "Will Chan",
         recipientName = "Andrew Smith",
         recipientEmail = "me@egraphs.com",
@@ -395,7 +396,7 @@ class Scenarios extends DeclaresScenarios {
         hasPrintOrder = true
       )
       email.setHtmlMsg(html.toString())
-      val textVersion = views.html.frontend.email_order_confirmation_text(
+      val textVersion = views.txt.frontend.email.order_confirmation(
         buyerName = "Will Chan",
         recipientName = "Andrew Smith",
         recipientEmail = "me@egraphs.com",
@@ -409,7 +410,7 @@ class Scenarios extends DeclaresScenarios {
         hasPrintOrder = true
       )
       email.setTextMsg(textVersion.toString())
-      mail.send(email)
+      mail.send(email, None, Some(html))
   }
   )
 
@@ -424,15 +425,28 @@ class Scenarios extends DeclaresScenarios {
       email.addReplyTo("webserver@egraphs.com")
       email.setSubject("I just finished signing your Egraph")
       val viewEgraphUrl = "http://www.google.com"
-      val html = views.html.frontend.email_view_egraph(
-        viewEgraphUrl = viewEgraphUrl,
-        celebrityName = "Celebrity Jane",
-        recipientName = "Will Chan"
+      val html = views.html.frontend.email.view_egraph(
+        RegularEgraphSignedEmailViewModel(  
+          viewEgraphUrl = viewEgraphUrl,
+          celebrityPublicName = "Celebrity Jane",
+          recipientName = "Will Chan",
+          couponAmount = 15,
+          couponCode = "xxxxxxxxxxxx"
+        )
       )
       email.setHtmlMsg(html.toString())
-      val textVersion = views.html.frontend.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = "Celebrity Jane", recipientName = "Will Chan")
-      email.setTextMsg(textVersion.toString())
-      mail.send(email)
+      val textVersion = views.txt.frontend.email.view_egraph(
+        RegularEgraphSignedEmailViewModel(
+          viewEgraphUrl = viewEgraphUrl,
+          celebrityPublicName = "Celebrity Jane",
+          recipientName = "Will Chan",
+          couponAmount = 15,
+          couponCode = "xxxxxxxxxxxx"
+        )    
+      ).toString
+      email.setTextMsg(textVersion)
+      
+      mail.send(email, Some(textVersion), Some(html))
   }
   )
 

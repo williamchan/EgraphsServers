@@ -2,6 +2,7 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import models.frontend.email.RegularEgraphSignedEmailViewModel
 
 /**
  * Permutations of Emails.
@@ -9,7 +10,7 @@ import play.api.mvc._
 object Email extends Controller {
 
   def orderConfirmation = Action {
-    Ok(views.html.frontend.email_order_confirmation(
+    Ok(views.html.frontend.email.order_confirmation(
       buyerName = "Joshua Johnson",
       recipientName = "Carlos Pena",
       recipientEmail = "carlos@egraphs.com",
@@ -25,7 +26,7 @@ object Email extends Controller {
   }
 
   def orderConfirmationText = Action {
-    Ok(views.html.frontend.email_order_confirmation_text(
+    Ok(views.txt.frontend.email.order_confirmation(
       buyerName = "Joshua Johnson",
       recipientName = "Carlos Pena",
       recipientEmail = "carlos@egraphs.com",
@@ -41,19 +42,23 @@ object Email extends Controller {
   }
 
   def verify = Action {
-    Ok(views.html.frontend.email_account_verification("http://www.egraphs.com/word"))
+    Ok(views.html.frontend.email.account_verification("http://www.egraphs.com/word"))
   }
 
   def viewEgraph = Action {
-    Ok(views.html.frontend.email_view_egraph(
-      viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
-      celebrityName = "Big Papi",
-      recipientName = "Carlos Pena"
+    Ok(views.html.frontend.email.view_egraph(
+      RegularEgraphSignedEmailViewModel(
+        viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
+        celebrityPublicName = "Big Papi",
+        recipientName = "Carlos Pena",
+        couponAmount = 15,
+        couponCode = "xxxxxxxxxxxx"
+      )
     ))
   }
 
   def confirm = Action {
-    Ok(views.html.frontend.email_account_confirmation())
+    Ok(views.html.frontend.email.account_confirmation())
   }
 
   def mlbStatic = Action {
