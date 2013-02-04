@@ -43,13 +43,26 @@ class AccountRegistrationForm(val paramsMap: Form.Readable, check: FormChecks)
     }
   }
 
+  val bulkEmail = field(Params.BulkEmail).validatedBy { toValidate =>
+    for (
+      // There's gotta be a value
+      submission <- check.isSomeValue(toValidate, "We're gonna need this").right;
+
+      // Value's gotta be a valid password
+      validBulkEmail <- check.isBoolean(submission).right
+    ) yield {
+      validBulkEmail
+    }
+  }
+
   //
   // Form members
   //
   protected def formAssumingValid: AccountRegistrationForm.Valid = {
     AccountRegistrationForm.Valid(
       email.value.get,
-      password.value.get
+      password.value.get,
+      bulkEmail.value.get
     )
   }
 }
@@ -59,6 +72,7 @@ object AccountRegistrationForm {
   object Params {
     val Email = "registration.email"
     val Password = "registration.password"
+    val BulkEmail = "registration.bulk_email"
   }
 
   /**
@@ -67,6 +81,7 @@ object AccountRegistrationForm {
    *     that it is not a duplciate
    * @param password the submitted password. We know due to validation that it passes
    *     our (not so stringent) strength tests.
+   * @param bulkEmail This is true if we are signing them up for the bulk mailing list.
    */
-  case class Valid(email: String, password: String)
+  case class Valid(email: String, password: String, bulkEmail: Boolean)
 }

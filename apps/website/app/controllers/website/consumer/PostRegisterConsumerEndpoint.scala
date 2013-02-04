@@ -45,6 +45,11 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
       ) yield {
         // OK We made it! The user is created. Unpack account and customer
         val (account, customer) = accountAndCustomer
+
+        // We'll automatically add the new account to our bulk mailing list
+        if (customer.notice_stars) {
+          bulkMailList.subscribeNewAsync(account.email)
+        }
   
         // Shoot out a welcome email
         dbSession.connected(TransactionReadCommitted) {
@@ -96,7 +101,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         // We don't require a name to register so...screw it his name is the first part of
         // his email.
         val customerName = validForm.email.split("@").head
-        val savedCustomer = unsavedAccount.createCustomer(customerName).save()
+        val savedCustomer = unsavedAccount.createCustomer(customerName).copy(notice_stars = validForm.bulkEmail).save()
         val savedAccount = unsavedAccount.copy(customerId=Some(savedCustomer.id)).withResetPasswordKey.save()
 
         (savedAccount, savedCustomer)
