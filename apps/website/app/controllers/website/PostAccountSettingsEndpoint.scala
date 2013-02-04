@@ -59,6 +59,13 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
     }
     address.copy(addressLine1 = addressLine1, addressLine2 = addressLine2, city = city, _state = state, postalCode = postalCode).save()
 
+    // Subscribe or unsubscribe from the mailing list
+    if (!customer.notice_stars && notice_stars == "on") {
+      bulkMailList.subscribeNewAsync(email)
+    } else if (customer.notice_stars && notice_stars == "off") {
+      bulkMailList.removeMember(email)
+    }
+
     // Persist Customer changes
     customer.copy(name = fullname, username = username,
       isGalleryVisible = (isGalleryVisible == "Public"),
