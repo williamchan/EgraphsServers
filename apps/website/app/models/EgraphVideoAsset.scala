@@ -7,7 +7,7 @@ import services.{Utils, TempFile, Time, AppConfig}
 import services.audio.AudioConverter
 import services.blobs.{AccessPolicy, Blobs}
 import services.logging.Logging
-import services.video.VideoEncoder
+import services.video.EgraphVideoEncoder
 import Blobs.Conversions._
 
 /**
@@ -22,7 +22,7 @@ import Blobs.Conversions._
 case class EgraphVideoAsset(blobPath: String,
                             egraph: Egraph,
                             videoType: VideoType = Mp4,
-                            width: Int = VideoEncoder.canvasWidth,
+                            width: Int = EgraphVideoEncoder.canvasWidth,
                             services: EgraphVideoAssetServices = AppConfig.instance[EgraphVideoAssetServices]
                            ) {
 
@@ -65,7 +65,7 @@ case class EgraphVideoAsset(blobPath: String,
       /* Generate an mp4 without sound */
       val thisOrder = egraph.order
       val videoNoAudioFileName = videoNoAudioFile.getPath
-      VideoEncoder.generateMp4SansAudio(
+      EgraphVideoEncoder.generateMp4SansAudio(
         targetFilePath = videoNoAudioFileName,
         egraphImageFile = egraphImageTempFile,
         recipientName = thisOrder.recipientName,
@@ -74,7 +74,7 @@ case class EgraphVideoAsset(blobPath: String,
       )
 
       /* Mux the soundless mp4 with the aac audio to create an mp4 with sound */
-      VideoEncoder.muxVideoWithAudio(
+      EgraphVideoEncoder.muxVideoWithAudio(
         videoFile = new File(videoNoAudioFileName),
         audioFile = finalAacTempFile,
         targetFile = videoWithAudioFile
@@ -106,7 +106,6 @@ case class EgraphVideoAsset(blobPath: String,
     blobPath + "/" + idString + "-v" + EgraphVideoAsset.Version + "." + videoType.extension
   }
 
-  /* Looks just like EgraphImage. Can be refactored. */
   def getSavedUrl(accessPolicy: AccessPolicy, overwrite: Boolean = false): String = {
     val blobs = services.blobs
     val ((url, alreadyCached), durationSecs) = Time.stopwatch {

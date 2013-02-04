@@ -12,9 +12,10 @@ import org.apache.commons.io.IOUtils
 import play.api.Play.current
 import services.blobs.Blobs
 
-object VideoEncoder {
+object EgraphVideoEncoder {
 
   val canvasWidth = 600
+  val canvasHeight = 380
 
   /**
    * Generates an audio-less mp4 using the Xuggle library. See documentation at:
@@ -36,7 +37,7 @@ object VideoEncoder {
                            audioDuration: Int) {
     val egraphImg = ImageIO.read(egraphImageFile)
     val writer = ToolFactory.makeWriter(targetFilePath)
-    writer.addVideoStream(/*inputIndex*/ 0, /*streamId*/ 0, /*codecId*/ ICodec.ID.CODEC_ID_MPEG4, /*width*/ egraphImg.getWidth, /*height*/ egraphImg.getHeight)
+    writer.addVideoStream(/*inputIndex*/ 0, /*streamId*/ 0, /*codecId*/ ICodec.ID.CODEC_ID_MPEG4, /*width*/ canvasWidth, /*height*/ canvasHeight)
 
     /**
      * TODO(egraph-exploration): uncomment when we can stitch multiple images into an mp4, and adjust t on egraphImg screens
