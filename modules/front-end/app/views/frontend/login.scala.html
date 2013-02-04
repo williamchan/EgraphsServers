@@ -55,6 +55,12 @@
         inputType="password"
       )
 
+      @tags.bootstrap_input_field(
+        registrationForm.bulkEmail
+      ) {
+        Sign up for mailing list: <input type="checkbox" id="bulk-email" name="bulk-email" value="true" checked>
+      }
+
       @for(error <- registrationForm.generalErrors.headOption) {
         <div class="general-errors">
           <div class="alert alert-error @if(loginForm.generalErrors.isEmpty) {hidden}">

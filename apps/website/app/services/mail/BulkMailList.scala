@@ -109,7 +109,10 @@ private[mail] object StubBulkMailList extends BulkMailList
     new Gson().toJson(List("derp"))
   }
   
-  override def removeMember(email: String) : Promise[Response] = throw new Error("This isn't yet supported on StubBulkMailList")
+  override def removeMember(email: String) : Promise[Response] = {
+    play.api.Logger.info("Unsubscribed " + email + " from email list: " + newsletterListId + "\n")
+    Promise()
+  }
 }
 
 /**

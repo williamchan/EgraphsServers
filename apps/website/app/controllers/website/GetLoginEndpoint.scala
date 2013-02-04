@@ -63,11 +63,13 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     import services.mvc.forms.AccountRegistrationFormViewConversions._
 
     // Get for form flash if possible
-    val flashAsReadable = flash.asFormReadable
-    val maybeFormFromFlash = formReaders.forRegistrationForm.read(flashAsReadable)
-    val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
+    //TODO make the error handling work again
+//    val flashAsReadable = flash.asFormReadable
+//    val maybeFormFromFlash = formReaders.forRegistrationForm.read(flashAsReadable)
+//    val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
 
     // Get the default
-    maybeFormViewModel.getOrElse(AccountRegistrationFormViewConversions.defaultView)
+//    maybeFormViewModel.getOrElse(AccountRegistrationFormViewConversions.defaultView)
+    AccountRegistrationFormViewConversions.defaultView
   }
 }

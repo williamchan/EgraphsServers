@@ -16,11 +16,12 @@ import models.frontend.forms.{FormError, Field}
 case class AccountRegistrationFormViewModel(
   email: Field[String],
   password: Field[String],
+  bulkEmail: Field[String],
   generalErrors: Iterable[FormError],
   actionUrl: String
 ) {
   /** Returns true that the view model has at least one error */
   def hasErrors: Boolean = {
-    email.error.isDefined || password.error.isDefined || !generalErrors.isEmpty
+    email.error.isDefined || password.error.isDefined || bulkEmail.error.isDefined || !generalErrors.isEmpty
   }
 }

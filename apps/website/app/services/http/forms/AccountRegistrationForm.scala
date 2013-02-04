@@ -49,7 +49,7 @@ class AccountRegistrationForm(val paramsMap: Form.Readable, check: FormChecks)
       submission <- check.isSomeValue(toValidate, "We're gonna need this").right;
 
       // Value's gotta be a valid password
-      validBulkEmail <- check.isBoolean(submission).right
+      validBulkEmail <- check.isChecked(Some("bulk-mail")).right
     ) yield {
       validBulkEmail
     }

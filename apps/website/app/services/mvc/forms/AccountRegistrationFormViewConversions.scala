@@ -17,6 +17,7 @@ object AccountRegistrationFormViewConversions {
       defaultView.copy(
         email=model.email.asViewField,
         password=model.password.asViewField,
+        bulkEmail=model.bulkEmail.asViewField,
         generalErrors=model.fieldInspecificErrors.map(error => error.asViewError)
       )
     }
@@ -27,10 +28,11 @@ object AccountRegistrationFormViewConversions {
     import controllers.routes.WebsiteControllers.{postRegisterConsumerEndpoint}
 
     AccountRegistrationFormViewModel(
-      email=Field(Params.Email),
-      password=Field(Params.Password),
-      generalErrors=List(),
-      actionUrl=postRegisterConsumerEndpoint.url
+      email = Field("email"),
+      password = Field("password"),
+      bulkEmail = Field("bulk-email"),
+      generalErrors = List(),
+      actionUrl = postRegisterConsumerEndpoint.url
     )
   }
 

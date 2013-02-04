@@ -98,7 +98,7 @@ class FormChecks @Inject()(accountStore: AccountStore, couponStore: CouponStore,
    * to true. Returns false on the right if it was not present. Returns an error if it was
    * present but did not correspond to true.
    */
-  def isChecked(toValidate: Option[String], message:String="Was not checked")
+  def isChecked(toValidate: Option[String], message: String="Was not checked")
   : Either[FormError, Boolean] =
   {
     toValidate.map(string => isBoolean(string, message)).getOrElse(Right(false))
