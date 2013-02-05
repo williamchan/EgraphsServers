@@ -16,7 +16,6 @@ import play.api.mvc.AnyContent
 import services.ConsumerApplication
 import services.logging.Logging
 import services.http.EgraphsSession.Conversions._
-import services.mail.BulkMailList
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -34,7 +33,6 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   protected def customerStore: CustomerStore
   protected def dbSession: DBSession
   protected def consumerApp: ConsumerApplication
-  protected def bulkMailList: BulkMailList
 
   //
   // Controllers
@@ -47,9 +45,6 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
       ) yield {
         // OK We made it! The user is created. Unpack account and customer
         val (account, customer) = accountAndCustomer
-
-        // We'll automatically add the new account to our bulk mailing list
-        bulkMailList.subscribeNewAsync(account.email)
   
         // Shoot out a welcome email
         dbSession.connected(TransactionReadCommitted) {
