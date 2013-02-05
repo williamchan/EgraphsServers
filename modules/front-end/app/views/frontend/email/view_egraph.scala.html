@@ -4,5 +4,10 @@
 @import models.frontend.email.EgraphSignedEmailViewModel
 
 @tags.email.header("Egraphs | View Egraph")
+
+@if(egraphSignedEmailStack.isGift) {
+  @tags.email.gift_header(egraphSignedEmailStack)
+}
+
 @tags.email.egraph_ready(egraphSignedEmailStack)
 @tags.email.footer()

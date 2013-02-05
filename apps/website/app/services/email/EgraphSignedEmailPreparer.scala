@@ -62,10 +62,4 @@ object EgraphSignedEmailPreparer {
     val textMsg = views.txt.frontend.email.view_egraph(egraphSignedEmailStack).toString
     (htmlMsg, textMsg)
   }
-
-  def getGiftHtmlAndTextMsgs(egraphSignedEmailStack: GiftEgraphSignedEmailViewModel): (Html, String) = {
-    val htmlMsg = views.html.frontend.email.view_gift_egraph(egraphSignedEmailStack)
-    val textMsg = views.txt.frontend.email.view_gift_egraph(egraphSignedEmailStack).toString
-    (htmlMsg, textMsg)
-  }
 }

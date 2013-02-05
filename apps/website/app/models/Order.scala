@@ -254,10 +254,7 @@ case class Order(
   }
 
   def sendEgraphSignedMail[A](implicit request: RequestHeader) {
-    val (email, htmlMsg, textMsg) = {
-      if (buyerId == recipientId) prepareEgraphSignedEmail
-      else prepareGiftEgraphSignedEmail
-    }
+    val (email, htmlMsg, textMsg) = prepareEgraphSignedEmail
     services.mail.send(email, Some(textMsg), Some(htmlMsg))
   }
   
@@ -266,18 +263,14 @@ case class Order(
   : (HtmlEmail, Html, String)  = 
   {
     val (viewEgraphUrl, celebrity, email, coupon) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
-    val egraphSignedEmailStack = RegularEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code)
+
+    val egraphSignedEmailStack = if (buyerId == recipientId) {
+      RegularEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code)
+    } else {
+      GiftEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code, this.buyer.name)
+    }
+
     val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getHtmlAndTextMsgs(egraphSignedEmailStack)
-    (email, htmlMsg, textMsg)
-  }
-  
-  // This function provides a hook for testing the gift email
-  def prepareGiftEgraphSignedEmail
-  : (HtmlEmail, Html, String)  = 
-  {
-    val (viewEgraphUrl, celebrity, email, coupon) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
-    val egraphSignedEmailStack = GiftEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code, this.buyer.name)
-    val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getGiftHtmlAndTextMsgs(egraphSignedEmailStack)
     (email, htmlMsg, textMsg)
   }
 

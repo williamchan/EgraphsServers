@@ -4,6 +4,12 @@
 
 Egraphs | View Egraph
 
+@if(egraphSignedEmailStack.isGift) {
+You have just recieved an egraph from @egraphSignedEmailStack.buyerName!
+
+An egraph is a shared moment between you and your favorite star. Check it out!
+}
+
 Hi @egraphSignedEmailStack.recipientName,
 
 It's me, @egraphSignedEmailStack.celebrityPublicName. I just finished putting the final touches on my egraph to you. Here it is: @egraphSignedEmailStack.viewEgraphUrl

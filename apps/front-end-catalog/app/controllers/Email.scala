@@ -63,6 +63,19 @@ object Email extends Controller {
     ))
   }
 
+  def viewGiftEgraph = Action {
+    Ok(views.html.frontend.email.view_egraph(
+      GiftEgraphSignedEmailViewModel(
+        viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
+        celebrityPublicName = "Big Papi",
+        recipientName = "Carlos Pena",
+        couponAmount = 15,
+        couponCode = "xxxxxxxxxxxx",
+        buyerName = "Mr. Generous"
+      )
+    ))
+  }
+
   def confirm = Action {
     Ok(views.html.frontend.email.account_confirmation())
   }
