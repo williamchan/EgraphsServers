@@ -33,10 +33,6 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   // Controllers
   //
 
-  def getVideoTest = controllerMethod.withForm() { implicit authToken =>
-    Action { implicit request => Ok(views.html.frontend.video_test()) }
-  }
-
   def getEgraph(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       orderStore.findFulfilledWithId(orderId) match {
@@ -44,7 +40,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
         case Some(FulfilledOrder(order, egraph)) =>
           val product = order.product
           val celebrity = product.celebrity
-          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public/*, overwrite = true*/)
+          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
           val egraphStillUrl = egraph.getEgraphImage(EgraphVideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
           val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
