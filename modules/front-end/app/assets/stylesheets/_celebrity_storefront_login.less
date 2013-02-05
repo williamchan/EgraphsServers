@@ -36,19 +36,19 @@
 			
 			fieldset {
 
-				p { 
-				
+				p {
+
 					margin-bottom: 10px; 
-				
+
 					&.account-actions {
-						
+
 						em {
 							text-transform: uppercase;
 							display: block;
 							padding: 10px 0;
 							color: @grayLighter;
 						}
-						
+
 						.create-account {
 							
 							text-transform: uppercase;
@@ -58,11 +58,28 @@
 							&:hover, span { color: @orange; }
 							
 						}
-						
+
 					}
-				
+
 				}
-			
+
+				.bulk-email {
+					margin-top: -9px;
+					display: inline-block;
+					font-size: 12px;
+
+					input {
+						float: left;
+						margin-right: 10px;
+						margin-top: 7px;
+					}
+
+					.signup-label {
+						float: left;
+						display: inline;
+					}
+				}
+
 				legend {
 					padding: 0 0 20px;
 					border: none;

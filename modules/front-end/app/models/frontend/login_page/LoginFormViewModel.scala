@@ -22,3 +22,5 @@ case class LoginFormViewModel(
   actionUrl: String,
   forgotPasswordUrl: String
 )
+
+case class RegisterConsumerViewModel(email: String, password: String, bulkEmail: Boolean)

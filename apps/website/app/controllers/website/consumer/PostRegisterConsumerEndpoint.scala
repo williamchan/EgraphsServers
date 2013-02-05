@@ -1,21 +1,29 @@
 package controllers.website.consumer
 
+import play.api.data.Form
+import play.api.data._
+import play.api.data.Forms._
+import play.api.data.validation.Constraints._
+import play.api.data.validation.Constraint
+import play.api.data.validation.Valid
+import play.api.data.validation.Invalid
 import play.api.mvc.{Action, Controller, Result}
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.{WithoutDBConnection, EgraphsSession, POSTControllerMethod}
 import models._
 import services.mvc.ImplicitHeaderAndFooterData
-import services.http.forms.purchase.FormReaders
-import services.http.forms.Form
 import controllers.WebsiteControllers
 import services.db.{TransactionReadCommitted, TransactionSerializable, DBSession}
 import play.api.mvc.Results.Redirect
-import Form.Conversions._
 import play.api.mvc.Request
 import play.api.mvc.AnyContent
 import services.ConsumerApplication
 import services.logging.Logging
 import services.http.EgraphsSession.Conversions._
+import services.mail.BulkMailList
+import egraphs.playutils.FlashableForm._
+import models.frontend.login_page.RegisterConsumerViewModel
+import services.AppConfig
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -28,7 +36,6 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   //
   protected def postController: POSTControllerMethod
   protected def celebrityStore: CelebrityStore
-  protected def formReaders: FormReaders
   protected def accountStore: AccountStore
   protected def customerStore: CustomerStore
   protected def dbSession: DBSession
@@ -73,32 +80,16 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
     }
   }
 
-  case class PostRegisterConsuerForm(email: String, password: String, bulkEmail: Boolean)
-
-  import play.api.data.validation.Constraint
-  import play.api.data.validation.Valid
-  import play.api.data.validation.Invalid
-
   private def redirectOrCreateAccountCustomerTuple2(implicit request: Request[AnyContent])
   : Either[Result, (Account, Customer)] = {
-    import play.api.data._
-    import play.api.data.Forms._
-    import play.api.data.Form
-    import play.api.data.validation.Constraints._
 
     dbSession.connected(TransactionSerializable) {
-    val form = Form(mapping(
-      "email" -> email.verifying(nonEmpty),
-      "password" -> nonEmptyText,
-      "bulk-email" -> boolean)(PostRegisterConsuerForm.apply)(PostRegisterConsuerForm.unapply)
-      .verifying(
-        isUniqueEmail,
-        isPasswordValid))
+    val form = PostRegisterConsumerEndpoint.form
 
       form.bindFromRequest.fold(
-        formWithErrors =>
-          //TODO: Put errors in the flash
-          Left(Redirect(controllers.routes.WebsiteControllers.getLogin))
+        formWithErrors => {
+          Left(Redirect(controllers.routes.WebsiteControllers.getLogin).flashingFormData(formWithErrors))
+        }
         , validForm => {
           // The form validation already told us we can add this fella to the DB
           val passwordErrorOrAccount = Account(email = validForm.email).withPassword(validForm.password)
@@ -117,11 +108,21 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
       ) 
     }
   }
-  
+}
+
+object PostRegisterConsumerEndpoint {
+  def accountStore = AppConfig.instance[AccountStore]
+
+  def form: Form[RegisterConsumerViewModel] = Form(mapping(
+      "email" -> email.verifying(nonEmpty, isUniqueEmail),
+      "password" -> text.verifying(nonEmpty, isPasswordValid),
+      "bulk-email" -> boolean)(RegisterConsumerViewModel.apply)(RegisterConsumerViewModel.unapply)
+  )
+        
   //TODO: Unify with PostCelebrityAdinEndpoints version of the same
-  private def isUniqueEmail: Constraint[PostRegisterConsuerForm] = {
-    Constraint { form: PostRegisterConsuerForm =>
-      accountStore.findByEmail(form.email) match {
+  private def isUniqueEmail: Constraint[String] = {
+    Constraint { email: String =>
+      accountStore.findByEmail(email) match {
         case Some(preexistingAccount) if (preexistingAccount.customerId.isDefined) => Invalid("Customer with e-mail address already exists")
         case _ => Valid
       }
@@ -129,11 +130,10 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   }
   
   //TODO: Ditto
-  private def isPasswordValid: Constraint[PostRegisterConsuerForm] = {
-    Constraint { form: PostRegisterConsuerForm =>
-      val passwordValidationOrAccount = Account(email = form.email).withPassword(form.password)
+  private def isPasswordValid: Constraint[String] = {
+    Constraint { password: String =>
+      val passwordValidationOrAccount = Account(email = "none").withPassword(password)
       if (passwordValidationOrAccount.isRight) Valid else Invalid("Password is invalid")
     }
   }
 }
-

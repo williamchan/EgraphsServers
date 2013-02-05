@@ -11,6 +11,8 @@ import services.http.forms.purchase.FormReaders
 import services.mvc.forms.{AccountRegistrationFormViewConversions, LoginFormViewConversions}
 import services.mvc.ImplicitHeaderAndFooterData
 import controllers.WebsiteControllers
+import egraphs.playutils.FlashableForm._
+import controllers.website.consumer.PostRegisterConsumerEndpoint
 
 private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   import services.http.forms.Form.Conversions._
@@ -36,9 +38,10 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
 
       // Render
       Ok(views.html.frontend.login(
-        loginForm=makeLoginFormView,
-        registrationForm=makeRegisterFormView,
-        fbAuthUrl=fbOauthUrl
+        loginForm = makeLoginFormView,
+        registrationForm = PostRegisterConsumerEndpoint.form.bindWithFlashData,
+        registrationActionUrl = controllers.routes.WebsiteControllers.postRegisterConsumerEndpoint.url,
+        fbAuthUrl = fbOauthUrl
       )).withSession(request.session + (Facebook._fbState -> fbState))
     }
   }
@@ -57,19 +60,5 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     // If we couldn't find the form in the flash we'll just make an empty form
     // with the right names
     maybeFormViewModel.getOrElse(LoginFormViewConversions.defaultView)
-  }
-
-  private def makeRegisterFormView(implicit flash: Flash): AccountRegistrationFormViewModel = {
-    import services.mvc.forms.AccountRegistrationFormViewConversions._
-
-    // Get for form flash if possible
-    //TODO make the error handling work again
-//    val flashAsReadable = flash.asFormReadable
-//    val maybeFormFromFlash = formReaders.forRegistrationForm.read(flashAsReadable)
-//    val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
-
-    // Get the default
-//    maybeFormViewModel.getOrElse(AccountRegistrationFormViewConversions.defaultView)
-    AccountRegistrationFormViewConversions.defaultView
   }
 }

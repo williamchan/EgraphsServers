@@ -2,13 +2,14 @@ package controllers.website
 
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
+import play.api.mvc.Action
+import play.api.mvc.Results.{Ok, Redirect}
+import controllers.routes.WebsiteControllers.getAccountSettings
 import models._
 import services.http.filters.HttpFilters
 import services.http.POSTControllerMethod
 import services.http.forms.{AccountSettingsForm, AccountSettingsFormFactory, Form}
-import play.api.mvc.Action
-import play.api.mvc.Results.{Ok, Redirect}
-import controllers.routes.WebsiteControllers.getAccountSettings
+import services.mail.BulkMailList
 
 private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   import Form.Conversions._
@@ -17,6 +18,7 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def accountSettingsForms: AccountSettingsFormFactory
+  protected def bulkMailList: BulkMailList
 
   def postAccountSettings() = postController() {
     httpFilters.requireCustomerLogin.inSession() { case (customer, account) =>
