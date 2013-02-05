@@ -19,9 +19,8 @@ import services.http.forms.purchase.CheckoutShippingForm
 import controllers.routes.WebsiteControllers.getFAQ
 import services._
 import models.frontend.email.OrderConfirmationViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
 import services.Finance.TypeConversions._
+import _root_.frontend.formatting.DateFormatting.Conversions._
 
 case class EgraphPurchaseHandlerServices @Inject() (
   mail: TransactionalMail,
@@ -67,8 +66,6 @@ case class EgraphPurchaseHandler(
 {
   import EgraphPurchaseHandler._
   
-  private val dateFormat = new SimpleDateFormat("MMMM dd, yyyy")
-
   private def purchaseData: String = Serializer.SJSON.toJSON(Map(
     "recipientName" -> recipientName,
     "recipientEmail" -> recipientEmail,
@@ -178,10 +175,10 @@ case class EgraphPurchaseHandler(
         recipientEmail = recipientEmail,
         celebrityName = celebrity.publicName,
         productName = product.name,
-        orderDate = dateFormat.format(order.created),
+        orderDate = order.created.formatDayAsPlainLanguage,
         orderId = order.id.toString,
         pricePaid = totalAmountPaid.formatSimply,
-        deliveredByDate = dateFormat.format(order.expectedDate),
+        deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
         faqHowLongLink = services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
         hasPrintOrder = maybePrintOrder.isDefined
       ), services.mail
