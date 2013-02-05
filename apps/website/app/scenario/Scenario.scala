@@ -36,7 +36,7 @@ case class Scenario(name: String, category: String = "Uncategorized", descriptio
     }
     catch {
       case sqlEx: BatchUpdateException => 
-        Logger.info("SQL error: ", sqlEx)
+        Logger.info("SQL error: ", sqlEx.getNextException)
         throw new RuntimeException("Error while executing scenario \"" + name + "\"" + sqlEx.getMessage(), sqlEx)
       case exc: Throwable =>
         throw new RuntimeException("Error while executing scenario \"" + name + "\"" + exc.getMessage, exc)
