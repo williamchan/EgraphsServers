@@ -56,9 +56,7 @@ object Email extends Controller {
       RegularEgraphSignedEmailViewModel(
         viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
         celebrityPublicName = "Big Papi",
-        recipientName = "Carlos Pena",
-        couponAmount = 15,
-        couponCode = "xxxxxxxxxxxx"
+        recipientName = "Carlos Pena"
       )
     ))
   }
@@ -69,8 +67,6 @@ object Email extends Controller {
         viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
         celebrityPublicName = "Big Papi",
         recipientName = "Carlos Pena",
-        couponAmount = 15,
-        couponCode = "xxxxxxxxxxxx",
         buyerName = "Mr. Generous"
       )
     ))

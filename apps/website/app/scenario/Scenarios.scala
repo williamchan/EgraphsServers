@@ -435,9 +435,7 @@ class Scenarios extends DeclaresScenarios {
         RegularEgraphSignedEmailViewModel(  
           viewEgraphUrl = viewEgraphUrl,
           celebrityPublicName = "Celebrity Jane",
-          recipientName = "Will Chan",
-          couponAmount = 15,
-          couponCode = "xxxxxxxxxxxx"
+          recipientName = "Will Chan"
         )
       )
       email.setHtmlMsg(html.toString())
@@ -445,9 +443,7 @@ class Scenarios extends DeclaresScenarios {
         RegularEgraphSignedEmailViewModel(
           viewEgraphUrl = viewEgraphUrl,
           celebrityPublicName = "Celebrity Jane",
-          recipientName = "Will Chan",
-          couponAmount = 15,
-          couponCode = "xxxxxxxxxxxx"
+          recipientName = "Will Chan"
         )    
       ).toString
       email.setTextMsg(textVersion)

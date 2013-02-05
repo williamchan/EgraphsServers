@@ -25,10 +25,6 @@ A note from the Egraphs team:
 
 Your egraph is already in your account so you can manage your gallery and easily share with your friends. If you've never logged into your account, go to https://www.egraphs.com/account/recover to set a password. Reach out to support@@egraphs.com if you have any questions.
 
-As a gift to you, redeem the following code to enjoy @egraphSignedEmailStack.couponAmount% off any purchase made in the next 7 days:
-
-@egraphSignedEmailStack.couponCode
-
 All our best,
 
 Egraphs

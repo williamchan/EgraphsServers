@@ -262,12 +262,12 @@ case class Order(
   def prepareEgraphSignedEmail
   : (HtmlEmail, Html, String)  = 
   {
-    val (viewEgraphUrl, celebrity, email, coupon) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
+    val (viewEgraphUrl, celebrity, email) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
 
     val egraphSignedEmailStack = if (buyerId == recipientId) {
-      RegularEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code)
+      RegularEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName)
     } else {
-      GiftEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code, this.buyer.name)
+      GiftEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, this.buyer.name)
     }
 
     val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getHtmlAndTextMsgs(egraphSignedEmailStack)

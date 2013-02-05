@@ -4,12 +4,11 @@ import models.Celebrity
 import models.Coupon
 import models.Order
 import models.OrderServices
-import models.enums.{CouponDiscountType, CouponUsageType}
-import models.frontend.email.{EgraphSignedEmailViewModel, GiftEgraphSignedEmailViewModel}
+import models.frontend.email.EgraphSignedEmailViewModel
 import org.apache.commons.mail.{ Email, HtmlEmail }
 import play.api.templates.Html
 import controllers.website.GetEgraphEndpoint
-import java.sql.Timestamp
+import services.coupon.CouponCreator
 import utils.TestData
 
 /**
@@ -18,7 +17,7 @@ import utils.TestData
  */
 object EgraphSignedEmailPreparer {
 
-  def prepareEgraphSignedEmailHelper(order: Order, services: OrderServices): (String, Celebrity, HtmlEmail, Coupon) = {
+  def prepareEgraphSignedEmailHelper(order: Order, services: OrderServices): (String, Celebrity, HtmlEmail) = {
 
     val maybeCelebrity = services.celebrityStore.findByOrderId(order.id)
     maybeCelebrity match {
@@ -41,20 +40,10 @@ object EgraphSignedEmailPreparer {
         email.setSubject("I just finished signing your Egraph")
 
         val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-        val coupon = getNewPercentOffCouponCode(15, TestData.sevenDaysHence.getTime)
 
-        (viewEgraphUrl, celebrity, email, coupon)
+        (viewEgraphUrl, celebrity, email)
       }
     }
-  }
-
-  // Creates a one-time coupon with the given percentage off any purchase made in the next week  
-  private def getNewPercentOffCouponCode(percent: Int, timeToExpire: Long): Coupon = {
-    if (percent < 0 || percent > 100)
-      throw new IllegalArgumentException("The value percent must be between 0 and 100. Value given: " + percent)
-    else
-      Coupon(startDate = new Timestamp(TestData.today.getTime), endDate = new Timestamp(timeToExpire),
-        discountAmount = percent, _discountType = CouponDiscountType.Percentage.name, _usageType = CouponUsageType.OneUse.name).save()
   }
     
   def getHtmlAndTextMsgs(egraphSignedEmailStack: EgraphSignedEmailViewModel): (Html, String) = {    
