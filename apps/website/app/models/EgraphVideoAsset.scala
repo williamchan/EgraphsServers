@@ -11,7 +11,7 @@ import services.video.EgraphVideoEncoder
 import Blobs.Conversions._
 
 /**
- * The video representation of an Egraph.
+ * The video representation of an Egraph. Must be landscaped.
  *
  * @param blobPath Root blobstore path where permutations of the video should be stored. For example,
  *                 the first Egraph will probably pass usually be "egraphs/1/video"

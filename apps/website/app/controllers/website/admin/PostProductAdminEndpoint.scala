@@ -216,7 +216,9 @@ trait PostProductAdminEndpoint extends Logging {
 	        val isOriginalImageTooSmall = width < Product.minPhotoWidth || height < Product.minPhotoHeight
 	        if (isOriginalImageTooSmall) {
 	          Invalid("Product Photo must be at least " + Product.minPhotoWidth + " in width and " + Product.minPhotoHeight + " in height - resolution was " + resolutionStr)
-	        }
+	        } else if (width < height) {
+            Invalid("Product Photo must be landscaped.")
+          }
 	        else {
 	          val croppedDimensions = EgraphFrame.suggestedFrame(Dimensions(width, height)).getCropDimensions(image)
 	          if (!(croppedDimensions.width < Product.minPhotoWidth || croppedDimensions.height < Product.minPhotoHeight)) {
