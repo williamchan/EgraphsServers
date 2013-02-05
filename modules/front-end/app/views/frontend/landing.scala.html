@@ -164,7 +164,7 @@
           <li class="right-tab"><a id="learn-switch" class="switcher-tab" href="#learn">Learn</a></li>
         </ul>
         
-        <section id="learn" class="tab" style="display: none">
+        <div id="learn" class="tab" style="display: none">
           @tags.landing.welcome_header(celebrityGender = Gender.Neutral)
 
           @tags.landing.landing_steps(celebrityGender = Gender.Neutral)
@@ -172,8 +172,8 @@
           @tags.landing.landing_details(celebrityGender = Gender.Neutral)
 
           @tags.landing.landing_more(None, Some(marketplaceRoute))
-        </section>        
-        <section id="shop" class="tab">
+        </div>        
+        <div id="shop" class="tab">
           @verticalsRow(verticalViewModels)
           
           @starsBlock(stars, clearFix=true)
@@ -185,7 +185,7 @@
               @tags.mailing_list_form()
             </div>
           </div>  
-        </section>    
+        </div>    
         
 
           <p class="to-top"><a href="#to-top">Back to Top</a></p>  

@@ -25,20 +25,48 @@
   <li>Hello, <a href="@status.loginUrl">Sign in</a></li>
   <li class="account-options"><a href="@status.loginUrl">My Account</a></li>
 }
+@** Lefthand navigations for screen resolutions 768px and below **@
+@leftNav = {
+  <div id="left-flyout">
+    <ul>
+      <li>
+        <a href="@headerData.ourStarsLink">Store</a>
+      </li>
+      <li>
+         <a href="@headerData.insideAnEgraphLink">How it works</a>
+      </li>
+    </ul>
+    <ul>
+      @{headerData.loggedInStatus match {
+        case Left(notLoggedIn) => {
+          <li><a href="@status.loginUrl">Sign in</a></li>
+        }
+        case Right(loggedIn) => loggedInHeader(loggedIn)
+      }}   
+    </ul>
+  </div>
+}
 
 <!-- Begin site_header.scala.html -->
+@leftNav
 <header id="top" role="navigation">
   @headerContent.getOrElse {
     <div class="container">
       <div class="row">
         <div id="logo-account-social">
           <div class="logo span">
-
           	<h1><a href="/" title="Egraphs">Egraphs</a></h1>
-
-
           </div>
+        </div> <!-- end #logo-account-social -->
+        <div class="navbar-expand navbar">
+          <a class="btn btn-navbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+        </div>
         
+        <div class="wide-only">
           <div id="account-social">
             <nav class="account @if(headerData.loggedInStatus.isRight) {logged-in}">
               <ul>
@@ -49,31 +77,30 @@
               </ul>
             </nav>
           </div> <!-- end #account-social -->
-        </div> <!-- end #logo-account-social -->
-        
-        <div class="linkz">
-          <div class="navbar-item our-stars">
-            <p><a class="separator-after" href="@headerData.ourStarsLink">Enter store</a></p>
-            
-          </div> <!-- end .our-stars -->
-                
-          <div class="navbar-item">
-            
-            <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
-            
-          </div> <!-- end .explore -->
+          <div class="linkz">
+            <div class="navbar-item our-stars">
+              <p><a class="separator-after" href="@headerData.ourStarsLink">Enter store</a></p>
+              
+            </div> <!-- end .our-stars -->
+                  
+            <div class="navbar-item">
+              
+              <p><a class="separator-after" href="@headerData.insideAnEgraphLink">How it works</a></p>
+              
+            </div> <!-- end .explore -->
 
-          <div class="navbar-item">
-            <div>
-              <form action="/stars">
-                <div class="search-control input-append">
-                  <input name="query" type="search" placeholder="Find names, teams"></input>
-                  <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
-                </div>
-              </form>  
-            </div>
-          </div>  <!-- end .search-control -->
-        </div> <!-- end .linkz -->
+            <div class="navbar-item">
+              <div>
+                <form action="/stars">
+                  <div class="search-control input-append">
+                    <input name="query" type="search" placeholder="Find names, teams"></input>
+                    <button class="btn" type="submit"><i class="icon-search icon-white"></i></button>
+                  </div>
+                </form>  
+              </div>
+            </div>  <!-- end .search-control -->
+          </div> <!-- end .linkz -->
+        </div>
       </div> <!-- end .row -->
     </div> <!-- end .container -->
   }

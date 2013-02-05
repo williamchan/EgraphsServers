@@ -35,7 +35,7 @@ function (Egraphs, marketplace, logging, requireModule) {
     go: function() {
       $(document).ready(function() {
         
-        $(".play-egraph").click(function() {
+        $(".play-egraph a").click(function() {
           $("#video-modal").responsivemodal('toggle');
         });
         var apiLoaded = false;
