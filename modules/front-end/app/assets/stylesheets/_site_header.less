@@ -13,13 +13,13 @@
 #left-flyout {
   display: none;
 }
-section, header, footer {
+
+#top, #bottom, #content, .flyout-pull-right {
     -webkit-transition: -webkit-transform .2s ease-in-out;
     -moz-transition: -moz-transform .2s ease-in-out;
     -ms-transition: -ms-transform .2s ease-in-out;
     -o-transition: -o-transform .2s ease-in-out;
     transition: transform .2s ease-in-out;
-    .translate(0,0);
     .no-flicker();
 }  
 
@@ -279,7 +279,7 @@ section, header, footer {
 }
 
 @media(max-width: 768px) {
-  section, header, footer {
+  #top, #bottom, #content, .flyout-pull-right {
     .translate(0,0);
     &.left-flyout-push {
       .translate(@flyoutWidth + 1, 0);
@@ -297,7 +297,6 @@ section, header, footer {
     visibility: hidden;
     width: @flyoutWidth;
     z-index: -1;
-
     &.is-visible {
       z-index: 0;
       .transition(z-index 0 linear .2s);

@@ -72,7 +72,10 @@ define(["page", "window", "services/logging", "module", "services/ng/mail-servic
         });
 
         var mobileNavOut = false;
-        var pushedElements = $("header, footer, section");
+        // use the .flyout-pull-right class to specify any items outside of the
+        // the normal #top, #bottom, #content heirarchy that must slide out from the
+        // mobile navigation menu.
+        var pushedElements = $("#top, #bottom, #content, .flyout-pull-right");
         var mobileMenu = $("#left-flyout");
         log("Binding things");
         $(".navbar-expand").click(function() {
