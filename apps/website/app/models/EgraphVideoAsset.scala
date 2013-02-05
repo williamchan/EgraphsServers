@@ -28,7 +28,6 @@ case class EgraphVideoAsset(blobPath: String,
 
   import EgraphVideoAsset._
 
-  /* TODO(egraph-exploration): Work in progress. Not finalized. */
   protected[models] def encodeVideo(): Array[Byte] = {
 
     /* Xuggle uses intermediate files. So, prep a bunch of temp files. */
@@ -50,12 +49,6 @@ case class EgraphVideoAsset(blobPath: String,
        */
       Utils.saveToFile(egraph.assets.audioMp3.asByteArray, sourceMp3TempFile)
       Utils.convertMediaFile(sourceMp3TempFile, finalAacTempFile)
-      /**
-       * Enable the following code to generate an aac appropriate with a video with preamble:
-       * val sourceAacTempFile = TempFile.named(blobPath + "/source.aac")
-       * Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
-       * VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
-       */
 
       /* Get egraph image as a jpg */
       val egraphImage = egraph.getEgraphImage(width).asJpg
@@ -75,8 +68,8 @@ case class EgraphVideoAsset(blobPath: String,
 
       /* Mux the soundless mp4 with the aac audio to create an mp4 with sound */
       EgraphVideoEncoder.muxVideoWithAudio(
-        videoFile = new File(videoNoAudioFileName),
-        audioFile = finalAacTempFile,
+        mp4File = new File(videoNoAudioFileName),
+        aacFile = finalAacTempFile,
         targetFile = videoWithAudioFile
       )
 
@@ -93,7 +86,6 @@ case class EgraphVideoAsset(blobPath: String,
       videoNoAudioFile.delete()
       videoWithAudioFile.delete()
       finalMp4TempFile.delete()
-      //      sourceAacTempFile.delete()
     }
 
   }

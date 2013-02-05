@@ -137,24 +137,35 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
     }
   }
 
-  /* TODO(egraph-exploration): Temporary endpoint to help generating egraph videos */
+  /**
+   * TODO(egraph-exploration): Temporary endpoint to generate egraph videos. Delete after we are caught up. Use like so:
+   * https://admin.egraphs.com/admin/generateEgraphVideos?start=487&end=550
+   */
   def getGenerateEgraphVideos = controllerMethod(dbSettings = WithoutDBConnection) {
     Action { implicit request =>
       val start = Form("start" -> number).bindFromRequest.get
       val end = Form("end" -> number).bindFromRequest.get
       for (orderId <- start to end) {
         println("orderId " + orderId)
-//        dbSession.connected(TransactionSerializable) {
-//          orderStore.findFulfilledWithId(orderId) match {
-//            case None => NotFound("No Egraph exists with the provided identifier.")
-//            case Some(FulfilledOrder(order, egraph)) => {
-//              val p = order.product.photoImage
-//              if (p.getWidth > p.getHeight) egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public/*, overwrite = true*/)
-//            }
-//          }
-//        }
+        try {
+          generate(orderId)
+        } catch {
+          case e: NoSuchElementException => /*try again*/ generate(orderId)
+        }
       }
       Ok("Generated egraph videos from " + start + " to " + end + ".")
+    }
+  }
+
+  private def generate(orderId: Long) {
+    dbSession.connected(TransactionSerializable) {
+      orderStore.findFulfilledWithId(orderId) match {
+        case None => NotFound("No Egraph exists with the provided identifier.")
+        case Some(FulfilledOrder(order, egraph)) => {
+          val p = order.product.photoImage
+          if (p.getWidth > p.getHeight) egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public /*, overwrite = true*/)
+        }
+      }
     }
   }
 }

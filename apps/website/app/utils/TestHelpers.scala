@@ -1,8 +1,7 @@
 package utils
 
-import java.io.{File, FileInputStream}
+import java.io.FileInputStream
 import services.blobs.Blobs
-import play.api.Play
 import services.AppConfig
 import java.io.File
 import org.jclouds.blobstore.domain.Blob
@@ -40,6 +39,8 @@ object TestHelpers {
     val blobKey = getBlobKeyFromTestBlobUrl(testBlobUrl)
     blobs.get(blobKey)
   }
+
+  def getBlobWithBlobKey(blobKey: String): Option[Blob] = blobs.get(blobKey)
 
   /**
    * @return the baseUrl and a list of the query parameters as field-value tuples

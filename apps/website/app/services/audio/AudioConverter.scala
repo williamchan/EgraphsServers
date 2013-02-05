@@ -34,10 +34,17 @@ object AudioConverter {
     audioAsMp3
   }
 
-  // TODO(egraph-exploration): Should convert from wav to aac, not from lossy format to lossy format.
+  /**
+   * Converts from mp3 audio to aac audio. It SHOULD convert from wav to aac instead of converting from one lossy format
+   * to another, but Xuggle has trouble converting wav to aac.
+   *
+   * @param sourceAudio byte array of source audio
+   * @param tempFilesId a unique filepath root for the temporary files
+   * @return byte array of aac audio
+   */
   def convertToAAC(sourceAudio: Array[Byte], tempFilesId: String): Array[Byte] = {
     // save sourceAudio to temp file
-    val sourceTempFile = TempFile.named(tempFilesId + "/audio.mp3") // Change to wav
+    val sourceTempFile = TempFile.named(tempFilesId + "/audio.mp3") // I wish this could be wav
     val targetTempFile = TempFile.named(tempFilesId + "/audio.aac")
     Utils.saveToFile(sourceAudio, sourceTempFile)
 
