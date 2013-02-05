@@ -2,38 +2,6 @@
 
 @import views.html.frontend.tags
 
-<html>
-  <head>
-    <title>Egraphs | Welcome</title>
-  </head>
-
-  <body style="margin: 0; padding: 0; background: #f0f0f0;">
-    <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0" style="width: 100%; background: #f0f0f0;">
-      <tr>
-        <td align="middle">
-          <table cellpadding="0" cellspacing="0" width="600px" align="middle" bgcolor="#fafafa" style="width: 600px; margin: 0 auto; background: #fafafa repeat-y 50% 0;">
-            <tr>
-              <td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
-            </tr>
-            <tr>
-              <td align="middle">
-                <table cellpadding="0" cellspacing="0" width="520px" style="width: 520px;">
-                  <tr>
-                    <td align="left" valign="top">
-                      @tags.email.header()
-                      @tags.email.account_confirmation()
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
-            </tr>
-          </table>
-          @tags.email.footer()
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+@tags.email.header("Egraphs | Welcome")
+@tags.email.account_confirmation()
+@tags.email.footer()

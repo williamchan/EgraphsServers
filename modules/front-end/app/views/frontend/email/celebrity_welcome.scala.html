@@ -1,0 +1,7 @@
+@(celebrityName: String, celebrityEmail: String, appPlistUrl: String)
+
+@import views.html.frontend.tags
+
+@tags.email.header("Welcome to Egraphs")
+@tags.email.celebrity_welcome(celebrityName, celebrityEmail, appPlistUrl)
+@tags.email.footer()

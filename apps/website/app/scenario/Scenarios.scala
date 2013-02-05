@@ -21,7 +21,7 @@ import scala.Some
 import models.Administrator
 import models.InventoryBatch
 import models.Order
-import models.frontend.email.RegularEgraphSignedEmailViewModel
+import models.frontend.email.{RegularEgraphSignedEmailViewModel, OrderConfirmationViewModel}
 
 /**
  * All scenarios supported by the API.
@@ -383,31 +383,37 @@ class Scenarios extends DeclaresScenarios {
       email.addTo("will@egraphs.com")
       email.setSubject("Order Confirmation")
       val html = views.html.frontend.email.order_confirmation(
-        buyerName = "Will Chan",
-        recipientName = "Andrew Smith",
-        recipientEmail = "me@egraphs.com",
-        celebrityName = "Celebrity Joe",
-        productName = "Product 1",
-        orderDate = "Jan 1, 2012",
-        orderId = "1234",
-        pricePaid = "$50.00",
-        deliveredByDate = "Jan 8, 2012",
-        faqHowLongLink = "/faq#how-long",
-        hasPrintOrder = true
+        OrderConfirmationViewModel(
+          buyerName = "Will Chan",
+          buyerEmail = "will@egraphs.com",
+          recipientName = "Andrew Smith",
+          recipientEmail = "me@egraphs.com",
+          celebrityName = "Celebrity Joe",
+          productName = "Product 1",
+          orderDate = "Jan 1, 2012",
+          orderId = "1234",
+          pricePaid = "$50.00",
+          deliveredByDate = "Jan 8, 2012",
+          faqHowLongLink = "/faq#how-long",
+          hasPrintOrder = true
+        )
       )
       email.setHtmlMsg(html.toString())
       val textVersion = views.txt.frontend.email.order_confirmation(
-        buyerName = "Will Chan",
-        recipientName = "Andrew Smith",
-        recipientEmail = "me@egraphs.com",
-        celebrityName = "Celebrity Joe",
-        productName = "Product 1",
-        orderDate = "Jan 1, 2012",
-        orderId = "1234",
-        pricePaid = "$50.00",
-        deliveredByDate = "Jan 8, 2012",
-        faqHowLongLink = "/faq#how-long",
-        hasPrintOrder = true
+        OrderConfirmationViewModel(
+          buyerName = "Will Chan",
+          buyerEmail = "will@egraphs.com",
+          recipientName = "Andrew Smith",
+          recipientEmail = "me@egraphs.com",
+          celebrityName = "Celebrity Joe",
+          productName = "Product 1",
+          orderDate = "Jan 1, 2012",
+          orderId = "1234",
+          pricePaid = "$50.00",
+          deliveredByDate = "Jan 8, 2012",
+          faqHowLongLink = "/faq#how-long",
+          hasPrintOrder = true
+        )
       )
       email.setTextMsg(textVersion.toString())
       mail.send(email, None, Some(html))

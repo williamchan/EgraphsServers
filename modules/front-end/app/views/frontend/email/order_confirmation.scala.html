@@ -1,34 +1,7 @@
-@(buyerName: String,
-  recipientName: String,
-  recipientEmail: String,
-  celebrityName: String,
-  productName: String,
-  orderDate: String,
-  orderId: String,
-  pricePaid: String,
-  deliveredByDate: String,
-  faqHowLongLink: String,
-  hasPrintOrder: Boolean
-)
+@(orderConfirmationEmailStack: models.frontend.email.OrderConfirmationViewModel)
 
 @import views.html.frontend.tags
 
-@general_email("Egraphs | Order Confirmation")
-
-                      @tags.email.order_confirmation(buyerName, recipientName, recipientEmail, celebrityName, productName, orderDate,
-                                                     orderId, pricePaid, deliveredByDate, faqHowLongLink, hasPrintOrder)
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
-            </tr>
-          </table>
-          @tags.email.footer()
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+@tags.email.header("Egraphs | Order Confirmation")
+@tags.email.order_confirmation(orderConfirmationEmailStack)
+@tags.email.footer()

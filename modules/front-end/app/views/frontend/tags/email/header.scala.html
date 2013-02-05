@@ -1,24 +1,40 @@
-@()
+@(title: String)
 
 @import controllers._
 
-
-<table cellpadding="0" cellspacing="0" width="100%" style="width: 100%;">
-  <tr>
-    <td width="450" align="left" valign="top">
-      <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="https://www.egraphs.com">
-        <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-logo.jpg"/>
-      </a>
-    </td>
-    <td width="40px" valign="top">
-      <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="http://www.facebook.com/egraphs">
-        <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-facebook.jpg"/>
-      </a>
-    </td>
-    <td width="30px" valign="top">
-      <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="http://www.twitter.com/egraphs">
-        <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-twitter.jpg"/>
-      </a>
-    </td>
-  </tr>
-</table>
+<html>
+  <head>
+    <title>@title</title>
+  </head>
+  <body style="margin: 0; padding: 0; background: #f0f0f0;">
+    <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#f0f0f0" style="width: 100%; background: #f0f0f0;">
+      <tr>
+        <td align="middle">
+          <table cellpadding="0" cellspacing="0" width="600px" align="middle" bgcolor="#fafafa" style="width: 600px; margin: 0 auto; background: #fafafa repeat-y 50% 0;">
+            <tr>
+              <td><img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-shim.gif" width="520" height="40" /></td>
+            </tr>
+            <tr>
+              <td align="middle">
+                <table cellpadding="0" cellspacing="0" width="520px" style="width: 520px;">
+                  <tr>
+                    <td align="left" valign="top">
+                      <table cellpadding="0" cellspacing="0" width="100%" style="width: 100%;">
+                        <tr>
+                          <td width="450" align="left" valign="top">
+                            <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="https://www.egraphs.com">
+                              <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-logo.jpg"/>
+                            </a>
+                          </td>
+                          <td width="40px" valign="top">
+                            <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="http://www.facebook.com/egraphs">
+                              <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-facebook.jpg"/>
+                            </a>
+                          </td>
+                          <td width="30px" valign="top">
+                            <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="http://www.twitter.com/egraphs">
+                              <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-twitter.jpg"/>
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
