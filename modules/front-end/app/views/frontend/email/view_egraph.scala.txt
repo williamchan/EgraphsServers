@@ -1,0 +1,34 @@
+@(egraphSignedEmailStack: models.frontend.email.EgraphSignedEmailViewModel)
+
+@import models.frontend.email.EgraphSignedEmailViewModel
+
+Egraphs | View Egraph
+
+@if(egraphSignedEmailStack.isGift) {
+You have just recieved an egraph from @egraphSignedEmailStack.buyerName!
+
+An egraph is a shared moment between you and your favorite star. Check it out!
+}
+
+Hi @egraphSignedEmailStack.recipientName,
+
+It's me, @egraphSignedEmailStack.celebrityPublicName. I just finished putting the final touches on my egraph to you. Here it is: @egraphSignedEmailStack.viewEgraphUrl
+
+I hope you enjoy it and share it with all of your friends and family. Thank you for connecting with me on Egraphs and for being a loyal fan! It means a lot.
+
+Thanks,
+
+@egraphSignedEmailStack.celebrityPublicName
+
+
+A note from the Egraphs team:
+
+Your egraph is already in your account so you can manage your gallery and easily share with your friends. If you've never logged into your account, go to https://www.egraphs.com/account/recover to set a password. Reach out to support@@egraphs.com if you have any questions.
+
+As a gift to you, redeem the following code to enjoy @egraphSignedEmailStack.couponAmount% off any purchase made in the next 7 days:
+
+@egraphSignedEmailStack.couponCode
+
+All our best,
+
+Egraphs

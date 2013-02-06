@@ -1,0 +1,7 @@
+@(orderConfirmationEmailStack: models.frontend.email.OrderConfirmationViewModel)
+
+@import views.html.frontend.tags
+
+@tags.email.header("Egraphs | Order Confirmation")
+@tags.email.order_confirmation(orderConfirmationEmailStack)
+@tags.email.footer()

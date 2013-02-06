@@ -16,7 +16,8 @@ import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
 import org.squeryl.dsl.ManyToMany
-import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
+import views.html.frontend.email.{celebrity_welcome => celebrity_welcome_html}
+import views.txt.frontend.email.{celebrity_welcome => celebrity_welcome_txt}
 import anorm._
 import services.mvc.celebrity.CelebrityViewConversions
 import play.api.libs.concurrent.Promise
@@ -278,8 +279,8 @@ case class Celebrity(id: Long = 0,
     val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(
       email, 
-      text=Some(celebrity_welcome_email_text(publicName, account.email, appDownloadLink).toString),
-      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink))
+      text=Some(celebrity_welcome_txt(publicName, account.email, appDownloadLink).toString),
+      html=Some(celebrity_welcome_html(publicName, account.email, appDownloadLink))
     )
   }
 

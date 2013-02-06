@@ -58,6 +58,7 @@ GET     /Email/orderConfirmation                                  controllers.Em
 GET     /Email/orderConfirmationText                              controllers.Email.orderConfirmationText
 GET     /Email/verify                                             controllers.Email.verify
 GET     /Email/viewEgraph                                         controllers.Email.viewEgraph
+GET     /Email/viewGiftEgraph                                     controllers.Email.viewGiftEgraph
 
 GET     /Failed/creditcard_error                                  controllers.Failed.creditcard_error
 GET     /Failed/no_inventory                                      controllers.Failed.no_inventory
