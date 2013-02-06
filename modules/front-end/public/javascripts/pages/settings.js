@@ -1,5 +1,7 @@
 /* Scripting for the settings page */
-define(["Egraphs", "libs/angular", "services/forms"], function (Egraphs) {
+define(["Egraphs", "services/logging", "module"], function (Egraphs, logging, requireModule) {
+  var log = logging.namespace(requireModule.id);
+
   //Controller class for Angular app
   var Controller = function ($scope) {
     //Plugin default values here
