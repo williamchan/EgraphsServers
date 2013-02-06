@@ -82,6 +82,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       ownerName = order.recipientName,
       ownerEmail = recipientAccount.email,
       celebName = celebrity.publicName,
+      celebrityGender = celebrity.gender,
       productName = product.name,
       productId = product.id,
       expectedDeliveryDate = Order.expectedDeliveryDate(celebrity),

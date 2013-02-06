@@ -1,0 +1,52 @@
+@(egraphSignedEmailStack: models.frontend.email.EgraphSignedEmailViewModel)
+
+@import controllers._
+@import models.frontend.email.EgraphSignedEmailViewModel
+
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  Hi @egraphSignedEmailStack.recipientName,
+</p>
+
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  It's me, @egraphSignedEmailStack.celebrityPublicName. I just finished putting the final touches on my egraph to you. 
+  I hope you enjoy it and share it with all of your friends and family. Thank you for connecting with me on Egraphs and for being a loyal fan! It means a lot.
+</p>
+                      
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: right; padding-right: 18%">
+  Thanks,<br>@egraphSignedEmailStack.celebrityPublicName
+</p>
+                      
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: center;">
+  <a href="@egraphSignedEmailStack.viewEgraphUrl" class=""><strong>View your Egraph</strong> <span>&raquo;</span></a>
+</p>
+                      
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  <br>A note from the Egraphs team:
+</p>
+
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  Your egraph is already in your account so you can manage your gallery and easily share with your friends. If you've never logged into your account, <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="https://www.egraphs.com/account/recover">click here to set a password</a>.
+  Reach out to <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="mailto:support@@egraphs.com">support@@egraphs.com</a> if you have any questions.
+</p>
+
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  Here are just a few of the cool features your egraph has to offer:
+</p>
+                        
+<img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-instructions.jpg" width=500 />                  
+                        
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  As a gift to you, redeem the following code to enjoy @egraphSignedEmailStack.couponAmount% off any purchase made in the next 7 days:
+</p>
+                        
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 20px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  @egraphSignedEmailStack.couponCode
+</p>
+                    
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  All our best,
+</p>
+                    
+<a style="color: #ff5124; text-decoration: none; border: none; outline: none; width: 120;" href="https://www.egraphs.com">
+  <img src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-logo.jpg"/>
+</a> 

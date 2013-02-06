@@ -1,0 +1,28 @@
+@(orderConfirmationEmailStack: models.frontend.email.OrderConfirmationViewModel)
+
+Egraphs | Order Confirmation
+Order Number: @orderConfirmationEmailStack.orderId
+
+Hi @orderConfirmationEmailStack.buyerName,
+
+Thank you so much for purchasing an Egraph. Please find your order summary information below. A detailed summary of your order is also at www.egraphs.com.
+
+ORDER DETAILS
+
+Egraph Order Date: @orderConfirmationEmailStack.orderDate
+Egraph Purchased by: @orderConfirmationEmailStack.buyerName
+Egraph Owner: @orderConfirmationEmailStack.recipientName
+Owner's Email: @orderConfirmationEmailStack.recipientEmail
+Celebrity: @orderConfirmationEmailStack.celebrityName
+Image Name: @orderConfirmationEmailStack.productName
+Order Number: @orderConfirmationEmailStack.orderId
+Price: @orderConfirmationEmailStack.pricePaid
+Expected Digital Delivery: @orderConfirmationEmailStack.deliveredByDate
+
+@if(orderConfirmationEmailStack.hasPrintOrder) { Your framed print is expected to arrive 3 weeks after your digital delivery. }
+
+For more information on expected delivery dates, please see @orderConfirmationEmailStack.faqHowLongLink
+
+Thank you,
+
+The Egraphs Team

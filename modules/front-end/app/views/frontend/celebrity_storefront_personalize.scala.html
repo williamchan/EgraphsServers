@@ -159,7 +159,7 @@
 	                        <button type="button" 
 	                                value="CelebrityChoosesMessage" 
 	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(CelebrityChoosesMessage)) {active}">
-                          	    Anything @subjectPronoun(celebrityGender)<br /> wants
+                          	    Anything @subjectPronoun(celebrityGender)<br /> @regularVerb("want", celebrityGender)
                         	</button>
 	                        <button type="button"
 	                                value="SignatureOnly"
