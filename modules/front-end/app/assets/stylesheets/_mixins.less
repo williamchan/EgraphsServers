@@ -82,8 +82,9 @@
 }
 
 // Prevents awkward flicker after using CSS3 animations on  mobile webkit. 
+// http://stackoverflow.com/questions/3461441/prevent-flicker-on-webkit-transition-of-webkit-transform
 .no-flicker() {
-  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
 }
 
 // A search box that doesn't use images.  It's borders glow.
