@@ -81,6 +81,12 @@
   }
 }
 
+// Prevents awkward flicker after using CSS3 animations on  mobile webkit. 
+// http://stackoverflow.com/questions/3461441/prevent-flicker-on-webkit-transition-of-webkit-transform
+.no-flicker() {
+  -webkit-backface-visibility: hidden;
+}
+
 // A search box that doesn't use images.  It's borders glow.
 .celebrity-searchbox-container(@mainColor: @orange, @borderColor: @inputBorder, @containerWidth: 256px) {
   .border-radius(3px 3px 3px 3px);

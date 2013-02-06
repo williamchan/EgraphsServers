@@ -71,10 +71,32 @@ define(["page", "window", "services/logging", "module", "services/ng/mail-servic
           e.preventDefault();
         });
 
+        var mobileNavOut = false;
+        // use the .flyout-pull-right class to specify any items outside of the
+        // the normal #top, #bottom, #content heirarchy that must slide out from the
+        // mobile navigation menu.
+        var pushedElements = $("#top, #bottom, #content, .flyout-pull-right");
+        var mobileMenu = $("#left-flyout");
+        log("Binding things");
+        $(".navbar-expand").click(function() {
+          log("click");
+          if(mobileNavOut === false) {
+            log("expanding");
+            pushedElements.addClass("left-flyout-push");
+            mobileMenu.addClass("is-visible");
+            mobileNavOut = true;
+          } else {
+            log("contracting");
+            pushedElements.removeClass("left-flyout-push");
+            mobileMenu.removeClass("is-visible");
+            mobileNavOut = false;
+          }
+        });
+
         // set modal to visible if toggled.
         if(Egraphs.page.modalOn === true) {
           $(window).load(function(){
-              signupModal.modal({});
+            signupModal.modal({});
           });
         }
       });
