@@ -127,7 +127,7 @@ object Customer {
   )(implicit request: RequestHeader)
   {
     val email = new HtmlEmail()
-    email.setFrom("webserver@egraphs.com")
+    email.setFrom("webserver@egraphs.com", "Egraphs")
     email.addReplyTo("webserver@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")

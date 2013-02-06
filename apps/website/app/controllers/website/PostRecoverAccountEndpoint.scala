@@ -48,7 +48,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
    */
   private def sendRecoveryPasswordEmail(account: Account)(implicit request: RequestHeader) {
     val email = new HtmlEmail()
-    email.setFrom("support@egraphs.com")
+    email.setFrom("support@egraphs.com", "Egraphs")
     email.addReplyTo("support@egraphs.com")
     email.addTo(account.email)
     email.setSubject("Egraphs Password Recovery")

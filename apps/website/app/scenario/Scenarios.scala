@@ -360,7 +360,7 @@ class Scenarios extends DeclaresScenarios {
   """Sends account confirmation email to will@egraphs.com using the configured SMTP server""", {
     () =>
       val email = new HtmlEmail()
-      email.setFrom("webserver@egraphs.com")
+      email.setFrom("webserver@egraphs.com", "Egraphs")
       email.addReplyTo("webserver@egraphs.com")
       email.addTo("will@egraphs.com")
       email.setSubject("Welcome to Egraphs!")
