@@ -3,10 +3,12 @@ package controllers.website.consumer
 import play.api.mvc.Controller
 import play.api.mvc.Action
 import services.http.ControllerMethod
-import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
+import services.mvc.{ celebrity, ImplicitHeaderAndFooterData }
 import models.CelebrityStore
-import models.categories.{VerticalStore, Featured}
+import models.categories.{ VerticalStore, Featured }
 import services.mvc.marketplace._
+import services.http.SignupModal
+
 /**
  * The main landing page for the consumer website.
  */
@@ -21,6 +23,8 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   protected def verticalStore: VerticalStore
   protected def featured: Featured
   protected def marketplaceServices: MarketplaceServices
+  protected def signupModal: SignupModal
+
   //
   // Controllers
   //
@@ -28,15 +32,21 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   var marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
 
   def getRootConsumerEndpoint = controllerMethod.withForm() { implicit authToken =>
-    Action {implicit request =>
-      val featuredStars = celebrityStore.catalogStarsSearch(refinements = List(List(featured.categoryValue.id))).toList
-      val verticals = marketplaceServices.getVerticalViewModels()
-      val html = request.queryString.get("signup") match {
-        case Some(Seq("true")) => views.html.frontend.landing(stars=featuredStars, verticalViewModels = verticals, marketplaceRoute = marketplaceRoute, signup = true)
-        case _  =>  views.html.frontend.landing(stars=featuredStars, verticalViewModels = verticals, marketplaceRoute = marketplaceRoute, signup = false)
-      }
+    signupModal() { displayModal =>
+      Action { implicit request =>
+        val featuredStars = celebrityStore.catalogStarsSearch(refinements = List(List(featured.categoryValue.id)))
+        val verticals = marketplaceServices.getVerticalViewModels()
+        val displayModal = request.queryString.get("signup") match {
+          case Some(Seq("true")) => true
+          case _ => signupModal.shouldDisplay(request)
+        }
 
-      Ok(html)
+        Ok(views.html.frontend.landing(
+          stars = featuredStars.toList,
+          verticalViewModels = verticals,
+          marketplaceRoute = marketplaceRoute,
+          signup = displayModal))
+      }
     }
   }
 }

@@ -15,5 +15,6 @@ case class HeaderData(
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
   ourStarsLink: String = "/stars",
   giftCertificateLink: Option[String] = None,
-  deploymentInformation: Option[DeploymentInformation] = None
+  deploymentInformation: Option[DeploymentInformation] = None,
+  updateMixpanelAlias: Boolean = false
 )

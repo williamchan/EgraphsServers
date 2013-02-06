@@ -71,10 +71,3 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     maybeFormViewModel.getOrElse(AccountRegistrationFormViewConversions.defaultView)
   }
 }
-
-object GetLoginEndpoint {
-  def url() = {
-    controllers.routes.WebsiteControllers.getLogin().url
-//    WebsiteControllers.reverse(WebsiteControllers.getLogin)
-  }
-}

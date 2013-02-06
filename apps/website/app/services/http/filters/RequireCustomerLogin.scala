@@ -23,7 +23,7 @@ object RequireCustomerLogin {
  */
 class RequireCustomerLogin @Inject() (customerStore: CustomerStore) extends Filter[Long, CustomerAccount] with RequestFilter[Long, CustomerAccount] {
 
-  private val redirectToLogin = Redirect(controllers.website.GetLoginEndpoint.url())
+  private val redirectToLogin = Redirect(controllers.routes.WebsiteControllers.getLogin().url)
 
   override protected def formFailedResult[A, S >: Source](formWithErrors: Form[Long], source: S)(implicit request: Request[A]): Result = {
     source match {
