@@ -56,6 +56,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val payment = instance[Payment]
   override protected val schema = instance[Schema]
   override protected val featured = instance[Featured] 
+  override protected val signupModal = instance[SignupModal]
 
   override protected val accountStore = instance[AccountStore]
   override protected val administratorStore = instance[AdministratorStore]

@@ -8,6 +8,7 @@ import controllers.routes.WebsiteControllers.{getLogin, getCustomerGalleryById}
 import services.http.POSTControllerMethod
 import services.http.forms.CustomerLoginFormFactory
 import services.http.EgraphsSession
+import services.http.EgraphsSession.Conversions._
 import models._
 
 private[controllers] trait PostLoginEndpoint { this: Controller =>
@@ -29,7 +30,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
   
         case Right(validForm) =>          
           Redirect(getCustomerGalleryById(validForm.customerId)).withSession(
-            request.session + (EgraphsSession.Key.CustomerId.name -> validForm.customerId.toString)
+            request.session.withCustomerId(validForm.customerId).withHasSignedUp
           )
       }
     }

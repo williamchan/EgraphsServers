@@ -25,7 +25,7 @@ import services.db.{TransactionIsolation, TransactionSerializable, DBSession}
  * @param db used to make a DB connection for the request where appropriate
  * @param httpsFilter used to ensure that the request occurs over SSL.
  */
-class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFilter: HttpsFilter, httpFilters: HttpFilters) {
+class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFilter: HttpsFilter, httpFilters: HttpFilters, analyticsActions: AnalyticsActions) {
 
   /**
    * Prepares and customizes controller method behavior. The first expression in
@@ -42,10 +42,12 @@ class ControllerMethod @Inject()(logging: LoggingContext, db: DBSession, httpsFi
     httpsFilter {
       logging.withRequestContext {
         httpFilters.requireSessionId {
-          Action(action.parser) { request => 
-            dbSettings match {
-              case WithoutDBConnection => action(request)
-              case WithDBConnection(dbIsolation, isReadOnly) => db.connected(dbIsolation, isReadOnly) { action(request) }
+          analyticsActions {
+            Action(action.parser) { request =>
+              dbSettings match {
+                case WithoutDBConnection => action(request)
+                case WithDBConnection(dbIsolation, isReadOnly) => db.connected(dbIsolation, isReadOnly) { action(request) }
+              }
             }
           }
         }

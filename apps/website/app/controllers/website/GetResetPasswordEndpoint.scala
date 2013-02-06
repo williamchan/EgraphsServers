@@ -44,7 +44,6 @@ private[controllers] trait GetResetPasswordEndpoint extends ImplicitHeaderAndFoo
     }
   }
 
-  // TODO
   def getVerifyAccount(email: String, resetKey: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireAccountEmail(email) { account =>

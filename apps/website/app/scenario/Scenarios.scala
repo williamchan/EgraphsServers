@@ -464,8 +464,9 @@ class Scenarios extends DeclaresScenarios {
   accountSettingsPage,
   """Changes All new Orders to ApprovedByAdmin, which makes them signable""", {
     () =>
-      Scenario.play("Erem-is-a-customer")      
-      Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(Key.CustomerId.name -> "1")
+      Scenario.play("Erem-is-a-customer")
+      val erem = Scenarios.getEremCustomerAccount
+      Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(Key.CustomerId.name -> erem.id.toString)
   }
   )
 
