@@ -18,6 +18,9 @@ import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
 import controllers.routes.WebsiteControllers.getFAQ
 import services._
+import models.frontend.email.OrderConfirmationViewModel
+import services.Finance.TypeConversions._
+import _root_.frontend.formatting.DateFormatting.Conversions._
 
 case class EgraphPurchaseHandlerServices @Inject() (
   mail: TransactionalMail,
@@ -165,19 +168,20 @@ case class EgraphPurchaseHandler(
 
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
     OrderConfirmationEmail(
-      buyerName,
-      buyerEmail,
-      recipientName,
-      recipientEmail,
-      celebrity.publicName,
-      product.name,
-      order.id,
-      order.created,
-      order.expectedDate,
-      totalAmountPaid,
-      services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
-      maybePrintOrder.isDefined,
-      services.mail
+      OrderConfirmationViewModel(
+        buyerName = buyerName,
+        buyerEmail = buyerEmail,
+        recipientName = recipientName,
+        recipientEmail = recipientEmail,
+        celebrityName = celebrity.publicName,
+        productName = product.name,
+        orderDate = order.created.formatDayAsPlainLanguage,
+        orderId = order.id.toString,
+        pricePaid = totalAmountPaid.formatSimply,
+        deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
+        faqHowLongLink = services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
+        hasPrintOrder = maybePrintOrder.isDefined
+      ), services.mail
     ).send()
 
     // Clear out the shopping cart and redirect
