@@ -58,13 +58,18 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   //
   def _entity: CheckoutEntity
   def services: CheckoutServices
-  def customer: Option[Customer]
+
+  def buyer: Customer
+  def recipient: Option[Customer]   // note(shopping cart): decide whether to support having multiple recipients
+  def payment: Option[CashTransactionLineItemType]
+  def shippingAddress: Option[Address]
+
+
   def zipcode: Option[String]
   def lineItems: LineItems
   def itemTypes: LineItemTypes
   def pendingItems: LineItems
   def pendingTypes: LineItemTypes
-  protected def _persisted: Boolean
   protected def _dirty: Boolean     // simplifies transaction -- does nothing if clean
 
   /**
@@ -88,25 +93,24 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   /** for services to return a persisted checkout as the correct type */
   def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout
 
+  def toJson: String = """ { } """
 
   /**
-   * Charges or credits customer as needed through the information in the txnType, transacts all the
+   * Charges or credits buyer as needed through the information in the txnType, transacts all the
    * line items which have been added since the last transaction as well as the cash transaction
-   * of the charge or credit to the customer, and returns the resulting PersistedCheckout.
+   * of the charge or credit to the buyer, and returns the resulting PersistedCheckout.
    *
-   * @param txnType used to charge or credit customer
+   * @param txnType used to charge or credit buyer
    * @return failure, this if not _dirty, or the resulting PersistedCheckout
    */
-  def transact(txnType: Option[CashTransactionLineItemType]): FailureOrCheckout = {
+  def transact(txnType: Option[CashTransactionLineItemType] = payment): FailureOrCheckout = {
     def nothingToTransact = pendingTypes.isEmpty
     def paymentMissing = !(balance.amount.isZero || txnType.isDefined)
-    def customerMissing = !customer.isDefined
 
     if (nothingToTransact) { Right(this) }
     else if (paymentMissing) { Left(CheckoutFailedCashTransactionMissing(this)) }
-    else if (customerMissing) { Left(CheckoutFailedCustomerMissing(this, txnType)) }
     else {
-      // save checkout
+      // save checkout entity
       val savedCheckout = this.save()
 
       // resolve transaction item and make charge (or return error)
@@ -247,7 +251,7 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   //
   // Helper methods
   //
-  def save(): Checkout = if (id > 0) { this.update() } else { this.insert() }
+  def save(): Checkout
 
   /** get the line item of the given `CashTransactionLineItemType` as applied to this checkout */
   private def resolveCashTransaction(txnType: Option[CashTransactionLineItemType])
@@ -298,10 +302,9 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   //
   // utility members
   //
-  def customerId: Long = _entity.customerId
-  def accountId: Long = account map (_.id) getOrElse(0L)
-  lazy val account: Option[Account] = customer.map(_.account)
-  lazy val addresses = account.map(_.addresses).getOrElse(Nil)
+  def buyerId = _entity.customerId
+  lazy val account: Account = buyer.account
+  lazy val addresses = account.addresses
 
   def fees: LineItems = lineItems(LineItemNature.Fee)
   def taxes: Seq[TaxLineItem] = lineItems(CheckoutCodeType.Tax)
@@ -332,15 +335,13 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
 object Checkout {
 
   // Create
-  def apply(types: LineItemTypes, maybeZipcode: Option[String], maybeCustomer: Option[Customer])
-  : FreshCheckout = {
-    val entity = CheckoutEntity(customerId = maybeCustomer.map(_.id).getOrElse(0L))
-    new FreshCheckout(entity, types, maybeCustomer, maybeZipcode)
+  def create(types: LineItemTypes, maybeBuyer: Option[Customer], zipcode: Option[String] = None): FreshCheckout = {
+    FreshCheckout(types, _buyer = maybeBuyer, zipcode = zipcode)
   }
 
   // Restore
-  def apply(id: Long)(services: CheckoutServices = AppConfig.instance[CheckoutServices])
-  : PersistedCheckout = { services.findById(id).get }
+  def restore(id: Long)(implicit services: CheckoutServices = AppConfig.instance[CheckoutServices])
+  : Option[PersistedCheckout] = { services.findById(id) }
 
 
   //

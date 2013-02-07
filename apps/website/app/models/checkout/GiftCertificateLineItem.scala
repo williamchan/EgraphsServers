@@ -19,7 +19,7 @@ case class GiftCertificateLineItem (
   _typeEntity: LineItemTypeEntity,
   _maybeGiftCertificate: Option[GiftCertificate] = None,
   services: GiftCertificateLineItemServices = AppConfig.instance[GiftCertificateLineItemServices]
-) extends LineItem[GiftCertificate] with HasLineItemEntity
+) extends LineItem[GiftCertificate] with HasLineItemEntity[GiftCertificateLineItem]
   with LineItemEntityGettersAndSetters[GiftCertificateLineItem]
   with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItem, LineItemEntity]
 {

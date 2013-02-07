@@ -94,7 +94,7 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
 
 /** tests simple LineItem persistence */
 trait CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[
-  ItemT <: LineItem[_] with CanInsertAndUpdateAsThroughServices[ItemT, LineItemEntity] with HasLineItemEntity
+  ItemT <: LineItem[_] with CanInsertAndUpdateAsThroughServices[ItemT, LineItemEntity] with HasLineItemEntity[ItemT]
 ] extends CanInsertAndUpdateAsThroughServicesWithLongKeyTests[ItemT, LineItemEntity]
 { this: FlatSpec with ShouldMatchers with LineItemTests[_ <: LineItemType[_], ItemT] =>
 
@@ -150,15 +150,16 @@ object LineItemTestData {
   def randomTotalItem = TotalLineItem(randomMoney)
   def randomBalanceItem = BalanceLineItem(randomMoney)
 
-  def randomCashTransactionType = CashTransactionLineItemType(newSavedAccount().id, zipcode, Some(payment.testToken().id))
+  def randomCashTransactionType = CashTransactionLineItemType(Some(payment.testToken().id), zipcode)
   def randomCashTransactionItem = randomCashTransactionType.lineItems(Seq(randomBalanceItem)).get.head
 
   def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
   def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
 
-  def newCheckout = Checkout(Seq(randomGiftCertificateType), zipcode, Some(newSavedCustomer()))
+
+  def newCheckout: FreshCheckout = Checkout.create(Seq(randomGiftCertificateType), Some(newSavedCustomer()), zipcode)
   def newSavedCheckout() = newCheckout.insert()
-  def newTransactedCheckout = newCheckout.transact(Some(randomCashTransactionType))
+  def newTransactedCheckout() = newCheckout.transact(Some(randomCashTransactionType))
 
   def payment: StripeTestPayment = {
     val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap(); pment

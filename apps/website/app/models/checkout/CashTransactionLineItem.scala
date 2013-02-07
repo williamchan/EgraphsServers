@@ -45,7 +45,7 @@ case class CashTransactionLineItem(
   _typeEntity: LineItemTypeEntity,
   _maybeCashTransaction: Option[CashTransaction],
   services: CashTransactionLineItemServices = AppConfig.instance[CashTransactionLineItemServices]
-) extends LineItem[CashTransaction] with HasLineItemEntity
+) extends LineItem[CashTransaction] with HasLineItemEntity[CashTransactionLineItem]
   with LineItemEntityGettersAndSetters[CashTransactionLineItem]
   with CanInsertAndUpdateAsThroughServices[CashTransactionLineItem, LineItemEntity]
 {
@@ -78,12 +78,12 @@ case class CashTransactionLineItem(
   override def transact(checkout: Checkout) = {
     if (id > 0) { this }
     else {
-      require( checkout.accountId > 0 )
+      require( checkout.account.id > 0 )
 
       // note: type is not saved since the entities are singular
       val savedItem = this.withCheckoutId(checkout.id).insert()
       val savedCashTxn = domainObject.copy(
-        accountId = checkout.accountId,
+        accountId = checkout.account.id,
         lineItemId = Some(savedItem.id)
       ).save()
 

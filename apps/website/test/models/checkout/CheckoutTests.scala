@@ -21,12 +21,14 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // CanInsertAndUpdateAsThroughServicesTests members
   //
-  override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), taxedZip, Some(newSavedCustomer()))
-  override def saveModel(toSave: Checkout): Checkout = toSave.transact(cashTxnTypeFor(toSave)) match {
+  override def newModel(): FreshCheckout = newCheckout
+
+  override def saveModel(toSave: Checkout): Checkout = toSave.transact(Some(randomCashTransactionType)) match {
     case Right(checkout: Checkout) => checkout
     case Left(failure) => fail("saveModel failed with " + failure)
   }
-  override def restoreModel(id: Long): Option[Checkout] = checkoutServices.findById(id)
+
+  override def restoreModel(id: Long): Option[Checkout] = Checkout.restore(id)
 
   override def transformModel(toTransform: Checkout) = {
     toTransform.withAdditionalTypes(Seq(giftCertificateTypeForLesserFriend))
@@ -37,43 +39,35 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Checkout test cases
   //
-  "A checkout" should "fail to transact without a customer" in {
-    val checkout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
-    lazy val failedTransaction: FailureOrCheckout = checkout.transact(Some(randomCashTransactionType))
-
-    failedTransaction should be ('left)
-  }
-
-  it should "have a balance of zero after transaction" in {
+  "A checkout" should "have a balance of zero after transaction" in {
     val transacted: Checkout = saveModel(newModel)
     transacted.total should haveNegatedAmountOf (transacted.payments.head)
     transacted.balance should haveAmount (zeroDollars)
   }
 
   it should "charge the customer for the total on checkout" in {
-    val total: TotalLineItem = newModel.total
-    val transacted: Checkout = saveModel(newModel)
+    val checkout = newModel()
+    val total: TotalLineItem = checkout.total
+    val transacted: Checkout = saveModel(checkout)
     val txnItem = transacted.payments.head
 
     txnItem should haveNegatedAmountOf (total)
   }
 
   it should "not have duplicate summaries" in {
-    val taxedCheckout: Checkout = Checkout(oneGiftCertificate, taxedZip, Some(newSavedCustomer()))
-    val untaxedCheckout: Checkout = Checkout(oneGiftCertificate, untaxedZip, Some(newSavedCustomer()))
-    val checkoutWithoutZip: Checkout = Checkout(oneGiftCertificate, None, Some(newSavedCustomer()))
-    val checkoutWithoutCustomer: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
+    val taxedCheckout: Checkout = newModel.withZipcode(taxedZip)
+    val untaxedCheckout: Checkout = newModel.withZipcode(untaxedZip)
+    val checkoutWithoutZip: Checkout = newModel.withZipcode(None)
 
     // check that checkouts only have one of each summary (e.g. subtotal, total, balance)
     taxedCheckout should notHaveDuplicateSummaries
     untaxedCheckout should notHaveDuplicateSummaries
     checkoutWithoutZip should notHaveDuplicateSummaries
-    checkoutWithoutCustomer should notHaveDuplicateSummaries
   }
 
   it should "add taxes for taxed zipcodes" in {
-    val taxedCheckout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
-    val untaxedCheckout: Checkout = Checkout(oneGiftCertificate, untaxedZip, None)
+    val taxedCheckout: Checkout = newModel.withZipcode(taxedZip)
+    val untaxedCheckout: Checkout = newModel.withZipcode(untaxedZip)
 
     taxedCheckout.taxes should not be (Nil)
     untaxedCheckout.taxes should be (Nil)  // NOTE: this should change if we have some universal tax of sorts
@@ -139,8 +133,8 @@ class CheckoutTests extends EgraphsUnitTest
 
   it should "not do anything on transact without any changes being made" in {
     val restoredUnchanged = restoreModel(saveModel(newModel).id).get
-    val transactedWithCash = restoredUnchanged.transact(None)
-    val transactedWithoutCash = restoredUnchanged.transact(cashTxnTypeFor(restoredUnchanged))
+    val transactedWithCash = restoredUnchanged.transact(Some(randomCashTransactionType))
+    val transactedWithoutCash = restoredUnchanged.transact(None)
 
     transactedWithCash should be (Right(restoredUnchanged))
     transactedWithoutCash should be (Right(restoredUnchanged))
@@ -167,11 +161,6 @@ class CheckoutTests extends EgraphsUnitTest
   val untaxedZip = Some("12345")  // not Washington
 
   def zeroDollars: Money = BigDecimal(0).toMoney()
-
-  // txn type is associated with the checkout's customer's account
-  def cashTxnTypeFor(checkout: Checkout) = Some(
-    randomCashTransactionType.copy(accountId = Some(checkout.accountId))
-  )
 
   def expectedTotalOf(checkout: Checkout) = checkout.lineItems.notOfNatures(Summary, Payment).sumAmounts
   def totalPaymentsOf(checkout: Checkout) = checkout.payments.sumAmounts

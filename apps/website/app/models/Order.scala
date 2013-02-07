@@ -97,6 +97,7 @@ case class Order(
   requestedMessage: Option[String] = None,
   expectedDate: Date = Order.defaultExpectedDate,
   _orderType: String = OrderType.Normal.name,
+  lineItemId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -517,6 +518,10 @@ class OrderStore @Inject() (
         select (order)
         orderBy (order.id asc)
     )
+  }
+
+  def findByLineItemId(itemId: Long) = {
+    schema.orders.where(_.lineItemId === Some(itemId))
   }
 
   def getOrderResults(filters: FilterOneTable[Order]*): Query[(Order, Celebrity)] = {

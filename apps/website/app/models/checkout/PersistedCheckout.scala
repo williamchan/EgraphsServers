@@ -11,20 +11,35 @@ import services.AppConfig
 case class PersistedCheckout(
   _entity: CheckoutEntity,
   _addedTypes: LineItemTypes = Nil,
+
+  stripeToken: Option[String] = None,      // used for payment or refund
+  zipcode: Option[String] = None,
+
   services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends Checkout {
 
   //
+  // CE-13 Changes
+  //
+  /** buyer ought not to change, so just get from store */
+  override lazy val buyer: Customer = services.customerStore.findById(buyerId).get
+
+  /** if there's a use for thise field, can be taken in constructor */
+  override lazy val recipient: Option[Customer] = None
+
+  /** cash transaction to be made if changes are transacted */
+  override def payment: Option[CashTransactionLineItemType] = {
+    for ( token <- stripeToken; zip <- zipcode) yield
+      CashTransactionLineItemType(Some(token), Some(zip))
+  }
+
+  override def shippingAddress = addresses.headOption
+
+
+  //
   // Checkout members
   //
-  override protected def _persisted: Boolean = true
   override protected def _dirty: Boolean = !_addedTypes.isEmpty
-
-  override lazy val customer: Option[Customer] = services.customerStore.findById(customerId)
-
-  override lazy val zipcode: Option[String] = {
-    _lineItems(CheckoutCodeType.CashTransaction).headOption flatMap (_.domainObject.billingPostalCode)
-  }
 
   /** all LineItemTypes */
   override lazy val itemTypes: LineItemTypes = summaryTypes ++ (pendingTypes ++ _lineItems.map(_.itemType))
@@ -57,6 +72,8 @@ case class PersistedCheckout(
   override def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout = {
     this.copy(savedEntity)
   }
+
+  override def save(): Checkout = this.update()
 
 
   //

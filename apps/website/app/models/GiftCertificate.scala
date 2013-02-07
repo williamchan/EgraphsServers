@@ -106,9 +106,10 @@ case class GiftCertificate protected (
   //
   // Lenses
   //
-  lazy val entity = MemberLens[GiftCertificate, GiftCertificateEntity](this)(_entity, copy(_))
-  lazy val coupon = MemberLens[GiftCertificate, Coupon](this)( _coupon,
-    newCoupon => this.couponId.set(newCoupon.id).copy(_coupon = newCoupon)
+  lazy val entity = MemberLens[GiftCertificate, GiftCertificateEntity](this)(getter = _entity, setter = copy(_))
+  lazy val coupon = MemberLens[GiftCertificate, Coupon](this)(
+    getter = _coupon,
+    setter = newCoupon => this.couponId.set(newCoupon.id).copy(_coupon = newCoupon)
   )
 
   /** just provide getter and setter */

@@ -29,8 +29,8 @@ object CheckoutCodeType extends Enum {
   //
   // Products
   //
-  val GiftCertificate =
-    new EnumVal("GiftCertificateLineItemType") with CodeTypeFactory[GiftCertificateLineItemType, GiftCertificateLineItem] {
+  val GiftCertificate = new EnumVal("GiftCertificateLineItemType")
+    with CodeTypeFactory[GiftCertificateLineItemType, GiftCertificateLineItem] {
       override def itemInstance(itemEntity: ItemEntity, typeEntity: TypeEntity) = {
         GiftCertificateLineItem(itemEntity, typeEntity)
       }
@@ -39,7 +39,11 @@ object CheckoutCodeType extends Enum {
   //
   // Discounts
   //
-
+  val Coupon = new EnumVal("CouponLineItemType") with CodeTypeFactory[CouponLineItemType, CouponLineItem] {
+    override def itemInstance(itemEntity: ItemEntity, typeEntity: TypeEntity) = {
+      CouponLineItem(itemEntity, typeEntity)
+    }
+  }
 
   //
   // Charges

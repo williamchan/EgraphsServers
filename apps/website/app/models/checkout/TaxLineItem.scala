@@ -18,7 +18,7 @@ case class TaxLineItem private (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
   services: TaxLineItemServices = AppConfig.instance[TaxLineItemServices]
-) extends LineItem[Money] with HasLineItemEntity
+) extends LineItem[Money] with HasLineItemEntity[TaxLineItem]
   with LineItemEntityGettersAndSetters[TaxLineItem]
   with CanInsertAndUpdateAsThroughServices[TaxLineItem, LineItemEntity]
 {

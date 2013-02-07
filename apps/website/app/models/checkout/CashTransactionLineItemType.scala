@@ -13,14 +13,13 @@ import services.AppConfig
  * cash transactions. They can be payments or refunds, which just reflects the sign of the charged
  * amount.
  *
- * New/unpersisted instances need an accountId, billingPostalCode, and stripeCardTokenId if the
- * charged amount is non-zero. Restored or persisted instances only need the entity and item entity.
+ * New/unpersisted instances need a billingPostalCode, and stripeCardTokenId if the charged amount is non-zero.
+ * Restored or persisted instances only need the entity and item entity.
  *
  * The entities are singular based on their LineItemNature; for now, no need is seen for multiple
  * payment cash transaction type entities (same for refunds and forseeably for invoices).
  *
  * @param _entity new or persisted LineItemTypeEntity
- * @param accountId needed for CashTransaction, otherwise None
  * @param billingPostalCode needed for CashTransaction, otherwise None
  * @param stripeCardTokenId needed for CashTransaction, otherwise None
  * @param _maybeItemEntity None or persisted LineItemEntity
@@ -28,7 +27,6 @@ import services.AppConfig
  */
 case class CashTransactionLineItemType protected (
   _entity: LineItemTypeEntity,
-  accountId: Option[Long],
   billingPostalCode: Option[String],
   stripeCardTokenId: Option[String],
   _maybeItemEntity: Option[LineItemEntity],
@@ -66,7 +64,6 @@ case class CashTransactionLineItemType protected (
 
         // note: stripeChargeId set when charge is made in Checkout transaction
         val txn = CashTransaction(
-          accountId = accountId.get,          // should be defined, see apply for creating new type below
           billingPostalCode = billingPostalCode,
           stripeCardTokenId = stripeCardTokenId
         ) .withCashTransactionType(CashTransactionType.Checkout)
@@ -121,10 +118,9 @@ object CashTransactionLineItemType {
   //
   // Create
   //
-  def apply(accountId: Long, billingPostalCode: Option[String], stripeCardTokenId: Option[String]) = {
+  def apply(stripeCardTokenId: Option[String], billingPostalCode: Option[String]) = {
     new CashTransactionLineItemType(
       _entity = paymentEntity,
-      accountId = Some(accountId),
       billingPostalCode = billingPostalCode,
       stripeCardTokenId = stripeCardTokenId,
       _maybeItemEntity = None
@@ -139,7 +135,6 @@ object CashTransactionLineItemType {
   def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity) = {
     new CashTransactionLineItemType(
       _entity = entity,
-      accountId = None,
       billingPostalCode = None,
       stripeCardTokenId = None,
       _maybeItemEntity = Some(itemEntity)

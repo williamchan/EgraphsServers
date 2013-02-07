@@ -7,7 +7,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import models.enums._
 import models.SavesCreatedUpdated
 import scalaz.Lens
-import services.db.{InsertsAndUpdatesAsEntity, HasEntity, Schema}
+import services.db.{CanInsertAndUpdateAsThroughTransientServices, InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
 import org.squeryl.Query
 
@@ -139,17 +139,28 @@ class LineItemStore @Inject() (schema: Schema) {
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-trait HasLineItemEntity extends HasEntity[LineItemEntity, Long] { this: LineItem[_] => }
+trait HasLineItemEntity[T <: LineItem[_]] extends HasEntity[LineItemEntity, Long] { this: T =>
+  def withEntity(entity: LineItemEntity): T
+}
+
+trait SavesAsLineItemEntityThroughServices[
+  T <: LineItem[_] with HasLineItemEntity[T],
+  ServicesT <: SavesAsLineItemEntity[T]
+] extends CanInsertAndUpdateAsThroughTransientServices[T, LineItemEntity, ServicesT]
+{
+  this: T with Serializable =>
+}
 
 
 /** Allows LineItems' Services to insert and update LineItems */
-trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
-  extends InsertsAndUpdatesAsEntity[ModelT, LineItemEntity]
+trait SavesAsLineItemEntity[T <: LineItem[_] with HasLineItemEntity[T]]
+  extends InsertsAndUpdatesAsEntity[T, LineItemEntity]
   with SavesCreatedUpdated[LineItemEntity]
 {
   protected def schema: Schema
   override protected val table = schema.lineItems
 
+  override protected def modelWithNewEntity(model: T, entity: LineItemEntity) = model.withEntity(entity)
   override protected def withCreatedUpdated(toUpdate: LineItemEntity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
@@ -161,7 +172,7 @@ trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
+trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity[T] =>
   import services.Finance.TypeConversions._
   import MemberLens.Conversions._
 
@@ -182,6 +193,9 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
    *
    */
   protected def entityLens: Lens[T, LineItemEntity]
+
+  protected def EntityLens(get: T => LineItemEntity, set: (T, LineItemEntity) => T) = Lens[T, LineItemEntity](get, set)
+
   def entity = entityLens.asMemberOf(this)
 
   //
@@ -209,14 +223,15 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
 }
 
 
-trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
+trait LineItemEntityGetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T]=>
   override lazy val checkoutId = checkoutIdField()
   override lazy val amount = amountField()
   lazy val itemTypeId = itemTypeIdField()
 }
 
 
-trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
+trait LineItemEntitySetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T]=>
+  override def withEntity(newEntity: LineItemEntity) = entity.set(newEntity)
   override def withCheckoutId(newId: Long) = checkoutIdField.set(newId)
   override def withAmount(newAmount: Money) = amountField.set(newAmount)
   lazy val withItemTypeId = itemTypeIdField.set _
@@ -225,4 +240,4 @@ trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLense
 trait LineItemEntityGettersAndSetters[T <: LineItem[_]]
   extends LineItemEntityLenses[T]
   with LineItemEntityGetters[T]
-  with LineItemEntitySetters[T] { this: T with HasLineItemEntity => }
+  with LineItemEntitySetters[T] { this: T with HasLineItemEntity[T] => }

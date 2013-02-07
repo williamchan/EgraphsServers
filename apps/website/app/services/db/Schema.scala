@@ -567,7 +567,7 @@ class Schema @Inject() (
   override def callbacks = {
     Seq(
       factoryFor(accounts) is Account(services = injector.instance[AccountServices]),
-      factoryFor(addresses) is Address(services = injector.instance[AddressServices]),
+      factoryFor(addresses) is Address(_services = injector.instance[AddressServices]),
       factoryFor(administrators) is Administrator(services = injector.instance[AdministratorServices]),
       factoryFor(blobKeys) is BlobKey(services = injector.instance[BlobKeyServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),

@@ -90,7 +90,7 @@ trait CanInsertAndUpdateAsThroughTransientServices[
  */
 trait HasTransientServices[T] { this: Serializable =>
   /** services parameter */
-  def _services: T
+  protected def _services: T
 
   /** accessor, defaults to injected instance */
   def services(implicit manifest: Manifest[T]): T = if (_services == null) _services else defaultServices
