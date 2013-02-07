@@ -39,6 +39,8 @@ ul.credit-cards {
 	  &.discover { background-position: 100% 50%; }
   }
 
+  // Put this class on the UL as well as any class such as "visa", "mastercard",
+  // etc, in order to have the correct card highlighted.
   &.dynamic-highlighting {
   	li:after {
 	  	display:block;
@@ -68,6 +70,8 @@ ul.credit-cards {
 	  }
 	}
 
+  // Put this class on the UL as well as any class such as "visa", "mastercard",
+  // etc, in order to have the correct card appear, and none of the others.
   &.dynamic-hiding {
   	li { display:none; }
 

@@ -82,7 +82,7 @@ function(page, window, logging, requireModule) {
           });
         }
 
-        // Populate social links
+        // Populate social links asynchronously
         require(["services/social-links"], function(links) {
           links.insertIntoPage();
         });

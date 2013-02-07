@@ -1,3 +1,14 @@
+/**
+  Configures an angular directive that monitors user "attention". Here, attention is defined
+  by having focused then un-focused on an element. The directive sets some configuration onto
+  the NgModel controller under the "userAttention" property. It also sets the class
+  ng-user-has-attended on the input itself.
+
+  Access whether an NgModel controller has been attended to by the user by reading
+  controller.userAttention.attended
+
+  The directive is "monitor-user-attention"
+*/
 /*global angular*/
 define(
 [

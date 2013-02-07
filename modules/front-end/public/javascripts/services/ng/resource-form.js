@@ -1,3 +1,9 @@
+/**
+  Provides two directive: remote-resource and resource-property. They handle asynchronous
+  live posting and validation of form data with arbitrary remote data sources.
+
+  This file needs some serious dox. Until then, see the checkout page for best usage
+*/
 /*global angular*/
 define(
 [

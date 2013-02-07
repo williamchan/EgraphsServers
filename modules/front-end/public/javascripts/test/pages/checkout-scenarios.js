@@ -1,3 +1,4 @@
+/* Testing scenarios for the checkout page in the purchase flow */
 /*global angular, describe, it*/
 define(
 [

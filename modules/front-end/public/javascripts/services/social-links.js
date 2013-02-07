@@ -1,6 +1,5 @@
 /* Provides social media links in template footer */
 define(["window"], function(window) {
-
   return {
     insertIntoPage: function() {
       // Facebook
