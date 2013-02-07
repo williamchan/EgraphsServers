@@ -62,7 +62,7 @@ trait PostOrderAdminEndpoint { this: Controller =>
                 egraphStore.findByOrder(orderId, egraphQueryFilters.publishedOrApproved).headOption match {
                   case None => Ok(<html><body>A published or approved egraph is required.</body></html>)
                   case Some(egraph) => {
-                    val pngUrl = egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, false).asPng.getSavedUrl(AccessPolicy.Public)
+                    val pngUrl = egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false).asPng.getSavedUrl(AccessPolicy.Public)
                     val framedPrintImageUrl = egraph.getFramedPrintImageUrl
                     val csv = PrintManufacturingInfo.toCSVLine(buyerEmail = order.buyer.account.email,
                       shippingAddress = "",

@@ -51,7 +51,9 @@ case class PrintOrder(id: Long = 0,
    */
   def getPngUrl: Option[String] = {
     services.egraphStore.findByOrder(orderId, services.egraphQueryFilters.publishedOrApproved).headOption.map {egraph =>
-      egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, false).asPng.getSavedUrl(AccessPolicy.Public)
+      egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false)
+        .asPng
+        .getSavedUrl(AccessPolicy.Public)
     }
   }
 
