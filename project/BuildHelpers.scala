@@ -1,10 +1,11 @@
 import sbt._
 import Keys._
 import play.core.PlayVersion
+import play.Project._
 
 object BuildHelpers {
 
-  val currentPlayDependency = "play" % "play_2.9.1" % PlayVersion.current
+  val currentPlayDependency = "play" % "play_2.1.0" % PlayVersion.current
 
   val defaultModuleSettings = Project.defaultSettings ++ Seq(
     resolvers ++= Seq(
@@ -54,7 +55,7 @@ object BuildHelpers {
       Project(
         id=name,
         base=file("modules") / name,
-        settings=defaultModuleSettings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings ++ settings
+        settings=defaultModuleSettings ++ settings
       )
     }
   }

@@ -22,7 +22,7 @@ object WebsiteBuild extends Build {
       "com.google.zxing" % "core" % "2.0",
       "com.google.zxing" % "javase" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
-      "com.typesafe" %% "play-plugins-mailer" % "2.0.4" excludeAll(
+      "com.typesafe" %% "play-plugins-mailer" % "2.1.0" excludeAll(
         ExclusionRule(organization="com.cedarsoft")
       ),
 //      "junit-addons" % "junit-addons" % "1.4",
@@ -85,8 +85,7 @@ object WebsiteBuild extends Build {
       appName,
       appVersion,
       appDependencies,
-      path = websiteBaseDir,
-      mainLang = SCALA
+      path = websiteBaseDir
     ).settings(cloudBeesSettings: _*)
     .settings(
       organization := "egraphs",

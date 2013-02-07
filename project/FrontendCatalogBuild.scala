@@ -23,8 +23,7 @@ object FrontendCatalogBuild extends Build {
       "front-end-catalog",
       appVersion,
       appDependencies,
-      path = file(".") / "apps" / "front-end-catalog",
-      mainLang = SCALA
+      path = file(".") / "apps" / "front-end-catalog"
     ).settings(
       organization := "egraphs",
       

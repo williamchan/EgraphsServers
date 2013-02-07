@@ -2,7 +2,6 @@ import cloudbees.Plugin._
 import sbt._
 import Keys._
 import play.Project._
-import cloudbees.Plugin._
 
 object ApplicationBuild extends Build {
 
@@ -25,8 +24,7 @@ object ApplicationBuild extends Build {
     appName, 
     appVersion, 
     appDependencies, 
-    path = baseDir,
-    mainLang = SCALA
+    path = baseDir
   ).settings(
     // Add your own project settings here 
     testOptions in Test := Nil

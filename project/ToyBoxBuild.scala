@@ -24,8 +24,7 @@ object ToyBoxBuild extends Build {
     appName, 
     appVersion, 
     appDependencies,
-    path = baseDir, 
-    mainLang = SCALA
+    path = baseDir
   ).settings(
     // Copied from build helpers
     resolvers ++= Seq(

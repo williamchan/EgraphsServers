@@ -19,8 +19,7 @@ object IntegrationBuild extends Build {
       appName,
       appVersion,
       appDependencies,
-      path = file(".") / "apps" / "integration-app",
-      mainLang = SCALA
+      path = file(".") / "apps" / "integration-app"
     ).settings(
       organization := "egraphs",
       

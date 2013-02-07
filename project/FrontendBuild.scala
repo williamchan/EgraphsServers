@@ -30,8 +30,7 @@ object FrontendBuild extends Build {
     appName,
     appVersion,
     appDependencies,
-    path = file(".") / "modules" / "front-end",
-    mainLang = SCALA
+    path = file(".") / "modules" / "front-end"
   ).settings(
     //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
     organization := "egraphs",
