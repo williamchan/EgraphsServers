@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 
 /**
  * Builds the front-end Play 2.0 module. Provides the 'frontend' project to Play / SBT.
@@ -26,7 +26,7 @@ object FrontendBuild extends Build {
     (base / "bootstrap" / "less" / "bootstrap" * "bootstrap.less") //twitter bootstrap
   )
 
-  val main = PlayProject(
+  val main = play.Project(
     appName,
     appVersion,
     appDependencies,

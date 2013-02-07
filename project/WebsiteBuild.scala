@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
 import cloudbees.Plugin._
 
@@ -81,7 +81,7 @@ object WebsiteBuild extends Build {
 
     val sep = java.io.File.separator
     val timestamp = new java.util.Date().getTime
-    val main = PlayProject(
+    val main = play.Project(
       appName,
       appVersion,
       appDependencies,

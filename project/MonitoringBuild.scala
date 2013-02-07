@@ -1,7 +1,7 @@
 import cloudbees.Plugin._
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import cloudbees.Plugin._
 
 object ApplicationBuild extends Build {
@@ -21,7 +21,7 @@ object ApplicationBuild extends Build {
     "com.typesafe.akka" % "akka-testkit" % "2.0.2" % "test"
   )
 
-  val main = PlayProject(
+  val main = play.Project(
     appName, 
     appVersion, 
     appDependencies, 

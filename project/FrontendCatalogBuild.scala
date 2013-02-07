@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 
 /**
  * Builds the front-end catalog Play 2.0 application.
@@ -19,7 +19,7 @@ object FrontendCatalogBuild extends Build {
       "org.scalatest" %% "scalatest" % "1.8" % "test"
     )
   
-    val main = PlayProject(
+    val main = play.Project(
       "front-end-catalog",
       appVersion,
       appDependencies,

@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 
 /**
  * Testing out making a simple integration app.
@@ -15,7 +15,7 @@ object IntegrationBuild extends Build {
       "org.scalatest" %% "scalatest" % "1.8" % "test"
     )
   
-    val main = PlayProject(
+    val main = play.Project(
       appName,
       appVersion,
       appDependencies,

@@ -1,7 +1,6 @@
 import sbt._
 import Keys._
 import play.core.PlayVersion
-import PlayProject._
 
 object BuildHelpers {
 

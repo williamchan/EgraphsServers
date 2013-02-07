@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import play.core.PlayVersion
 
 import BuildHelpers.ModuleProject
@@ -15,7 +15,7 @@ object ToyBoxSampleBuild extends Build {
     
   val appDependencies = Seq()
 
-  val main = PlayProject(
+  val main = play.Project(
     appName, 
     appVersion, 
     appDependencies,
