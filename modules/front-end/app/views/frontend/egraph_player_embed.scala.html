@@ -1,0 +1,34 @@
+@(mp4Url: String,
+  videoPosterUrl: String,
+  celebrityName: String,
+  recipientName: String
+)(implicit
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData,
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@title = {@celebrityName egraph for @recipientName}
+
+@headHtml = {
+<link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+<script src="https://vjs.zencdn.net/c/video.js"></script>
+}
+
+@baseBody = {
+  <div id="main" class="egraph-embed">
+    <video id="egraph-player-embed" class="video-js vjs-default-skin" controls
+           preload="auto" width="100%" height="100%" poster="@videoPosterUrl"
+           data-setup="{}">
+      <source src="@mp4Url" type='video/mp4'>
+    </video>
+  </div>
+}
+
+@base_template(
+  title=title.toString,
+  headHtml=headHtml,
+  body=baseBody,
+  bodyClasses=Seq("egraph-embed"),
+  suppressHeaderAndFooter=true
+)

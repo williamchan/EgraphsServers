@@ -48,6 +48,7 @@ GET     /ChoosePhoto/withRecentEgraphs                            controllers.Ch
 GET     /Complete/index                                           controllers.Complete.index
 
 GET     /Egraph/index                                             controllers.Egraph.egraph()
+GET     /Egraph/embed                                             controllers.Egraph.egraph_player_embed()
 GET     /Egraph/landscape                                         controllers.Egraph.classicLandscape(isPromotional: Boolean ?= false)
 GET     /Egraph/portrait                                          controllers.Egraph.classicPortrait(isPromotional: Boolean ?= false)
 
