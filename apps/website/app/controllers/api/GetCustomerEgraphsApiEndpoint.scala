@@ -31,7 +31,7 @@ case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, 
   import _root_.frontend.formatting.DateFormatting.Conversions._
   private val desiredWidth = 480
   def renderedForApi: Map[String, Any] = {
-    val imageUrl = egraph.image(product.photoImage).rasterized.scaledToWidth(595).getSavedUrl(accessPolicy = AccessPolicy.Public)
+    val imageUrl = egraph.getEgraphImage(LandscapeEgraphFrame.imageWidthPixels).asPng.getSavedUrl(accessPolicy = AccessPolicy.Public)
     Map(
       "orderId" -> order.id,
       "egraphId" -> egraph.id,

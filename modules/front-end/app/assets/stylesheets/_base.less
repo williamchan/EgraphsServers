@@ -7,7 +7,6 @@
 @standardContentMaxWidth: 1020px;
 
 /* !Links */
-
 a, a:link, a:visited {
 	.transitions(color 0.25s ease);
 	&:hover { text-decoration: none; }
@@ -308,29 +307,26 @@ button  {
 }
 
 .social {
+  > ul {
 
-//    float: right;
+      padding: 20px 0 0 40px;
+      margin: 0;
+      list-style: none;
 
-    > ul {
+      li {
 
-        padding: 20px 0 0 40px;
-        margin: 0;
-        list-style: none;
+          float: left;
+          margin-left: 10px;
 
-        li {
+          a {
+          	.social-sprite(30px);
+          	display:block;
+          }
+      }
 
-            float: left;
-            margin-left: 10px;
+      li:first-child { margin-left: 0; }
 
-            a {
-            	.social-sprite(30px);
-            	display:block;
-            }
-        }
-
-        li:first-child { margin-left: 0; }
-
-    }
+  }
 
 }
 
@@ -470,9 +466,10 @@ section[role=banner] {
 
 #content {
 
-	position: relative;
-	background: @contentBackground;
 	.box-shadow(0 -8px 8px -8px rgba(0, 0, 0, .5));
+	background: @contentBackground;
+	position: relative;
+	z-index: 1;
 	
 	#main {
 

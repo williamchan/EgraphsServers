@@ -12,6 +12,7 @@ import akka.actor.Props
 import play.api.libs.concurrent.Akka
 import services.config.ConfigFileProxy
 import play.api.mvc.RequestHeader
+import services.blobs.AccessPolicy
 
 /**
  * Actor that performs most of the work of creating an egraph and running it through our biometrics
@@ -65,7 +66,7 @@ case class EgraphActor @Inject() (
 
               egraph.assets.generateAndSaveMp3()
               // TODO(egraph-exploration): Work in progress. Not finalized.
-//              egraph.assets.generateAndSaveMp4()
+//              egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
 
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
               if (config.adminreviewSkip) {

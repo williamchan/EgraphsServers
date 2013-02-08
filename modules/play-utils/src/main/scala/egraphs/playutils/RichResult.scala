@@ -1,13 +1,12 @@
 package egraphs.playutils
 
+import org.joda.time.DateTimeConstants
 import play.api.mvc.{Session, Result, PlainResult, Cookies}
 import play.api.http.HeaderNames.SET_COOKIE
 import play.api.mvc.AsyncResult
 import play.api.mvc.RequestHeader
 import play.api.mvc.CookieBaker
 import play.api.mvc.Flash
-import play.api.mvc.AsyncResult
-import org.joda.time.DateTimeConstants
 import play.api.mvc.SimpleResult
 
 /**
@@ -28,6 +27,18 @@ import play.api.mvc.SimpleResult
  */
 class RichResult(result: Result) {
   
+  /**
+   * Extracts the Status code of this Result value. Copied from Play20's
+   * play.api.test.Helpers.status(of: Result)
+   */
+  def status: Option[Int] = result match {
+    case Result(status, _) => Some(status)
+    case _ => None
+    //FIXME: need to update in Play 2.1, will be better since can work on async results
+//    case PlainResult(status, _) => status
+//    case AsyncResult(p) => status(p.await.get)
+  }
+
   /**
    * Returns the [[play.api.mvc.Result]]'s session as represented in its
    * SET_COOKIE header, if it had one. Otherwise returns None.
@@ -76,6 +87,15 @@ class RichResult(result: Result) {
   {
     val originalSessionMap = this.session.getOrElse(requestHeader.session).data 
     this.withSession(Session(originalSessionMap ++ newSessionTuples.toMap))
+  }
+
+  def removeFromSession
+    (removedKeys: String*)
+    (implicit requestHeader: RequestHeader)
+    : Result = 
+  {
+    val originalSessionMap = this.session.getOrElse(requestHeader.session).data 
+    this.withSession(Session(originalSessionMap -- removedKeys))
   }
 
   //

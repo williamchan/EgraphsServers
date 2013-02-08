@@ -122,7 +122,7 @@ class AccountSettingsForm(val paramsMap: Form.Readable, check: FormChecks, custo
       city = city.value.get.getOrElse(""),
       state = stateStr,
       postalCode = postalCode.value.get.getOrElse(""),
-      noticeStars = noticeStars.value.get.getOrElse("false"))
+      noticeStars = noticeStars.value.get.getOrElse("off"))
   }
 }
 

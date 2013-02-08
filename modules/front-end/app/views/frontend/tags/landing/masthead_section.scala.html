@@ -13,10 +13,32 @@
 
 @standardHeadline = {
   <h1>Get an egraph from your favorite star</h1>
-  <a class="helper" href="#">What is an egraph? &gt;&gt;</a>
+  <p class="play-egraph">
+    <a href="#" class="button">
+      <strong>View Video<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
+    </a>
+  </p>
 }
 
-<section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
+@videoModal = {
+  <div id="video-modal" class="modal hide fade egraph-video-modal" data-backdrop="static">
+    <div class="modal-header">
+    What is an egraph?
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="egraph-container">
+        <div id="egraph-video">
+        </div>
+      </div>  
+      <div class="modal-body-separator">
+        <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true" href="">Close</a>
+      </div>
+    </div>
+  </div>     
+}
+
+<section id="masthead-home" role="banner" class="flyout-pull-right" style="background-image: url(@mastheadImageUrl);">
   <div class="banner-gradient">
     <div class="container">
       <div class="row">
@@ -31,18 +53,15 @@
             @getStartedUrl.map{ url =>
             @{
               celebrityPublicName match {
-                case None => tags.landing.searchbox(url, autofocus=true, helper=false)
+                case None => {}
                 case Some(name) => tags.landing.get_started(url)
               }
             }
           }
-
         </div>
-
       </div>
-
     </div>
-
   </div>
-
+  @videoModal
 </section> <!-- end #masthead-home -->
+     

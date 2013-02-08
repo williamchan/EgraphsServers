@@ -5,6 +5,20 @@
 // Default styles (all screen sizes)
 
 @navbarZIndex: 9001; // over 9000
+@flyoutWidth: 200px;
+
+#left-flyout {
+  display: none;
+}
+
+#top, #bottom, #content, .flyout-pull-right {
+    -webkit-transition: -webkit-transform .2s ease-in-out;
+    -moz-transition: -moz-transform .2s ease-in-out;
+    -ms-transition: -ms-transform .2s ease-in-out;
+    -o-transition: -o-transform .2s ease-in-out;
+    transition: transform .2s ease-in-out;
+    .no-flicker();
+}  
 
 header.top {
   .clearfix();
@@ -18,6 +32,14 @@ header.top {
   text-shadow: 0 1px 1px @white;
   top: 0;
   z-index: @navbarZIndex;
+
+  .navbar-expand {
+    display: none;
+  } 
+  // Bootsrap overrides
+  .navbar {
+    margin-bottom: 0;
+  }
   
   &.relative {
     position:relative;
@@ -40,8 +62,8 @@ header.top {
     text-align: center;
 
     a {
-      padding-left: 15px;
-      padding-right: 15px;
+      padding-left: 14px;
+      padding-right: 14px;
     }
 
     > div {
@@ -231,7 +253,6 @@ header.top {
   }
 }
 
-
 @media (max-width: 979px) and (min-width: 769px) {
   header.top {
     .social {
@@ -262,21 +283,75 @@ header.top {
   } // end header.top
 }
 
+@media(max-width: 768px) {
+  #top, #bottom, #content, .flyout-pull-right {
+    .translate(0,0);
+    &.left-flyout-push {
+      .translate(@flyoutWidth + 1, 0);
+    }
+  }
 
-//
-// At this width alter the breadcrumbs to become more condensed. Introduce
-// forward slashes as a delimiter and use smaller social links.
-//
+  #left-flyout {
+    .box-shadow(inset 0px 0px 15px 0px rgba(26,26,26,1)); 
+    .transition(visibility 0 linear .2s);
+    background-color: @grayDarker;
+    border-right: 1px solid rgba(255,255,255,.15);
+    display: block;
+    height: 100%;
+    position: fixed;
+    visibility: hidden;
+    width: @flyoutWidth;
+    z-index: -1;
+    &.is-visible {
+      z-index: 0;
+      .transition(z-index 0 linear .2s);
+      visibility: visible;
+    }
+
+    ul {
+      border-bottom: 1px solid rgba(255,255,255,.15);
+      list-style-type: none;
+      margin: 0;
+      text-transform: uppercase;
+      width: 100%;
+      
+      li {
+        line-height: 2.5em;
+        padding-left: 10px;
+
+        a {
+          text-shadow: 0px -1px 0px black;
+          color: @white;
+          font-size: 16px;
+          font-weight:300;
+          text-transform: uppercase;
+
+          &:hover {
+            color: @orange; 
+          }    
+        }
+      }
+     
+      &:last-of-type {
+        border-bottom: none;
+      }
+    } 
+  }
+}
+
 @media (max-width: 768px) {
 
   header.top {
     padding-top:5px;
     padding-bottom: 0;
-          
-    .mobile-only {
-      display:block;
-    }
 
+    .container {
+      padding: 0;
+      .row {
+      // margin-left: -20px;
+      }
+    } 
+         
     .logo {
       float:left;
       padding-top: 0px;
@@ -288,153 +363,39 @@ header.top {
         }
       }
     }
-
-    .linkz {
-      float: left;
-      margin-left: 0%;
-      margin-right: 0%;
-      text-align:center;
-      width: 67%;
-
-      .navbar-item {
-        display:inline-block;
-        border: none;
-        float:none;
-
-        p { 
-          border: none;
-        }
-
-        a {
-          border: none;
-          padding-left:0px;
-          padding-right:0px;
-          line-height: 0em;
-        }
-
-        > div {
-          display: inline;
-	      border: none;
-	      padding-left:0px;
-	      padding-right:0px;
-        }
-
-        .separator-after:after {
-          content: "/";
-          padding-right:9px;
-          padding-left:13px;
-          color: #ddd;
-        }
-
-        a.responsive-social-sprite {
-          .social-sprite(20px);
-          vertical-align:middle;
-          margin-bottom:2px;
-        }
-      }
-    }
-
-    .search-control {
-      input[type="search"] {
-        width: 133px;
-      }
-    }
-
-    .account > ul {
-      position: static;
-      
-      .account-options ul {
-        left: 0;
-        top: 100%;
-      }
-    }    
-  
-    .span3,.span6 {
-      float: none;
-      overflow: hidden;
-    }
-  
-    .account {
     
-      float: left;
-      border: none;
-      
-      > ul {
-        height:auto;
-        padding-top:0px;
-        padding-left: 0;
-        padding-right: 0;
-        border: none;
-      
-      }
-    }
-
-    .social > ul { 
-      padding:0px;
-      padding-bottom:7px;
-    }
-  }
-}
-
-
-//
-// Bump the links and search bar to the next line, and make header no longer fixed.
-//
-@media (max-width: 688px) {
-  header.top {
-    display: none;
-
-    &.relative {
-      display:block;
-      visibility: visible;
-    }
-
-    .linkz {
-      float: center;
-      margin-left: 0px;
-      margin-right: 0px;
-      padding-top: 0px;
-      position: static;
-      width: auto;
-    }
-  }
-}
-
-//
-// Bump text links to the second level when the screen becomes small enough that
-// the they would run into the social tools.
-//
-@media (max-width: 600px) {
-  header.top {
-    // Pop the text linkz down to the second row
     #logo-account-social {
       .clearfix();      
+      display: inline;
+      float: right;
+      .logo {
+        margin-right: 0;
+      }  
     }
-  }
-}
+    
+    .wide-only {
+      display: none;
+    }
+    
+    .navbar-expand {
+      display: block;
+      float: left;
+      .btn-navbar { 
 
+        border: none;
+        background: @offWhite;
+        cursor: pointer;
 
-//
-// For super-small screens condense the linkz even more. This breakpoint has increased to 
-// iPhone width to accomodate more than two links in the top bar.
-//
-@media (max-width: 480px) {
-  header.top {
-    .linkz {
-      .navbar-item {
-        .separator-after:after {
-          padding-left: 3px;
-          padding-right: 1px;
-        }
-
-        .search-control {
-          margin-top: 5px;
+        span.icon-bar {
+          background-image: none;
+          .buttonBackground(lighten(@orange, 10%), @orange);
+          width: 24px;
+          height: 4px;
         }
       }
     }
-  }
-}
-
+  }  
+}  
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 

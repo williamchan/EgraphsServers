@@ -102,7 +102,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             recipientName = validPersonalizeForm.recipientName,
             messageText=PurchaseForms.makeTextForCelebToWrite(
               validPersonalizeForm.writtenMessageRequest,
-              validPersonalizeForm.writtenMessageText
+              validPersonalizeForm.writtenMessageText,
+              celebrityGender = celeb.gender
             ),
             editUrl = getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
           )
@@ -189,11 +190,10 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           totalAmountPaid=forms.total(subtotal = subtotal, discount = discount),
           coupon=maybeCoupon,
           billingPostalCode=billing.postalCode,
-          flash=request.flash,
           printingOption=forms.highQualityPrint.getOrElse(PrintingOption.DoNotPrint),
           shippingForm=shipping,
           writtenMessageRequest=personalization.writtenMessageRequest
-        ).execute()        
+        ).execute()
       }
       
       failureOrSuccessRedirects.merge

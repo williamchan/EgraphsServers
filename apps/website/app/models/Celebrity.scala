@@ -16,7 +16,8 @@ import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
 import org.squeryl.dsl.ManyToMany
-import views.html.frontend.{celebrity_welcome_email, celebrity_welcome_email_text}
+import views.html.frontend.email.{celebrity_welcome => celebrity_welcome_html}
+import views.txt.frontend.email.{celebrity_welcome => celebrity_welcome_txt}
 import anorm._
 import services.mvc.celebrity.CelebrityViewConversions
 import play.api.libs.concurrent.Promise
@@ -28,6 +29,7 @@ import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.CatalogStarsQuery
 import java.util.Date
 import org.apache.commons.codec.binary.Base64
+import egraphs.playutils.{Gender, HasGender}
 
 /**
  * Services used by each celebrity instance
@@ -61,6 +63,7 @@ case class Celebrity(id: Long = 0,
                      twitterUsername: Option[String] = None,
                      profilePhotoUpdated: Option[String] = None, //TODO: rename to _profilePhotoKey
                      expectedOrderDelayInMinutes: Int = 30 * DateTimeConstants.MINUTES_PER_DAY,
+                     _gender: String = Gender.Male.name,
                      _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
                      _landingPageImageKey: Option[String] = None,
@@ -72,6 +75,7 @@ case class Celebrity(id: Long = 0,
   with HasCreatedUpdated
   with HasPublishedStatus[Celebrity]
   with HasEnrollmentStatus[Celebrity]
+  with HasGender[Celebrity]
 {
 
   /**
@@ -275,8 +279,8 @@ case class Celebrity(id: Long = 0,
     val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(
       email, 
-      text=Some(celebrity_welcome_email_text(publicName, account.email, appDownloadLink).toString),
-      html=Some(celebrity_welcome_email(publicName, account.email, appDownloadLink))
+      text=Some(celebrity_welcome_txt(publicName, account.email, appDownloadLink).toString),
+      html=Some(celebrity_welcome_html(publicName, account.email, appDownloadLink))
     )
   }
 
@@ -294,6 +298,10 @@ case class Celebrity(id: Long = 0,
 
   override def withEnrollmentStatus(status: EnrollmentStatus.EnumVal) = {
     this.copy(_enrollmentStatus = status.name)
+  }
+
+  override def withGender(gender: Gender.EnumVal) = {
+    this.copy(_gender = gender.name)
   }
 
   //

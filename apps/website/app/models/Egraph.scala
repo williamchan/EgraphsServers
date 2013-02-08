@@ -19,12 +19,9 @@ import com.google.inject.{Provider, Inject}
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 import org.squeryl.Query
 import print.{StandaloneCertificatePrint, LandscapeFramedPrint}
-import video.VideoEncoder
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import controllers.website.consumer.{StorefrontChoosePhotoConsumerEndpoints, CelebrityLandingConsumerEndpoint}
 import java.util.Date
-import java.io.{File, ByteArrayInputStream}
-import javax.imageio.ImageIO
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -85,10 +82,12 @@ case class Egraph(
   import EgraphState._
 
   private lazy val blobKeyBase = "egraphs/" + id
+  private def imageAssetBlobKeyBase = blobKeyBase + "/image"
+  private def videoAssetBlobKeyBase = blobKeyBase + "/video"
+
   private def framedPrintVersion = "v" + LandscapeFramedPrint.currentVersion
   private def framedPrintBlobKey = blobKeyBase + "/framed-print/" + framedPrintVersion + "/" + framedPrintFilename
   def framedPrintFilename = "order" + orderId + ".jpg" // this cannot change it is linked to printer specifications
-
   private def standaloneCertPrintVersion = "v" + StandaloneCertificatePrint.currentVersion
   private def standaloneCertPrintBlobKey = blobKeyBase + "/certificate/" + standaloneCertPrintVersion + "/" + standaloneCertPrintFilename
   def standaloneCertPrintFilename = "order" + orderId + "-cert.jpg"
@@ -175,7 +174,7 @@ case class Egraph(
     EgraphImage(
       ingredientFactory=imageIngredientFactory(order.product, productPhoto),
       graphicsSource=services.graphicsSourceFactory(),
-      blobPath=blobKeyBase + "/image"
+      blobPath=imageAssetBlobKeyBase
     )
   }
 
@@ -211,11 +210,15 @@ case class Egraph(
         val thisOrder = order
         val product = thisOrder.product
         val celebrity = product.celebrity
-        val egraphImage = getSavedEgraphUrlAndImage(LandscapeFramedPrint.targetEgraphWidth)._2
+
+        // Generate and save print-sized egraph image, and get it as a BufferedImage to be passed to LandscapeFramedPrint
+        val egraphImageAsPng = getEgraphImage(LandscapeFramedPrint.targetEgraphWidth).asPng
+        egraphImageAsPng.getSavedUrl(AccessPolicy.Public)
+        val egraphImage = egraphImageAsPng.transformAndRender.graphicsSource.asInstanceOf[RasterGraphicsSource].image
 
         val framedPrintImage = LandscapeFramedPrint().assemble(
           orderNumber = orderId.toString,
-          egraphImage = egraphImage(),
+          egraphImage = egraphImage,
           teamLogoImage = product.icon.renderFromMaster,
           recipientName = thisOrder.recipientName,
           celebFullName = celebrity.publicName,
@@ -260,11 +263,13 @@ case class Egraph(
   }
 
   /**
+   * TODO(SER-677): This method is slow as balls because it calls renderFrommaster no product.photoImage.
+   *
    * @param width the desired width of the egraph image. If this width is larger than the width of the master egraph
    *              image, then the master egraph image's width will be used instead.
-   * @return url of the egraph image in PNG format, along with the image data
+   * @return the egraph image asset
    */
-  def getSavedEgraphUrlAndImage(width: Int): (String, () => BufferedImage) = {
+  def getEgraphImage(width: Int): EgraphImage = {
     val product = order.product
     val rawSignedImage = image(product.photoImage)
     // targetWidth is either the default width, or the width of the master if necessary to avoid upscaling
@@ -272,11 +277,14 @@ case class Egraph(
       val masterWidth = product.photoImage.getWidth
       if (masterWidth < width) masterWidth else width
     }
-    val egraphImage = rawSignedImage
+    rawSignedImage
       .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
+      .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY)
       .scaledToWidth(targetWidth)
-      .rasterized
-    (egraphImage.getSavedUrl(AccessPolicy.Public), () => egraphImage.transformAndRender.graphicsSource.asInstanceOf[RasterGraphicsSource].image)
+  }
+
+  def getVideoAsset: EgraphVideoAsset = {
+    EgraphVideoAsset(blobPath = videoAssetBlobKeyBase, egraph = this)
   }
 
   /**
@@ -433,88 +441,12 @@ case class Egraph(
       }
     }
 
-    override def audioMp4Url = {
-//      println("Generating mp4 file for " + mp4Key + "...")
-//      generateAndSaveMp4()
-//      blobs.getUrl((mp4Key))
-
-      blobs.getUrlOption((mp4Key)).getOrElse {
-        generateAndSaveMp4()
-        blobs.getUrl((mp4Key))
-      }
-    }
-
     /**
      * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
      */
     override def generateAndSaveMp3() {
       val mp3 = AudioConverter.convertWavToMp3(audioWav.asByteArray, blobKeyBase)
       blobs.put(mp3Key, mp3, access=AccessPolicy.Public)
-    }
-
-    // TODO(egraph-exploration): Work in progress. Not finalized.
-    override def generateAndSaveMp4() {
-      val wavTempFile = TempFile.named(blobKeyBase + "/temp.wav")
-      val sourceMp3TempFile = TempFile.named(blobKeyBase + "/source.mp3")
-      val sourceAacTempFile = TempFile.named(blobKeyBase + "/source.aac")
-      val finalAacTempFile = TempFile.named(blobKeyBase + "/final.aac")
-      val egraphImageTempFile = TempFile.named(blobKeyBase + "/egraph.jpg")
-      val videoNoAudioFile = TempFile.named(blobKeyBase + "/no-audio.mp4")
-      val videoWithAudioFile = TempFile.named(blobKeyBase + "/with-audio.mp4")
-      val finalMp4TempFile = TempFile.named(blobKeyBase + "/final.mp4")
-
-      // get audio duration
-      Utils.saveToFile(audioWav.asByteArray, wavTempFile)
-      val audioDuration = AudioConverter.getDurationOfWavInSeconds(wavTempFile)
-
-      // build final aac file
-      Utils.saveToFile(audioMp3.asByteArray, sourceMp3TempFile)
-      // FIXME: this should go wav >> aac
-      Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
-      VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
-
-      // get egraph image jpg
-      val thisOrder = order
-      val product = order.product
-      val egraphImage = image(product.photoImage).withPenWidth(Handwriting.defaultPenWidth).withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
-        .withPenShadowOffset(Handwriting.defaultShadowOffsetX, Handwriting.defaultShadowOffsetY).scaledToWidth(VideoEncoder.canvasWidth).rasterized
-      val imageBytes = egraphImage.transformAndRender.graphicsSource.asByteArray
-      val bufferedImage = ImageIO.read(new ByteArrayInputStream(imageBytes))
-      val convertedImg = new BufferedImage(bufferedImage.getWidth, bufferedImage.getHeight, BufferedImage.TYPE_3BYTE_BGR)
-      convertedImg.getGraphics.drawImage(bufferedImage, 0, 0, null)
-      import ImageUtil.Conversions._
-      val jpgBytes = convertedImg.asByteArray(ImageAsset.Jpeg)
-      Utils.saveToFile(jpgBytes, egraphImageTempFile)
-
-      val videoNoAudioFileName = videoNoAudioFile.getPath
-      VideoEncoder.generateMp4_no_audio_xuggle(
-        targetFileName = videoNoAudioFileName,
-        egraphImageFile = egraphImageTempFile,
-        recipientName = thisOrder.recipientName,
-        celebrityName = product.celebrity.publicName,
-        audioDuration = audioDuration
-      )
-
-      VideoEncoder.muxVideoWithAAC_mp4parser(
-        videoFile = new File(videoNoAudioFileName),
-        audioFile = finalAacTempFile,
-        targetFile = videoWithAudioFile
-      )
-
-      Utils.convertMediaFile(videoWithAudioFile, finalMp4TempFile)
-      val mp4Bytes = Blobs.Conversions.fileToByteArray(finalMp4TempFile)
-
-      wavTempFile.delete()
-      sourceMp3TempFile.delete()
-      sourceAacTempFile.delete()
-      finalAacTempFile.delete()
-      egraphImageTempFile.delete()
-      videoNoAudioFile.delete()
-      videoWithAudioFile.delete()
-      finalMp4TempFile.delete()
-      //TODO also need to delete png, which apparently is also saved to disk
-
-      blobs.put(mp4Key, mp4Bytes, access = AccessPolicy.Public)
     }
 
     override def message: Option[String] = {
@@ -535,8 +467,6 @@ case class Egraph(
 
     lazy val wavKey = blobKeyBase + "/audio.wav"
     lazy val mp3Key = blobKeyBase + "/audio.mp3"
-    lazy val mp4Key = blobKeyBase + "/egraph.mp4"
-    lazy val webmKey = blobKeyBase + "/egraph.webm"
     lazy val signatureJsonKey = signatureKey + ".json"
     lazy val messageJsonKey = messageKey + ".json"
 
@@ -687,7 +617,6 @@ case class EgraphStory(
   }
 }
 
-
 /**
  * Visual and audio assets associated with the Egraph entity. These are stored in the blobstore
  * rather than the relational database. Access this class via the assets method
@@ -712,7 +641,6 @@ trait EgraphAssets {
   /**
    * Retrieves the bytes of mp3 audio from the blobstore.
    * Also lazily initializes the mp3 from the wav, though EgraphActor should have handled that.
-   * TODO(wchan): This method does not need to be here.
    */
   def audioMp3: Blob
 
@@ -723,20 +651,9 @@ trait EgraphAssets {
   def audioMp3Url: String
 
   /**
-   * Retrieves the url of the mp4 in the blobstore.
-   * Also lazily initializes the mp4, though EgraphActor should have handled that.
-   */
-  def audioMp4Url: String
-
-  /**
    * Encodes an mp3 from the wav asset and stores the mp3 to the blobstore.
    */
   def generateAndSaveMp3()
-
-  /**
-   * Encodes an mp4 and stores it to the blobstore.
-   */
-  def generateAndSaveMp4()
 
   /** Stores the assets in the blobstore */
   def save(signature: String, message: Option[String], audio: Array[Byte])
@@ -1013,7 +930,10 @@ object EgraphFrame {
   }
 }
 
-/** The default egraph portrait frame */
+/**
+ * The default egraph portrait frame
+ * @deprecated With video-fied egraphs, we are dropping support for portrait-oriented egraphs.
+ */
 object PortraitEgraphFrame extends EgraphFrame {
   override val name: String = "Default Portrait"
 

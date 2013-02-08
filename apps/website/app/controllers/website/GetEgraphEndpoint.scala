@@ -8,12 +8,14 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Session
 import services._
+import blobs.AccessPolicy
 import mvc.egraphs.EgraphView
-import services.graphics.Handwriting
 import services.http.ControllerMethod
 import services.http.EgraphsSession.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import _root_.frontend.formatting.DateFormatting.Conversions._
+import social.Pinterest
+import video.VideoEncoder
 
 private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData { 
   this: Controller =>
@@ -27,39 +29,58 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   protected def facebookAppId: String
   protected def consumerApp: ConsumerApplication
 
-  val penWidth: Double=Handwriting.defaultPenWidth
-  val shadowX: Double=Handwriting.defaultShadowOffsetX
-  val shadowY: Double=Handwriting.defaultShadowOffsetY
-
   //
   // Controllers
   //
 
+  def getVideoTest = controllerMethod.withForm() { implicit authToken =>
+    Action { implicit request => Ok(views.html.frontend.video_test()) }
+  }
+
   def getEgraph(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
+
+    /**
+     * Sneakpeak URLs for these Egraphs:
+     * Josh Hamilton: 462
+     * Kenny Mendes's: 1033, 2404
+     * Smith Family: 46
+     * board members on beta: 624
+     * localhost test: 2
+     */
       orderStore.findFulfilledWithId(orderId) match {
         case None => NotFound("No Egraph exists with the provided identifier.")
+        case Some(FulfilledOrder(order, egraph)) if (!List(462, 1033, 2404, 46, 624, 2).contains(orderId)) => NotFound("Not available")
         case Some(FulfilledOrder(order, egraph)) =>
           val product = order.product
           val celebrity = product.celebrity
-          val mp4Url = egraph.assets.audioMp4Url
-          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-          // TODO(wchan): This should point to a jpg. (svzg renders the signature before the image, which is weird.)
-          val videoPosterUrl = ""
+          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public/*, overwrite = true*/)
+          val egraphStillUrl = egraph.getEgraphImage(VideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
+          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+          val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
+          val celebrityNameForTweet = celebrity.twitterUsername match {
+            case Some(username) => "@" + username
+            case None => celebrity.publicName
+          }
+          val tweetText = "An egraph for " + order.recipientName + " from " + celebrityNameForTweet
+          val shareOnPinterestLink = Pinterest.getPinterestShareLink(
+            url = thisPageLink,
+            media = egraphStillUrl,
+            description = celebrity.publicName + " egraph for " + order.recipientName)
           Ok(views.html.frontend.egraph(
             mp4Url = mp4Url,
-            videoPosterUrl = videoPosterUrl,
+            videoPosterUrl = egraphStillUrl,
             celebrityName = celebrity.publicName,
             celebrityTagline = celebrity.roleDescription,
             recipientName = order.recipientName,
             privacySetting = order.privacyStatus.name,
             messageToCelebrity = order.messageToCelebrity,
-            // productIcon should be sized down to the final display dimensions.
             productIconUrl = product.iconUrl,
             signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
             thisPageLink = thisPageLink,
-            shareOnFacebookLink = "",
-            shareOnTwitterLink = "",
+            classicPageLink = classicPageLink,
+            shareOnPinterestLink = shareOnPinterestLink,
+            tweetText = tweetText,
             isPromotional = order.isPromotional
           ))
       }
@@ -95,8 +116,8 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   }
 
   private def isViewable(order: Order)(implicit session: Session): Boolean = {
-    val customerIdOption = session.customerId.map(customerId => customerId.toLong)
-    val adminIdOption = session.adminId.map(adminId => adminId.toLong)
+    val customerIdOption = session.customerId.map(customerId => customerId)
+    val adminIdOption = session.adminId.map(adminId => adminId)
 
     order.isPublic ||
       order.isBuyerOrRecipient(customerIdOption) ||

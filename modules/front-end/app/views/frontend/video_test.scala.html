@@ -1,0 +1,66 @@
+@(celebrityName: String = "Matt Silverman",
+recipientName: String = "Dr. Horrible",
+isPromotional: Boolean = false
+)(implicit
+headerData: models.frontend.header.HeaderData,
+footerData: models.frontend.footer.FooterData,
+authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@title = {@celebrityName egraph for @recipientName}
+
+@headHtml = {
+<link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+<script src="https://vjs.zencdn.net/c/video.js"></script>
+}
+
+@headJs = {
+Egraphs.page.celebrityName = "@celebrityName";
+}
+
+@baseBody = {
+
+@** Facebook Comments plugin - https://developers.facebook.com/docs/reference/plugins/comments/ *@
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=156115741184892";
+  fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));</script>
+
+@** Twitter tweet plugin - https://dev.twitter.com/docs/tweet-button *@
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
+@** Pinterest pin button - http://pinterest.com/about/goodies/ *@
+<script type="text/javascript" src="//assets.pinterest.com/js/pinit.js"></script>
+
+<section id="content" class="egraph-page" role="main">
+  <div id="main" class="egraph">
+    <div class="container">
+      <div class="egraph-container">
+        <div class="egraph-player-container">
+          <video id="egraph-player" class="video-js vjs-default-skin" controls
+                 preload="auto" width="100%" height="100%"
+                 poster="https://egraphs.s3.amazonaws.com/egraphs/481/image/signing-origin-offset-0x0_shadow-offset-3.00x3.00_global-width-600px-v1.jpg"
+                 data-setup="{}">
+            <source src="https://egraphs.s3.amazonaws.com/egraphs/481/video/width-600px-v0.mp4" type='video/mp4'>
+            <source src="https://s3.amazonaws.com/egraphs-static-resources/test-files/zencoder-test.webm" type='video/webm'>
+            <source src="https://s3.amazonaws.com/egraphs-static-resources/test-files/zencoder-test.ogg" type='video/ogg'>
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+}
+
+@base_template(
+title=title.toString,
+headHtml=headHtml,
+body=baseBody,
+headJs=headJs,
+bodyClasses=Seq("egraph-page")
+)

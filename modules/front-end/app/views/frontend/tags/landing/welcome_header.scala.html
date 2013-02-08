@@ -1,4 +1,6 @@
-@(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityIsMale: Boolean = true)
+@(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityGender: egraphs.playutils.Gender.EnumVal = egraphs.playutils.Gender.Male)
+
+@import egraphs.playutils.Grammar._
 
 <header id="landing-welcome" class="row">
 
@@ -7,7 +9,7 @@
     <h1>Egraphs is your direct line.</h1>
 
     <p>
-	An egraph is a shared moment between you and @celebrityCasualName.getOrElse("your favorite star"). It is immortalized forever with a beautiful high resolution photograph, handwritten note, autograph, and personalized voice message. It's his voice, his handwriting, his time — every egraph is one-of-a-kind.  Share it, print it, play it ... whatever you want <em>&ndash; it’s your egraph.</em>
+	  An egraph is a shared moment between you and @celebrityCasualName.getOrElse("your favorite star"). It is immortalized forever with a beautiful high resolution photograph, handwritten note, autograph, and personalized voice message. It's @possessivePronoun(celebrityGender) voice, @possessivePronoun(celebrityGender) handwriting, @possessivePronoun(celebrityGender) time — every egraph is one-of-a-kind.  Share it, print it, play it ... whatever you want <em>&ndash; it’s your egraph.</em>
     </p>
 	  <p>
 	    <em>This is how it works:</em>

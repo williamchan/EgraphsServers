@@ -1,10 +1,17 @@
 /* Scripting for the landing page */
-define(["Egraphs", "pages/marketplace", "bootstrap/bootstrap-tooltip", "bootstrap/bootstrap-popover"],
-function (Egraphs, marketplace) {
+define(["Egraphs",
+ "pages/marketplace",
+ "services/logging",
+ "module",
+ "bootstrap/bootstrap-tooltip",
+ "bootstrap/bootstrap-popover",
+ "services/responsive-modal"],
+function (Egraphs, marketplace, logging, requireModule) {
   /**
    * Functions for the new landing page that share dependencies with the marketplace.
    * Marketplace.js contains mixpanel tracking events.
    **/
+  var log = logging.namespace(requireModule.id);
 
   // Select a vertical
   var verticalFunction = function(e) {
@@ -23,10 +30,58 @@ function (Egraphs, marketplace) {
       marketplace.updateCategories(catVal, category, $(this).attr("data-vertical"));
       marketplace.reloadPage();
   };
-  
+
   return {
     go: function() {
       $(document).ready(function() {
+        
+        $(".play-egraph a").click(function() {
+          $("#video-modal").responsivemodal('toggle');
+        });
+        var apiLoaded = false;
+
+        var createPlayer = function(playerReadyCallback) {
+          return new YT.Player('egraph-video', {
+            videoId: 'BfU_cE6HxDw',
+            events: {'onReady': playerReadyCallback}
+          });
+        };
+
+        var onPlayerReady = function(event) {
+          $("#video-modal").on('hide', function() {
+            // Remove the player iframe to avoid weirdness around iframes being hidden.
+            $("#egraph-video").replaceWith('<div id="egraph-video"></div>');
+          });
+
+          event.target.seekTo(7.0);
+          event.target.playVideo();
+          mixpanel.track("Watched homepage video");
+        };
+
+        // Initialize the YouTube video and start playing.
+        // See this YouTube Iframe API reference
+        // https://developers.google.com/youtube/iframe_api_reference
+        //
+
+        $("#video-modal").on('shown', function() {
+          var player;
+          // Load the API selectively and create the YT object in a callback.
+          if(apiLoaded === false) {
+            var tag = document.createElement('script');
+            tag.src = "//www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            window.onYouTubeIframeAPIReady = function() {
+              apiLoaded = true;
+              log("API ready");
+              player = createPlayer(onPlayerReady);
+            };
+          } else {
+            player = createPlayer(onPlayerReady);
+          }
+        });
+
         $(".soldout-tooltip").tooltip({placement:"top"});
 
         // Mixpanel events

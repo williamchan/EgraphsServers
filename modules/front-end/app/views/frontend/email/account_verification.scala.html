@@ -1,0 +1,7 @@
+@(verifyPasswordUrl: String)
+
+@import views.html.frontend.tags
+
+@tags.email.header("Egraphs | Account Verification")
+@tags.email.account_verification(verifyPasswordUrl)
+@tags.email.footer()

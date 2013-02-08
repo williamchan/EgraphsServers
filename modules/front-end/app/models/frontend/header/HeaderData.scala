@@ -15,6 +15,8 @@ case class HeaderData(
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
   ourStarsLink: String = "/stars",
+  blogLink: String = "http://blog.egraphs.com",
   giftCertificateLink: Option[String] = None,
-  deploymentInformation: Option[DeploymentInformation] = None
+  deploymentInformation: Option[DeploymentInformation] = None,
+  updateMixpanelAlias: Boolean = false
 )

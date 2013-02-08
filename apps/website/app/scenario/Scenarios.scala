@@ -6,20 +6,13 @@ import egraphs.playutils.Encodings.Base64
 import org.apache.commons.mail.HtmlEmail
 import org.squeryl.PrimitiveTypeMode._
 import models._
-import categories.CategoryValue
 import play.api.mvc.Results.Redirect
-import controllers.WebsiteControllers
 import enums._
-import services.{Utils, AppConfig}
+import services.AppConfig
 import org.joda.time.DateTime
 import java.text.SimpleDateFormat
 import javax.imageio.ImageIO
-import controllers.website.GetAccountSettingsEndpoint
 import services.http.EgraphsSession._
-import scala.Some
-import models.Administrator
-import models.InventoryBatch
-import models.Order
 import play.api.Play
 import play.api.Play.current
 import utils.{TestData, TestConstants}
@@ -28,6 +21,7 @@ import scala.Some
 import models.Administrator
 import models.InventoryBatch
 import models.Order
+import models.frontend.email.{RegularEgraphSignedEmailViewModel, OrderConfirmationViewModel}
 
 /**
  * All scenarios supported by the API.
@@ -146,7 +140,8 @@ class Scenarios extends DeclaresScenarios {
       val celebrity = Celebrity(
         publicName = "Wizzle",
         bio = "Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
-        organization = "Major League Baseball"
+        organization = "Major League Baseball",
+        roleDescription = "Egraphs"
       ).withPublishedStatus(PublishedStatus.Published).save()
       Account(email = Scenarios.willsEmail,
         celebrityId = Some(celebrity.id)
@@ -276,7 +271,6 @@ class Scenarios extends DeclaresScenarios {
   apiCategory,
   """Will fulfills Erem's gift order for Myyk""", {
     () =>
-      val (starcraftChampionship, _) = Scenarios.getWillsTwoProducts
       val order = orderStore.findByBuyerCustomerId(Scenarios.getEremCustomerAccount.id).filter { order => order.recipient == Scenarios.getMyykCustomerAccount }.head
       order
         .withPaymentStatus(PaymentStatus.Charged).save()
@@ -371,11 +365,11 @@ class Scenarios extends DeclaresScenarios {
       email.addTo("will@egraphs.com")
       email.setSubject("Welcome to Egraphs!")
       val verifyPasswordUrl = "https://www.google.com"
-      val html = views.html.frontend.email_account_verification(verifyPasswordUrl = verifyPasswordUrl)
+      val html = views.html.frontend.email.account_verification(verifyPasswordUrl = verifyPasswordUrl)
       email.setHtmlMsg(html.toString())
-      val textVersion = views.html.frontend.email_account_verification_text(verifyPasswordUrl)
+      val textVersion = views.txt.frontend.email.account_verification(verifyPasswordUrl)
       email.setTextMsg(textVersion.toString())
-      mail.send(email)
+      mail.send(email, None, Some(html))
   }
   )
 
@@ -388,35 +382,41 @@ class Scenarios extends DeclaresScenarios {
       email.setFrom("webserver@egraphs.com", "Egraphs")
       email.addTo("will@egraphs.com")
       email.setSubject("Order Confirmation")
-      val html = views.html.frontend.email_order_confirmation(
-        buyerName = "Will Chan",
-        recipientName = "Andrew Smith",
-        recipientEmail = "me@egraphs.com",
-        celebrityName = "Celebrity Joe",
-        productName = "Product 1",
-        orderDate = "Jan 1, 2012",
-        orderId = "1234",
-        pricePaid = "$50.00",
-        deliveredByDate = "Jan 8, 2012",
-        faqHowLongLink = "/faq#how-long",
-        hasPrintOrder = true
+      val html = views.html.frontend.email.order_confirmation(
+        OrderConfirmationViewModel(
+          buyerName = "Will Chan",
+          buyerEmail = "will@egraphs.com",
+          recipientName = "Andrew Smith",
+          recipientEmail = "me@egraphs.com",
+          celebrityName = "Celebrity Joe",
+          productName = "Product 1",
+          orderDate = "Jan 1, 2012",
+          orderId = "1234",
+          pricePaid = "$50.00",
+          deliveredByDate = "Jan 8, 2012",
+          faqHowLongLink = "/faq#how-long",
+          hasPrintOrder = true
+        )
       )
       email.setHtmlMsg(html.toString())
-      val textVersion = views.html.frontend.email_order_confirmation_text(
-        buyerName = "Will Chan",
-        recipientName = "Andrew Smith",
-        recipientEmail = "me@egraphs.com",
-        celebrityName = "Celebrity Joe",
-        productName = "Product 1",
-        orderDate = "Jan 1, 2012",
-        orderId = "1234",
-        pricePaid = "$50.00",
-        deliveredByDate = "Jan 8, 2012",
-        faqHowLongLink = "/faq#how-long",
-        hasPrintOrder = true
+      val textVersion = views.txt.frontend.email.order_confirmation(
+        OrderConfirmationViewModel(
+          buyerName = "Will Chan",
+          buyerEmail = "will@egraphs.com",
+          recipientName = "Andrew Smith",
+          recipientEmail = "me@egraphs.com",
+          celebrityName = "Celebrity Joe",
+          productName = "Product 1",
+          orderDate = "Jan 1, 2012",
+          orderId = "1234",
+          pricePaid = "$50.00",
+          deliveredByDate = "Jan 8, 2012",
+          faqHowLongLink = "/faq#how-long",
+          hasPrintOrder = true
+        )
       )
       email.setTextMsg(textVersion.toString())
-      mail.send(email)
+      mail.send(email, None, Some(html))
   }
   )
 
@@ -431,15 +431,28 @@ class Scenarios extends DeclaresScenarios {
       email.addReplyTo("webserver@egraphs.com")
       email.setSubject("I just finished signing your Egraph")
       val viewEgraphUrl = "http://www.google.com"
-      val html = views.html.frontend.email_view_egraph(
-        viewEgraphUrl = viewEgraphUrl,
-        celebrityName = "Celebrity Jane",
-        recipientName = "Will Chan"
+      val html = views.html.frontend.email.view_egraph(
+        RegularEgraphSignedEmailViewModel(  
+          viewEgraphUrl = viewEgraphUrl,
+          celebrityPublicName = "Celebrity Jane",
+          recipientName = "Will Chan",
+          couponAmount = 15,
+          couponCode = "xxxxxxxxxxxx"
+        )
       )
       email.setHtmlMsg(html.toString())
-      val textVersion = views.html.frontend.email_view_egraph_text(viewEgraphUrl = viewEgraphUrl, celebrityName = "Celebrity Jane", recipientName = "Will Chan")
-      email.setTextMsg(textVersion.toString())
-      mail.send(email)
+      val textVersion = views.txt.frontend.email.view_egraph(
+        RegularEgraphSignedEmailViewModel(
+          viewEgraphUrl = viewEgraphUrl,
+          celebrityPublicName = "Celebrity Jane",
+          recipientName = "Will Chan",
+          couponAmount = 15,
+          couponCode = "xxxxxxxxxxxx"
+        )    
+      ).toString
+      email.setTextMsg(textVersion)
+      
+      mail.send(email, Some(textVersion), Some(html))
   }
   )
 
@@ -451,8 +464,9 @@ class Scenarios extends DeclaresScenarios {
   accountSettingsPage,
   """Changes All new Orders to ApprovedByAdmin, which makes them signable""", {
     () =>
-      Scenario.play("Erem-is-a-customer")      
-      Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(Key.CustomerId.name -> "1")
+      Scenario.play("Erem-is-a-customer")
+      val erem = Scenarios.getEremCustomerAccount
+      Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(Key.CustomerId.name -> erem.id.toString)
   }
   )
 

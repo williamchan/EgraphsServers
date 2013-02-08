@@ -5,16 +5,23 @@
 @import "_newsletter_modal.less";
 
 #bottom {
-
-	padding-top: 40px;
 	padding-bottom: 40px;
+	padding-top: 40px;
+	z-index: 0;
 
 	.mobile-notices {
 		display: none;
 	}
 
-	a { color: @grayLighter; }
-	a:hover{ color: @gray; }
+	a { 
+		color: @grayLighter;
+
+		&:hover { 
+			color: @gray; 
+		
+		}
+
+	}
 
 	#email-link {
       color: @orange;
@@ -117,8 +124,10 @@
 }
 
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   #bottom {
+	  background: @offWhite;
+	  padding-bottom: 100%;
 		.mobile-notices {
 			display: block;
 		}

@@ -24,8 +24,9 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       productIconUrl = EgraphsAssets.at("images/sample_product_icon.png").url,
       signedOnDate = "January 1, 2013",
       thisPageLink = "https://www.egraphs.com/stars",
-      shareOnFacebookLink = "",
-      shareOnTwitterLink = "",
+      classicPageLink = "#",
+      shareOnPinterestLink = "http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fwww.egraphs.com&media=https%3A%2F%2Fd3kp0rxeqzwisk.cloudfront.net%2Fassets%2Fimages%2Fcrowd-fp-2054508835.jpg&description=Share%20a%20moment%20with%20your%20star",
+      tweetText = "An egraph for Jordan from Sergio Romo",
       isPromotional = false
     ))
   }

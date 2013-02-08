@@ -71,6 +71,7 @@ POST     /admin/celebrities                                               contro
 GET      /admin/celebrities/search                                        controllers.WebsiteControllers.getCelebritiesBySearchAdmin
 POST     /admin/celebrities/search/rebuild                                controllers.WebsiteControllers.postRebuildSearchIndex
 GET      /admin/celebrities/twitter                                       controllers.WebsiteControllers.getTwitterData
+GET      /admin/celebrities/images/audit                                  controllers.WebsiteControllers.getImageAudit
 GET      /admin/celebrities/create                                        controllers.WebsiteControllers.getCreateCelebrityAdmin
 POST     /admin/celebrities/featured                                      controllers.WebsiteControllers.postFeaturedCelebrities
 GET      /admin/celebrities/$celebrityId<[0-9]+>                          controllers.WebsiteControllers.getCelebrityAdmin(celebrityId: Long)
@@ -133,8 +134,9 @@ GET     /affiliates                                                 controllers.
 #GET     /careers                                                    controllers.WebsiteControllers.getCareers
 GET     /egraph/$orderId<[0-9]+>                                    controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
 GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
-# GET     /$orderId<[0-9]+>/new                                       controllers.WebsiteControllers.getEgraph(orderId: Long)
+GET     /$orderId<[0-9]+>/new                                       controllers.WebsiteControllers.getEgraph(orderId: Long)
 # GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
+GET     /video-test                                                 controllers.WebsiteControllers.getVideoTest
 GET     /facebooklogin/callback                                     controllers.WebsiteControllers.getFacebookLoginCallback
 GET     /faq                                                        controllers.WebsiteControllers.getFAQ
 GET     /inside-an-egraph                                           controllers.WebsiteControllers.getInsideEgraph

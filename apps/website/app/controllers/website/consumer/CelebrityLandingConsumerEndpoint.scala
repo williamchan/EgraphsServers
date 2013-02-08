@@ -47,7 +47,7 @@ object CelebrityLandingConsumerEndpoint {
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
-      celebrityIsMale = true
+      celebrityGender = celebrity.gender
     )
   }
 

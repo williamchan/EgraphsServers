@@ -36,4 +36,11 @@ class SocialTests extends EgraphsUnitTest
     twitterLink should include("text=Hey @egraphceleb this is one choice egraph you made.")
   }
 
+  "Pinterest" should "return url for Pin It button" in {
+    Pinterest.getPinterestShareLink(
+      url = "https://www.egraphs.com/66",
+      media = "https://d3kp0rxeqzwisk.cloudfront.net/assets/images/egraph_plaque-fp-2697217610.png",
+      description = "Pedro Martinez egraph for Tommy Shannon Jr"
+    ) should be("http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fwww.egraphs.com%2F66&media=https%3A%2F%2Fd3kp0rxeqzwisk.cloudfront.net%2Fassets%2Fimages%2Fegraph_plaque-fp-2697217610.png&description=Pedro+Martinez+egraph+for+Tommy+Shannon+Jr")
+  }
 }
