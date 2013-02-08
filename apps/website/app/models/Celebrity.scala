@@ -76,6 +76,7 @@ case class Celebrity(id: Long = 0,
   with HasPublishedStatus[Celebrity]
   with HasEnrollmentStatus[Celebrity]
   with HasGender[Celebrity]
+  with LandingPageImage[Celebrity]
 {
 
   /**
@@ -168,21 +169,6 @@ case class Celebrity(id: Long = 0,
       .getOrElse(defaultProfile)
   }
 
-  def withLandingPageImage(imageData: Array[Byte]): CelebrityWithImage = {
-    val newImageKey = "landing_" + Time.toBlobstoreFormat(Time.now)
-    CelebrityWithImage(
-      celebrity=this.copy(_landingPageImageKey=Some(newImageKey)),
-      image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
-    ).save()
-  }
-
-  def landingPageImage: ImageAsset = {
-    _landingPageImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
-      case Some(imageAsset) => imageAsset
-      case None => defaultLandingPageImage
-    }
-  }
-
   def withLogoImage(imageData: Array[Byte]): CelebrityWithImage = {
     val newImageKey = "logo_" + Time.toBlobstoreFormat(Time.now)
     CelebrityWithImage(
@@ -213,7 +199,9 @@ case class Celebrity(id: Long = 0,
           val croppedImage = ImageUtil.crop(image, Celebrity.defaultLandingPageImageDimensions)
           croppedImage.asByteArray(ImageAsset.Jpeg)
         }
-        withLandingPageImage(landingPageImageBytes).save().celebrity
+        val (celeb, newImage) = withLandingPageImage(landingPageImageBytes)
+        newImage.save()
+        celeb.save()
       }
     }
   }
@@ -304,6 +292,20 @@ case class Celebrity(id: Long = 0,
     this.copy(_gender = gender.name)
   }
 
+  override lazy val defaultLandingPageImage = ImageAsset(
+    IOUtils.toByteArray(current.resourceAsStream("images/1550x556.jpg").get),
+    keyBase="defaults/celebrity",
+    name="landingPageImage",
+    imageType=ImageAsset.Png,
+    services=services.imageAssetServices.get
+  )
+
+  override def withLandingPageImageKey(key: Option[String]) : Celebrity = {
+    this.copy(_landingPageImageKey = key)
+  }
+
+  override def imageAssetServices = services.imageAssetServices.get
+
   //
   // Private members
   //
@@ -318,7 +320,7 @@ case class Celebrity(id: Long = 0,
    * The blobstore folder name upon which all resources relating to this celebrity should base
    * their keys. This value can not be determined if the entity has not yet been saved.
    */
-  private def keyBase = {
+  override def keyBase = {
     require(id > 0, "Cannot determine blobstore key when no id exists yet for this entity in the relational database")
     "celebrity/" + id
   }
@@ -330,13 +332,7 @@ case class Celebrity(id: Long = 0,
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
-  lazy val defaultLandingPageImage = ImageAsset(
-    IOUtils.toByteArray(current.resourceAsStream("images/1550x556.jpg").get),
-    keyBase="defaults/celebrity",
-    name="landingPageImage",
-    imageType=ImageAsset.Png,
-    services=services.imageAssetServices.get
-  )
+
   lazy val defaultLogoImage = ImageAsset(
     IOUtils.toByteArray(current.resourceAsStream("images/40x40.jpg").get),
     keyBase="defaults/celebrity",

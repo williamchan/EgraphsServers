@@ -147,7 +147,9 @@ class Scenarios extends DeclaresScenarios {
         celebrityId = Some(celebrity.id)
       ).withPassword(TestData.defaultPassword).right.get.save()
       celebrity.saveWithProfilePhoto(Play.getFile("test/resources/will_chan_celebrity_profile.jpg"))
-      celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save()
+      val (celeb, image) = celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg"))
+      celeb.save()
+      image.save()
       featured.updateFeaturedCelebrities(List(celebrity.id))
   }
   )

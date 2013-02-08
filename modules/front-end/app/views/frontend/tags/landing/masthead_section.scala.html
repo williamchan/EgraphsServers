@@ -11,8 +11,8 @@
   <h1>Connect with @name in a whole new way</h1>
 }
 
-@standardHeadline = {
-  <h1>Get an egraph from your favorite star</h1>
+@standardHeadline(text:String = "Get an egraph from your favorite star") = {
+  <h1>@text</h1>
   <p class="play-egraph">
     <a href="#" class="button">
       <strong>View Video<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
@@ -38,30 +38,57 @@
   </div>     
 }
 
-<section id="masthead-home" role="banner" style="background-image: url(@mastheadImageUrl);">
-  <div class="banner-gradient">
-    <div class="container">
-      <div class="row">
-
-        <div class="span6 header-parent">
-          @{
-              celebrityPublicName match {
-                case None => standardHeadline
-                case Some(name) => celebHeadline(name)
-              }
-            }
-            @getStartedUrl.map{ url =>
+@celebMasthead = {
+  <section class="masthead-home" role="banner" style="background-image: url(@EgraphsAssets.at(mastheadImageUrl).url);">
+    <div class="banner-gradient">
+      <div class="container">
+        <div class="row">
+          <div class="span6 header-parent">
             @{
-              celebrityPublicName match {
-                case None => {}
-                case Some(name) => tags.landing.get_started(url)
+                celebrityPublicName match {
+                  case None => standardHeadline()
+                  case Some(name) => celebHeadline(name)
+                }
+              }
+              @getStartedUrl.map{ url =>
+              @{
+                celebrityPublicName match {
+                  case None => {}
+                  case Some(name) => tags.landing.get_started(url)
+                }
               }
             }
-          }
+          </div>
         </div>
       </div>
     </div>
+  </section>  
+}
+
+@masthead(headlineText: String, mastheadImageUrl: String, active: Boolean = false) = {
+  <section class="masthead-home item @if(active){active}" role="banner" style="background-image: url(@EgraphsAssets.at(mastheadImageUrl).url);">
+    <div class="banner-gradient">
+      <div class="container">
+        <div class="row">
+          <div class="span6 header-parent">
+            @standardHeadline(headlineText)
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>  
+}
+
+<div id="masthead" class="carousel slide" data-interval="100">
+  <div id="mastheads" class="carousel-inner">
+    @masthead("Connect with your bros", mastheadImageUrl, true)
+    @masthead("Just give us your money", "images/landing-masthead-1.jpg")
   </div>
-  @videoModal
-</section> <!-- end #masthead-home -->
-     
+  <div class="carousel-controls">
+    <a class="carousel-control left" href="#mastheads" data-slide="prev"><i class="icon-white icon-step-backward"></i></a>
+    <a class="carousel-control left" href="#mastheads" data-slide="pause"><i class="icon-white icon-pause"></i></a>
+    <a class="carousel-control left" href="#mastheads" data-slide="next"><i class="icon-white icon-step-forward"></i></a>
+  </div>
+</div>
+
+@videoModal
