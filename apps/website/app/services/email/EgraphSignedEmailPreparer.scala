@@ -40,7 +40,7 @@ object EgraphSignedEmailPreparer {
         email.addReplyTo("webserver@egraphs.com")
         email.setSubject("I just finished signing your Egraph")
 
-        val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
+        val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
         val coupon = getNewPercentOffCouponCode(15, TestData.sevenDaysHence.getTime)
 
         (viewEgraphUrl, celebrity, email, coupon)

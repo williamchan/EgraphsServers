@@ -20,7 +20,7 @@ object OrderViewConversions {
       productTitle=product.name,
       ownersName=order.recipientName,
       imageUrl=egraph.image(product.photoImage).asPng.scaledToWidth(340).getSavedUrl(AccessPolicy.Public),
-      url=controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url
+      url=controllers.routes.WebsiteControllers.getEgraph(order.id).url
     )
   }
 }

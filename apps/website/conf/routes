@@ -134,9 +134,9 @@ GET     /account/:username                                          controllers.
 GET     /affiliates                                                 controllers.WebsiteControllers.getAffiliates
 #GET     /careers                                                    controllers.WebsiteControllers.getCareers
 GET     /egraph/$orderId<[0-9]+>                                    controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
-GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
-GET     /$orderId<[0-9]+>/new                                       controllers.WebsiteControllers.getEgraph(orderId: Long)
-# GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
+GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraph(orderId: Long)
+GET     /66/new                                                     controllers.WebsiteControllers.getEgraphTemp
+GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
 GET     /$orderId<[0-9]+>/embed                                     controllers.WebsiteControllers.getEgraphPlayerEmbed(orderId: Long)
 GET     /facebooklogin/callback                                     controllers.WebsiteControllers.getFacebookLoginCallback
 GET     /faq                                                        controllers.WebsiteControllers.getFAQ

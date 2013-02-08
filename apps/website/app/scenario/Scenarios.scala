@@ -487,7 +487,7 @@ class Scenarios extends DeclaresScenarios {
         "Deliver-All-Orders-to-Celebrities",
         "Will-fulfills-one-of-Erems-product-orders"
       )
-      Redirect(controllers.routes.WebsiteControllers.getEgraphClassic(2).url)
+      Redirect(controllers.routes.WebsiteControllers.getEgraph(2).url)
   }
   )
 
