@@ -36,13 +36,13 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   def getEgraph(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       orderStore.findFulfilledWithId(orderId) match {
-        case None => NotFound("No Egraph exists with the provided identifier.")
-        case Some(FulfilledOrder(order, egraph)) =>
+        case Some(FulfilledOrder(order, egraph)) if isViewable(order)(session) =>
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
           val egraphStillUrl = egraph.getEgraphImage(EgraphVideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+          val iframeUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphPlayerEmbed(order.id).url)
           val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
           val celebrityNameForTweet = celebrity.twitterUsername match {
             case Some(username) => "@" + username
@@ -67,8 +67,11 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
             classicPageLink = classicPageLink,
             shareOnPinterestLink = shareOnPinterestLink,
             tweetText = tweetText,
-            isPromotional = order.isPromotional
+            isPromotional = order.isPromotional,
+            iframeUrl = iframeUrl
           ))
+        case Some(FulfilledOrder(order, egraph)) => Forbidden(views.html.frontend.errors.forbidden())
+        case None => NotFound("No Egraph exists with the provided identifier.")
       }
     }
   }
@@ -88,10 +91,29 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val maybeGalleryLink = maybeCustomerId.map { customerId =>
             controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId).url
           }
-          Ok(EgraphView.renderEgraphPage(egraph=egraph, order=order, facebookAppId = facebookAppId,galleryLink = maybeGalleryLink, consumerApp = consumerApp))
+          Ok(EgraphView.renderEgraphPage(egraph=egraph, order=order, facebookAppId = facebookAppId, galleryLink = maybeGalleryLink, consumerApp = consumerApp))
         }
         case Some(FulfilledOrder(order, egraph)) => Forbidden(views.html.frontend.errors.forbidden())
         case None => NotFound("No Egraph exists with the provided identifier.")
+      }
+    }
+  }
+
+  def getEgraphPlayerEmbed(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
+    Action { implicit request =>
+      orderStore.findFulfilledWithId(orderId) match {
+        case None => NotFound("No Egraph exists with the provided identifier.")
+        case Some(FulfilledOrder(order, egraph)) =>
+          val product = order.product
+          val celebrity = product.celebrity
+          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
+          val egraphStillUrl = egraph.getEgraphImage(EgraphVideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
+          Ok(views.html.frontend.egraph_player_embed(
+            mp4Url = mp4Url,
+            videoPosterUrl = egraphStillUrl,
+            celebrityName = celebrity.publicName,
+            recipientName = order.recipientName
+          ))
       }
     }
   }
