@@ -1,4 +1,4 @@
-@(orderConfirmationEmailStack: models.frontend.email.OrderConfirmationViewModel)
+@(orderConfirmationEmailStack: models.frontend.email.OrderConfirmationEmailViewModel)
 
 Egraphs | Order Confirmation
 Order Number: @orderConfirmationEmailStack.orderId

@@ -274,7 +274,7 @@ case class Celebrity(id: Long = 0,
     email.setFrom("webserver@egraphs.com", "Egraphs")
     email.addTo(toAddress, publicName)
     bccEmail.map(bcc => email.addBcc(bcc))
-    email.setSubject("Welcome to Egraphs")
+    email.setSubject("Welcome to Egraphs!")
     
     val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
     services.transactionalMail.send(

@@ -28,7 +28,7 @@ import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
-import models.frontend.email.{RegularEgraphSignedEmailViewModel, GiftEgraphSignedEmailViewModel}
+import models.frontend.email.{RegularViewEgraphEmailViewModel, GiftViewEgraphEmailViewModel}
 import services.email.EgraphSignedEmailPreparer
 
 case class OrderServices @Inject() (
@@ -265,9 +265,9 @@ case class Order(
     val (viewEgraphUrl, celebrity, email) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
 
     val egraphSignedEmailStack = if (buyerId == recipientId) {
-      RegularEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName)
+      RegularViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName)
     } else {
-      GiftEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, this.buyer.name)
+      GiftViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, this.buyer.name)
     }
 
     val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getHtmlAndTextMsgs(egraphSignedEmailStack)

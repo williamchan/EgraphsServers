@@ -4,7 +4,7 @@ import models.Celebrity
 import models.Coupon
 import models.Order
 import models.OrderServices
-import models.frontend.email.EgraphSignedEmailViewModel
+import models.frontend.email.ViewEgraphEmailViewModel
 import org.apache.commons.mail.{ Email, HtmlEmail }
 import play.api.templates.Html
 import controllers.website.GetEgraphEndpoint
@@ -46,9 +46,9 @@ object EgraphSignedEmailPreparer {
     }
   }
     
-  def getHtmlAndTextMsgs(egraphSignedEmailStack: EgraphSignedEmailViewModel): (Html, String) = {    
-    val htmlMsg = views.html.frontend.email.view_egraph(egraphSignedEmailStack)    
-    val textMsg = views.txt.frontend.email.view_egraph(egraphSignedEmailStack).toString
+  def getHtmlAndTextMsgs(viewEgraphEmailStack: ViewEgraphEmailViewModel): (Html, String) = {
+    val htmlMsg = views.html.frontend.email.view_egraph(viewEgraphEmailStack)
+    val textMsg = views.txt.frontend.email.view_egraph(viewEgraphEmailStack).toString
     (htmlMsg, textMsg)
   }
 }

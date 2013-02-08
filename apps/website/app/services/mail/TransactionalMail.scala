@@ -13,10 +13,15 @@ import play.api.templates.Html
 import scala.collection.JavaConversions._
 import services.inject.InjectionProvider
 import play.api.libs.concurrent.Akka
+import play.api.libs.ws.WS
+import play.api.libs.ws.WS.{WSRequest, WSRequestHolder}
+import org.joda.time.DateTimeConstants
+import play.api.libs.json.{Json, JsValue}
+import services.config.ConfigFileProxy
 
 /** Interface for sending transactional mails. Transactional mails are  */
 trait TransactionalMail {
-  def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None)
+  def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None, templateContentParts: Option[List[(String, String)]] = None)
   protected def newEmail: MailerAPI
   
   private[mail] def toMailerAPI(email: Email): MailerAPI = {
@@ -43,10 +48,14 @@ trait TransactionalMail {
 /**
  * Provides a TransactionalMail implementation given the play configuration
  */
-class MailProvider @Inject() extends InjectionProvider[TransactionalMail]
+class MailProvider @Inject()(config: ConfigFileProxy) extends InjectionProvider[TransactionalMail]
 {
   def get(): TransactionalMail = {
-    new DefaultTransactionalMail
+    if (!config.smtpMock) {
+      new MandrillTransactionalMail(key = config.smtpOption.get.smtpPassword)
+    } else {
+      new DefaultTransactionalMail
+    }
   }
 }
 
@@ -55,7 +64,7 @@ class MailProvider @Inject() extends InjectionProvider[TransactionalMail]
  * See https://github.com/typesafehub/play-plugins/blob/master/mailer/README.md
  */
 private[mail] class DefaultTransactionalMail extends TransactionalMail {
-  override def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None) {
+  override def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None, templateContentParts: Option[List[(String, String)]] = None) {
     val mailer = toMailerAPI(mail)
     def performSendMail = (text, html) match {
       case (Some(text), Some(html)) => mailer.send(text, html.toString().trim())
@@ -69,5 +78,62 @@ private[mail] class DefaultTransactionalMail extends TransactionalMail {
   }
 
   override protected def newEmail: MailerAPI = use[MailerPlugin].email
+}
+
+private[mail] class MandrillTransactionalMail (key: String) extends TransactionalMail {
+  def actionUrl = "https://mandrillapp.com/api/1.0/"
+
+  override def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None, templateContentParts: Option[List[(String, String)]] = None) {
+    //TODO: think about whether these still need to be Options
+
+    val methodAndOutputFormat = "messages/send-template.json"
+
+    val jsonIterable = getJsonForEmailSend(html.get, text.get, mail, templateContentParts.get)
+
+    val promiseResponse = WS.url(actionUrl + methodAndOutputFormat).
+        post(jsonIterable).await(DateTimeConstants.MILLIS_PER_MINUTE).get.body.toString
+
+    println("promiseResponse is " + promiseResponse)
+  }
+
+  private def getJsonForEmailSend(html: Html, text: String, mail: HtmlEmail, templateContentParts: List[(String, String)]): JsValue = {
+    Json.toJson(Map(
+      "key" -> Json.toJson(key),
+      "template_name" -> Json.toJson("Account Verification"),
+      "template_content" -> Json.toJson(getTemplateContentPieces(templateContentParts)),
+      "message" -> Json.toJson(
+        Map(
+          //"html" -> Json.toJson(html.body),
+          //"text" -> Json.toJson("Test email"),
+          "subject" -> Json.toJson(mail.getSubject),
+          "from_email" -> Json.toJson("webserver@egraphs.com"),
+          "from_name" -> Json.toJson("Egraphs"),
+          "to" -> Json.toJson(
+            Seq(
+              Json.toJson(
+                Map(
+                  "email" -> Json.toJson("stephanie.gene@gmail.com")
+                )
+              )
+            )
+          )
+        )
+      ),
+      "async" -> Json.toJson(false)
+    ))
+  }
+
+  private def getTemplateContentPieces(templateContentPieces: List[(String, String)]): Seq[JsValue] = {
+    for ((name, content) <- templateContentPieces) yield {
+      Json.toJson(
+        Map(
+          "name" -> Json.toJson(name),
+          "content" -> Json.toJson(content)
+        )
+      )
+    }
+  }
+
+  override protected def newEmail: MailerAPI = use[MailerPlugin].email // i don't actually know what this does...
 } 
 

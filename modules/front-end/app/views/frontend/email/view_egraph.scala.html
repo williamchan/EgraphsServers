@@ -1,13 +1,13 @@
-@(egraphSignedEmailStack: models.frontend.email.EgraphSignedEmailViewModel)
+@(viewEgraphEmailStack: models.frontend.email.ViewEgraphEmailViewModel)
 
 @import views.html.frontend.tags
-@import models.frontend.email.EgraphSignedEmailViewModel
+@import models.frontend.email.ViewEgraphEmailViewModel
 
 @tags.email.header("Egraphs | View Egraph")
 
-@if(egraphSignedEmailStack.isGift) {
-  @tags.email.gift_header(egraphSignedEmailStack)
+@if(viewEgraphEmailStack.isGift) {
+  @tags.email.gift_header(viewEgraphEmailStack)
 }
 
-@tags.email.egraph_ready(egraphSignedEmailStack)
+@tags.email.view_egraph(viewEgraphEmailStack)
 @tags.email.footer()

@@ -7,12 +7,14 @@ import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
-import services.mail.TransactionalMail
+import services.mail.{TransactionalMail, MailUtils}
 import play.api.mvc.RequestHeader
 import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
+import models.enums.EmailType
+import models.frontend.email.AccountVerificationEmailViewModel
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -132,20 +134,21 @@ object Customer {
     email.addTo(account.email)
     email.setSubject("Welcome to Egraphs!")
 
-    val (textMsg: String, htmlMsg: Html) = if (verificationNeeded) {
+    val (textMsg: String, htmlMsg: Html, templateContentParts: List[(String, String)]) = if (verificationNeeded) {
       val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
+      val templateContentParts = MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification, AccountVerificationEmailViewModel(verifyPasswordUrl))
       val html = views.html.frontend.email.account_verification(verifyPasswordUrl = verifyPasswordUrl)
-      val text = views.txt.frontend.email.account_verification(verifyPasswordUrl).toString()
-      (text, html)
+      val text = views.txt.frontend.email.account_verification(verifyPasswordUrl).toString
+      (text, html, templateContentParts)
     } else {
+      val templateContentParts = MailUtils.getAccountConfirmationTemplateContentParts(EmailType.AccountConfirmation)
       val html = views.html.frontend.email.account_confirmation()
-      val text = views.txt.frontend.email.account_confirmation.toString()
-      (text, html)
+      val text = views.txt.frontend.email.account_confirmation.toString
+      (text, html, templateContentParts)
     }
 
-    mail.send(email, Some(textMsg), Some(htmlMsg))
+    mail.send(email, Some(textMsg), Some(htmlMsg), Some(templateContentParts))
   }
-
 }
 
 class CustomerStore @Inject() (

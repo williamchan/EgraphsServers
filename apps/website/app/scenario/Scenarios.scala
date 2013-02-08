@@ -21,7 +21,7 @@ import scala.Some
 import models.Administrator
 import models.InventoryBatch
 import models.Order
-import models.frontend.email.{RegularEgraphSignedEmailViewModel, OrderConfirmationViewModel}
+import models.frontend.email.{RegularViewEgraphEmailViewModel, OrderConfirmationEmailViewModel}
 
 /**
  * All scenarios supported by the API.
@@ -383,7 +383,7 @@ class Scenarios extends DeclaresScenarios {
       email.addTo("will@egraphs.com")
       email.setSubject("Order Confirmation")
       val html = views.html.frontend.email.order_confirmation(
-        OrderConfirmationViewModel(
+        OrderConfirmationEmailViewModel(
           buyerName = "Will Chan",
           buyerEmail = "will@egraphs.com",
           recipientName = "Andrew Smith",
@@ -400,7 +400,7 @@ class Scenarios extends DeclaresScenarios {
       )
       email.setHtmlMsg(html.toString())
       val textVersion = views.txt.frontend.email.order_confirmation(
-        OrderConfirmationViewModel(
+        OrderConfirmationEmailViewModel(
           buyerName = "Will Chan",
           buyerEmail = "will@egraphs.com",
           recipientName = "Andrew Smith",
@@ -432,7 +432,7 @@ class Scenarios extends DeclaresScenarios {
       email.setSubject("I just finished signing your Egraph")
       val viewEgraphUrl = "http://www.google.com"
       val html = views.html.frontend.email.view_egraph(
-        RegularEgraphSignedEmailViewModel(  
+        RegularViewEgraphEmailViewModel(
           viewEgraphUrl = viewEgraphUrl,
           celebrityPublicName = "Celebrity Jane",
           recipientName = "Will Chan"
@@ -440,7 +440,7 @@ class Scenarios extends DeclaresScenarios {
       )
       email.setHtmlMsg(html.toString())
       val textVersion = views.txt.frontend.email.view_egraph(
-        RegularEgraphSignedEmailViewModel(
+        RegularViewEgraphEmailViewModel(
           viewEgraphUrl = viewEgraphUrl,
           celebrityPublicName = "Celebrity Jane",
           recipientName = "Will Chan"

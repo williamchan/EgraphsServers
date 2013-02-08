@@ -1,24 +1,24 @@
-@(egraphSignedEmailStack: models.frontend.email.EgraphSignedEmailViewModel)
+@(viewEgraphEmailStack: models.frontend.email.ViewEgraphEmailViewModel)
 
-@import models.frontend.email.EgraphSignedEmailViewModel
+@import models.frontend.email.ViewEgraphEmailViewModel
 
 Egraphs | View Egraph
 
-@if(egraphSignedEmailStack.isGift) {
-You have just recieved an egraph from @egraphSignedEmailStack.buyerName!
+@if(viewEgraphEmailStack.isGift) {
+You have just recieved an egraph from @viewEgraphEmailStack.buyerName!
 
 An egraph is a shared moment between you and your favorite star. Check it out!
 }
 
-Hi @egraphSignedEmailStack.recipientName,
+Hi @viewEgraphEmailStack.recipientName,
 
-It's me, @egraphSignedEmailStack.celebrityPublicName. I just finished putting the final touches on my egraph to you. Here it is: @egraphSignedEmailStack.viewEgraphUrl
+It's me, @viewEgraphEmailStack.celebrityPublicName. I just finished putting the final touches on my egraph to you. Here it is: @viewEgraphEmailStack.viewEgraphUrl
 
 I hope you enjoy it and share it with all of your friends and family. Thank you for connecting with me on Egraphs and for being a loyal fan! It means a lot.
 
 Thanks,
 
-@egraphSignedEmailStack.celebrityPublicName
+@viewEgraphEmailStack.celebrityPublicName
 
 
 A note from the Egraphs team:

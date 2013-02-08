@@ -1,12 +1,12 @@
-package services.mvc
+package services.email
 
 import org.apache.commons.mail.HtmlEmail
 import services.mail.TransactionalMail
 import services.logging.Logging
-import models.frontend.email.OrderConfirmationViewModel
+import models.frontend.email.OrderConfirmationEmailViewModel
 
 case class OrderConfirmationEmail(
-  orderConfirmationEmailStack: OrderConfirmationViewModel,
+  orderConfirmationEmailStack: OrderConfirmationEmailViewModel,
   mailService: TransactionalMail
 ) {
 
