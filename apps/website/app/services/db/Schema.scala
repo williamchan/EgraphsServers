@@ -122,6 +122,14 @@ class Schema @Inject() (
   val lineItemTypes = table[LineItemTypeEntity]("LineItemType")
   // TODO(SER-499): Index declarations
 
+  val mastheads = table[Masthead]
+  on(mastheads)(masthead =>
+    declare(
+      masthead.headline is dbType("text"),
+      masthead.subtitle is dbType("text")
+    )
+  )
+
   val orders = table[Order]("Orders")
   on(orders)(order =>
     declare(
