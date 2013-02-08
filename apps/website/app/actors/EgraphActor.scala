@@ -41,7 +41,7 @@ case class EgraphActor @Inject() (
 
   /**
    * Run biometrics on the Egraph and updates the EgraphState based on the result.
-   * Also, initializes the MP3 from the WAV (Egraphs are typically created with WAVs) and stores it to the blobstore.
+   * Also, initializes the mp3 and mp4 assets for the egraph, and stores them to the blobstore.
    *
    * If the application config paramter "adminreview.skip" is turned on, then the Egraph is immediately published.
    *
@@ -65,8 +65,7 @@ case class EgraphActor @Inject() (
               val testedEgraph = egraph.verifyBiometrics.save()
 
               egraph.assets.generateAndSaveMp3()
-              // TODO(egraph-exploration): Work in progress. Not finalized.
-//              egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
+              egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
 
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
               if (config.adminreviewSkip) {

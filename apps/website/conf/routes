@@ -109,6 +109,7 @@ GET      /admin/products/$productId<[0-9]+>                               contro
 POST     /admin/products/$productId<[0-9]+>                               controllers.WebsiteControllers.postProductAdmin(productId: Long)
 GET      /admin/reports                                                   controllers.WebsiteControllers.getReportsAdmin
 GET      /admin/tools                                                     controllers.WebsiteControllers.getToolsAdmin
+GET      /admin/generateEgraphVideos                                      controllers.WebsiteControllers.getGenerateEgraphVideos
 GET      /admin/videoasset                                                controllers.WebsiteControllers.getVideoAssetAdmin
 POST     /admin/videoasset                                                controllers.WebsiteControllers.postVideoAssetAdmin
 GET      /admin/videoassets                                               controllers.WebsiteControllers.getVideoAssetsAdmin
@@ -136,7 +137,6 @@ GET     /egraph/$orderId<[0-9]+>                                    controllers.
 GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
 GET     /$orderId<[0-9]+>/new                                       controllers.WebsiteControllers.getEgraph(orderId: Long)
 # GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
-GET     /video-test                                                 controllers.WebsiteControllers.getVideoTest
 GET     /facebooklogin/callback                                     controllers.WebsiteControllers.getFacebookLoginCallback
 GET     /faq                                                        controllers.WebsiteControllers.getFAQ
 GET     /inside-an-egraph                                           controllers.WebsiteControllers.getInsideEgraph

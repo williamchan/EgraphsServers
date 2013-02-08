@@ -263,17 +263,18 @@ case class Egraph(
   }
 
   /**
-   * TODO(SER-677): This method is slow as balls because it calls renderFrommaster no product.photoImage.
-   *
    * @param width the desired width of the egraph image. If this width is larger than the width of the master egraph
    *              image, then the master egraph image's width will be used instead.
+   * @param ignoreMasterWidth if false, then the lesser of width and the master photo's width will be used. Setting this
+   *                          to false is computational expensive since the image asset needs to be retrieved and examined.
    * @return the egraph image asset
    */
-  def getEgraphImage(width: Int): EgraphImage = {
+  def getEgraphImage(width: Int, ignoreMasterWidth: Boolean = true): EgraphImage = {
     val product = order.product
     val rawSignedImage = image(product.photoImage)
-    // targetWidth is either the default width, or the width of the master if necessary to avoid upscaling
-    val targetWidth = {
+    val targetWidth = if (ignoreMasterWidth) {
+      width
+    } else {
       val masterWidth = product.photoImage.getWidth
       if (masterWidth < width) masterWidth else width
     }

@@ -15,7 +15,7 @@ import services.http.EgraphsSession.Conversions._
 import services.mvc.ImplicitHeaderAndFooterData
 import _root_.frontend.formatting.DateFormatting.Conversions._
 import social.Pinterest
-import video.VideoEncoder
+import video.EgraphVideoEncoder
 
 private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData { 
   this: Controller =>
@@ -33,29 +33,15 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
   // Controllers
   //
 
-  def getVideoTest = controllerMethod.withForm() { implicit authToken =>
-    Action { implicit request => Ok(views.html.frontend.video_test()) }
-  }
-
   def getEgraph(orderId: Long) = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
-
-    /**
-     * Sneakpeak URLs for these Egraphs:
-     * Josh Hamilton: 462
-     * Kenny Mendes's: 1033, 2404
-     * Smith Family: 46
-     * board members on beta: 624
-     * localhost test: 2
-     */
       orderStore.findFulfilledWithId(orderId) match {
         case None => NotFound("No Egraph exists with the provided identifier.")
-        case Some(FulfilledOrder(order, egraph)) if (!List(462, 1033, 2404, 46, 624, 2).contains(orderId)) => NotFound("Not available")
         case Some(FulfilledOrder(order, egraph)) =>
           val product = order.product
           val celebrity = product.celebrity
-          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public/*, overwrite = true*/)
-          val egraphStillUrl = egraph.getEgraphImage(VideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
+          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
+          val egraphStillUrl = egraph.getEgraphImage(EgraphVideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
           val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
           val celebrityNameForTweet = celebrity.twitterUsername match {

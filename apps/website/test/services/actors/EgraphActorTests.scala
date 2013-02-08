@@ -1,15 +1,11 @@
 package services.actors
 
 import actors.{ProcessEgraphMessage, EgraphActor}
-import akka.actor.Actor
-import Actor._
 import services.db.{DBSession, TransactionSerializable}
-import services.{Utils, AppConfig}
-import models.EgraphStore
-import utils.{ClearsCacheBefore, EgraphsUnitTest, TestData}
+import services.AppConfig
+import utils.{TestHelpers, ClearsCacheBefore, EgraphsUnitTest, TestData}
 import models.enums.EgraphState
 import org.scalatest.BeforeAndAfterAll
-import play.api.Application
 import utils.TestHelpers.withActorUnderTest
 import akka.pattern._
 import akka.util.Timeout
@@ -50,14 +46,20 @@ class EgraphActorTests extends EgraphsUnitTest
     }
   }
 
-  it should "initialize mp3 asset from wav asset" in new EgraphsTestApplication {
+  it should "initialize mp3 audio asset from wav asset" in new EgraphsTestApplication {
     withActorUnderTest(AppConfig.instance[EgraphActor]) { egraphActor =>
       import services.blobs.Blobs.Conversions._
       val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
-
       Await.result(egraphActor ask ProcessEgraphMessage(egraph.id, FakeRequest()), 10 second)
-
       egraph.assets.audioMp3.asByteArray.length should be > (0)
+    }
+  }
+
+  it should "initialize mp4 video asset" in new EgraphsTestApplication {
+    withActorUnderTest(AppConfig.instance[EgraphActor]) { egraphActor =>
+      val egraph = db.connected(TransactionSerializable) { TestData.newSavedEgraphWithRealAudio() }
+      Await.result(egraphActor ask ProcessEgraphMessage(egraph.id, FakeRequest()), 10 second)
+      TestHelpers.getBlobWithBlobKey("egraphs/" + egraph.id + "/video/width-600px-v0.mp4") should not be (None)
     }
   }
 
