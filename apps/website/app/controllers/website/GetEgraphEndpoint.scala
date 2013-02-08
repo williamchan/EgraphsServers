@@ -41,7 +41,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val product = order.product
           val celebrity = product.celebrity
           val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
-          val egraphStillUrl = egraph.getEgraphImage(EgraphVideoEncoder.canvasWidth).getSavedUrl(AccessPolicy.Public)
+          val egraphStillUrl = egraph.getEgraphImage(EgraphVideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
           val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
           val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
           val celebrityNameForTweet = celebrity.twitterUsername match {
