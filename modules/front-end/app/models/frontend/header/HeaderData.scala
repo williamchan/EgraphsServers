@@ -18,5 +18,6 @@ case class HeaderData(
   blogLink: String = "http://blog.egraphs.com",
   giftCertificateLink: Option[String] = None,
   deploymentInformation: Option[DeploymentInformation] = None,
+  enableLogging: Boolean = true,
   updateMixpanelAlias: Boolean = false
 )

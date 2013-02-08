@@ -102,7 +102,10 @@
         authenticityToken: "@authToken.value",
         sessionId: "@headerData.sessionId",
         apiRoot: "/api/1.0",
-        version: "@headerData.deploymentInformation.map(info=> info.timestamp)"
+        version: "@headerData.deploymentInformation.map(info=> info.timestamp)",
+        logging: {
+          level: "@if(headerData.enableLogging){all} else {off}"
+        }
       });
       @headJs
     </script>

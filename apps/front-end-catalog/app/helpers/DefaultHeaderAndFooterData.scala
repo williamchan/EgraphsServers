@@ -23,6 +23,7 @@ trait DefaultHeaderAndFooterData {
       loggedInStatus=Left(HeaderNotLoggedIn("/login-link")),
       insideAnEgraphLink="inside-an-egraph",
       egraphsFacebookLink="http://www.facebook.com/egraphs",
+      enableLogging=true,
       egraphsTwitterLink="http://www.twitter.com/egraphs"
     )
   }

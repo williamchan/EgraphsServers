@@ -9,6 +9,7 @@ import controllers.routes.WebsiteControllers.{getCustomerGalleryByUsername, getA
 import play.api.mvc.RequestHeader
 import controllers.WebsiteControllers
 import services.mail.BulkMailList
+import services.config.ConfigFileProxy
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -18,11 +19,13 @@ import services.mail.BulkMailList
 trait ImplicitHeaderAndFooterData {
   protected def customerStore: CustomerStore
   protected def bulkMailList: BulkMailList
+  protected def config: ConfigFileProxy
 
   implicit def siteHeaderData(implicit request: RequestHeader): HeaderData = {
     HeaderData(
       loggedInStatus = getHeaderLoggedInStatus(request.session),
       deploymentInformation = Option(DeploymentInformation(System.getProperty("deploymentTime"))),
+      enableLogging=config.enableFrontendLogging,
       //TODO: move into it's own implicit object
       updateMixpanelAlias = shouldUpdateMixpanelAlias(request.session)
     )
