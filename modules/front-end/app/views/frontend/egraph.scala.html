@@ -8,6 +8,7 @@
   signedOnDate: String,
   thisPageLink: String,
   classicPageLink: String,
+  iframeUrl: String,
   shareOnPinterestLink: String,
   tweetText: String,
   privacySetting: String,
@@ -23,7 +24,21 @@
 @headHtml = {
   <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
   <script src="https://vjs.zencdn.net/c/video.js"></script>
+
   <meta property="og:image" content="@videoPosterUrl"/>
+
+  @** Twitter card for embedded player - https://dev.twitter.com/docs/cards *@
+  <meta name="twitter:card" content="player">
+  <meta name="twitter:site" content="@@egraphs">
+  <meta name="twitter:url" content="@thisPageLink">
+  <meta name="twitter:title" content="A message for @recipientName from @celebrityName">
+  <meta name="twitter:description" content="An egraph from @celebrityName, @celebrityTagline">
+  <meta name="twitter:image" content="@videoPosterUrl">
+  <meta name="twitter:player" content="@iframeUrl">
+  <meta name="twitter:player:width" content="435">
+  <meta name="twitter:player:height" content="274">
+  <meta name="twitter:player:stream" content="@mp4Url">
+  <meta name="twitter:player:stream:content_type" content="video/mp4">
 }
 
 @headJs = {
