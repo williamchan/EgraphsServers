@@ -45,9 +45,7 @@
     </ul>
     <ul>
       @{headerData.loggedInStatus match {
-        case Left(notLoggedIn) => {
-          <li><a href="@status.loginUrl">Sign in</a></li>
-        }
+        case Left(notLoggedIn) => notLoggedInHeader(notLoggedIn)
         case Right(loggedIn) => loggedInHeader(loggedIn)
       }}   
     </ul>
