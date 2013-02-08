@@ -25,25 +25,13 @@ object WebsiteBuild extends Build {
       "com.typesafe" %% "play-plugins-mailer" % "2.1.0" excludeAll(
         ExclusionRule(organization="com.cedarsoft")
       ),
-//      "junit-addons" % "junit-addons" % "1.4",
-      "net.debasishg" %% "sjson" % "0.15" exclude("org.scala-lang", "scala-library"),  //from 0.12
-  //        exclude:
-  //            # Exclude scala because its included with play-scala
-  //            org.scala-lang % scala-library 2.8.1
       "org.antlr" % "stringtemplate" % "4.0.2",
       "org.apache.commons" % "commons-email" % "1.2",
       "org.apache.commons" % "commons-lang3" % "3.1",
       "org.apache.pdfbox" % "pdfbox" % "1.7.1",
-//      "org.jclouds.api" % "filesystem" % "1.5.1" excludeAll(
-//          ExclusionRule(organization = "org.clojure")
-//      ),
-  //        exclude:
-  //            org.clojure % *      
       "org.jclouds" % "jclouds-blobstore" % "1.4.2",
       "org.jclouds.api" % "filesystem" % "1.4.2",
       "org.jclouds.provider" % "aws-s3" % "1.4.2",
-  //        exclude:
-  //            org.clojure % *
       "org.joda" % "joda-money" % "0.6",
       "org.specs2" %% "specs2" % "1.5" excludeAll(
           ExclusionRule(organization = "org.mockito"),
@@ -65,8 +53,6 @@ object WebsiteBuild extends Build {
       "org.scalaz" %% "scalaz-core" % "6.0.4",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
-      //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6
-      // "uk.me.lings" %% "scala-guice" % "3.0.1-SNAPSHOT",
       "xml-apis" % "xml-apis-ext" % "1.3.04",
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
       "xuggle" % "xuggle-xuggler" % "5.4",
