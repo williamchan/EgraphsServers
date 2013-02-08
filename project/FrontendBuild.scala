@@ -12,6 +12,7 @@ object FrontendBuild extends Build {
 
   val appDependencies = Seq(
     "org.joda" % "joda-money" % "0.6",
+    "com.google.guava" % "guava" % "13.0.1",
 
     // Test dependencies
     "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
