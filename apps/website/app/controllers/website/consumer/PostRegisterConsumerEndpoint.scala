@@ -85,7 +85,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   : Either[Result, (Account, Customer)] = {
 
     dbSession.connected(TransactionSerializable) {
-    val form = PostRegisterConsumerEndpoint.form
+      val form = PostRegisterConsumerEndpoint.form
 
       form.bindFromRequest.fold(
         formWithErrors => {

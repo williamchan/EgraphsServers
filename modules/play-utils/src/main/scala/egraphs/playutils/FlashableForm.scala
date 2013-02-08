@@ -49,6 +49,6 @@ case class SimpleResultWithFlashedForm(result: SimpleResult[_]) {
 
 object FlashableForm {
   val CONTAINS_FLASHED_FORM = "contains-form-data"
-  implicit def result2RichForm[A](form: Form[A]) = FlashableForm(form)
+  implicit def form2FlashableForm[A](form: Form[A]) = FlashableForm(form)
   implicit def result2SimpleResultWithFlashedForm(result: SimpleResult[_]) = SimpleResultWithFlashedForm(result)
 }

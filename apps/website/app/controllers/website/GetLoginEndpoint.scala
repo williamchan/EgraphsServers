@@ -8,7 +8,7 @@ import services.social.Facebook
 import java.util.UUID
 import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormViewModel}
 import services.http.forms.purchase.FormReaders
-import services.mvc.forms.{AccountRegistrationFormViewConversions, LoginFormViewConversions}
+import services.mvc.forms.LoginFormViewConversions
 import services.mvc.ImplicitHeaderAndFooterData
 import controllers.WebsiteControllers
 import egraphs.playutils.FlashableForm._

@@ -2,9 +2,9 @@ package services.http.forms
 
 import com.google.inject.Inject
 import play.api.data.validation.Constraint
-import models.Password
-import models.AccountStore
+import models.{Account, Password, AccountStore}
 import play.api.data.validation.{ Valid, Invalid }
+import models.Password.{PasswordRequired, PasswordTooShort}
 
 class FormConstraints @Inject() (accountStore: AccountStore) {
   def isUniqueEmail: Constraint[String] = {
@@ -18,7 +18,11 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
 
   def isPasswordValid: Constraint[String] = {
     Constraint { password: String =>
-      if (Password.validate(password).isRight) Valid else Invalid("Password is invalid")
+      Password.validate(password) match {
+        case Right(_) => Valid
+        case Left(PasswordTooShort(_)) => Invalid(Account.minPasswordLength + " characters minimum")
+        case Left(PasswordRequired) => Invalid("Password is required")
+      }
     }
   }
 }
