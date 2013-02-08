@@ -8,6 +8,7 @@
   signedOnDate: String,
   thisPageLink: String,
   classicPageLink: String,
+  iframeUrl: String,
   shareOnPinterestLink: String,
   tweetText: String,
   privacySetting: String,
@@ -23,7 +24,21 @@
 @headHtml = {
   <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
   <script src="https://vjs.zencdn.net/c/video.js"></script>
+
   <meta property="og:image" content="@videoPosterUrl"/>
+
+  @** Twitter card for embedded player - https://dev.twitter.com/docs/cards *@
+  <meta name="twitter:card" content="player">
+  <meta name="twitter:site" content="@@egraphs">
+  <meta name="twitter:url" content="@thisPageLink">
+  <meta name="twitter:title" content="A message for @recipientName from @celebrityName">
+  <meta name="twitter:description" content="An egraph from @celebrityName, @celebrityTagline">
+  <meta name="twitter:image" content="@videoPosterUrl">
+  <meta name="twitter:player" content="@iframeUrl">
+  <meta name="twitter:player:width" content="435">
+  <meta name="twitter:player:height" content="274">
+  <meta name="twitter:player:stream" content="@mp4Url">
+  <meta name="twitter:player:stream:content_type" content="video/mp4">
 }
 
 @headJs = {
@@ -60,23 +75,21 @@
             <source src="@mp4Url" type='video/mp4'>
           </video>
         </div>
-        <div id="egraph-description">
-          <p class="description-line"><i>A message for</i> @recipientName</p>
-          <p class="description-line"><i>from</i> @celebrityName</p>
-          @** <p class="description-date">@signedOnDate</p> *@
-        </div>
-        @**
-        <hr class="separator"/>
         <div class="byline-container">
           <img class="byline-icon" src='@productIconUrl' height="50" width="50"/>
           <h3 class="byline-name">@celebrityName</h3>
           <p class="byline-tagline">@celebrityTagline</p>
         </div>
         <hr class="separator"/>
-        *@
+        <div id="egraph-description">
+          <p class="description-line">A message for <em>@recipientName</em></p>
+          <p class="description-line">from <em>@celebrityName</em></p>
+          @** <p class="description-date">@signedOnDate</p> *@
+        </div>
+        <hr class="separator"/>
         <div id="social">
           <div>
-            <a id="classic-mode" class="tip" href="@classicPageLink">View in classic mode</a>
+            <a id="classic-link" class="tip" href="@classicPageLink">View in classic mode</a>
           </div>
           <ul class="clearfix">
             <li class="tweet-button">

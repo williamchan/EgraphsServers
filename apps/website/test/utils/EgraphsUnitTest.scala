@@ -7,12 +7,9 @@ import akka.agent.Agent
 import play.api.mvc.Session
 import com.typesafe.config.ConfigFactory
 import play.api.Play
-import play.api.test.FakeRequest
 import play.api.Configuration
-import play.api.test.FakeApplication
 import play.api.Application
 import play.api.test._
-import play.api.test.Helpers._
 import java.io.File
 import services.logging.Logging
 

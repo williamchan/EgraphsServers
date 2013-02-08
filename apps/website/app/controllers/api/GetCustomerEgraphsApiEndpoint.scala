@@ -31,11 +31,11 @@ case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, 
   import _root_.frontend.formatting.DateFormatting.Conversions._
   private val desiredWidth = 480
   def renderedForApi: Map[String, Any] = {
-    val imageUrl = egraph.getEgraphImage(LandscapeEgraphFrame.imageWidthPixels).asPng.getSavedUrl(accessPolicy = AccessPolicy.Public)
+    val imageUrl = egraph.getEgraphImage(LandscapeEgraphFrame.imageWidthPixels).getSavedUrl(accessPolicy = AccessPolicy.Public)
     Map(
       "orderId" -> order.id,
       "egraphId" -> egraph.id,
-      "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url),
+      "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url),
       "image" -> imageUrl,
       "audio" -> egraph.assets.audioMp3Url,
       "video" -> "",

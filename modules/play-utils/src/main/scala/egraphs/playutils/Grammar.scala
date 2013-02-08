@@ -50,6 +50,18 @@ object Grammar {
     }
   }
 
+  def irregularToBe(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
+    (gender, capitalize) match {
+      case (Gender.Male, false) => "is"
+      case (Gender.Male, true) => "Is"
+      case (Gender.Female, false) => "is"
+      case (Gender.Female, true) => "Is"
+      case (Gender.Neutral, false) => "are"
+      case (Gender.Neutral, true) => "Are"
+      case _ => throw new IllegalStateException("You are a very rare gender")
+    }
+  }
+
   def regularVerb(verb: String, gender: Gender.EnumVal): String = {
     gender match {
       case Gender.Male => verb + "s"

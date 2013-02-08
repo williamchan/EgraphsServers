@@ -11,7 +11,7 @@ object Email extends Controller {
 
   def orderConfirmation = Action {
     Ok(views.html.frontend.email.order_confirmation(
-      OrderConfirmationViewModel(
+      OrderConfirmationEmailViewModel(
         buyerName = "Joshua Johnson",
         buyerEmail = "joshua@johnson.com",
         recipientName = "Carlos Pena",
@@ -30,7 +30,7 @@ object Email extends Controller {
 
   def orderConfirmationText = Action {
     Ok(views.txt.frontend.email.order_confirmation(
-      OrderConfirmationViewModel(
+      OrderConfirmationEmailViewModel(
         buyerName = "Joshua Johnson",
         buyerEmail = "joshua@johnson.com",
         recipientName = "Carlos Pena",
@@ -53,7 +53,7 @@ object Email extends Controller {
 
   def viewEgraph = Action {
     Ok(views.html.frontend.email.view_egraph(
-      RegularEgraphSignedEmailViewModel(
+      RegularViewEgraphEmailViewModel(
         viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
         celebrityPublicName = "Big Papi",
         recipientName = "Carlos Pena"
@@ -63,7 +63,7 @@ object Email extends Controller {
 
   def viewGiftEgraph = Action {
     Ok(views.html.frontend.email.view_egraph(
-      GiftEgraphSignedEmailViewModel(
+      GiftViewEgraphEmailViewModel(
         viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
         celebrityPublicName = "Big Papi",
         recipientName = "Carlos Pena",

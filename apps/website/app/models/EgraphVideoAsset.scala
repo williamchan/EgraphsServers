@@ -7,11 +7,11 @@ import services.{Utils, TempFile, Time, AppConfig}
 import services.audio.AudioConverter
 import services.blobs.{AccessPolicy, Blobs}
 import services.logging.Logging
-import services.video.VideoEncoder
+import services.video.EgraphVideoEncoder
 import Blobs.Conversions._
 
 /**
- * The video representation of an Egraph.
+ * The video representation of an Egraph. Must be landscaped.
  *
  * @param blobPath Root blobstore path where permutations of the video should be stored. For example,
  *                 the first Egraph will probably pass usually be "egraphs/1/video"
@@ -22,13 +22,12 @@ import Blobs.Conversions._
 case class EgraphVideoAsset(blobPath: String,
                             egraph: Egraph,
                             videoType: VideoType = Mp4,
-                            width: Int = VideoEncoder.canvasWidth,
+                            width: Int = EgraphVideoEncoder.canvasWidth,
                             services: EgraphVideoAssetServices = AppConfig.instance[EgraphVideoAssetServices]
                            ) {
 
   import EgraphVideoAsset._
 
-  /* TODO(egraph-exploration): Work in progress. Not finalized. */
   protected[models] def encodeVideo(): Array[Byte] = {
 
     /* Xuggle uses intermediate files. So, prep a bunch of temp files. */
@@ -50,12 +49,6 @@ case class EgraphVideoAsset(blobPath: String,
        */
       Utils.saveToFile(egraph.assets.audioMp3.asByteArray, sourceMp3TempFile)
       Utils.convertMediaFile(sourceMp3TempFile, finalAacTempFile)
-      /**
-       * Enable the following code to generate an aac appropriate with a video with preamble:
-       * val sourceAacTempFile = TempFile.named(blobPath + "/source.aac")
-       * Utils.convertMediaFile(sourceMp3TempFile, sourceAacTempFile)
-       * VideoEncoder.generateFinalAudio(sourceAacTempFile, finalAacTempFile)
-       */
 
       /* Get egraph image as a jpg */
       val egraphImage = egraph.getEgraphImage(width).asJpg
@@ -65,7 +58,7 @@ case class EgraphVideoAsset(blobPath: String,
       /* Generate an mp4 without sound */
       val thisOrder = egraph.order
       val videoNoAudioFileName = videoNoAudioFile.getPath
-      VideoEncoder.generateMp4SansAudio(
+      EgraphVideoEncoder.generateMp4SansAudio(
         targetFilePath = videoNoAudioFileName,
         egraphImageFile = egraphImageTempFile,
         recipientName = thisOrder.recipientName,
@@ -74,9 +67,9 @@ case class EgraphVideoAsset(blobPath: String,
       )
 
       /* Mux the soundless mp4 with the aac audio to create an mp4 with sound */
-      VideoEncoder.muxVideoWithAudio(
-        videoFile = new File(videoNoAudioFileName),
-        audioFile = finalAacTempFile,
+      EgraphVideoEncoder.muxVideoWithAudio(
+        mp4File = new File(videoNoAudioFileName),
+        aacFile = finalAacTempFile,
         targetFile = videoWithAudioFile
       )
 
@@ -93,7 +86,6 @@ case class EgraphVideoAsset(blobPath: String,
       videoNoAudioFile.delete()
       videoWithAudioFile.delete()
       finalMp4TempFile.delete()
-      //      sourceAacTempFile.delete()
     }
 
   }
@@ -106,7 +98,6 @@ case class EgraphVideoAsset(blobPath: String,
     blobPath + "/" + idString + "-v" + EgraphVideoAsset.Version + "." + videoType.extension
   }
 
-  /* Looks just like EgraphImage. Can be refactored. */
   def getSavedUrl(accessPolicy: AccessPolicy, overwrite: Boolean = false): String = {
     val blobs = services.blobs
     val ((url, alreadyCached), durationSecs) = Time.stopwatch {

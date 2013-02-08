@@ -279,7 +279,7 @@ object Product {
   val defaultSigningAreaW = 1024 // This is the width of an iPad2 screen. Default signing area is 1024x1024.
   val defaultLandscapeSigningScale = Dimensions(width = 1615, height = 1024)
   val defaultPortraitSigningScale = Dimensions(width = 1024, height = 1428)
-  val minPhotoWidth = 1024
+  val minPhotoWidth = 1615
   val minPhotoHeight = 1024
   val minIconWidth = 40
 

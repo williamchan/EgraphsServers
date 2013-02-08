@@ -36,7 +36,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheBefore 
   private val buyerEmail = TestData.generateEmail(prefix = "buyer")
 
   "An EgraphPurchaseHandler" should "create Order and CashTransaction for a digital-only purchase" in new EgraphsTestApplication {
-    val Right(orderFromHandler) = executePurchaseHandler()
+    val Right((orderFromHandler, createdBuyer)) = executePurchaseHandler()
     db.connected(TransactionSerializable) {
       val order = orderStore.get(orderFromHandler.id)
       order.amountPaidInCurrency should be(BigDecimal(50))
@@ -64,7 +64,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheBefore 
       postalCode = "98102"
     )
 
-    val Right(orderFromHandler) = executePurchaseHandler(
+    val Right((orderFromHandler, createdBuyer)) = executePurchaseHandler(
       totalAmountPaid = BigDecimal(95).toMoney(),
       printingOption = PrintingOption.HighQualityPrint,
       shippingForm = Some(shippingForm)
@@ -120,7 +120,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheBefore 
    */
   it should "charge totalAmountPaid and correctly mark one-use coupon as used" in new EgraphsTestApplication {
     val coupon = db.connected(TransactionSerializable) { Coupon(discountAmount = BigDecimal(10)).save() }
-    val Right(orderFromHandler) = executePurchaseHandler(coupon = Some(coupon), totalAmountPaid = BigDecimal(40).toMoney())
+    val Right((orderFromHandler, createdBuyer)) = executePurchaseHandler(coupon = Some(coupon), totalAmountPaid = BigDecimal(40).toMoney())
     db.connected(TransactionSerializable) {
       val order = orderStore.get(orderFromHandler.id)
       order.amountPaidInCurrency should be(BigDecimal(50))
@@ -135,7 +135,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheBefore 
   
   it should "not create a CashTransaction if totalAmountPaid was zero" in new EgraphsTestApplication {
     val coupon = db.connected(TransactionSerializable) { Coupon(discountAmount = BigDecimal(50)).save() }
-    val Right(orderFromHandler) = executePurchaseHandler(coupon = Some(coupon), totalAmountPaid = BigDecimal(0).toMoney(), 
+    val Right((orderFromHandler, createdBuyer)) = executePurchaseHandler(coupon = Some(coupon), totalAmountPaid = BigDecimal(0).toMoney(), 
         stripeTokenId = None)
     db.connected(TransactionSerializable) {
       val order = orderStore.get(orderFromHandler.id)
@@ -158,7 +158,7 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheBefore 
     celebrityAndProduct: Option[(Celebrity, Product)] = None,
     stripeTokenId: Option[String] = Some(payment.testToken().id),
     coupon: Option[Coupon] = None
-  ): Either[EgraphPurchaseHandler.PurchaseFailed, Order] =
+  ): Either[EgraphPurchaseHandler.PurchaseFailed, (Order, Boolean)] =
   {
     val (celebrity, product) = celebrityAndProduct.getOrElse {
       db.connected(TransactionSerializable) {
@@ -182,7 +182,6 @@ class EgraphPurchaseHandlerTests extends EgraphsUnitTest with ClearsCacheBefore 
       totalAmountPaid = totalAmountPaid,
       coupon = coupon,
       billingPostalCode = "55555",
-      flash = req.flash,
       printingOption = printingOption,
       shippingForm = shippingForm,
       writtenMessageRequest = WrittenMessageRequest.SpecificMessage

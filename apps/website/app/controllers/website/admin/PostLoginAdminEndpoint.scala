@@ -12,6 +12,7 @@ import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
 import services.http.EgraphsSession._
+import services.http.EgraphsSession.Conversions._
 
 private[controllers] trait PostLoginAdminEndpoint {
   this: Controller =>
@@ -39,7 +40,7 @@ private[controllers] trait PostLoginAdminEndpoint {
           },
           validForm => {
             Redirect(controllers.routes.WebsiteControllers.getCelebritiesAdmin.url).withSession(
-                request.session + (EgraphsSession.Key.AdminId.name -> validForm.authenticatedAdminLogin.get.id.toString))
+              request.session.withAdminId(validForm.authenticatedAdminLogin.get.id))
           }
       )
     }

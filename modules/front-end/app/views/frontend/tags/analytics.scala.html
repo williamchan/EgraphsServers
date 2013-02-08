@@ -1,4 +1,13 @@
-@()
+@()(implicit headerData: models.frontend.header.HeaderData)
+
+@import models.frontend.header.HeaderData
+
+@customerUsername(header: HeaderData) = @{
+  headerData.loggedInStatus match {
+    case Left(notLoggedIn) => None
+    case Right(loggedIn) => Some(loggedIn.username)
+  }
+}
 
 @**Configure google analytics**@
 <script type="text/javascript">
@@ -40,5 +49,13 @@
   for(e=0;e<g.length;e++)(function(a){b[a]=function(){b.push([a].concat(
   Array.prototype.slice.call(arguments,0)))}})(g[e]);c._i.push([a,d,f])};window.mixpanel=c}
   )(document,window.mixpanel||[]);
+
   mixpanel.init(mixpanelToken);
+  @if(customerUsername(headerData).isDefined) {
+    @if(headerData.updateMixpanelAlias) {
+      mixpanel.alias("@customerUsername(headerData)");
+    } else {
+      mixpanel.identify("@customerUsername(headerData)");
+    }
+  }
 </script>
