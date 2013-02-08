@@ -72,6 +72,39 @@ div.inside-egraph {
     font-size: 14px;
   }
 
+  figure {
+	display: block;
+    text-align: center;
+    position: relative;
+    margin: 0 0 40px 0;
+    padding-top: 10px;
+
+    div {
+      max-width: 65%;
+      display: block;
+      margin: 0 auto 20px auto;
+
+      img {
+        .box-shadow(0px 0px 0px 2px #888);
+      }
+    }
+
+    figcaption {
+      position: absolute;
+      p {
+        text-align: left;
+        font-size: 14px;
+        line-height: 1.5em;
+        margin-bottom: 0;
+
+        a {
+          text-decoration: underline;
+          font-size: 14px
+        }
+      }
+    }
+  }
+
   article {
     padding-top: 50px;
     margin-top: 15px;

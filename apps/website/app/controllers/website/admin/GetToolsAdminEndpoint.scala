@@ -3,17 +3,16 @@ package controllers.website.admin
 import models._
 import models.enums._
 import play.api.mvc.{Action, Controller}
-import services.blobs.{AccessPolicy, Blobs}
-import services.http.{WithoutDBConnection, WithDBConnection, ControllerMethod}
+import services.blobs.Blobs
+import services.http.{WithDBConnection, ControllerMethod}
 import services.http.filters.HttpFilters
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
-import services.db.{TransactionSerializable, DBSession, Schema}
+import services.db.{DBSession, Schema}
 import play.api.data._
 import play.api.data.Forms._
 import services.mvc.ImplicitHeaderAndFooterData
 import models.Egraph
-import scala.Some
 
 /**
  * These are the Sheriff's tools to handle tasks that are not yet self-serve. If writing a one-time script, use "sheriff".
@@ -132,38 +131,6 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
 //            Ok("Enrollment batched marked as complete")
 //          }
           case _ => Ok("Not a valid action")
-        }
-      }
-    }
-  }
-
-  /**
-   * TODO(egraph-exploration): Temporary endpoint to generate egraph videos. Delete after we are caught up. Use like so:
-   * https://admin.egraphs.com/admin/generateEgraphVideos?start=487&end=550
-   */
-  def getGenerateEgraphVideos = controllerMethod(dbSettings = WithoutDBConnection) {
-    Action { implicit request =>
-      val start = Form("start" -> number).bindFromRequest.get
-      val end = Form("end" -> number).bindFromRequest.get
-      for (orderId <- start to end) {
-        println("orderId " + orderId)
-        try {
-          generate(orderId)
-        } catch {
-          case e: NoSuchElementException => /*try again*/ generate(orderId)
-        }
-      }
-      Ok("Generated egraph videos from " + start + " to " + end + ".")
-    }
-  }
-
-  private def generate(orderId: Long) {
-    dbSession.connected(TransactionSerializable) {
-      orderStore.findFulfilledWithId(orderId) match {
-        case None => NotFound("No Egraph exists with the provided identifier.")
-        case Some(FulfilledOrder(order, egraph)) => {
-          val p = order.product.photoImage
-          if (p.getWidth > p.getHeight) egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public /*, overwrite = true*/)
         }
       }
     }
