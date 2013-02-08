@@ -24,6 +24,7 @@ import services.mail.BulkMailList
 import egraphs.playutils.FlashableForm._
 import models.frontend.login_page.RegisterConsumerViewModel
 import services.AppConfig
+import services.http.forms.FormConstraints
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -111,29 +112,11 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
 }
 
 object PostRegisterConsumerEndpoint {
-  def accountStore = AppConfig.instance[AccountStore]
+  def formConstraints = AppConfig.instance[FormConstraints]
 
   def form: Form[RegisterConsumerViewModel] = Form(mapping(
-      "email" -> email.verifying(nonEmpty, isUniqueEmail),
-      "password" -> text.verifying(nonEmpty, isPasswordValid),
+      "email" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
+      "password" -> text.verifying(nonEmpty, formConstraints.isPasswordValid),
       "bulk-email" -> boolean)(RegisterConsumerViewModel.apply)(RegisterConsumerViewModel.unapply)
   )
-        
-  //TODO: Unify with PostCelebrityAdinEndpoints version of the same
-  private def isUniqueEmail: Constraint[String] = {
-    Constraint { email: String =>
-      accountStore.findByEmail(email) match {
-        case Some(preexistingAccount) if (preexistingAccount.customerId.isDefined) => Invalid("Customer with e-mail address already exists")
-        case _ => Valid
-      }
-    }
-  }
-  
-  //TODO: Ditto
-  private def isPasswordValid: Constraint[String] = {
-    Constraint { password: String =>
-      val passwordValidationOrAccount = Account(email = "none").withPassword(password)
-      if (passwordValidationOrAccount.isRight) Valid else Invalid("Password is invalid")
-    }
-  }
 }

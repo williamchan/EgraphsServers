@@ -14,7 +14,7 @@ import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
 import services.http.filters._
-import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory}
+import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory, FormConstraints}
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.marketplace._
@@ -57,6 +57,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val schema = instance[Schema]
   override protected val featured = instance[Featured] 
   override protected val signupModal = instance[SignupModal]
+  override protected val formConstraints = instance[FormConstraints]
 
   override protected val accountStore = instance[AccountStore]
   override protected val administratorStore = instance[AdministratorStore]
