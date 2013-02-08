@@ -22,6 +22,9 @@ import play.api.mvc.SimpleResult
  * using FieldConstructors in your template.
  *
  *   Ok(views.html.index("other arguments", form.bindWithFlashData))
+ *   
+ * USER WARNING: If there are two or more forms with fields with the same name that were stored in
+ *  the flash this will not work as intended.  Make sure form field names are unique on a page.
  *
  */
 case class FlashableForm[A](form: Form[A]) {
@@ -41,6 +44,10 @@ case class FlashableForm[A](form: Form[A]) {
 case class SimpleResultWithFlashedForm(result: SimpleResult[_]) {
   import FlashableForm.CONTAINS_FLASHED_FORM
 
+  /**
+   * USER WARNING: If there are two or more forms with fields with the same name that were stored in
+   * the flash this will not work as intended.  Make sure form field names are unique on a page.
+   */
   def flashingFormData(form: Form[_]) = {
     val flash = form.data + (CONTAINS_FLASHED_FORM -> true.toString)
     result.flashing(flash.toSeq: _*)

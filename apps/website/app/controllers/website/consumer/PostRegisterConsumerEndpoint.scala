@@ -115,8 +115,8 @@ object PostRegisterConsumerEndpoint {
   def formConstraints = AppConfig.instance[FormConstraints]
 
   def form: Form[RegisterConsumerViewModel] = Form(mapping(
-      "email" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
-      "password" -> text.verifying(nonEmpty, formConstraints.isPasswordValid),
-      "bulk-email" -> boolean)(RegisterConsumerViewModel.apply)(RegisterConsumerViewModel.unapply)
+    "email" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
+    "password" -> text.verifying(nonEmpty, formConstraints.isPasswordValid),
+    "bulk-email" -> boolean)(RegisterConsumerViewModel.apply)(RegisterConsumerViewModel.unapply)
   )
 }

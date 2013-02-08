@@ -9,8 +9,8 @@
         @**   Error reporting *@
         <div class="alert alert-error @if(!elements.hasErrors) {hidden}">    
           <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <span class="error-message">@elements.errors.mkString(", ")</span>
-          <span class="help">@elements.infos.mkString(", ")</span>
+          <span class="error-message">@elements.errors.headOption.getOrElse("")</span>
+          <span class="help">@elements.infos.headOption.getOrElse("")</span>
         </div>
       </div>
     </div> 

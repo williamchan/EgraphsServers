@@ -1,8 +1,11 @@
 package controllers
 
 import play.api._
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.data.validation.Constraints._
 import play.api.mvc._
-import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormViewModel}
+import models.frontend.login_page.{RegisterConsumerViewModel, LoginFormViewModel}
 import models.frontend.forms.{FormError, Field}
 import helpers.DefaultImplicitTemplateParameters
 
@@ -11,19 +14,19 @@ import helpers.DefaultImplicitTemplateParameters
  */
 object Login extends Controller with DefaultImplicitTemplateParameters {
   def storefront(recipient: Option[String]) = Action {
-    Ok(LoginRenderArgs().copy(maybeGiftRecipient = recipient).renderCheckoutAsForm())
+    Ok(LoginRenderArgs().copy(maybeGiftRecipient = recipient).renderCheckoutAsForm)
   }
 
   def index = Action {
-    Ok(LoginRenderArgs().renderLoginForm())
+    Ok(LoginRenderArgs().renderLoginForm)
   }
 
   def allErrorsLogin = Action {
-    Ok(allErrorsLoginRenderArgs.renderLoginForm())
+    Ok(allErrorsLoginRenderArgs.renderLoginForm)
   }
 
   def allErrorsStorefront = Action {
-    Ok(allErrorsLoginRenderArgs.renderCheckoutAsForm())
+    Ok(allErrorsLoginRenderArgs.renderCheckoutAsForm)
   }
 
   private def allErrorsLoginRenderArgs = {
@@ -36,27 +39,27 @@ object Login extends Controller with DefaultImplicitTemplateParameters {
         defaultLogin.password.copy(values=Some("Erroneous password")).withError("Oops! Login pass."),
         List(FormError("Oops! Login nebulous."))
       ),
-      registrationForm=defaultRegister.copy(
-        defaultRegister.email.copy(values=Some("Erroneous register email")).withError("Oops! Register email."),
-        defaultRegister.password.copy(values=Some("Erroneous password email")).withError("Oops! Register pass."),
-        List(FormError("Oops! Register nebulous."))
-      )
+      registrationForm=defaultRegister.bind(Map(
+        ("email" -> "Erroneous register email"),
+        ("password" -> "short"), // too short
+        ("bulk-email" -> true.toString)
+      ))
     )
   }
 
   private case class LoginRenderArgs(
     loginForm: LoginFormViewModel = defaultLoginForm,
-    registrationForm: AccountRegistrationFormViewModel = defaultRegistrationForm,
+    registrationForm: Form[RegisterConsumerViewModel] = defaultRegistrationForm,
     maybeGiftRecipient: Option[String] = None,
     celebrityName: String = "Herp Derpson",
-    newOwnerTargetUrl: String = "new-owner-target-url",
+    registerTargetUrl: String = "register-target-url",
     fbAuthUrl: String = "fbAuthUrl"
   ) {
-    def renderLoginForm() = {
-      views.html.frontend.login(loginForm, registrationForm, fbAuthUrl)
+    def renderLoginForm = {
+      views.html.frontend.login(loginForm, registrationForm, registerTargetUrl, fbAuthUrl)
     }
 
-    def renderCheckoutAsForm() = {
+    def renderCheckoutAsForm = {
       views.html.frontend.celebrity_storefront_login(
         loginForm,
         newOwnerTargetUrl,
@@ -78,14 +81,15 @@ object Login extends Controller with DefaultImplicitTemplateParameters {
   }
 
   private def defaultRegistrationForm = {
-    AccountRegistrationFormViewModel(
-      Field("emailField", None),
-      Field("passwordField", None),
-      List.empty[FormError],
-      "this-is-the-action-url"
-    )
+    // you could bind this to a Map[String, String] if you want to prepopulate
+    simpleRegisterForm
   }
 
+  private def simpleRegisterForm: Form[RegisterConsumerViewModel] = Form(mapping(
+    "email" -> email.verifying(nonEmpty),
+    "password" -> nonEmptyText(8),
+    "bulk-email" -> boolean)(RegisterConsumerViewModel.apply)(RegisterConsumerViewModel.unapply)
+  )
 
 }
 
