@@ -1,5 +1,7 @@
 .egraph-page {
   #content #main {
+    margin-left:auto;
+    margin-right:auto;
     margin-bottom: 0px;
     padding-bottom: 0px;
 
@@ -10,10 +12,13 @@
       max-width: 100%;
     }
 
+    h3 {
+      line-height:28px;
+    }
+
     .container {
       margin: 0px 0px 0px 0px;
       max-width: 100%;
-      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 
       #egraph-player {
         width: 100%;
@@ -26,8 +31,10 @@
       }
 
       .egraph-player-container {
-        .box-shadow(0 0 1px 2px #000);
+        // .box-shadow(0 0 1px 2px #666);
+        position:relative;
         margin-top: 25px;
+        .box-shadow(0px 0px 0px 2px #888);
         margin-left: auto;
         margin-right: auto;
       }
@@ -81,16 +88,23 @@
       #egraph-description {
         margin: 15px 0 15px 0;
         text-align: center;
-        font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
       }
+      
       .description-line {
         font-size: 24px;
-        color: rgb(51, 51, 51);
-      }
-      .description-line i {
-        font-size: 24px;
+        margin-bottom:8px;
+        font-style:italic;        
         color: rgb(128, 128, 128);
+        font-weight:100;
+
+        em {
+          font-size: 24px;
+          font-weight:300;
+          font-style:normal;
+          color: rgb(51, 51, 51);
+        }
       }
+      
 
       #social {
         margin: 10px 0 10px 0;
