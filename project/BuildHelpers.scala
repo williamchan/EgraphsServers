@@ -16,7 +16,7 @@ object BuildHelpers {
     libraryDependencies ++= Seq(
       "play" %% "play" % PlayVersion.current,    
     
-      "org.scalatest" %% "scalatest" % "1.8" % "test",
+      "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       "play" %% "play-test" % PlayVersion.current % "test"
     ),
 

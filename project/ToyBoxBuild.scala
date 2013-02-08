@@ -14,9 +14,9 @@ object ToyBoxBuild extends Build {
   // From squeryl.org/getting-started.html
     
   val appDependencies = Seq(
-    "play" %% "play" % PlayVersion.current,    
-  
-    "org.scalatest" %% "scalatest" % "1.8" % "test",
+    "play" %% "play" % PlayVersion.current,
+
+    "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
     "play" %% "play-test" % PlayVersion.current % "test"
   )
 

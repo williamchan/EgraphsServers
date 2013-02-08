@@ -12,7 +12,7 @@ object IntegrationBuild extends Build {
 
     val appDependencies = Seq(
       // test dependencies
-      "org.scalatest" %% "scalatest" % "1.8" % "test"
+      "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
     )
   
     val main = play.Project(

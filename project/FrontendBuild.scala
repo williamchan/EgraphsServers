@@ -14,7 +14,7 @@ object FrontendBuild extends Build {
     "org.joda" % "joda-money" % "0.6",
 
     // Test dependencies
-    "org.scalatest" %% "scalatest" % "1.8" % "test"
+    "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
   )
 
   // Only compile the bootstrap bootstrap.less file and any other *.less file in the stylesheets directory

@@ -16,7 +16,7 @@ object ApplicationBuild extends Build {
     "redis.clients" % "jedis" % "2.0.0",
     
     "org.mockito" % "mockito-all" % "1.9.0" % "test",
-    "org.scalatest" %% "scalatest" % "1.8" % "test",
+    "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
     "com.typesafe.akka" % "akka-testkit" % "2.0.2" % "test"
   )
 

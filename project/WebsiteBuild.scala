@@ -73,8 +73,8 @@ object WebsiteBuild extends Build {
 
       // Test dependencies
       "com.typesafe.akka" % "akka-testkit" % "2.0.2" % "test",
-      "org.scalatest" %% "scalatest" % "1.8" % "test",
-      "org.scalamock" %% "scalamock-scalatest-support" % "2.4" % "test"
+      "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
+      "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
     )
     
     val websiteBaseDir = file(".") / "apps" / "website"
