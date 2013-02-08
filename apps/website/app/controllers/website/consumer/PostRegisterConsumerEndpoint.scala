@@ -49,7 +49,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
     Action { implicit request =>
       val redirects = for(
         // Get either the account and customer or a redirect back to the sign-in page
-        accountAndCustomer <- redirectOrCreateAccountCustomerTuple2(request).right
+        accountAndCustomer <- redirectOrCreateAccountCustomerTuple(request).right
       ) yield {
         // OK We made it! The user is created. Unpack account and customer
         val (account, customer) = accountAndCustomer
@@ -81,7 +81,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
     }
   }
 
-  private def redirectOrCreateAccountCustomerTuple2(implicit request: Request[AnyContent])
+  private def redirectOrCreateAccountCustomerTuple(implicit request: Request[AnyContent])
   : Either[Result, (Account, Customer)] = {
 
     dbSession.connected(TransactionSerializable) {

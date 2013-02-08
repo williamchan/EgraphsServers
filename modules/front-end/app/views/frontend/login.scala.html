@@ -57,16 +57,6 @@
         <input type="checkbox" name="@name" id="@id" value="true" checked @toHtmlArgs(args)>
         Signup for the Egraphs Insider newsletter
       }
-@**
-
-      for(error <- registrationForm.generalErrors.headOption) {
-        <div class="general-errors">
-          <div class="alert alert-error @if(loginForm.generalErrors.isEmpty) {hidden}">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <span class="error-message">@error</span>
-          </div>
-        </div>
-      }*@
 
       <p class="registration-instructions" style="display:none">
         Put in your deets, press the big red button, and feel like a million bucks.
