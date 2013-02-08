@@ -9,6 +9,7 @@ object BuildHelpers {
 
   val defaultModuleSettings = Project.defaultSettings ++ Seq(
     scalaVersion := "2.10.0",
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
 
     resolvers ++= Seq(
       "Typesafe Releases Repository" at "http://repo.typesafe.com/typesafe/releases/",

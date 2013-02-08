@@ -1,5 +1,7 @@
 package egraphs.playutils
 
+import scala.language.postfixOps
+import scala.language.implicitConversions
 import org.joda.time.DateTimeConstants
 import play.api.mvc._
 import play.api.http.HeaderNames.SET_COOKIE
