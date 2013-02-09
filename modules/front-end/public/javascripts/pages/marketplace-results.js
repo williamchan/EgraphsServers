@@ -1,65 +1,7 @@
-/*global angular console */
-define(["Egraphs", "pages/marketplace", "services/logging", "module", "libs/angular", "libs/waypoints.min"],
-function (Egraphs, marketplace, logging, requireModule) {
+/*global angular console mixpanel*/
+define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min"],
+function (Egraphs, marketplace, ngApp, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
-  /**
-   * Define controller for marketplace
-   * @param $scope Global Angular Scope
-   */
-  var marketplaceCtrl = function ($scope) {
-    $scope.results = angular.copy(Egraphs.page.results);
-    $scope.total = $scope.results.celebrities.length;
-    $scope.celebrities = [];
-    var count = 0;
-    var countIncrement = 0;
-
-    /**
-     * Depending on the screensize, set increment for infinite scroll
-     * of celebrity result sets.
-     * Desktop displays rows of 3, iPad-like rows of 2, and phone is 1.
-     * Buffer two rows to keep scrolling smooth.
-     **/
-    if($(window).width() < 720) {
-      countIncrement = 4;
-    } else {
-      countIncrement = 6;
-    }
-
-    /**
-     *  Function for loading celebrities.
-     *  Hides the see-more button when out of celebrities.
-     *  Button serves as a manual override for when scroll events behave strangely.
-     **/
-    var loadCelebrities = function(incr) {
-      if(count < $scope.total) {
-        $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + incr));
-        count += incr;
-        atBottom = false;
-        log("Loading celebrities");
-        mixpanel.track("Loaded more results");
-        if(count >= $scope.total) {
-          mixpanel.track("Loaded all results");
-          $(".see-more").addClass("hidden");
-        }
-      }
-    };
-
-    /**
-     * Creates a controller function with a fixed increment
-    **/
-    $scope.loadCelebrities = function() {
-      loadCelebrities(countIncrement);
-    };
-
-    // Page in two sets of results.
-    loadCelebrities(countIncrement*2);
-
-  };
-
-  /**
-   * Define a angular module for the marketplace
-   */
-  var marketplaceModule = angular.module('marketplace', []);
 
   /**
    * Filter for producing a price range string from a celebrity object.
@@ -67,7 +9,7 @@ function (Egraphs, marketplace, logging, requireModule) {
    * $90 if minimum price is zero
    * <empty-string> if the prices are both zero
    */
-  marketplaceModule.filter('priceRange', function() {
+  ngApp.filter('priceRange', function() {
     return function(celebrity) {
       if(celebrity.minPrice === celebrity.maxPrice && celebrity.minPrice > 0) {
         return "$" + celebrity.minPrice;
@@ -92,7 +34,7 @@ function (Egraphs, marketplace, logging, requireModule) {
    */
   var atBottom = false;
 
-  marketplaceModule.directive('whenScrolled', function() {
+  ngApp.directive('whenScrolled', function() {
     return function(scope, element, attrs) {
       $(".celebrity-result").last().waypoint(function(){
         if(atBottom === false && !scope.$$phase){
@@ -104,11 +46,61 @@ function (Egraphs, marketplace, logging, requireModule) {
     };
   });
   
-  window.MarketplaceCtrl = marketplaceCtrl;
-
   return {
-    
-    ngModules:  ['marketplace'],
+    ngControllers: {
+     /**
+      * Define controller for marketplace
+      * @param $scope Global Angular Scope
+      */
+      MarketplaceCtrl: ["$scope", function ($scope) {
+        $scope.results = angular.copy(Egraphs.page.results);
+        $scope.total = $scope.results.celebrities.length;
+        $scope.celebrities = [];
+        var count = 0;
+        var countIncrement = 0;
+
+        /**
+         * Depending on the screensize, set increment for infinite scroll
+         * of celebrity result sets.
+         * Desktop displays rows of 3, iPad-like rows of 2, and phone is 1.
+         * Buffer two rows to keep scrolling smooth.
+         **/
+        if($(window).width() < 720) {
+          countIncrement = 4;
+        } else {
+          countIncrement = 6;
+        }
+
+        /**
+         *  Function for loading celebrities.
+         *  Hides the see-more button when out of celebrities.
+         *  Button serves as a manual override for when scroll events behave strangely.
+         **/
+        var loadCelebrities = function(incr) {
+          if(count < $scope.total) {
+            $scope.celebrities = $scope.celebrities.concat($scope.results.celebrities.slice(count, count + incr));
+            count += incr;
+            atBottom = false;
+            log("Loading celebrities");
+            mixpanel.track("Loaded more results");
+            if(count >= $scope.total) {
+              mixpanel.track("Loaded all results");
+              $(".see-more").addClass("hidden");
+            }
+          }
+        };
+
+        /**
+         * Creates a controller function with a fixed increment
+        **/
+        $scope.loadCelebrities = function() {
+          loadCelebrities(countIncrement);
+        };
+
+        // Page in two sets of results.
+        loadCelebrities(countIncrement*2);
+      }]
+    },
 
     go: function () {
       /**

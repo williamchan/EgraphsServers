@@ -52,9 +52,10 @@
   </div>
 }
 
-<!-- Begin site_header.scala.html -->
-@leftNav
-<header id="top" role="navigation">
+@header(id: String, cssClass: String) = {
+  <!-- Begin site_header.scala.html -->
+  @leftNav
+  <header id="@id" role="navigation" class="top @cssClass">
   @headerContent.getOrElse {
     <div class="container">
       <div class="row">
@@ -115,10 +116,10 @@
       </div> <!-- end .row -->
     </div> <!-- end .container -->
   }
+  </header> <!-- end #top -->
+}
 
-</header> <!-- end #top -->
-
-<!-- This just takes up as much space as the header so that other things below can appear below the header. -->
-<div id="to-top" class="header-sized-container"></div>
+@header(id="top", cssClass="fixed")
+@header(id="top-relative", cssClass="relative")
 
 <!-- End site_header.scala.html -->

@@ -3,9 +3,6 @@
 //
 
 // Default styles (all screen sizes)
-.header-sized-container {
-  height: 67px;
-}
 
 @navbarZIndex: 9001; // over 9000
 @flyoutWidth: 200px;
@@ -23,7 +20,7 @@
     .no-flicker();
 }  
 
-#top {
+header.top {
   .clearfix();
 
   .box-shadow(0px 2px 4px rgba(0, 0, 0, .15));  
@@ -44,6 +41,11 @@
     margin-bottom: 0;
   }
   
+  &.relative {
+    position:relative;
+    visibility:hidden;
+  }
+
   p {
     font-size: 14px;
     line-height: 1em;
@@ -238,28 +240,27 @@
       .celebrity-searchbox-container(@orange, @inputBorder, 180px);
     }
   }
-} // end #top
+} // end header.top
 
 
 // Adjust the logo and social tools when at widest to align them with
 // the edges of the content column itself rather than the content within
 // the content column. Below this res, layout will use bootstrap's defaults.
 @media (min-width: 1340px) {
-  #top {
+  header.top {
     .logo { margin-left: -20px; }
     .social { margin-right: -40px; }
   }
 }
 
 @media (max-width: 979px) and (min-width: 769px) {
-  #top {
-
+  header.top {
     .social {
       > ul {
         padding-left: 10px;     
       }
     }
-    // Bring down the padding to handle more than two links up #top   
+    // Bring down the padding to handle more than two links up top
     .account > ul {
       padding-left: 10px;
       padding-right: 10px;
@@ -275,7 +276,11 @@
      margin-right: 5px;
     }
 
-  } // end #top
+    // This keeps the search box from shrinking
+    input.span2, textarea.span2, .uneditable-input.span2 {
+      width: 140px;
+    }
+  } // end header.top
 }
 
 @media(max-width: 768px) {
@@ -332,13 +337,11 @@
       }
     } 
   }
+}
 
-  .header-sized-container {
-    height: 48px;
-  }
+@media (max-width: 768px) {
 
-  #top {
-    
+  header.top {
     padding-top:5px;
     padding-bottom: 0;
 
@@ -396,7 +399,7 @@
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2) { 
 
-  #top {
+  header.top {
   
     .logo h1 a {
       background-image: url(/assets/images/logo-ios.png);      

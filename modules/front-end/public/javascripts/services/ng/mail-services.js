@@ -1,36 +1,33 @@
 /**
   Angular service for subscribing emails to our mailchimp mailing list
-  Example usage:
-  // Define a stub controller
-  var mailCtrl = function($scope, subscribeService) {
-    $scope.subscribe = function() {
-      subscribeService($scope.email);
-    };
-  }
-  // Bootstrap the angular dependencies
-  angular.element(document).ready(function() {
-    window.MailCtrl = mailCtrl;
-    window.MailCtrl.$inject = ['$scope', 'subscribe'];
-    angular.bootstrap(document, ['MailServices']);
-  });
+  Example usage (with requirejs boilerplate):
+
+  // Define your page module
+  define(["services/ng/mail-services"], function() {
+    return {
+      ngControllers: {
+        MailCtrl: ["$scope", "$subscribe", function($scope, $subscribe) {
+          $scope.subscribe = function() {
+            subscribeService($scope.email);
+          }
+        }]
+      };
+    }
+  })
 
   // A basic form
   <form ng-controller="MailCtrl" ng-submit="subscribe()">
     <input type="email" ng-model="email">
     <button type="submit"></button>
   </form>
-
-  // This service depends on an authToken here Egraphs.page.authenticityToken.
 **/
-
-define(["page", "window", "services/logging", "module"],
-  function(page, window, logging, requireModule) {
+/*global angular, mixpanel*/
+define(["page", "ngApp", "services/logging", "module"],
+  function(page, ngApp, logging, requireModule) {
     var log = logging.namespace(requireModule.id);
     var mail = page.mail;
     var authToken = page.authenticityToken;
-
-    // Angular module for subcscribing to the newsletter
-    angular.module('MailServices', []).factory('subscribe', ['$http', function($http) {
+    var subscribeFactory = function($http) {
       return function(email, successCallback, errorCallback) {
         log(email);
         $http({
@@ -45,6 +42,11 @@ define(["page", "window", "services/logging", "module"],
           (errorCallback || angular.noop)(data);
         });
       };
-    }]);
+    };
+
+    // Angular module for subscribing to the newsletter
+    ngApp.factory('$subscribe', ["$http", subscribeFactory]);
+    
+    return subscribeFactory;
   }
 );

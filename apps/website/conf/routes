@@ -134,6 +134,7 @@ GET     /affiliates                                                 controllers.
 #GET     /careers                                                    controllers.WebsiteControllers.getCareers
 GET     /egraph/$orderId<[0-9]+>                                    controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
 GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraph(orderId: Long)
+# temporary until Twitter Card application is concluded b/c we applied with https://www.egraphs.com/66/new
 GET     /66/new                                                     controllers.WebsiteControllers.getEgraphTemp
 GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
 GET     /$orderId<[0-9]+>/embed                                     controllers.WebsiteControllers.getEgraphPlayerEmbed(orderId: Long)

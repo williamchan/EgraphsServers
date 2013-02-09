@@ -1,4 +1,8 @@
-@()(
+@(celebId: Long = 1L,
+  testcase: Option[String] = None,
+  paymentJsModule: String = "stripe-payment",
+  paymentPublicKey: String = "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX"
+)(
   implicit
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
@@ -9,21 +13,22 @@
  * Template for the checkout page. See base_template.scala.html for description
  * of implicit params.
  *@
-
 @import views.html.frontend._
 @import tags.tooltip
+@import models.frontend.NgField.withField
 @import models.frontend.forms.Field
 
-@headerStep(image: String, label: String, current: Boolean=false, last: Boolean=false) = {
-  <div class="step">
-    <div class="image-container">
+@identifyAs(name: String) = {id="@name" name="@name" ng-model="@name"}
+@headerStep(image: String, label: String, stage: String) = {
+  <div class="step @stage">
+    <div class="image-container ">
       <img src="@EgraphsAssets.at(image)">
     </div>
     <label>@label</label>
 
   </div>
-  @if(!last) {
-    <img class="step-arrow" src="@EgraphsAssets.at("images/glyphicons-rightarrow.png")">
+  @if(stage != "final") {
+    <img class="step-arrow" class="@stage" src="@if(stage == "current") {@EgraphsAssets.at("images/glyphicons-rightarrow.png")} @if(stage == "previous") {@EgraphsAssets.at("images/glyphicons-rightarrow-orange.png")}">
   }
 }
 
@@ -35,10 +40,9 @@
       </a>
     </div>
     <div class="steps">
-      @headerStep("images/glyphicons-link.png", "connect")
-      @headerStep("images/glyphicons-cart.png", "enter details", current=true)
-      @headerStep("images/glyphicons-book.png", "review")
-      @headerStep("images/glyphicons-check.png", "done", last=true)
+      @headerStep("images/glyphicons-links-orange.png", "connect", stage="previous")
+      @headerStep("images/glyphicons-pencil-box-orange.png", "enter details", stage="current")
+      @headerStep("images/glyphicons-check-circle.png", "done", stage="final")
     </div>
   </div>
 }
@@ -49,7 +53,41 @@
    *@
   angular.extend(Egraphs.page, {
     config: {},
+
+    celebId: @celebId,
+
+    payment: {
+      jsModule: "@paymentJsModule",
+      apiKey: "@paymentPublicKey"
+    },
+
+    months: @Html({ (1 to 12).map("\"%02d\"".format(_)).mkString("[", ",", "]") }),
+
+    years: @Html({ (13 to 25).map("\"%d\"".format(_)).mkString("[", ",", "]") }),
+
+    states: @tags.geo.usstates(formatStr="json")
+
+    //scenarios: {
+    //  module: "test/pages/checkout-scenarios",
+    //  // testcase: "digital-egraph-only"
+    //  // testcase: "digital-egraph-with-framed-print"
+    //  // testcase: "15-dollar-code-herpderp-available"
+    //  // testcase: "15-dollar-code-herpderp-exercised"
+    //  // testcase: "pre-populate-all-forms"
+    //  // testcase: "all-errors"
+    //}
+
   });
+
+  @if(!testcase.isEmpty) {
+    angular.extend(Egraphs.page, {
+      scenarios: {
+        module: "test/pages/checkout-scenarios",
+        testcase: "@testcase"
+      }
+    });
+  }
+  
 }
 
 @headerIcon(filename: String) = {
@@ -58,194 +96,340 @@
   </div>
 }
 
+@orderSummary = {
+  <div id="order-summary">
+  <div class="summary-insertion"></div>
+  <div class="summary">
+    <h2 id="items-header">Items</h2>
+    <ul class="line-items">
+      <li ng-repeat="product in cart.products" class="{{product.type.codeType}}">
+        <div class="image-and-description">
+          <img ng-src="{{product.imageUrl}}"></img>
+          <h3><div class="money">${{product.amount}}</div>{{product.name}}</h3>
+          <div class="line-item-description">{{product.description}}</div>
+        </div>
+      </li>
+    </ul>
+    <div class="discounts clearfix">
+      <h2>Discounts</h2>
+       <a class="redeem-link" id="open-redeem" ng-click="toggleCodeRedeemerVisibility()">redeem code</a>
+       <ul ng-show="codeRedeemerVisible" class="line-items">
+         <li class="discount {{cart.discount.status}}">
+           <div class="image-and-description">
+             <div class="money {{cart.discount.status}}" >-${{cart.discount.amount}}</div>
+             <form name="couponForm"
+                   class="form-horizontal"
+                   remote-resource="{{cartApi.url}}/coupon"
+                   local-resource="coupon"
+                   submit-completed="refreshCart()">
+               @withField("coupon", "couponCode") { field =>
+                 <input @field.identityAttributes
+                        resource-property
+                        monitor-user-attention
+                        no-submit-on-blur
+                        placeholder="Enter code here"
+                        type="text" />
+                 <div class="errors" ng-show="@field.invalid">
+                   @field.ifError("remote_invalid_code") {invalid code}
+                 </div>
+               }
+             </form>
+              @tooltip("How do I get one?") {
+                <strong>We reward our customers.</strong> Join our mailing list after you buy to get exclusive weekly deals on egraphs.
+              }
+              <a class="redeem-link" id="close-redeem" ng-click="toggleCodeRedeemerVisibility()">actually, forget about it</a>
+           </div>
+         </li>
+       </ul>
+    </div>
+    <h2>Fees</h2>
+    <ul class="line-items">
+      <li ng-show="cart.requiresShipping">
+        <h3><div class="money">free!</div>Shipping</h3>
+      </li>
+      <li>
+        <h3><div class="money">included in price!</div>Sales Tax</h3>
+      </li>                
+    </ul>              
+    <ul class="line-items">
+      <li ng-repeat="line in cart.summary" class="{{line.type.codeType}} summary-line">
+        <h3><div class="money">${{line.amount}}</div>{{line.name}}</h3>
+      </li>
+    </ul>
+  </div>
+</div>
+
+}
+
 @baseBody = {
   <div id="content" role="main">
-    <div id="main">
+    <div id="main" ng-cloak ng-controller="CheckoutController">
       <div id="form" class="form-horizontal">
         <section id="double-check">
           @headerIcon("glyphicons-magnifier-orange.png")
           <h2>Double-check your order</h2>
-          <div id="order-summary">
-            <div class="summary-insertion"></div>
-            <div class="summary">
-              <h2 id="items-header">Items</h2>
-              <ul class="line-items">
-                <li>
-                  <div class="image-and-description">
-                    <img class="framed" src="https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png"></img>
-                    <h3><div class="money">$50</div>Sergio Romo egraph</h3>
-
-                    <div class="line-item-description">
-
-                      For <strong>Herp Derpson</strong> with note <strong>I'm your biggest fan!</strong>. He will sign the photo <strong>Heart of a Warrior</strong>.
-                    </div>
-                  </div>
-                  <div class="line-item-controls clearfix">
-                    
-                  </div>
-                </li>
-
-                <li>
-                  <div class="image-and-description">
-                    <img src="@EgraphsAssets.at("images/framed-print.png")"></img>
-                    <h3><div class="money">$45</div>Framed print</h3>
-                    <div class="line-item-description">
-                      Of your Sergio Romo egraph. Shipping info to-be-provided.
-                    </div>
-                  </div>
-                  <div class="line-item-controls clearfix">
-                  </div>                  
-                </li>
-              </ul>
-              <div class="discounts clearfix">
-                <h2>Discounts</h2>
-                 <a href="#" id="redeem-link">redeem code</a>
-              </div>
-              <h2>Fees</h2>
-              <ul class="line-items">
-                <li>
-                  <h3><div class="money">free!</div>Shipping</h3>
-                </li>
-                <li>
-                  <h3><div class="money">included!</div>Sales Tax</h3>
-                </li>                
-              </ul>              
-              <ul class="line-items">
-                <li class="total summary-line">
-                  <h3><div class="money">$95</div>Total</h3>
-                </li>
-              </ul>
-            </div>
-          </div>
+          @orderSummary
         </section>
         <section id="delivery-details">
           @headerIcon("glyphicons-envelope-orange.png")
           <h2>Enter delivery details</h2>
           <h3 class="fancy-header">Online Egraph Delivery</h3>
-          <div class="control-group">
-            <label class="control-label" for="recipientEmail">
-              Recipient Email:
-              @tooltip("Why do you need this?") {
-                <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit            
+          <form remote-resource="{{cartApi.url}}/recipient"
+                local-resource="recipient"
+                name="recipientForm"
+                novalidate>
+            @withField("recipient", "email") { field =>
+              <div class="control-group">
+                <label class="control-label" for="@field.id">
+                  Recipient Email:
+                  @tooltip("Why do you need this?") {
+                    <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit            
+                  }
+                </label>
+                <div class="controls">
+                    <input @field.identityAttributes
+                           type="email"
+                           monitor-user-attention
+                           resource-property
+                           required>
+                    @field.standardErrorDiv
+                </div>
+              </div> <!-- End .control-group.recipientName -->
+            }
+          </form>
+          <form remote-resource="{{cartApi.url}}/buyer"
+                local-resource="buyer"
+                name="buyerForm"
+                novalidate>
+            <div class="control-group">
+              @withField("buyer", "email") { field =>
+                <label class="control-label" for="@field.id">Your Email:</label>
+                <div class="controls">
+                  <input @field.identityAttributes
+                         type="email"
+                         monitor-user-attention
+                         resource-property
+                         required>
+                  @field.standardErrorDiv
+                </div>
               }
-            </label>
-            <div class="controls">
-              <input id="recipientEmail"
-                     name="recipientEmail">
-            </div>
-          </div> <!-- End .control-group.recipientName -->
-          <div class="control-group">
-            <label class="control-label" for="buyerEmail">Your Email:</label>
-            <div class="controls">
-              <input id="buyerEmail"
-                     name="buyerEmail">
-            </div>
-          </div> <!-- End .control-group.recipientName -->
+            </div> <!-- End .control-group.recipientName -->
+          </form>
 
-          <h3 class="fancy-header framed-print">
-            Framed print delivery
-          </h3>
-          <div class="control-group">
-            <label class="control-label" for="shippingName">Name:</label>
-            <div class="controls">
-              <input id="shippingName"
-                     name="shippingName">
-            </div>
-          </div>
+          <div id="framed-print-delivery" ng-show="cart.requiresShipping">
+            <h3 class="fancy-header framed-print">
+              Framed print delivery
+            </h3>
+            <form name="shippingForm"
+                  class="form-horizontal"
+                  remote-resource="{{cartApi.url}}/shipping-address"
+                  local-resource="shipping">
 
-          <div class="control-group">
-            <label class="control-label" for="addressLine1">Address:</label>
-            <div class="controls">
-              <input id="addressLine1"
-                     name="addressLine1">
-            </div>                      
-          </div>
-          <div class="control-group">
-            <div class="controls">
-              <input id="addressLine2"
-                     name="addressLine2">
-            </div>                      
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="City">City:</label>
-            <div class="controls">
-              <input id="city"
-                     name="city"
-                     class="half">
-              <select id="state"
-                      name="state"
-                      class="half">
-                <option value>State</option>
-              </select>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="postalCode">Postal code:</label>
-            <div class="controls">
-              <input id="postalCode"
-                     name="postalCode"
-                     class="quarter">
-            </div>
-          </div>
+              @withField("shipping", "name") { field =>
+                <div class="control-group">
+                  <label class="control-label" for="@field.id">Name:</label>
+                  <div class="controls">
+                    <input @field.identityAttributes
+                           monitor-user-attention
+                           resource-property 
+                           required>
+                    @field.standardErrorDiv
+                  </div>
+                </div>
+              }
 
+              @withField("shipping", "addressLine1") { field =>
+                <div class="control-group">
+                  <label class="control-label" for="@field.id">Address:</label>
+                  <div class="controls">
+                    <input @field.identityAttributes
+                           monitor-user-attention
+                           resource-property
+                           required>
+                    @field.standardErrorDiv
+                  </div>
+                </div>
+              }
+
+              @withField("shipping", "addressLine2") { field =>
+                <div class="control-group">
+                  <div class="controls">
+                    <input @field.identityAttributes
+                           monitor-user-attention
+                           resource-property>
+                           
+                    @field.standardErrorDiv
+                  </div>
+                </div>
+              }
+              
+              <div class="control-group">
+                @withField("shipping", "city") { field =>
+                  <label class="control-label" for="@field.id">City:</label>
+                  <div class="controls">
+                    <input @field.identityAttributes
+                           class="half"
+                           monitor-user-attention
+                           resource-property
+                           required />
+                    @field.standardErrorDiv
+                }
+                @withField("shipping", "state") { field =>
+                  <select @field.identityAttributes
+                          monitor-user-attention
+                          resource-property
+                          ng-options="state[1] for state in states"
+                          class="half" 
+                          required />
+                    <option value>State</option>
+                  </select>
+                  @field.standardErrorDiv
+                </div>
+                }
+              </div>
+
+              @withField("shipping", "postalCode") { field =>
+                <div class="control-group">
+                  <label class="control-label" for="@field.id">Postal code:</label>
+                  <div class="controls">
+                    <input @field.identityAttributes monitor-user-attention resource-property class="half" required />
+                    @field.standardErrorDiv
+                  </div>
+                </div>
+              }
+            </form>
+          </div> <!-- end #framed-print-delivery -->
         </section>
-        <section id="payment-details">
+        <section id="payment-details" ng-show="cart.total > 0">
           @headerIcon("glyphicons-lock-orange.png")
           <h2>Enter payment details</h2>
-          <div class="control-group">
-            <label class="control-label" for="City">Card Number:</label>
-            <div class="controls">
-              <input id="cardNumber"
-                     name="cardNumber">
+          <form id="stripeForm" stripe-resource="stripeToken" remote-resource name="stripeForm" novalidate>
+            @withField("stripe", "cardNumber") { field =>
+              <div class="control-group">
+                <label class="control-label" for="@field.id">Card Number:</label>
+                <div class="controls">
+                  <input @field.identityAttributes monitor-user-attention resource-property required credit-card-number />
+                  @field.errorDiv {
+                    @field.ifError("required") {required}
+                    
+                    @field.ifError(
+                      "creditCardNumber",
+                      "remote_invalid_number", 
+                      "remote_incorrect_number"
+                    ) {invalid card number}
+
+                    @field.ifError("remote_expired_card") {card expired}
+                  }
+                  <ul class="credit-cards clearfix">
+                    <li class="visa">Visa</li>
+                    <li class="mastercard">Mastercard</li>
+                    <li class="amex">American Express</li>
+                    <li class="discover">Discover</li>
+                  </ul>                  
+                </div>
+              </div>
+            }
+            <div class="control-group">
+              <label class="control-label" for="card-exp-month">Expiration:</label>
+              <div class="controls">
+                <select @identifyAs("cardExpMonth")
+                        monitor-user-attention
+                        resource-property
+                        class="inline"
+                        ng-options="month for month in months"
+                        required 
+                        credit-card-expiry-month>
+                  <option value>MM</option>
+                </select>
+                /
+                <select @identifyAs("cardExpYear")
+                        monitor-user-attention
+                        resource-property
+                        class="inline"
+                        ng-options="year for year in years"
+                        required
+                        credit-card-expiry-year>
+                  <option value>YY</option>
+                </select>
+                @withField("stripe", "cardExpMonth") { monthField =>
+                  @withField("stripe", "cardExpYear") { yearField =>
+                    <div class="errors" ng-show="(@monthField.userHasAttended && @yearField.userHasAttended) && (@monthField.invalid || @yearField.invalid)">
+                      @monthField.ifError("remote_invalid_expiry_month") {incorrect expiration date}
+                      @yearField.ifError("remote_invalid_expiry_year") {invalid expiration date}
+                      @monthField.ifError("required") {month required}
+                      @yearField.ifError("required") {year required}
+                    </div>
+                  }
+                }
+              </div>
             </div>
-          </div>          
-          <div class="control-group">
-            <label class="control-label" for="City">Expiration:</label>
-            <div class="controls">
-              <select id="card-exp-month"
-                      credit-card-expiry-month
-                      name="cardExpMonth"
-                      class="inline"
-                      ng-model="order.card.expMonth"
-                      ng-options="month for month in months"
-                      required >
-                <option value>MM</option>
-              </select>
-              /
-              <select id="card-exp-year"
-                      credit-card-expiry-year
-                      name="cardExpYear"
-                      class="inline"
-                      ng-model="order.card.expYear"
-                      ng-options="year for year in years"
-                      required >
-                <option value>YY</option>
-              </select>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="City">Security code:</label>
-            <div class="controls">
-              <input id="securityCode"
-                     name="securityCode">
-            </div>                      
-          </div>          
-          <div class="control-group">
-            <label class="control-label" for="City">Zip:</label>
-            <div class="controls">
-              <input id="billingZip"
-                     name="billingZip">
-            </div>
-          </div>
+            @withField("stripe", "securityCode") { field =>
+              <div class="control-group">
+                <label class="control-label" for="@field.id">Security code:</label>
+                <div class="controls">
+                  <input @field.identityAttributes
+                         monitor-user-attention
+                         resource-property
+                         class="half"
+                         required 
+                         credit-card-cvc />
+                  @field.errorDiv {
+                    @field.ifError("required") {required}
+                    @field.ifError(
+                      "creditCardCvc",
+                      "remote_invalid_cvc",
+                      "remote_incorrect_cvc"
+                    ) {invalid security code}
+                  }
+                </div>
+              </div>
+            }
+          </form>
+          <form name="paymentForm"
+                remote-resource="{{cartApi.url}}/payment"
+                local-resource="payment"
+                submit-completed="refreshCart()">
+            @withField("payment", "postalCode") { field => 
+              <div class="control-group">
+                <label class="control-label" for="@field.id">Zip:</label>
+                <div class="controls">
+                  <input @field.identityAttributes class="half"  monitor-user-attention required resource-property>
+                  @field.standardErrorDiv
+                </div>
+              </div>
+            }
+            @withField("payment", "stripeToken") { field =>
+              <input name="@field.name"
+                     ng-model="stripeToken.id"
+                     type="hidden" 
+                     monitor-user-attention
+                     resource-property
+                     required />
+            }
+            </form>
         </section>
       </div>
-      <div id="submission">
-        @tags.arrow_button(
-          caption="Proceed to Final Step",
-          classes="button"
-        )
-        <div>or</div>
-        <a href="#">Edit your order</a>
+      <div id="review" class="{{orderStatus()}}" >
+        <div class="control-group">
+          @headerIcon("glyphicons-check-circle-dense-green.png")
+          <h2>Complete your order</h2>
+          <div class="submission">
+            <button type="button"
+                    class="button"
+                    ng-click="creditCardFormSubmit(onCardInfoValidated)" >
+              <strong>
+                <em>Purchase now</em> 
+              </strong>
+              <span>&raquo;</span>
+            </button>
+            <div id="this-will-charge">
+              <span class="money">${{cart.total}}</span> will be charged
+              <span ng-show="cart.total > 0">to your {{stripeToken.data.card.type}}********{{stripeToken.data.card.last4}}</span>
+              <span ng-show="cart.total <= 0">to you. This one's on us!</span>
+            </div>
+            <div id="or-edit"><a href="#">Edit your order</a></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -255,7 +439,7 @@
 @base_template(
   title = "Egraphs Secure Checkout",
   headJs = headJs,
-  jsMain = "pages/storefronts/a/personalize",
+  jsMain = "pages/storefronts/a/checkout",
   body=baseBody,
   headerContent=Some(header),
   bodyClasses=Seq("storefront-a-checkout")
