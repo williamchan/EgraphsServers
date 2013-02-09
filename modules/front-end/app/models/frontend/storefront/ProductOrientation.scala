@@ -9,16 +9,18 @@ package models.frontend.storefront
 sealed case class ProductOrientation(
   name: String,
   tileClass: String
-)
+) {
+  def unapply(orientation: ProductOrientation): Option[(String, String)] = {
+    Some(orientation.name, orientation.tileClass)
+  }
+}
 
-
-case object PortraitOrientation extends ProductOrientation(
+object PortraitOrientation extends ProductOrientation(
   name = "portrait size",
   tileClass = "orientation portrait"
 )
 
-
-case object LandscapeOrientation extends ProductOrientation(
+object LandscapeOrientation extends ProductOrientation(
   name = "landscape size",
   tileClass = "orientation landscape"
 )

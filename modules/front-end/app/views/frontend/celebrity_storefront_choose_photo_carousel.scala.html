@@ -34,7 +34,7 @@
 @headJs = {
   Egraphs.page.firstSlideInCarousel = @firstCarouselProductIndex;
   Egraphs.page.productUrls = [@{
-    val productUrls = products.map(product => HtmlFormat.escape(product.carouselUrl).text)
+    val productUrls = products.map(product => HtmlFormat.escape(product.carouselUrl).body)
     Html(productUrls.mkString("\"", "\",\"", "\""))
   }]
 }

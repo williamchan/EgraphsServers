@@ -49,7 +49,7 @@ case class ResultSetViewModel(
 
 object MarketplaceConversions {
   implicit object MarketplaceCelebrityFormat extends Format[MarketplaceCelebrity] {
-    def reads(json: JsValue) = MarketplaceCelebrity (
+    def reads(json: JsValue): MarketplaceCelebrity = MarketplaceCelebrity (
       (json \ "id").as[Long],
       (json \ "publicName").as[String],
       (json \ "photoUrl").as[String],
@@ -60,7 +60,7 @@ object MarketplaceConversions {
       (json \ "secondaryText").as[String]
     )
 
-    def writes(c: MarketplaceCelebrity) : JsValue = JsObject(List(
+    def writes(c: MarketplaceCelebrity): JsValue = JsObject(List(
       "id" -> JsNumber(c.id),
       "publicName" -> JsString(c.publicName),
       "photoUrl" -> JsString(c.photoUrl),
@@ -74,11 +74,11 @@ object MarketplaceConversions {
   }
 
   implicit object ResultSetViewModelFormat extends Format[ResultSetViewModel] {
-    def reads(json: JsValue) : ResultSetViewModel = { ResultSetViewModel(
+    def reads(json: JsValue) : ResultSetViewModel = ResultSetViewModel(
       (json \ "subtitle").asOpt[String],
       (json \ "verticalUrl").as[Option[String]],  
       (json \ "celebrities").as[List[MarketplaceCelebrity]]
-    )}
+    )
 
     def writes(r: ResultSetViewModel) : JsValue =  JsObject(List(
       "subtitle" -> JsString(r.subtitle.getOrElse("")),
