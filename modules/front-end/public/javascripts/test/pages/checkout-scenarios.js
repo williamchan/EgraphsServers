@@ -155,12 +155,21 @@ function(mockBackend, logging, module, ngApp) {
     "default": {
       bootstrap: function() {
         checkout._addProduct(digitalEgraphLineItem());
-        checkout._addProduct(framedPrintLineItem());
         enableDiscountCode("herpderp", 15);
 
         configureDefaultCheckoutApi();
       }
     },
+
+    "full-discount": {
+      bootstrap: function() {
+        checkout._addProduct(digitalEgraphLineItem());
+        enableDiscountCode("herpderp", 50);
+
+        configureDefaultCheckoutApi();
+      }
+    },
+
     
     "digital-egraph-only": {
       bootstrap: function() {
