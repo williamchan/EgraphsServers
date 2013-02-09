@@ -12,7 +12,7 @@ object FrontendCatalogBuild extends Build {
     val appName         = "front-end-catalog"
     val appVersion      = "2.0-SNAPSHOT"
 
-    val appDependencies = Seq(      
+    val appDependencies = Seq(
       // test dependencies
       "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
     )
