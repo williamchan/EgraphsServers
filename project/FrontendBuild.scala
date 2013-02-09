@@ -33,7 +33,7 @@ object FrontendBuild extends Build {
     appDependencies,
     path = file(".") / "modules" / "front-end"
   ).settings(
-    //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
     organization := "egraphs",
 
     testOptions in Test := Nil,    
