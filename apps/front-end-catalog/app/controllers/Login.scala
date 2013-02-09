@@ -62,7 +62,7 @@ object Login extends Controller with DefaultImplicitTemplateParameters {
     def renderCheckoutAsForm = {
       views.html.frontend.celebrity_storefront_login(
         loginForm,
-        newOwnerTargetUrl,
+        registerTargetUrl,
         celebrityName,
         maybeGiftRecipient,
         fbAuthUrl
