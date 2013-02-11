@@ -226,6 +226,7 @@ function(mockBackend, logging, module, ngApp) {
     "pre-populate-all-forms": {
       bootstrap: function() {
         checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
 
         enableDiscountCode("herpderp", 50);
 
@@ -260,6 +261,8 @@ function(mockBackend, logging, module, ngApp) {
         var standardErrors = ["required", "invalid_length", "invalid_format", "unexpected_type"];
         
         checkoutApiShouldReturn(checkout);
+        checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
 
         mockBackend.stubResource({
           path: /coupon/,
