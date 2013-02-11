@@ -10,6 +10,7 @@ package models.frontend.header
  */
 case class HeaderData(
   loggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = Left(HeaderNotLoggedIn("/")),
+  sessionId: String = "1",
   insideAnEgraphLink: String = "/inside-an-egraph",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
@@ -17,5 +18,6 @@ case class HeaderData(
   blogLink: String = "http://blog.egraphs.com",
   giftCertificateLink: Option[String] = None,
   deploymentInformation: Option[DeploymentInformation] = None,
+  enableLogging: Boolean = true,
   updateMixpanelAlias: Boolean = false
 )

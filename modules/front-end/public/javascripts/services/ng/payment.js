@@ -1,43 +1,15 @@
-/**
- * Angular directives for creating forms for submitting credit card information
- * to our payment partners. Complements the existing angular forms API. To use, call
- * this module's applyDirectives method upon your angular module.
- *
- * See the form named "pay" in gift_certificate_checkout.scala.html for example usage.
- * The basic structure is:
- *
- *   <!-- Create a form with the directive, and give it a name. -->
- *   <form credit-card-form name="ccForm">
- *     <!-- Create necessary form inputs for card: number, cvc, expiry month, expiry year
- *          The form inputs will automatically use payment.js's client-side validation methods.
- *          You can name them whatever you want, but they do need a name. -->
- *     <input credit-card-number name="cardNumber" type="text" />
- *
- *     <!-- Hook into errors using angular's nice declarative syntax-->
- *     <div class="errors" ng-show="pay.cardNumber.$invalid" >
- *       <div ng-show="pay.cardNumber.$error.remote_payment_invalid_number || pay.cardNumber.$error.invalid_number" >
- *         Card number is invalid yo
- *       </div>
- *       <div ng-show="pay.cardNumber.$error.remote_payment_incorrect_number" >
- *         Card number is incorrect yo...whatever that means.
- *       </div>
- *     </div>
- *
- *     <input credit-card-cvc name="cardCvc" type="text" />
- *     <input credit-card-expiry-month name="cardExpMonth" type="text" />
- *     <input credit-card-expiry-year name="cardExpYear" type="text" />
- *     <!-- Submission on ng-click. This example presupposes your controller defined a handler named
- *            $scope.onCardInfoValidated, which takes the tokenId as its only parameter. That's where
- *            all your work happens, and it'll only happen if the CC info was valid!
- *
- *            If the CC info was invalid, then the error boxes we specified above will appear up in
- *            your form -->
- *     <button type="button" ng-click="creditCardFormSubmit(onCardInfoValidated)" >
- *   </form>
- */
+/* This file is in serious need of some dox */
 /*global angular*/
-define(["services/payment", "services/ng/validation-directive", "services/logging", "module"],
-function(payment, validationDirective, logging, module) {
+define(
+[
+  "services/payment",
+  "services/ng/validation-directive",
+  "ngApp",
+  "services/logging",
+  "module",
+  "services/ng/monitor-user-attention"
+],
+function(payment, validationDirective, ngApp, logging, module) {
   var log = logging.namespace(module.id);
   var forEach = angular.forEach;
   var noop = angular.noop;
@@ -50,128 +22,100 @@ function(payment, validationDirective, logging, module) {
     expiryYear: "creditCardExpiryYear"
   };
 
-  // Directive that supplies support for <form credit-card-form name="cc">...</form>
-  var creditCardFormDirective = function(ngModule) {
-    ngModule.directive('creditCardForm', function($rootScope) {
+  ngApp.directive("stripeResource", ["$parse", "$http", function($parse, $http) {
+    return {
+      restrict: 'A',
+      scope: true,
+      require: ["remoteResource"],
+      link: function(scope, element, attrs, requisites) {
+        var tokenIdModel = attrs.stripeResource + ".id";
+        var tokenDataModel = attrs.stripeResource + ".data";
+        var remoteResourceCtrl = requisites[0];
+        var getModel = function(modelStr) { return $parse(modelStr)(scope.$parent); };
+        var setModel = function(modelStr, value) { return $parse(modelStr).assign(scope.$parent, value); };
 
-      return {
-        'restrict': 'A',
+        attrs.localResource = tokenIdModel;
 
-        'scope': true,
+        // When the stripe token ID changes due to successful form submission
+        // we should also trigger a get of the remote token.
+        scope.$parent.$watch(attrs.localResource, function(tokenId) {
+          if(tokenId) {
+            payment.getToken(tokenId, function(status, token) {
+              scope.$parent.$apply(function() {
+                if (status === 200) {
+                  token.card.typeClass = function() {
+                    return this.type === "Visa"? "visa":
+                           this.type === "American Express"? "amex":
+                           this.type === "MasterCard"? "mastercard":
+                           this.type === "Discover"? "discover":
+                           this.type === "JCB"? "jcb":
+                           this.type;
+                  };
 
-        'controller': function($scope, $element, $attrs) {
-          var self = this;
-
-          angular.extend(self, {
-            formComponents: {},
-            paymentControls: {},
-
-            registerFormComponent: function (paymentDirectiveName, modelName, ngModel) {
-              self.formComponents[modelName] = ngModel;
-              self.paymentControls[paymentDirectiveName] = ngModel;
-            },
-
-            tokenForm: function() {
-              return {
-                number: cardControl().$modelValue,
-                cvc: cvcControl().$modelValue,
-                exp_month: parseInt(expMonthControl().$modelValue, 10),
-                exp_year: parseInt(expYearControl().$modelValue, 10)
-              };
-            },
-
-            controlForErrorCode: function(errorCode) {
-              return {
-                "invalid_number": cardControl(),
-                "incorrect_number": cardControl(),
-                "card_declined": cardControl(),
-                "expired_card": cardControl(),
-                "processing_error": cardControl(),
-                "invalid_cvc": cvcControl(),
-                "incorrect_cvc": cvcControl(),
-                "invalid_expiry_month": self.paymentControls[directiveNames.expiryMonth],
-                "invalid_expiry_year": self.paymentControls[directiveNames.expiryYear]
-              }[errorCode];
-            }
-          });
-
-          var cardControl = function() { return self.paymentControls[directiveNames.number]; };
-          var cvcControl = function() { return self.paymentControls[directiveNames.cvc]; };
-          var expMonthControl = function () { return self.paymentControls[directiveNames.expiryMonth]; };
-          var expYearControl = function () { return self.paymentControls[directiveNames.expiryYear]; };
-
-          /**
-           * Every submit should reset the form component, because its possible
-           * that the error is gone, but the form is still not valid
-           */
-          self.resetFormComponentsValidity = function () {
-            forEach(self.formComponents, function (component) {
-              forEach(component.$error, function (isError, errorName) {
-                if (isError && errorName.search("remote_payment_") === 0) {
-                  component.$setValidity(errorName, true);
+                  setModel(tokenDataModel, token);
+                } else {
+                  setModel(tokenDataModel, undefined);
+                  log("Error " + status + " retrieving token " + tokenId);
                 }
               });
             });
-          };
+          }
+        });
+        
+        var controlNameForErrorCode = function(errorCode) {
+          return {
+            "invalid_number": "cardNumber",
+            "incorrect_number": "cardNumber",
+            "card_declined": "cardNumber",
+            "expired_card": "cardNumber",
+            "processing_error": "cardNumber",
+            "invalid_cvc": "securityCode",
+            "incorrect_cvc": "securityCode",
+            "invalid_expiry_month": "cardExpMonth",
+            "invalid_expiry_year": "cardExpYear"
+          }[errorCode];
+        };
 
-          $scope.paymentValidationError = {};
-          $scope.submitted = false;
+        remoteResourceCtrl.setResourceBehavior({
+          get: function(controls, onSuccess) {
+            log("Intentionally neglecting GET on stripe resource form");
+          },
 
-          $scope.creditCardFormSubmit = function(onSuccess) {
-            log("Submitting card information form");
-            $scope.onSuccess = onSuccess;
+          submit: function(controls, callbacks) {
+            log("Submitting card info to stripe");
+            var form = {
+              number: controls["cardNumber"].$modelValue,
+              cvc: controls["securityCode"].$modelValue,
+              exp_month: parseInt(controls["cardExpMonth"].$modelValue, 10),
+              exp_year: parseInt(controls["cardExpYear"].$modelValue, 10)
+            };
 
-            // Hackily set the payment controls dirty just in case they were clean before;
-            // error messages won't appear on controls that aren't dirty.
-            forEach(self.paymentControls, function(control) {
-              if (!control.$dirty) control.$setViewValue(control.$viewValue);
+            payment.createToken(form, function(status, response) {
+              scope.$parent.$apply(function() {
+                var errors;
+                var data;
+                if (status === 200) {
+                  log("Stripe card submission accepted.");
+                  data = response.id;
+                  setModel(tokenIdModel, data);
+                  callbacks.onSubmitSuccess(data);
+                } else {
+                  var errorCode = response.error.code;
+                  var errorControlName = controlNameForErrorCode(errorCode);
+                  errors = [{field:errorControlName, cause:errorCode}];
+
+                  callbacks.onSubmitFail(data, errors);
+                }
+
+                callbacks.onSubmitEnd(data, errors);
+              });
             });
-
-            $scope.submitted = true;
-            self.resetFormComponentsValidity();
-          };
-
-        },
-
-        'link': function(scope, element, attrs, formCtrl) {
-          // Surface the underlying FormController for access by the page's outer controller;
-          // otherwise this directive's controller would have hidden it.
-          scope.$parent[attrs['name']] = scope[attrs['name']];
-
-          scope.$watch('submitted', function(submitted) {
-            if (!submitted) {
-              return;
-            }
-
-            payment.createToken(formCtrl.tokenForm(), function(status, response) {
-              if (response.error) {
-                var errorCode = response.error.code;
-                var errorClass = "remote_payment_" + errorCode;
-                var errorControl = formCtrl.controlForErrorCode(errorCode);
-                var errorControlName = errorControl.$name;
-
-                log(errorControl);
-                log("\"" + errorCode + "\": Card information failed remote validation." +
-                  " Applying angular.js validation error \"" + errorClass +
-                  "\" to UI control named \"" + errorControlName + "\"");
-
-                errorControl.$setValidity(errorClass, false);
-
-                scope.paymentValidationError[errorControlName] = errorClass;
-
-                $rootScope.$apply();
-              } else {
-                scope.onSuccess(response.id);
-              }
-            });
-
-            scope.submitted = false;
-          });
-        }
-      };
-    });
-  };
-
+          }
+        });
+      }
+    };
+  }]);
+  
   // Helper for creating the input field directives that follow
   var ccFieldDirective = function(ngModule, name, validate) {
     validate = validate || function() { return true; };
@@ -180,17 +124,13 @@ function(payment, validationDirective, logging, module) {
       return {
         'restrict': 'A',
 
-        'require': ['^creditCardForm', 'ngModel'],
+        'require': ['ngModel', 'resourceProperty'],
 
         'link': function(scope, element, attrs, ctrls) {
-          var formCtrl = ctrls[0];
-          var ngModel = ctrls[1];
+          var inputCtrl = ctrls[0];
 
           // Create and add the parser where applicable
-          ngModel.$parsers.push(validationDirective.parser(name, ngModel, validate));
-
-          // Add the control to the form
-          formCtrl.registerFormComponent(name, attrs.name, ngModel);
+          inputCtrl.$parsers.push(validationDirective.parser(name, inputCtrl, validate));
         }
       };
     });
@@ -224,14 +164,13 @@ function(payment, validationDirective, logging, module) {
     ccFieldDirective(ngModule, directiveNames.expiryYear);
   };
 
-  return {
-    /** Apply to an ng.module to make payment directives available to associated page */
-    applyDirectives: function(ngModule) {
-      creditCardFormDirective(ngModule);
-      creditCardNumberDirective(ngModule);
-      creditCardCvcDirective(ngModule);
-      creditCardExpiryDirectives(ngModule);
-    }
+  var applyDirectives = function(ngModule) {
+    creditCardNumberDirective(ngModule);
+    creditCardCvcDirective(ngModule);
+    creditCardExpiryDirectives(ngModule);
 
+    return ngModule;
   };
+
+  return applyDirectives(ngApp);
 });

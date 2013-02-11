@@ -370,6 +370,13 @@
       line-height: 1.5em;
     }
 
+    div {
+      img {
+        .box-shadow(0px 0px 0px 2px #888);
+        margin-top: 5px;
+      }
+    }
+
   } // end #landing-welcome
 
   #landing-steps {
@@ -464,7 +471,6 @@
   } // end #landing-details
 
   #landing-more {
-
     margin-bottom: 40px;
 
     header {
@@ -666,7 +672,7 @@
       background: @white;
       margin-left: -40px;
       margin-right: -40px;
-      padding: 0 40px;
+      padding: 40px 40px;
 
     } // end #landing-more
 
@@ -683,108 +689,6 @@
         max-width: 700px;
         margin: 0 auto;   
       }
-
-      figure {
-      
-        display: block;
-
-        figcaption {
-        
-          position: absolute;   
-                  
-          p {
-            
-            font-size: 14px;
-            line-height: 1.5em;
-            margin-bottom: 0;
-            text-align: left;
-          
-            a {
-              text-decoration: underline;
-            }
-          
-            span {
-              display: block;
-              overflow: hidden;
-              position: absolute;
-              text-indent: -9999px;
-            }
-            
-          }
-          
-        }
-        
-        .signature {
-        
-          left: -90px;
-          padding-right: 10px;
-          top: 90px;
-          width: 160px;
-          
-          p {
-    
-            text-align: right;
-          
-            span {
-              left: 100%;
-              top: 10px;
-              width: 185px;
-              height: 122px;
-              background: url(/assets/images/bg-diagram-signature.png) no-repeat 0 0;
-            }
-            
-          }
-          
-        }
-        
-        .name {
-        
-          padding-left: 10px;
-          right: -25px;
-          top: 347px;
-          width: 80px;
-          
-          p {
-          
-            text-align: left;
-          
-            span {
-              background: #29abe2;
-              height: 1px;
-              right: 100%;
-              top: 10px;
-              width: 250px;
-            }
-            
-          }
-        
-        }
-        
-        .audio {
-        
-          left: -80px;
-          padding-right: 10px;
-          top: 326px;
-          width: 100px;
-          
-          p {
-          
-            text-align: right;
-            
-            span {
-              background: #29abe2;          
-              height: 1px;
-              left: 100%;
-              top: 20px;
-              width: 210px;
-            }
-          
-          }
-        
-        }
-      
-      }
-      
     } // end #landing-details
 
   }

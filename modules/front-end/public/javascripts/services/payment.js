@@ -49,9 +49,11 @@ function(page, window) {
     },
 
     getToken: function(tokenId, callback) {
-      // Just a copy-paste of a sample stripe token
-      var fakeStripeToken = {"amount":0,"created":1341466397,"currency":"usd","id":"tok_fsVvVZQxxtbXEl","livemode":false,"object":"token","used":false,"card":{"country":"US","exp_month":4,"exp_year":2015,"fingerprint":"jaW3rHjVmI2YwHq9","last4":"4242","object":"card","type":"Visa"}};
-      callback(200, fakeStripeToken);
+      setTimeout(function() {
+        // Just a copy-paste of a sample stripe token
+        var fakeStripeToken = {"amount":0,"created":1341466397,"currency":"usd","id":"tok_fsVvVZQxxtbXEl","livemode":false,"object":"token","used":false,"card":{"country":"US","exp_month":4,"exp_year":2015,"fingerprint":"jaW3rHjVmI2YwHq9","last4":"4242","object":"card","type":"Visa"}};
+        callback(200, fakeStripeToken);
+      }, 50);
     },
 
     validateCVC: function(cvc) {

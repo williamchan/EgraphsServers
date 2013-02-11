@@ -44,8 +44,7 @@ object EgraphSignedEmailPreparer {
                                         fromName = celebrity.publicName,
                                         toEmail = receivingCustomer.account.email)
 
-        val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-
+        val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
         (viewEgraphUrl, celebrity, emailStack)
       }
     }

@@ -73,6 +73,7 @@ class ConfigFileProxy @Inject() (protected val playConfig: Configuration) extend
   val twitter = string("twitter", "fake", "twitter4j")
   val fbAppid = string("fb.appid")
   val fbAppsecret = string("fb.appsecret")
+  val enableFrontendLogging = boolean("enableFrontendLogging")
   val ipadBuildVersion = string("ipad.buildversion")
   val attachmentsPath = string("attachments.path")
   val parsersTextMaxlength = string("parsers.text.maxLength")
