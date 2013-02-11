@@ -10,7 +10,7 @@ object MailUtils {
   //TODO: think about whether EmailType enum is necessary or not
   def getAccountVerificationTemplateContentParts(emailType: EmailType.EnumVal, accountVerificationEmailStack: AccountVerificationEmailViewModel): List[(String, String)] = {
     baseList(emailType.name) ::: 
-    List(("account_verification", views.html.frontend.tags.email.account_verification(accountVerificationEmailStack.verifyPasswordUrl).body)) // TODO: change the template to accept view model
+    List(("account_verification", views.html.frontend.tags.email.account_verification(accountVerificationEmailStack).body))
   }
 
   def getAccountConfirmationTemplateContentParts(emailType: EmailType.EnumVal): List[(String, String)] = {
