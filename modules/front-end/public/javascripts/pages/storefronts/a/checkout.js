@@ -11,10 +11,10 @@ define([
   "bootstrap/bootstrap-button"
 ],
 function(page, tooltip, logging, requireModule) {
-  var log = logging.namespace(requireModule.id),
-      forEach = angular.forEach,
-      celebId = page.celebId,
-      states = page.states;
+  var log = logging.namespace(requireModule.id);
+  var forEach = angular.forEach;
+  var celebId = page.celebId;
+  var states = page.states;
 
   return {
     ngControllers: {
@@ -117,7 +117,7 @@ function(page, tooltip, logging, requireModule) {
          * Returns the number of fields the user still has left to enter before able
          * to validly check out
          */
-        $scope.numFieldsRemaining = function() {
+        $scope.fieldsRemaining = function() {
           var controls = $scope.userControls();
           var remaining = [];
           // log("Remaining:");
@@ -129,7 +129,7 @@ function(page, tooltip, logging, requireModule) {
             }
           });
 
-          return remaining.length;
+          return remaining;
         };
 
         /**
@@ -137,7 +137,7 @@ function(page, tooltip, logging, requireModule) {
          * Otherwise returns "enteringData"
          */
         $scope.orderStatus = function() {
-          if ($scope.numFieldsRemaining() === 0) {
+          if ($scope.fieldsRemaining().length === 0) {
             return "readyForReview";
           } else {
             return "enteringData";

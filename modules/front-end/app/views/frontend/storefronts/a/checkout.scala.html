@@ -408,6 +408,16 @@
             }
             </form>
         </section>
+        <div id="field-reminder" class="control-group">
+          <div class="controls">
+            <div class="fields-remaining" ng-show="fieldsRemaining().length > 0">
+              <img src="@EgraphsAssets.at("images/glyphicons-uparrow-circle-orange.png")"> <span class="num-remaining">{{fieldsRemaining().length}}</span> required fields remaining
+            </div>
+            <div class="no-fields-remaining" ng-show="fieldsRemaining().length == 0">
+              <img src="@EgraphsAssets.at("images/glyphicons-check-circle-green.png")"> All required fields complete!
+            </div>
+          </div>
+        </div>
       </div>
       <div id="review" class="{{orderStatus()}}" >
         <div class="control-group">
