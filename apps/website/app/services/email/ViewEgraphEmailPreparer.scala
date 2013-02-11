@@ -16,9 +16,9 @@ import models.frontend.email.EmailViewModel
  * A home for utility functions that help prepare the "egraph signed" emails.
  * Useful for both the regular case and the gift-giving case.
  */
-object EgraphSignedEmailPreparer {
+object ViewEgraphEmailPreparer {
 
-  def prepareEgraphSignedEmailHelper(order: Order, services: OrderServices): (String, Celebrity, EmailViewModel) = {
+  def prepareViewEgraphEmailHelper(order: Order, services: OrderServices): (String, Celebrity, EmailViewModel) = {
 
     val maybeCelebrity = services.celebrityStore.findByOrderId(order.id)
     maybeCelebrity match {
@@ -28,21 +28,22 @@ object EgraphSignedEmailPreparer {
       }
       case Some(celebrity) => {
 
-        //TODO: will need to make json object take multiple senders to handle this case
-        //if (buyingCustomer != receivingCustomer) {
-          //email.addCc(buyingCustomer.account.email)
-        //}
-
         // TODO: figure out how to add this to the json header
         //email.addReplyTo("webserver@egraphs.com")
 
         val buyingCustomer = order.buyer
         val receivingCustomer = order.recipient
 
+        val toAddresses = List((receivingCustomer.account.email, None))
+        if (buyingCustomer != receivingCustomer) {
+          // TODO: change this to a CC address when Mandrill allows it
+          toAddresses ::: List(buyingCustomer.account.email, None)
+        }
+
         val emailStack = EmailViewModel(subject = "I just finished signing your Egraph",
                                         fromEmail = celebrity.urlSlug + "@egraphs.com",
                                         fromName = celebrity.publicName,
-                                        toEmail = receivingCustomer.account.email)
+                                        toAddresses = toAddresses)
 
         val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
         (viewEgraphUrl, celebrity, emailStack)

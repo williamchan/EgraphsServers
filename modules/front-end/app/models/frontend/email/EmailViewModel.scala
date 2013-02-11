@@ -4,6 +4,6 @@ case class EmailViewModel(
   subject: String,
   fromEmail: String = "webserver@egraphs.com",
   fromName: String = "Egraphs",
-  toEmail: String,
+  toAddresses: List[(String, Option[String])],
   bccAddress: Option[String] = None
 )

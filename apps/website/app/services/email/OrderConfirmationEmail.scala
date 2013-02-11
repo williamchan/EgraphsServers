@@ -15,13 +15,11 @@ case class OrderConfirmationEmail(
   import OrderConfirmationEmail.log
   
   def send() {
-    //TODO: figure out how to give the name too (probably already mentioned this elsewhere)
-    //mail.addTo(orderConfirmationEmailStack.buyerEmail, orderConfirmationEmailStack.buyerName)
-    
     val emailStack = EmailViewModel(subject = "Order Confirmation",
                                     fromEmail = "webserver@egraphs.com",
                                     fromName = "Egraphs",
-                                    toEmail = orderConfirmationEmailStack.buyerEmail)
+                                    toAddresses = List((orderConfirmationEmailStack.buyerEmail,
+                                        Some(orderConfirmationEmailStack.buyerName))))
 
     val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
     log("Sending order confirmation mail to : " + orderConfirmationEmailStack.buyerName + " for order ID " + orderConfirmationEmailStack.orderId)

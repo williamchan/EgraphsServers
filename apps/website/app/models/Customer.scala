@@ -131,7 +131,7 @@ object Customer {
     val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
                                     fromEmail = "webserver@egraphs.com",
                                     fromName = "Egraphs",
-                                    toEmail = account.email)
+                                    toAddresses = List((account.email, None)))
 
     val templateContentParts = if (verificationNeeded) {
       val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)

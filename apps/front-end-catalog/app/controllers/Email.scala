@@ -48,7 +48,11 @@ object Email extends Controller {
   }
 
   def verify = Action {
-    Ok(views.html.frontend.email.account_verification("http://www.egraphs.com/word"))
+    Ok(views.html.frontend.email.account_verification(
+      AccountVerificationEmailViewModel(
+        verifyPasswordUrl = "http://www.egraphs.com/word"
+      )
+    ))
   }
 
   def viewEgraph = Action {

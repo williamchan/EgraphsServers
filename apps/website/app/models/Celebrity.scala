@@ -273,12 +273,10 @@ case class Celebrity(id: Long = 0,
   */
   def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
 
-    // email.addTo(toAddress, publicName) // TODO: figure out if this publicName is ever actually used, if so, rethink to-name in json object
-
     val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
                                     fromEmail = "webserver@egraphs.com",
                                     fromName = "Egraphs",
-                                    toEmail = toAddress,
+                                    toAddresses = List((toAddress, Some(publicName))),
                                     bccEmail)
     
     val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url

@@ -363,7 +363,7 @@ class Scenarios extends DeclaresScenarios {
       val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
                                       fromEmail = "webserver@egraphs.com",
                                       fromName = "Egraphs",
-                                      toEmail = "will@egraphs.com")
+                                      toAddresses = List(("will@egraphs.com", Some("Wizzle"))))
 
       val verifyPasswordUrl = "https://www.google.com"
       val accountVerificationTemplateContentParts = MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification,
@@ -381,7 +381,7 @@ class Scenarios extends DeclaresScenarios {
       val emailStack = EmailViewModel(subject = "Order Confirmation",
                                       fromEmail = "webserver@egraphs.com",
                                       fromName = "Egraphs",
-                                      toEmail = "will@egraphs.com")
+                                      toAddresses = List(("will@egraphs.com", Some("Wizzle"))))
 
       val orderConfirmationEmailStack =
         OrderConfirmationEmailViewModel(
@@ -416,7 +416,7 @@ class Scenarios extends DeclaresScenarios {
       val emailStack = EmailViewModel(subject = "I just finished signing your egraph",
                                       fromEmail = "celebrity@egraphs.com",
                                       fromName = "Celebrity Jane",
-                                      toEmail = "will@egraphs.com")
+                                      toAddresses = List(("will@egraphs.com", Some("Wizzle"))))
 
       val viewEgraphUrl = "http://www.google.com"
       val viewEgraphEmailStack =

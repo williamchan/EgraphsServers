@@ -53,7 +53,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
     val emailStack = EmailViewModel(subject = "Egraphs Password Recovery",
                                     fromEmail = "support@egraphs.com",
                                     fromName = "Egraphs Support",
-                                    toEmail = account.email)
+                                    toAddresses = List((account.email, None)))
 
     val resetPasswordUrl = consumerApp.absoluteUrl(getResetPassword(account.email, account.resetPasswordKey.get).url)
     val resetPasswordEmailStack = ResetPasswordEmailViewModel(email = account.email,

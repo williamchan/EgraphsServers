@@ -29,7 +29,7 @@ import java.util.Calendar
 import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
 import models.frontend.email.{RegularViewEgraphEmailViewModel, GiftViewEgraphEmailViewModel}
-import services.email.EgraphSignedEmailPreparer
+import services.email.ViewEgraphEmailPreparer
 import services.mail.MailUtils
 import models.frontend.email.{EmailViewModel, ViewEgraphEmailViewModel}
 
@@ -255,16 +255,16 @@ case class Order(
     withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
   }
 
-  def sendEgraphSignedMail[A](implicit request: RequestHeader) {
-    val (emailStack, viewEgraphEmailStack) = prepareEgraphSignedEmail
+  def sendViewEgraphMail[A](implicit request: RequestHeader) {
+    val (emailStack, viewEgraphEmailStack) = prepareViewEgraphEmail
     services.mail.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(EmailType.ViewEgraph, viewEgraphEmailStack))
   }
   
   // This function provides a hook for testing the email
-  def prepareEgraphSignedEmail
+  def prepareViewEgraphEmail
   : (EmailViewModel, ViewEgraphEmailViewModel)  =
   {
-    val (viewEgraphUrl, celebrity, emailStack) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
+    val (viewEgraphUrl, celebrity, emailStack) = ViewEgraphEmailPreparer.prepareViewEgraphEmailHelper(this, services)
 
     val viewEgraphEmailStack = if (buyerId == recipientId) {
       RegularViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName)

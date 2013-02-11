@@ -32,7 +32,7 @@ trait PostEgraphAdminEndpoint { this: Controller =>
 		    }
 		    case Some(EgraphState.Published) => {
 		      egraph.publish(admin).save()
-		      egraph.order.sendEgraphSignedMail(request)
+		      egraph.order.sendViewEgraphMail(request)
 		      Redirect(GetEgraphAdminEndpoint.url(egraphId))
 		    }
 		    case _ => Forbidden("Unsupported operation")

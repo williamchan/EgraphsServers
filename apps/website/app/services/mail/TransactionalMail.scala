@@ -41,8 +41,18 @@ private[mail] class StubTransactionalMail extends TransactionalMail {
   override def actionUrl = "#"
 
   override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)]) = {
-    println("this is a fake send that will ultimately have some useful info in it")
-    println("we can probably steal that from MailerPlugin")
+    println("don't forget to update this once we implement replyTo")
+    println("may want to do something with txt as well?")
+
+    play.Logger.info("MOCK MAILER: send email")
+    play.Logger.info("FROM: " + mailStack.fromEmail)
+
+    mailStack.toAddresses.foreach(emailNamePair => play.Logger.info("TO EMAIL: " +
+        emailNamePair._1 + ", TO NAME: " + emailNamePair._2.getOrElse("<none>")))
+
+    play.Logger.info("BCC: " + mailStack.bccAddress.getOrElse("none"))
+
+    templateContentParts.foreach(nameTemplatePair => play.Logger.info("HTML: " + nameTemplatePair._2))
   }
 }
 
@@ -71,15 +81,7 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
           "subject" -> Json.toJson(mailStack.subject),
           "from_email" -> Json.toJson(mailStack.fromEmail),
           "from_name" -> Json.toJson(mailStack.fromName),
-          "to" -> Json.toJson(
-            Seq(
-              Json.toJson(
-                Map(
-                  "email" -> Json.toJson(mailStack.toEmail)
-                )
-              )
-            )
-          ),
+          "to" -> Json.toJson(getToAddresses(mailStack)),
           "bcc_address" -> Json.toJson(mailStack.bccAddress.getOrElse("")) // TODO: need to make sure nothing weird happens here. test this.
         )
       ),
@@ -93,6 +95,17 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
         Map(
           "name" -> Json.toJson(name),
           "content" -> Json.toJson(content)
+        )
+      )
+    }
+  }
+
+  private def getToAddresses(mailStack: EmailViewModel): Seq[JsValue] = {
+    for ((email, name) <- mailStack.toAddresses) yield {
+      Json.toJson(
+        Map(
+          "email" -> Json.toJson(email),
+          "name" -> Json.toJson(name.getOrElse(email)) // use email if no name given
         )
       )
     }
