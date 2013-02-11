@@ -37,39 +37,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
     Action { implicit request =>
       orderStore.findFulfilledWithId(orderId) match {
         case Some(FulfilledOrder(order, egraph)) if isViewable(order)(session) =>
-          val product = order.product
-          val celebrity = product.celebrity
-          val mp4Url = egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public)
-          val egraphStillUrl = egraph.getEgraphImage(EgraphVideoEncoder.canvasWidth).asJpg.getSavedUrl(AccessPolicy.Public)
-          val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
-          val iframeUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphPlayerEmbed(order.id).url)
-          val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-          val celebrityNameForTweet = celebrity.twitterUsername match {
-            case Some(username) => "@" + username
-            case None => celebrity.publicName
-          }
-          val tweetText = "An egraph for " + order.recipientName + " from " + celebrityNameForTweet
-          val shareOnPinterestLink = Pinterest.getPinterestShareLink(
-            url = thisPageLink,
-            media = egraphStillUrl,
-            description = celebrity.publicName + " egraph for " + order.recipientName)
-          Ok(views.html.frontend.egraph(
-            mp4Url = mp4Url,
-            videoPosterUrl = egraphStillUrl,
-            celebrityName = celebrity.publicName,
-            celebrityTagline = celebrity.roleDescription,
-            recipientName = order.recipientName,
-            privacySetting = order.privacyStatus.name,
-            messageToCelebrity = order.messageToCelebrity,
-            productIconUrl = product.iconUrl,
-            signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
-            thisPageLink = thisPageLink,
-            classicPageLink = classicPageLink,
-            shareOnPinterestLink = shareOnPinterestLink,
-            tweetText = tweetText,
-            isPromotional = order.isPromotional,
-            iframeUrl = iframeUrl
-          ))
+          Ok(EgraphView.renderEgraphPage(egraph=egraph, order=order, consumerApp = consumerApp))
         case Some(FulfilledOrder(order, egraph)) => Forbidden(views.html.frontend.errors.forbidden())
         case None => NotFound("No Egraph exists with the provided identifier.")
       }
@@ -95,7 +63,7 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
           val maybeGalleryLink = maybeCustomerId.map { customerId =>
             controllers.routes.WebsiteControllers.getCustomerGalleryById(customerId).url
           }
-          Ok(EgraphView.renderEgraphPage(egraph=egraph, order=order, facebookAppId = facebookAppId, galleryLink = maybeGalleryLink, consumerApp = consumerApp))
+          Ok(EgraphView.renderEgraphClassicPage(egraph=egraph, order=order, facebookAppId = facebookAppId, galleryLink = maybeGalleryLink, consumerApp = consumerApp))
         }
         case Some(FulfilledOrder(order, egraph)) => Forbidden(views.html.frontend.errors.forbidden())
         case None => NotFound("No Egraph exists with the provided identifier.")
