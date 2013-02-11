@@ -20,8 +20,10 @@ import views.html.frontend.email.{celebrity_welcome => celebrity_welcome_html}
 import views.txt.frontend.email.{celebrity_welcome => celebrity_welcome_txt}
 import anorm._
 import services.mvc.celebrity.CelebrityViewConversions
+import services.mail.MailUtils
 import play.api.libs.concurrent.Promise
 import models.frontend.marketplace.MarketplaceCelebrity
+import models.frontend.email.{EmailViewModel, CelebrityWelcomeEmailViewModel}
 import play.api.libs.concurrent.Akka
 import services.db.DBSession
 import org.joda.time.DateTimeConstants
@@ -30,6 +32,7 @@ import services.mvc.celebrity.CatalogStarsQuery
 import java.util.Date
 import org.apache.commons.codec.binary.Base64
 import egraphs.playutils.{Gender, HasGender}
+import models.enums.EmailType
 
 /**
  * Services used by each celebrity instance
@@ -269,19 +272,21 @@ case class Celebrity(id: Long = 0,
   * includes a link to download the latest iPad app.
   */
   def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
-    val email = new HtmlEmail()
 
-    email.setFrom("webserver@egraphs.com", "Egraphs")
-    email.addTo(toAddress, publicName)
-    bccEmail.map(bcc => email.addBcc(bcc))
-    email.setSubject("Welcome to Egraphs!")
+    // email.addTo(toAddress, publicName) // TODO: figure out if this publicName is ever actually used, if so, rethink to-name in json object
+
+    val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
+                                    fromEmail = "webserver@egraphs.com",
+                                    fromName = "Egraphs",
+                                    toEmail = toAddress,
+                                    bccEmail)
     
     val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
-    services.transactionalMail.send(
-      email, 
-      text=Some(celebrity_welcome_txt(publicName, account.email, appDownloadLink).toString),
-      html=Some(celebrity_welcome_html(publicName, account.email, appDownloadLink))
-    )
+    val celebrityWelcomeEmailStack = CelebrityWelcomeEmailViewModel(celebrityName = publicName,
+                                                                    celebrityEmail = account.email,
+                                                                    appPlistUrl = appDownloadLink)
+
+    services.transactionalMail.send(emailStack, MailUtils.getCelebrityWelcomeTemplateContentParts(EmailType.CelebrityWelcome, celebrityWelcomeEmailStack))
   }
 
   //

@@ -80,13 +80,22 @@ object Email extends Controller {
     Redirect(routes.EgraphsAssets.at("html/email_mlb_marketing_static.html"))
   }
   
-  def celebrity_welcome_email = Action {
+  def celebrityWelcome = Action {
     val publicName = "Rodney Strong"
     val email = "rstrong@fantastic.com"
     Ok(views.html.frontend.email.celebrity_welcome(
       celebrityName = publicName,
       celebrityEmail = email,
       appPlistUrl = "//path/to/app"
+    ))
+  }
+
+  def resetPassword = Action {
+    val email = "cooluser@fantastic.com"
+    val resetPasswordUrl = "http://www.egraphs.com/cool"
+    Ok(views.html.frontend.email.reset_password(
+      email = email,
+      resetPasswordUrl = resetPasswordUrl
     ))
   }
 }

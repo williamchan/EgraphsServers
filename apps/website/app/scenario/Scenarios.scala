@@ -21,7 +21,8 @@ import scala.Some
 import models.Administrator
 import models.InventoryBatch
 import models.Order
-import models.frontend.email.{RegularViewEgraphEmailViewModel, OrderConfirmationEmailViewModel}
+import models.frontend.email._
+import services.mail.MailUtils
 
 /**
  * All scenarios supported by the API.
@@ -355,21 +356,20 @@ class Scenarios extends DeclaresScenarios {
   // servicesCategory
   //
   toScenarios add Scenario(
-  "Send account confirmation email to will@egraphs.com",
+  "Send account verification email to will@egraphs.com",
   servicesCategory,
-  """Sends account confirmation email to will@egraphs.com using the configured SMTP server""", {
+  """Sends account verification email to will@egraphs.com using the configured SMTP server""", {
     () =>
-      val email = new HtmlEmail()
-      email.setFrom("webserver@egraphs.com", "Egraphs")
-      email.addReplyTo("webserver@egraphs.com")
-      email.addTo("will@egraphs.com")
-      email.setSubject("Welcome to Egraphs!")
+      val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
+                                      fromEmail = "webserver@egraphs.com",
+                                      fromName = "Egraphs",
+                                      toEmail = "will@egraphs.com")
+
       val verifyPasswordUrl = "https://www.google.com"
-      val html = views.html.frontend.email.account_verification(verifyPasswordUrl = verifyPasswordUrl)
-      email.setHtmlMsg(html.toString())
-      val textVersion = views.txt.frontend.email.account_verification(verifyPasswordUrl)
-      email.setTextMsg(textVersion.toString())
-      mail.send(email, None, Some(html))
+      val accountVerificationTemplateContentParts = MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification,
+          AccountVerificationEmailViewModel(verifyPasswordUrl))
+
+      mail.send(emailStack, accountVerificationTemplateContentParts)
   }
   )
 
@@ -378,11 +378,12 @@ class Scenarios extends DeclaresScenarios {
   servicesCategory,
   """Sends order confirmation email to will@egraphs.com using the configured SMTP server""", {
     () =>
-      val email = new HtmlEmail()
-      email.setFrom("webserver@egraphs.com", "Egraphs")
-      email.addTo("will@egraphs.com")
-      email.setSubject("Order Confirmation")
-      val html = views.html.frontend.email.order_confirmation(
+      val emailStack = EmailViewModel(subject = "Order Confirmation",
+                                      fromEmail = "webserver@egraphs.com",
+                                      fromName = "Egraphs",
+                                      toEmail = "will@egraphs.com")
+
+      val orderConfirmationEmailStack =
         OrderConfirmationEmailViewModel(
           buyerName = "Will Chan",
           buyerEmail = "will@egraphs.com",
@@ -397,26 +398,9 @@ class Scenarios extends DeclaresScenarios {
           faqHowLongLink = "/faq#how-long",
           hasPrintOrder = true
         )
-      )
-      email.setHtmlMsg(html.toString())
-      val textVersion = views.txt.frontend.email.order_confirmation(
-        OrderConfirmationEmailViewModel(
-          buyerName = "Will Chan",
-          buyerEmail = "will@egraphs.com",
-          recipientName = "Andrew Smith",
-          recipientEmail = "me@egraphs.com",
-          celebrityName = "Celebrity Joe",
-          productName = "Product 1",
-          orderDate = "Jan 1, 2012",
-          orderId = "1234",
-          pricePaid = "$50.00",
-          deliveredByDate = "Jan 8, 2012",
-          faqHowLongLink = "/faq#how-long",
-          hasPrintOrder = true
-        )
-      )
-      email.setTextMsg(textVersion.toString())
-      mail.send(email, None, Some(html))
+
+        val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
+        mail.send(emailStack, orderConfirmationTemplateContentParts)
   }
   )
 
@@ -425,30 +409,25 @@ class Scenarios extends DeclaresScenarios {
   servicesCategory,
   """Sends egraph fulfilled email to will@egraphs.com using the configured SMTP server""", {
     () =>
-      val email = new HtmlEmail()
-      email.setFrom("celebrity@egraphs.com", "Celebrity Jane")
-      email.addTo("will@egraphs.com")
-      email.addReplyTo("webserver@egraphs.com")
-      email.setSubject("I just finished signing your Egraph")
+
+      // TODO: figure out how to add reply-to to header
+      //email.addReplyTo("webserver@egraphs.com")
+
+      val emailStack = EmailViewModel(subject = "I just finished signing your egraph",
+                                      fromEmail = "celebrity@egraphs.com",
+                                      fromName = "Celebrity Jane",
+                                      toEmail = "will@egraphs.com")
+
       val viewEgraphUrl = "http://www.google.com"
-      val html = views.html.frontend.email.view_egraph(
+      val viewEgraphEmailStack =
         RegularViewEgraphEmailViewModel(
           viewEgraphUrl = viewEgraphUrl,
           celebrityPublicName = "Celebrity Jane",
           recipientName = "Will Chan"
         )
-      )
-      email.setHtmlMsg(html.toString())
-      val textVersion = views.txt.frontend.email.view_egraph(
-        RegularViewEgraphEmailViewModel(
-          viewEgraphUrl = viewEgraphUrl,
-          celebrityPublicName = "Celebrity Jane",
-          recipientName = "Will Chan"
-        )    
-      ).toString
-      email.setTextMsg(textVersion)
-      
-      mail.send(email, Some(textVersion), Some(html))
+
+      val viewEgraphTemplateContentParts = MailUtils.getViewEgraphTemplateContentParts(EmailType.ViewEgraph, viewEgraphEmailStack)
+      mail.send(emailStack, viewEgraphTemplateContentParts)
   }
   )
 

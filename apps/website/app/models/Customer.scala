@@ -14,7 +14,7 @@ import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
 import models.enums.EmailType
-import models.frontend.email.AccountVerificationEmailViewModel
+import models.frontend.email.{AccountVerificationEmailViewModel, EmailViewModel}
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -128,26 +128,19 @@ object Customer {
       consumerApp: ConsumerApplication
   )(implicit request: RequestHeader)
   {
-    val email = new HtmlEmail()
-    email.setFrom("webserver@egraphs.com", "Egraphs")
-    email.addReplyTo("webserver@egraphs.com")
-    email.addTo(account.email)
-    email.setSubject("Welcome to Egraphs!")
+    val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
+                                    fromEmail = "webserver@egraphs.com",
+                                    fromName = "Egraphs",
+                                    toEmail = account.email)
 
-    val (textMsg: String, htmlMsg: Html, templateContentParts: List[(String, String)]) = if (verificationNeeded) {
+    val templateContentParts = if (verificationNeeded) {
       val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
-      val templateContentParts = MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification, AccountVerificationEmailViewModel(verifyPasswordUrl))
-      val html = views.html.frontend.email.account_verification(verifyPasswordUrl = verifyPasswordUrl)
-      val text = views.txt.frontend.email.account_verification(verifyPasswordUrl).toString
-      (text, html, templateContentParts)
+      MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification, AccountVerificationEmailViewModel(verifyPasswordUrl))
     } else {
-      val templateContentParts = MailUtils.getAccountConfirmationTemplateContentParts(EmailType.AccountConfirmation)
-      val html = views.html.frontend.email.account_confirmation()
-      val text = views.txt.frontend.email.account_confirmation.toString
-      (text, html, templateContentParts)
+      MailUtils.getAccountConfirmationTemplateContentParts(EmailType.AccountConfirmation)
     }
 
-    mail.send(email, Some(textMsg), Some(htmlMsg), Some(templateContentParts))
+    mail.send(emailStack, templateContentParts)
   }
 }
 

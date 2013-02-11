@@ -10,6 +10,7 @@ import play.api.templates.Html
 import controllers.website.GetEgraphEndpoint
 import services.coupon.CouponCreator
 import utils.TestData
+import models.frontend.email.EmailViewModel
 
 /**
  * A home for utility functions that help prepare the "egraph signed" emails.
@@ -17,7 +18,7 @@ import utils.TestData
  */
 object EgraphSignedEmailPreparer {
 
-  def prepareEgraphSignedEmailHelper(order: Order, services: OrderServices): (String, Celebrity, HtmlEmail) = {
+  def prepareEgraphSignedEmailHelper(order: Order, services: OrderServices): (String, Celebrity, EmailViewModel) = {
 
     val maybeCelebrity = services.celebrityStore.findByOrderId(order.id)
     maybeCelebrity match {
@@ -26,29 +27,27 @@ object EgraphSignedEmailPreparer {
         throw new IllegalStateException("There is no celebrity associated with order ID: " + order.id)
       }
       case Some(celebrity) => {
-        val email = new HtmlEmail()
+
+        //TODO: will need to make json object take multiple senders to handle this case
+        //if (buyingCustomer != receivingCustomer) {
+          //email.addCc(buyingCustomer.account.email)
+        //}
+
+        // TODO: figure out how to add this to the json header
+        //email.addReplyTo("webserver@egraphs.com")
 
         val buyingCustomer = order.buyer
         val receivingCustomer = order.recipient
-        email.setFrom(celebrity.urlSlug + "@egraphs.com", celebrity.publicName)
-        email.addTo(receivingCustomer.account.email)
-        if (buyingCustomer != receivingCustomer) {
-          email.addCc(buyingCustomer.account.email)
-        }
 
-        email.addReplyTo("webserver@egraphs.com")
-        email.setSubject("I just finished signing your Egraph")
+        val emailStack = EmailViewModel(subject = "I just finished signing your Egraph",
+                                        fromEmail = celebrity.urlSlug + "@egraphs.com",
+                                        fromName = celebrity.publicName,
+                                        toEmail = receivingCustomer.account.email)
 
         val viewEgraphUrl = services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
 
-        (viewEgraphUrl, celebrity, email)
+        (viewEgraphUrl, celebrity, emailStack)
       }
     }
-  }
-    
-  def getHtmlAndTextMsgs(viewEgraphEmailStack: ViewEgraphEmailViewModel): (Html, String) = {
-    val htmlMsg = views.html.frontend.email.view_egraph(viewEgraphEmailStack)
-    val textMsg = views.txt.frontend.email.view_egraph(viewEgraphEmailStack).toString
-    (htmlMsg, textMsg)
   }
 }

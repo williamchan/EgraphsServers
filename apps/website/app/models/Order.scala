@@ -30,6 +30,8 @@ import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
 import models.frontend.email.{RegularViewEgraphEmailViewModel, GiftViewEgraphEmailViewModel}
 import services.email.EgraphSignedEmailPreparer
+import services.mail.MailUtils
+import models.frontend.email.{EmailViewModel, ViewEgraphEmailViewModel}
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -254,24 +256,23 @@ case class Order(
   }
 
   def sendEgraphSignedMail[A](implicit request: RequestHeader) {
-    val (email, htmlMsg, textMsg) = prepareEgraphSignedEmail
-    services.mail.send(email, Some(textMsg), Some(htmlMsg))
+    val (emailStack, viewEgraphEmailStack) = prepareEgraphSignedEmail
+    services.mail.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(EmailType.ViewEgraph, viewEgraphEmailStack))
   }
   
   // This function provides a hook for testing the email
   def prepareEgraphSignedEmail
-  : (HtmlEmail, Html, String)  = 
+  : (EmailViewModel, ViewEgraphEmailViewModel)  =
   {
-    val (viewEgraphUrl, celebrity, email) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
+    val (viewEgraphUrl, celebrity, emailStack) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
 
-    val egraphSignedEmailStack = if (buyerId == recipientId) {
+    val viewEgraphEmailStack = if (buyerId == recipientId) {
       RegularViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName)
     } else {
       GiftViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, this.buyer.name)
     }
 
-    val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getHtmlAndTextMsgs(egraphSignedEmailStack)
-    (email, htmlMsg, textMsg)
+    (emailStack, viewEgraphEmailStack)
   }
 
   /**

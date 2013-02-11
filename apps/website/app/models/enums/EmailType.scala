@@ -25,6 +25,11 @@ object EmailType extends Enum {
     val name = "Order Confirmation"
     val subject = "Order Confirmation"
   }
+
+  val ResetPassword = new EnumVal {
+    val name = "Reset Password"
+    val subject = "Egraphs Password Recovery"
+  }
   
   val ViewEgraph = new EnumVal {
     val name = "View Egraph"

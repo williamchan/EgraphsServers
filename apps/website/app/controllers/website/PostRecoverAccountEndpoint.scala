@@ -11,6 +11,9 @@ import services.{ConsumerApplication, Utils}
 import services.http.filters.HttpFilters
 import controllers.routes.WebsiteControllers.getResetPassword
 import egraphs.authtoken.AuthenticityToken
+import models.frontend.email.{EmailViewModel, ResetPasswordEmailViewModel}
+import services.mail.MailUtils
+import models.enums.EmailType
 
 private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -47,16 +50,15 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
    * Sends an email so that the customer can reset password via the getResetPassword endpoint
    */
   private def sendRecoveryPasswordEmail(account: Account)(implicit request: RequestHeader) {
-    val email = new HtmlEmail()
-    email.setFrom("support@egraphs.com", "Egraphs")
-    email.addReplyTo("support@egraphs.com")
-    email.addTo(account.email)
-    email.setSubject("Egraphs Password Recovery")
+    val emailStack = EmailViewModel(subject = "Egraphs Password Recovery",
+                                    fromEmail = "support@egraphs.com",
+                                    fromName = "Egraphs Support",
+                                    toEmail = account.email)
+
     val resetPasswordUrl = consumerApp.absoluteUrl(getResetPassword(account.email, account.resetPasswordKey.get).url)
-    val htmlMsg = views.html.Application.email.reset_password_email(
-        email = account.email,
-        resetPasswordUrl = resetPasswordUrl
-      )
-    transactionalMail.send(email, html = Some(htmlMsg))
+    val resetPasswordEmailStack = ResetPasswordEmailViewModel(email = account.email,
+                                                              resetPasswordUrl = resetPasswordUrl)
+
+    transactionalMail.send(emailStack, MailUtils.getResetPasswordTemplateContentParts(EmailType.ResetPassword, resetPasswordEmailStack))
   }
 }
