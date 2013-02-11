@@ -20,7 +20,7 @@ object MemberLens {
 
 
   object Conversions {
-    implicit def parenLessApply[A,B](memberLens: MemberLens[A,B]): B = memberLens()
+    implicit def parenLessApply[A,B](memberLens: MemberLens[A,B]): B = memberLens.apply()
 
     implicit def lensToMemberLensConversion[A, B](lens: Lens[A, B]): MemberLensConversion[A, B] = {
       new MemberLensConversion(lens)

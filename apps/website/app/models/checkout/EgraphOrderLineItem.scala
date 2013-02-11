@@ -12,7 +12,7 @@ case class EgraphOrderLineItemServices @Inject() (
   schema: Schema,
   orderStore: OrderStore
 ) extends SavesAsLineItemEntity[EgraphOrderLineItem] {
-  override protected def modelWithNewEntity(order: EgraphOrderLineItem, entity: LineItemEntity) = order.entity.set(entity)
+
 }
 
 
@@ -20,7 +20,9 @@ case class EgraphOrderLineItem(
   _entity: LineItemEntity = LineItemEntity(),
   _type: Option[EgraphOrderLineItemType] = None,
   @transient _services: EgraphOrderLineItemServices = AppConfig.instance[EgraphOrderLineItemServices]
-) extends LineItem[Order] with HasLineItemEntity[EgraphOrderLineItem]
+)
+	extends LineItem[Order]
+	with HasLineItemEntity[EgraphOrderLineItem]
   with SavesAsLineItemEntityThroughServices[EgraphOrderLineItem, EgraphOrderLineItemServices]
   with LineItemEntityGettersAndSetters[EgraphOrderLineItem]
 {
@@ -53,4 +55,6 @@ object EgraphOrderLineItem {
     val entity = LineItemEntity(0, 0, itemType.id).withAmount(amount)
     new EgraphOrderLineItem( entity, Some(itemType) )
   }
+
+  def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = new EgraphOrderLineItem(entity)
 }

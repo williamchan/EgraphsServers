@@ -109,6 +109,8 @@ case class Coupon(
   override def withDiscountType(value: CouponDiscountType) = this.copy(_discountType = value.name)
   
   override def withUsageType(value: CouponUsageType) = this.copy(_usageType = value.name)
+
+  def withLineItemTypeId(typeId: Long) = this.copy(lineItemTypeId = Some(typeId))
 }
 
 object Coupon {

@@ -12,7 +12,8 @@ case class EgraphOrderLineItemType(
   desiredText: Option[String],
   messageToCeleb: Option[String],
   framedPrint: Boolean
-) extends LineItemType[Order] {
+)
+	extends LineItemType[Order] {
 
   import models.checkout.checkout.Conversions._
   import models.enums.{LineItemNature, CheckoutCodeType}

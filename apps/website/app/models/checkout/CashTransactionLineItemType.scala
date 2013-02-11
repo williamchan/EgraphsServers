@@ -31,7 +31,9 @@ case class CashTransactionLineItemType protected (
   stripeCardTokenId: Option[String],
   _maybeItemEntity: Option[LineItemEntity],
   @transient _services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
-) extends LineItemType[CashTransaction] with HasLineItemTypeEntity
+)
+  extends LineItemType[CashTransaction]
+  with HasLineItemTypeEntity[CashTransactionLineItemType]
   with LineItemTypeEntityLenses[CashTransactionLineItemType]
   with LineItemTypeEntityGetters[CashTransactionLineItemType]
   with HasTransientServices[CashTransactionLineItemTypeServices]
@@ -90,6 +92,8 @@ case class CashTransactionLineItemType protected (
     get = txnType => txnType._entity,
     set = (txnType, newEntity) => txnType.copy(newEntity)
   )
+
+  override def withEntity(newEntity: LineItemTypeEntity) = entity.set(newEntity)
 }
 
 
@@ -155,11 +159,6 @@ case class CashTransactionLineItemTypeServices @Inject() (
   lineItemStore: LineItemStore
 ) extends SavesAsLineItemTypeEntity[CashTransactionLineItemType] {
   import org.squeryl.PrimitiveTypeMode._
-
-  override protected def modelWithNewEntity(
-    txn: CashTransactionLineItemType,
-    newEntity: LineItemTypeEntity
-  ): CashTransactionLineItemType = { txn.entity.set(newEntity) }
 
   def getEntityByNatureOrCreate(nature: LineItemNature) = {
     schema.lineItemTypes.where(entity =>

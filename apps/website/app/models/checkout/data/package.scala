@@ -12,6 +12,7 @@ package object data {
     val InvalidLength = new EnumVal("invalid_length") {}
     val InvalidFormat = new EnumVal("invalid_format") {}
     val InvalidType = new EnumVal("unexpected_type") {}
+    val Required = new EnumVal("required") {}
   }
 
   val fieldKey = "field"

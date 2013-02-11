@@ -5,7 +5,7 @@ import models.GiftCertificate
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.Money
 import services.AppConfig
-import services.db.{CanInsertAndUpdateAsThroughTransientServices, CanInsertAndUpdateAsThroughServices, Schema}
+import services.db.Schema
 import scalaz.Lens
 import com.google.inject.Inject
 
@@ -20,9 +20,11 @@ case class GiftCertificateLineItemType (
   recipient: String,
   amount: Money,
   @transient _services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
-) extends LineItemType[GiftCertificate] with HasLineItemTypeEntity
+)
+	extends LineItemType[GiftCertificate]
+  with HasLineItemTypeEntity[GiftCertificateLineItemType]
   with LineItemTypeEntityGettersAndSetters[GiftCertificateLineItemType]
-  with CanInsertAndUpdateAsThroughTransientServices[GiftCertificateLineItemType, LineItemTypeEntity, GiftCertificateLineItemTypeServices]
+  with SavesAsLineItemTypeEntityThroughServices[GiftCertificateLineItemType, GiftCertificateLineItemTypeServices]
 {
 
   override def toJson: String = {
@@ -88,11 +90,3 @@ object GiftCertificateLineItemType {
 
 case class GiftCertificateLineItemTypeServices @Inject() (schema: Schema)
   extends SavesAsLineItemTypeEntity[GiftCertificateLineItemType]
-{
-  //
-  // SavesAsLineItemTypeEntity members
-  //
-  override protected def modelWithNewEntity(certificate: GiftCertificateLineItemType, entity: LineItemTypeEntity) = {
-    certificate.copy(_entity=entity)
-  }
-}

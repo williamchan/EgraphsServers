@@ -18,19 +18,17 @@ case class GiftCertificateLineItem (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
   _maybeGiftCertificate: Option[GiftCertificate] = None,
-  services: GiftCertificateLineItemServices = AppConfig.instance[GiftCertificateLineItemServices]
-) extends LineItem[GiftCertificate] with HasLineItemEntity[GiftCertificateLineItem]
+  @transient _services: GiftCertificateLineItemServices = AppConfig.instance[GiftCertificateLineItemServices]
+)
+  extends LineItem[GiftCertificate]
+  with HasLineItemEntity[GiftCertificateLineItem]
   with LineItemEntityGettersAndSetters[GiftCertificateLineItem]
-  with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItem, LineItemEntity]
+  with SavesAsLineItemEntityThroughServices[GiftCertificateLineItem, GiftCertificateLineItemServices]
 {
-//  require(_maybeGiftCertificate.isDefined || _entity._domainEntityId > 0)
 
   override def itemType = GiftCertificateLineItemType(this)
 
-
-
   override def toJson: String = ""
-
 
   override def domainObject: GiftCertificate = {
     _maybeGiftCertificate.getOrElse {
@@ -121,9 +119,4 @@ case class GiftCertificateLineItemServices @Inject() (
   schema: Schema,
   lineItemStore: LineItemStore,
   giftCertificateStore: GiftCertificateStore
-) extends SavesAsLineItemEntity[GiftCertificateLineItem] {
-  // SaveAsLineItemEntity members
-  override protected def modelWithNewEntity(certificate: GiftCertificateLineItem, entity: LineItemEntity) = {
-    certificate.copy(_entity=entity)
-  }
-}
+) extends SavesAsLineItemEntity[GiftCertificateLineItem]

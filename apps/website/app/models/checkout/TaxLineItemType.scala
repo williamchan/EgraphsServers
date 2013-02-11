@@ -6,7 +6,7 @@ import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.{CurrencyUnit, Money}
 import play.api.libs.json.Json
 import scalaz.Lens
-import services.db.{CanInsertAndUpdateAsThroughTransientServices, Schema, CanInsertAndUpdateAsThroughServices}
+import services.db.Schema
 import services.AppConfig
 
 
@@ -25,9 +25,11 @@ case class TaxLineItemType protected (
   taxName: String,
   taxRate: BigDecimal,
   @transient _services: TaxLineItemTypeServices = AppConfig.instance[TaxLineItemTypeServices]
-) extends LineItemType[Money] with HasLineItemTypeEntity
+)
+	extends LineItemType[Money]
+	with HasLineItemTypeEntity[TaxLineItemType]
   with LineItemTypeEntityGettersAndSetters[TaxLineItemType]
-  with CanInsertAndUpdateAsThroughTransientServices[TaxLineItemType, LineItemTypeEntity, TaxLineItemTypeServices]
+  with SavesAsLineItemTypeEntityThroughServices[TaxLineItemType, TaxLineItemTypeServices]
 {
 
   override def toJson: String = ""
@@ -163,8 +165,3 @@ object TaxLineItemType {
 // TODO(taxes): add helpers for getting taxes from a tax table when it is implemented
 case class TaxLineItemTypeServices @Inject() (schema: Schema)
   extends SavesAsLineItemTypeEntity[TaxLineItemType]
-{
-  override protected def modelWithNewEntity(tax: TaxLineItemType, entity: LineItemTypeEntity) = {
-    tax.copy(_entity=entity)
-  }
-}

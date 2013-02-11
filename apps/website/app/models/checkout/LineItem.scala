@@ -62,7 +62,7 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
 
   /** Returns option of this if it has the desired code type, otherwise None. */
   protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
-    desiredCodeType: CodeTypeFactory[LIT, LI]
+    desiredCodeType: OfCheckoutClass[LIT, LI]
   ): Option[LI] = {
     if (codeType != desiredCodeType) None
     else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
@@ -146,10 +146,7 @@ trait HasLineItemEntity[T <: LineItem[_]] extends HasEntity[LineItemEntity, Long
 trait SavesAsLineItemEntityThroughServices[
   T <: LineItem[_] with HasLineItemEntity[T],
   ServicesT <: SavesAsLineItemEntity[T]
-] extends CanInsertAndUpdateAsThroughTransientServices[T, LineItemEntity, ServicesT]
-{
-  this: T with Serializable =>
-}
+] extends CanInsertAndUpdateAsThroughTransientServices[T, LineItemEntity, ServicesT] { this: T with Serializable => }
 
 
 /** Allows LineItems' Services to insert and update LineItems */
@@ -223,14 +220,14 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity[T]
 }
 
 
-trait LineItemEntityGetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T]=>
+trait LineItemEntityGetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T] =>
   override lazy val checkoutId = checkoutIdField()
   override lazy val amount = amountField()
   lazy val itemTypeId = itemTypeIdField()
 }
 
 
-trait LineItemEntitySetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T]=>
+trait LineItemEntitySetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T] =>
   override def withEntity(newEntity: LineItemEntity) = entity.set(newEntity)
   override def withCheckoutId(newId: Long) = checkoutIdField.set(newId)
   override def withAmount(newAmount: Money) = amountField.set(newAmount)

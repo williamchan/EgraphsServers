@@ -7,7 +7,6 @@ import org.squeryl.{KeyedEntity, Table}
 trait HasEntity[T <: KeyedEntity[KeyT], KeyT] {
   def _entity: T
   def id: KeyT = _entity.id
-  def isPersisted: Boolean = _entity.isPersisted
 }
 
 

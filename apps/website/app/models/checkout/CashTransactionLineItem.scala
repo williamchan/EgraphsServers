@@ -15,12 +15,7 @@ case class CashTransactionLineItemServices @Inject() (
   schema: Schema,
   payment: Payment,
   cashTransactionStore: CashTransactionStore
-) extends SavesAsLineItemEntity[CashTransactionLineItem] {
-
-  override protected def modelWithNewEntity(txnItem: CashTransactionLineItem, newEntity: LineItemEntity) = {
-    txnItem.entity.set(newEntity)
-  }
-}
+) extends SavesAsLineItemEntity[CashTransactionLineItem]
 
 
 
@@ -38,16 +33,17 @@ case class CashTransactionLineItemServices @Inject() (
  * @param _entity new or persisted LineItemEntity
  * @param _typeEntity entity of CashTransactionLineItemType resolved from
  * @param _maybeCashTransaction CashTransaction given by item type, otherwise None
- * @param services
  */
 case class CashTransactionLineItem(
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
   _maybeCashTransaction: Option[CashTransaction],
-  services: CashTransactionLineItemServices = AppConfig.instance[CashTransactionLineItemServices]
-) extends LineItem[CashTransaction] with HasLineItemEntity[CashTransactionLineItem]
+  @transient _services: CashTransactionLineItemServices = AppConfig.instance[CashTransactionLineItemServices]
+)
+  extends LineItem[CashTransaction]
+  with HasLineItemEntity[CashTransactionLineItem]
   with LineItemEntityGettersAndSetters[CashTransactionLineItem]
-  with CanInsertAndUpdateAsThroughServices[CashTransactionLineItem, LineItemEntity]
+  with SavesAsLineItemEntityThroughServices[CashTransactionLineItem, CashTransactionLineItemServices]
 {
 
   //
@@ -130,6 +126,9 @@ case class CashTransactionLineItem(
     get = txnItem => txnItem._entity,
     set = (txnItem, newEntity) => txnItem copy newEntity
   )
+
+
+  override def withEntity(newEntity: LineItemEntity) = entity.set(newEntity)
 }
 
 
