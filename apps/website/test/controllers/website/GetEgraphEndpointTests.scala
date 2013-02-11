@@ -10,7 +10,7 @@ import services.AppConfig
 import services.db.DBSession
 import utils.EgraphsUnitTest
 import egraphs.playutils.Encodings.Base64
-import controllers.routes.WebsiteControllers.getEgraphClassic
+import controllers.routes.WebsiteControllers.getEgraph
 import utils.FunctionalTestUtils
 import FunctionalTestUtils.Conversions._
 
@@ -42,7 +42,7 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
     status(requestAsCustomer(Some(buyer.id))) should be (OK)
     status(requestAsCustomer(Some(recipient.id))) should be (OK)
     
-    val adminReq = FakeRequest(GET, getEgraphClassic(orderId).url).withAdmin(admin.id)
+    val adminReq = FakeRequest(GET, getEgraph(orderId).url).withAdmin(admin.id)
     status(routeAndCall(adminReq).get) should be (OK)
   }
   
@@ -56,7 +56,7 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
       order.id
     }
    
-    val Some(result) = routeAndCall(FakeRequest(GET, getEgraphClassic(orderId).url))
+    val Some(result) = routeAndCall(FakeRequest(GET, getEgraph(orderId).url))
     
     status(result) should be (OK)
   }
@@ -64,7 +64,7 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
   private def egraphRequestAsCustomer(orderId: Long, customerId: Option[Long]): Result = {
     val req = customerId.map(id => FakeRequest().withCustomer(id)).getOrElse(FakeRequest())
     
-    routeAndCall(req.copy(method=GET, uri=getEgraphClassic(orderId).url)).get
+    routeAndCall(req.copy(method=GET, uri=getEgraph(orderId).url)).get
   }
 
   

@@ -713,7 +713,7 @@ object GalleryOrderFactory {
         .withSigningOriginOffset(product.signingOriginX.toDouble, product.signingOriginY.toDouble)
         .scaledToWidth(product.frame.thumbnailWidthPixels)
       val thumbnailUrl = rawImage.getSavedUrl(accessPolicy = AccessPolicy.Public)
-      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
+      val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
 
       val facebookShareLink = Facebook.getEgraphShareLink(fbAppId = fbAppId,
         fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
