@@ -33,12 +33,12 @@ object WebsiteBuild extends Build {
       "org.jclouds.api" % "filesystem" % "1.4.2",
       "org.jclouds.provider" % "aws-s3" % "1.4.2",
       "org.joda" % "joda-money" % "0.6",
-      "org.specs2" %% "specs2" % "1.5" excludeAll(
+      "org.specs2" %% "specs2" % "1.13" excludeAll(
           ExclusionRule(organization = "org.mockito"),
           ExclusionRule(organization = "org.scala-lang")
       ),
       "org.twitter4j" % "twitter4j-core" % "3.0.3",
-      "org.squeryl" %% "squeryl" % "0.9.5-2" excludeAll(
+      "org.squeryl" %% "squeryl" % "0.9.5-6" excludeAll(
           // Exclude DB-specific libs
           ExclusionRule(organization = "net.sourceforge.jtds"),
           ExclusionRule(organization = "postgresql"),
