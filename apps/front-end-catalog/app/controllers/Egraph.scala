@@ -49,7 +49,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       "Derp Herpson",
       frame.cssClass,
       frame.cssFrameColumnClasses,
-      EgraphsAssets.at("images/egraph_default_plaque_icon.png").url,
+      EgraphsAssets.at("images/default_product_icon.png").url,
       frame.cssStoryColumnClasses,
       "Herp Derpson",
       """
@@ -75,7 +75,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       "Derp Herpson",
       frame.cssClass,
       frame.cssFrameColumnClasses,
-      EgraphsAssets.at("images/egraph_default_plaque_icon.png").url,
+      EgraphsAssets.at("images/default_product_icon.png").url,
       frame.cssStoryColumnClasses,
       "Herp Derpson",
       """

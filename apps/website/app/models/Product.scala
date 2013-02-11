@@ -265,7 +265,7 @@ case class Product(
   ).getSaved(AccessPolicy.Public)
 
   lazy val defaultIcon = ImageAsset(
-    IOUtils.toByteArray(current.resourceAsStream("images/egraph_default_plaque_icon.png").get),
+    IOUtils.toByteArray(current.resourceAsStream("images/default_product_icon.png").get),
     keyBase="defaults/product",
     name="photo_icon",
     imageType=ImageAsset.Png,
