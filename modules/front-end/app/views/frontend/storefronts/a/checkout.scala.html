@@ -432,7 +432,7 @@
               </strong>
               <span>&raquo;</span>
             </button>
-            <div id="this-will-charge">
+            <div id="this-will-charge" ng-show="fieldsRemaining().length == 0">
               <span class="money">${{cart.total}}</span> will be charged
               <span ng-show="cart.total > 0">to your {{stripeToken.data.card.type}}********{{stripeToken.data.card.last4}}</span>
               <span ng-show="cart.total <= 0">to you. This one's on us!</span>
