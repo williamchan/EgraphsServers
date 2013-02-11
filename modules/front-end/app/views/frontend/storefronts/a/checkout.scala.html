@@ -421,7 +421,7 @@
       </div>
       <div id="review" class="{{orderStatus()}}" >
         <div class="control-group">
-          @headerIcon("glyphicons-check-circle-dense-green.png")
+          @headerIcon("{{orderCompleteIcon()}}")
           <h2>Complete your order</h2>
           <div class="submission">
             <button type="button"
@@ -437,7 +437,7 @@
               <span ng-show="cart.total > 0">to your {{stripeToken.data.card.type}}********{{stripeToken.data.card.last4}}</span>
               <span ng-show="cart.total <= 0">to you. This one's on us!</span>
             </div>
-            <div id="or-edit"><a href="#">Edit your order</a></div>
+            @*<div id="or-edit"><a href="#">Edit your order</a></div>*@
           </div>
         </div>
       </div>

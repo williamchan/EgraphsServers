@@ -90,21 +90,31 @@ function(mockBackend, logging, module, ngApp) {
     });
   };
 
-  var enableDiscountCode = function(code, amount) {
+  var enableDiscountCodes = function(codesAndAmounts) {
     mockBackend.setBehavior(function($httpBackend) {
       $httpBackend.whenPOST(/checkouts\/[0-9]+\/coupon$/).respond(function(method, url, data) {
-        if (data.couponCode === code) {
-          checkout._setDiscount(amount);
-          return [200, "", {}];
-        } else if (data.couponCode === "" || !data.couponCode) {
-          checkout._setDiscount(0);
-          return [200, "", {}];
+        var foundDiscount = false;
+        var httpResult = [400, {errors:fieldErrors("couponCode", ["invalid_code"])}, {}];
+
+        if (data.couponCode === "" || !data.couponCode) {
+          httpResult = [200, "", {}];
         } else {
-          checkout._setDiscount(0);
-          return [400, {errors:fieldErrors("couponCode", ["invalid_code"])}, {}];
+          angular.forEach(codesAndAmounts, function(codeAndAmount) {
+            if (data.couponCode === codeAndAmount.code) {
+              foundDiscount = true;
+              checkout._setDiscount(codeAndAmount.amount);
+              httpResult = [200, "", {}];
+            }
+          });
         }
+        if (!foundDiscount) checkout._setDiscount(0);
+        return httpResult;
       });
     });
+  };
+
+  var enableDiscountCode = function(code, amount) {
+    enableDiscountCodes([{code: code, amount: amount}]);
   };
 
   var setDiscountCodeExercised = function(code) {
@@ -155,7 +165,11 @@ function(mockBackend, logging, module, ngApp) {
     "default": {
       bootstrap: function() {
         checkout._addProduct(digitalEgraphLineItem());
-        enableDiscountCode("herpderp", 15);
+        checkout._addProduct(framedPrintLineItem());
+        enableDiscountCodes([
+          {code:"15-bucks", amount:15},
+          {code:"all-bucks", amount:95}
+        ]);
 
         configureDefaultCheckoutApi();
       }

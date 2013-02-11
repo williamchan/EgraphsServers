@@ -142,6 +142,16 @@ function(page, tooltip, logging, requireModule) {
           } else {
             return "enteringData";
           }
+
+
+        };
+
+        $scope.orderCompleteIcon = function() {
+          if ($scope.fieldsRemaining().length > 0 ) {
+            return "glyphicons-x-circle-orange.png";
+          } else {
+            return "glyphicons-check-circle-dense-green.png";
+          }
         };
 
         $scope.refreshCart();
