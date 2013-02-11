@@ -33,6 +33,12 @@ object MailUtils {
     List(("view_egraph", views.html.frontend.tags.email.view_egraph(viewEgraphEmailStack).body))
   }
 
+  def getViewGiftEgraphTemplateContentParts(emailType: EmailType.EnumVal, viewEgraphEmailStack: ViewEgraphEmailViewModel): List[(String, String)] = {
+    baseList(emailType.name) :::
+    List(("gift_header", views.html.frontend.tags.email.gift_header(viewEgraphEmailStack).body),
+         ("view_egraph", views.html.frontend.tags.email.view_egraph(viewEgraphEmailStack).body))
+  }
+
   def getOrderConfirmationTemplateContentParts(emailType: EmailType.EnumVal, orderConfirmationEmailStack: OrderConfirmationEmailViewModel): List[(String, String)] = {
     baseList(emailType.name) :::
     List(("order_confirmation", views.html.frontend.tags.email.order_confirmation(orderConfirmationEmailStack).body))

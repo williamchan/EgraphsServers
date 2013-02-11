@@ -257,7 +257,14 @@ case class Order(
 
   def sendViewEgraphMail[A](implicit request: RequestHeader) {
     val (emailStack, viewEgraphEmailStack) = prepareViewEgraphEmail
-    services.mail.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(EmailType.ViewEgraph, viewEgraphEmailStack))
+
+    if (buyerId == recipientId) {
+      services.mail.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(
+          EmailType.ViewEgraph, viewEgraphEmailStack))
+    } else {
+      services.mail.send(emailStack, MailUtils.getViewGiftEgraphTemplateContentParts(
+          EmailType.ViewEgraph, viewEgraphEmailStack))
+    }
   }
   
   // This function provides a hook for testing the email
