@@ -103,6 +103,7 @@ GET      /admin/inventorybatches/$inventoryBatchId<[0-9]+>                contro
 POST     /admin/inventorybatches/$inventoryBatchId<[0-9]+>                controllers.WebsiteControllers.postInventoryBatchAdmin(inventoryBatchId: Long)
 GET      /admin/login                                                     controllers.WebsiteControllers.getLoginAdmin
 POST     /admin/login                                                     controllers.WebsiteControllers.postLoginAdmin
+GET      /admin/mastheads                                                 controllers.WebsiteControllers.getMastheadsAdmin
 GET      /admin/orders                                                    controllers.WebsiteControllers.getOrdersAdmin
 GET      /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.getOrderAdmin(orderId: Long)
 POST     /admin/orders/$orderId<[0-9]+>                                   controllers.WebsiteControllers.postOrderAdmin(orderId: Long)
