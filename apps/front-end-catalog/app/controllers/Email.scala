@@ -84,9 +84,11 @@ object Email extends Controller {
     val publicName = "Rodney Strong"
     val email = "rstrong@fantastic.com"
     Ok(views.html.frontend.email.celebrity_welcome(
-      celebrityName = publicName,
-      celebrityEmail = email,
-      appPlistUrl = "//path/to/app"
+      CelebrityWelcomeEmailViewModel(
+        celebrityName = publicName,
+        celebrityEmail = email,
+        appPlistUrl = "//path/to/app"
+      )
     ))
   }
 
@@ -94,8 +96,10 @@ object Email extends Controller {
     val email = "cooluser@fantastic.com"
     val resetPasswordUrl = "http://www.egraphs.com/cool"
     Ok(views.html.frontend.email.reset_password(
-      email = email,
-      resetPasswordUrl = resetPasswordUrl
+      ResetPasswordEmailViewModel(
+        email = email,
+        resetPasswordUrl = resetPasswordUrl
+      )
     ))
   }
 }
