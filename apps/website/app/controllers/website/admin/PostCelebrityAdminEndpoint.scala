@@ -21,6 +21,7 @@ import services.blobs.Blobs.Conversions._
 import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
 import org.joda.time.DateTimeConstants
 import egraphs.playutils.Gender
+import services.http.forms.FormConstraints
 
 trait PostCelebrityAdminEndpoint {
   this: Controller =>
@@ -30,6 +31,7 @@ trait PostCelebrityAdminEndpoint {
   protected def transactionalMail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
+  protected def formConstraints: FormConstraints
   
   def postCreateCelebrityAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { case (admin, adminAccount) =>
@@ -38,8 +40,8 @@ trait PostCelebrityAdminEndpoint {
         val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
       	
       	val form = Form(mapping(
-              "celebrityEmail" -> email.verifying(nonEmpty),
-              "celebrityPassword" -> text,
+              "celebrityEmail" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
+              "celebrityPassword" -> nonEmptyText.verifying(formConstraints.isPasswordValid),
               "publicName" -> nonEmptyText(maxLength = 128),
               "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
               "bio" -> nonEmptyText,
@@ -50,8 +52,6 @@ trait PostCelebrityAdminEndpoint {
               "twitterUsername" -> text
           )(PostCreateCelebrityForm.apply)(PostCreateCelebrityForm.unapply)
             .verifying(
-                isUniqueEmail,
-                isPasswordValid,
                 isUniqueUrlSlug(),
                 profileImageIsValid(profileImageFile),
                 landingPageImageIsValid(landingPageImageOption),
@@ -278,23 +278,7 @@ trait PostCelebrityAdminEndpoint {
     val logoImageOption = if (logoImageFile.isDefined) ImageUtil.parseImage(logoImageFile.get) else None
     (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption)
   }
-  
-  private def isUniqueEmail: Constraint[PostCreateCelebrityForm] = {
-    Constraint { form: PostCreateCelebrityForm =>
-      accountStore.findByEmail(form.celebrityEmail) match {
-        case Some(preexistingAccount) if (preexistingAccount.celebrityId.isDefined) => Invalid("Celebrity with e-mail address already exists")
-        case _ => Valid
-      }
-    }
-  }
-  
-  private def isPasswordValid: Constraint[PostCreateCelebrityForm] = {
-    Constraint { form: PostCreateCelebrityForm =>
-      val passwordValidationOrAccount = Account(email = form.celebrityEmail).withPassword(form.celebrityPassword)
-      if (passwordValidationOrAccount.isRight) Valid else Invalid("Password is invalid")
-    }
-  }
-  
+
   private def isUniqueUrlSlug(celebrityId: Option[Long] = None): Constraint[PostCelebrityForm] = {
     Constraint { form: PostCelebrityForm =>
       val isCreate = celebrityId.isEmpty

@@ -70,6 +70,7 @@ case class TestWebsiteControllers @Inject()(
   override def formReaders = instance[FormReaders]
   override def marketplaceServices = instance[MarketplaceServices]
   override def signupModal = instance[SignupModal]
+  override def formConstraints = instance[FormConstraints]
 
   override def catalogStarsQuery = instance[CatalogStarsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]

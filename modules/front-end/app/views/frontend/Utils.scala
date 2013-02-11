@@ -1,14 +1,14 @@
 package views.frontend
-import play.Play
-import java.io.File
-import controllers.Assets
-import scala.annotation.tailrec
+
 import models.frontend.egraphs.EgraphViewModel
+import views.html.helper.FieldConstructor
 
 /**
  * Front-end utilities that otherwise had no home.
  */
 object Utils {
+
+  implicit val bootstrapFields = FieldConstructor(views.html.frontend.tags.bootstrap_field_constructor.f)
 
   /**
    *  Returns a string for an angular.js binding

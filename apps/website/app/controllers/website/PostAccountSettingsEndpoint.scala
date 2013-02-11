@@ -2,13 +2,14 @@ package controllers.website
 
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
+import play.api.mvc.Action
+import play.api.mvc.Results.{Ok, Redirect}
+import controllers.routes.WebsiteControllers.getAccountSettings
 import models._
 import services.http.filters.HttpFilters
 import services.http.POSTControllerMethod
 import services.http.forms.{AccountSettingsForm, AccountSettingsFormFactory, Form}
-import play.api.mvc.Action
-import play.api.mvc.Results.{Ok, Redirect}
-import controllers.routes.WebsiteControllers.getAccountSettings
+import services.mail.BulkMailList
 
 private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   import Form.Conversions._
@@ -17,6 +18,7 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
   protected def accountSettingsForms: AccountSettingsFormFactory
+  protected def bulkMailList: BulkMailList
 
   def postAccountSettings() = postController() {
     httpFilters.requireCustomerLogin.inSession() { case (customer, account) =>
@@ -58,6 +60,13 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
       case Some(a) => a
     }
     address.copy(addressLine1 = addressLine1, addressLine2 = addressLine2, city = city, _state = state, postalCode = postalCode).save()
+
+    // Subscribe or unsubscribe from the mailing list
+    if (!customer.notice_stars && notice_stars == "on") {
+      bulkMailList.subscribeNewAsync(email)
+    } else if (customer.notice_stars && notice_stars == "off") {
+      bulkMailList.removeMember(email)
+    }
 
     // Persist Customer changes
     customer.copy(name = fullname, username = username,
