@@ -108,6 +108,10 @@ object TestData {
     celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod").withPublishedStatus(PublishedStatus.Published)
   }
 
+  def newSavedMasthead: Masthead = {
+    Masthead(name = generateUsername(), headline = generateUsername() ).save()
+  }
+
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {
     val product = newSavedProductWithoutInventoryBatch(celebrity)
     newSavedInventoryBatch(product)

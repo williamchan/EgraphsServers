@@ -56,6 +56,7 @@ case class TestWebsiteControllers @Inject()(
   override def schema = instance[Schema]
   override def featured = instance[Featured]
   override def verticalStore = instance[VerticalStore]
+  override def mastheadStore = instance[MastheadStore]
   override def inventoryBatchStore = instance[InventoryBatchStore]
   override def egraphStore = instance[EgraphStore]
   override def couponStore = instance[CouponStore]  

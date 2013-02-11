@@ -8,9 +8,6 @@ import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import org.apache.commons.io.IOUtils
 import play.api.Play._
-import models.MastheadServices
-import models.ImageAssetServices
-import models.Masthead
 
 case class MastheadServices @Inject() (
   store: MastheadStore,
@@ -50,9 +47,10 @@ case class Masthead (
   //
   override def unapplied = Masthead.unapply(this)
 
-  // Published status
-
-  override def withPublishedStatus(status: PublishedStatus.EnumVal) = {
+  //
+  // PublishedStatus[Masthead] methods
+  //
+  override def withPublishedStatus(status: PublishedStatus.EnumVal) :  Masthead = {
     this.copy(_publishedStatus = status.name)
   }
 
@@ -63,6 +61,7 @@ case class Masthead (
   override def withLandingPageImageKey(key: Option[String]) : Masthead = {
     this
   }
+
 
   override def imageAssetServices = services.imageAssetServices.get
 
@@ -82,6 +81,10 @@ class MastheadStore @Inject() (
 ) extends SavesWithLongKey[Masthead] with SavesCreatedUpdated[Masthead] {
   import org.squeryl.PrimitiveTypeMode._
 
+
+  def getAll: Iterable[Masthead] = {
+    for(masthead <- schema.mastheads) yield masthead
+  }
   //
   // SavesWithLongKey[Celebrity] methods
   //
