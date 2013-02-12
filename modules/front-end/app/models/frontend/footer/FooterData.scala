@@ -18,7 +18,7 @@ case class FooterData(
   affiliatesLink: String="/affiliates",
   termsOfUseLink: String="/terms",
   privacyPolicyLink: String="/privacy",
-  blogLink: String= "https://blog.egraphs.com",
+  blogLink: String= "http://blog.egraphs.com",
   careersPolicyLink: String="/careers",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",
