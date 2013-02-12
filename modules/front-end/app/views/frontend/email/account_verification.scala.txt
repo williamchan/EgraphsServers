@@ -1,0 +1,3 @@
+@(accountVerificationEmailStack: models.frontend.email.AccountVerificationEmailViewModel)
+
+Here is your account! Click here to verify it: @accountVerificationEmailStack.verifyPasswordUrl

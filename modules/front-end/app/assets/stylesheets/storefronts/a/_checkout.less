@@ -532,6 +532,26 @@ body.storefront-a-checkout {
       margin-top:7px;
     }
 
+    #field-reminder {
+      font-style:italic;
+      font-size:13px;
+
+      img {
+        width:16px;
+        margin-left:6px;
+        vertical-align:bottom;
+      }
+
+      .fields-remaining {
+        color:lighten(@orange, 11%);
+
+        .num-remaining {
+          color:@orange;
+          font-weight:600;
+        }
+      }
+    }
+
     // The fun slidey review widget that applies once all form components
     // are successfully completed.
     #review {
@@ -544,12 +564,20 @@ body.storefront-a-checkout {
       background-color:#eee;
       color:#555;
 
-      // Animate max-height as a shim for inability to animate from height:0 to height:auto
-      max-height:0px;
-      .transition(.75s @naturalEasing max-height);
-
       &.readyForReview {
-        max-height:219px; // Any number larger than we expect the box to be will do here.
+        &:after {
+          display:none;
+        }
+      }
+
+      &:after {
+        content:"";       
+        position:absolute;
+        width:100%;
+        height:100%;
+        top:0px;
+        left:0px;
+        background: rgba(255,255,255,.5);
       }
 
       h2 {

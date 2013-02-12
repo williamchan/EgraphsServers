@@ -98,7 +98,7 @@ private[mail] object StubBulkMailList extends BulkMailList
   override def actionUrl = "#"
 
   override def subscribeNewAsync(email: String) : Promise[Response] = {
-    play.api.Logger.info("Subscribed " + email + " to email list: " + newsletterListId + "\n")
+    play.api.Logger.info("Subscribed " + email + " to email list: " + newsletterListId)
     Promise()
   }
   override def checkConfiguration : BulkMailList = { this }
@@ -109,7 +109,10 @@ private[mail] object StubBulkMailList extends BulkMailList
     new Gson().toJson(List("derp"))
   }
   
-  override def removeMember(email: String) : Promise[Response] = throw new Error("This isn't yet supported on StubBulkMailList")
+  override def removeMember(email: String) : Promise[Response] = {
+    play.api.Logger.info("Unsubscribed " + email + " from email list: " + newsletterListId)
+    Promise()
+  }
 }
 
 /**

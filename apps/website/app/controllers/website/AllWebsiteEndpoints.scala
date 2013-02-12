@@ -3,7 +3,7 @@ package controllers.website
 import play.api.mvc.Controller
 import admin.AllAdminEndpoints
 import consumer.{GetRootConsumerEndpoint, AllConsumerEndpoints}
-import controllers.website.nonproduction.PostBuyDemoProductEndpoint
+import nonproduction.{StorefrontA, PostBuyDemoProductEndpoint}
 
 /**
  * All endpoints for the website (doesn't include the API)
@@ -13,4 +13,5 @@ trait AllWebsiteEndpoints
   with AllConsumerEndpoints
   with PostBuyDemoProductEndpoint
   with AllAdminEndpoints
+  with StorefrontA
 { this: Controller =>}

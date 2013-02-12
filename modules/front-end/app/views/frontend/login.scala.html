@@ -1,5 +1,6 @@
 @(loginForm: models.frontend.login_page.LoginFormViewModel,
-  registrationForm: models.frontend.login_page.AccountRegistrationFormViewModel,
+  registrationForm: Form[models.frontend.login_page.RegisterConsumerViewModel],
+  registrationActionUrl: String,
   fbAuthUrl: String
 )(implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
@@ -19,6 +20,7 @@
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import views.html.frontend.tags
 @import models.frontend.forms.{Field, FormError}
+@import views.frontend.Utils.bootstrapFields
 
 @headJs = {
   Egraphs.page.login = {
@@ -46,22 +48,14 @@
   <div class="new-account-fields" @if(!registrationForm.hasErrors) {style="display: none"}>
     <fieldset>
       <span id="register-email-field">
-        @tags.bootstrap_text_input_field("Email Address:", registrationForm.email)
+        @helper.inputText(registrationForm("email"), '_label -> "Email Address:", '_showConstraints -> false)
       </span>
 
-      @tags.bootstrap_text_input_field(
-        "Password:", 
-        registrationForm.password,
-        inputType="password"
-      )
+      @helper.inputPassword(registrationForm("password"), '_label -> "Password:", '_showConstraints -> false)
 
-      @for(error <- registrationForm.generalErrors.headOption) {
-        <div class="general-errors">
-          <div class="alert alert-error @if(loginForm.generalErrors.isEmpty) {hidden}">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <span class="error-message">@error</span>
-          </div>
-        </div>
+      @helper.input(registrationForm("bulk-email"), '_showConstraints -> false) { (id, name, value, args) =>
+        <input type="checkbox" name="@name" id="@id" value="true" checked @toHtmlArgs(args)>
+        Signup for the Egraphs Insider newsletter
       }
 
       <p class="registration-instructions" style="display:none">
@@ -92,7 +86,7 @@
   jsMain="pages/login",
   newOwnerHeader=newOwnerHeader,
   newOwnerContent=newOwnerContent,
-  newOwnerTargetUrl=registrationForm.actionUrl,
+  newOwnerTargetUrl=registrationActionUrl,
   fbHeader=fbHeader,
   fbContent=fbContent,
   fbAuthUrl=fbAuthUrl

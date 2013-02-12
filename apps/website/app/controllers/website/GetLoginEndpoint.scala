@@ -6,11 +6,13 @@ import services.ConsumerApplication
 import services.http.ControllerMethod
 import services.social.Facebook
 import java.util.UUID
-import models.frontend.login_page.{AccountRegistrationFormViewModel, LoginFormViewModel}
+import models.frontend.login_page.{RegisterConsumerViewModel, LoginFormViewModel}
 import services.http.forms.purchase.FormReaders
-import services.mvc.forms.{AccountRegistrationFormViewConversions, LoginFormViewConversions}
+import services.mvc.forms.LoginFormViewConversions
 import services.mvc.ImplicitHeaderAndFooterData
 import controllers.WebsiteControllers
+import egraphs.playutils.FlashableForm._
+import controllers.website.consumer.PostRegisterConsumerEndpoint
 
 private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
   import services.http.forms.Form.Conversions._
@@ -36,9 +38,10 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
 
       // Render
       Ok(views.html.frontend.login(
-        loginForm=makeLoginFormView,
-        registrationForm=makeRegisterFormView,
-        fbAuthUrl=fbOauthUrl
+        loginForm = makeLoginFormView,
+        registrationForm = PostRegisterConsumerEndpoint.form.bindWithFlashData,
+        registrationActionUrl = controllers.routes.WebsiteControllers.postRegisterConsumerEndpoint.url,
+        fbAuthUrl = fbOauthUrl
       )).withSession(request.session + (Facebook._fbState -> fbState))
     }
   }
@@ -57,17 +60,5 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
     // If we couldn't find the form in the flash we'll just make an empty form
     // with the right names
     maybeFormViewModel.getOrElse(LoginFormViewConversions.defaultView)
-  }
-
-  private def makeRegisterFormView(implicit flash: Flash): AccountRegistrationFormViewModel = {
-    import services.mvc.forms.AccountRegistrationFormViewConversions._
-
-    // Get for form flash if possible
-    val flashAsReadable = flash.asFormReadable
-    val maybeFormFromFlash = formReaders.forRegistrationForm.read(flashAsReadable)
-    val maybeFormViewModel = maybeFormFromFlash.map(form => form.asView)
-
-    // Get the default
-    maybeFormViewModel.getOrElse(AccountRegistrationFormViewConversions.defaultView)
   }
 }

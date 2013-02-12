@@ -47,6 +47,7 @@ case class EgraphVideoAsset(blobPath: String,
        * Generate aac audio file. This should not have to go through an intermediate step of generating an mp3,
        * but Xuggle seems to complain when converting a wav to an aac.
        */
+      egraph.assets.audioMp3Url // Calls generateAndSaveMp3 if the mp3 has not yet been prepared
       Utils.saveToFile(egraph.assets.audioMp3.asByteArray, sourceMp3TempFile)
       Utils.convertMediaFile(sourceMp3TempFile, finalAacTempFile)
 

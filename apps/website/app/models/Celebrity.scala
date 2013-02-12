@@ -16,8 +16,6 @@ import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
 import org.squeryl.dsl.ManyToMany
-import views.html.frontend.email.{celebrity_welcome => celebrity_welcome_html}
-import views.txt.frontend.email.{celebrity_welcome => celebrity_welcome_txt}
 import anorm._
 import services.mvc.celebrity.CelebrityViewConversions
 import services.mail.MailUtils

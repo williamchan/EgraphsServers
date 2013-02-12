@@ -10,6 +10,7 @@ GET     /test/scenarios/clear                    controllers.website.nonproducti
 GET     /test/scenarios/:urlSlug                 controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
 GET     /test/log-stuff-then-die                 controllers.website.nonproduction.TestControllers.logStuffThenThrowException
 GET     /test/throwError                         controllers.website.nonproduction.TestControllers.throwError(error: String)
+GET     /test/storefront-a/checkout              controllers.WebsiteControllers.storefrontACheckout
 
 ###
 ### Production routes

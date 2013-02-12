@@ -13,6 +13,7 @@ import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
+import services.http.forms.FormConstraints
 
 trait PostAccountAdminEndpoint {
   this: Controller =>
@@ -20,6 +21,7 @@ trait PostAccountAdminEndpoint {
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
   protected def accountStore: AccountStore
+  protected def formConstraints: FormConstraints
 
   case class PostAccountForm(accountId: Long, email: String, password: String) {
     lazy val accountById = accountStore.findById(accountId)
@@ -36,9 +38,9 @@ trait PostAccountAdminEndpoint {
           mapping(
             "accountId" -> longNumber,
             "email" -> email.verifying(nonEmpty),
-            "password" -> text.verifying(nonEmpty, passwordIsValid)
+            "password" -> text.verifying(nonEmpty, formConstraints.isPasswordValid)
           )(PostAccountForm.apply)(PostAccountForm.unapply)
-            .verifying(emailMatchesMatchesAccountOrIsUnique)
+            .verifying(emailMatchesAccountOrIsUnique)
         )
         
         changeAccountForm.bindFromRequest.fold(
@@ -55,7 +57,7 @@ trait PostAccountAdminEndpoint {
     }
   }
   
-  def emailMatchesMatchesAccountOrIsUnique: Constraint[PostAccountForm] = {
+  def emailMatchesAccountOrIsUnique: Constraint[PostAccountForm] = {
     Constraint { form: PostAccountForm =>
       val maybeValid = form.accountById.flatMap { accountById =>
         val isNotChangingEmail = accountById.email == form.email
@@ -67,12 +69,6 @@ trait PostAccountAdminEndpoint {
       }
 
       maybeValid.getOrElse(Invalid("An account with that email address already exists"))
-    }
-  }
-  
-  def passwordIsValid: Constraint[String] = {
-    Constraint { password: String =>
-      Password.validate(password).fold(error => Invalid("Invalid password"), valid => Valid)
     }
   }
 }
