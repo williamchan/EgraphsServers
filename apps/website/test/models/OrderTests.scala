@@ -260,7 +260,7 @@ class OrderTests extends EgraphsUnitTest
     val celebrity = TestData.newSavedCelebrity()
     val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
     implicit val request = FakeRequest()
-    val (emailViewModel, _) = ViewEgraphEmail(order).prepareViewEgraphEmail
+    val (emailViewModel, _, _) = ViewEgraphEmail(order).prepareViewEgraphEmail
     emailViewModel.fromEmail should not be (celebrity.account.email)
     emailViewModel.replyToEmail should be ("webserver@egraphs.com")
   }
