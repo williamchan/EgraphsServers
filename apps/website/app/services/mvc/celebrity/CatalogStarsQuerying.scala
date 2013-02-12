@@ -1,10 +1,11 @@
 package services.mvc.celebrity
 
+import scala.concurrent._
+import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
 import akka.actor.ActorRef
 import akka.agent.Agent
-import akka.dispatch.Await
 import akka.pattern.ask
-import akka.util.duration.intToDurationInt
 import akka.util.Timeout
 import models.frontend.landing.CatalogStar
 import services.logging.Logging
@@ -19,7 +20,7 @@ private[celebrity] trait CatalogStarsQuerying extends Logging {
   protected def catalogStarAgent: Agent[IndexedSeq[CatalogStar]]
   protected def catalogStarUpdateActor: ActorRef
 
-  implicit val timeout = Timeout(30 seconds)
+  implicit val timeout: Timeout = 30 seconds
 
   /**
    * Grabs the current set of CatalogStars out of the cache actor, and updates

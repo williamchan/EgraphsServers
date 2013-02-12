@@ -1,16 +1,16 @@
 package services.mail
 
 import java.util.concurrent.TimeUnit
+import scala.concurrent._
+import scala.concurrent.duration._
 import com.google.inject.{Inject, Provider}
 import com.google.gson.Gson
 import org.joda.time.DateTimeConstants
-import play.api.libs.concurrent.Promise
-import play.api.libs.ws.Response
-import play.api.libs.ws.WS
-import play.api.libs.ws.WS.{WSRequest, WSRequestHolder}
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.ws._
+import play.api.libs.ws.WS._
 import services.inject.InjectionProvider
 import services.config.ConfigFileProxy
-
 
 /**
  * Trait that defines bulk mail lists (e.g. MailChimp, Constant Contact).
@@ -27,7 +27,7 @@ trait BulkMailList {
    *
    * @param email e-mail address of the individual subscribing to the mailing list.
    */
-  def subscribeNewAsync(email: String) : Promise[Response]
+  def subscribeNewAsync(email: String) : Future[Response]
 
   /**
    * Throws exceptions if this implementation is not configured correctly.
@@ -48,7 +48,7 @@ trait BulkMailList {
    * Remove a member from the mailing list.
    * @param email The email address of the member being removed.
    */
-  def removeMember(email: String) : Promise[Response]
+  def removeMember(email: String) : Future[Response]
 
   /**
    * Used to set the value of API calls such as subscribeNew
@@ -97,10 +97,12 @@ private[mail] object StubBulkMailList extends BulkMailList
 
   override def actionUrl = "#"
 
-  override def subscribeNewAsync(email: String) : Promise[Response] = {
+
+  override def subscribeNewAsync(email: String) : Future[Response] = {
     play.api.Logger.info("Subscribed " + email + " to email list: " + newsletterListId)
-    Promise()
+    Future(throw new Exception("Oops, didn't think you'd use this response in subscribeNewAsync."))
   }
+
   override def checkConfiguration : BulkMailList = { this }
 
   override def newsletterListId = "NotARealListId"
@@ -108,10 +110,10 @@ private[mail] object StubBulkMailList extends BulkMailList
   override def members : String = {
     new Gson().toJson(List("derp"))
   }
-  
-  override def removeMember(email: String) : Promise[Response] = {
+
+  override def removeMember(email: String) : Future[Response] = {
     play.api.Logger.info("Unsubscribed " + email + " from email list: " + newsletterListId)
-    Promise()
+    Future(throw new Exception("Oops, didn't think you'd use this response in removeMember."))
   }
 }
 
@@ -128,10 +130,9 @@ private[mail] object StubBulkMailList extends BulkMailList
  */
 private[mail] case class MailChimpBulkMailList (apikey: String, datacenter: String, newsletterListId: String) extends BulkMailList
 {
-
   override def actionUrl = "https://" + datacenter + ".api.mailchimp.com/1.3/"
 
-  override def subscribeNewAsync(email: String) : Promise[Response] = {
+  override def subscribeNewAsync(email: String) : Future[Response] = {
     WS.url(actionUrl).withQueryString(
       ("output", "json"),
       ("apikey", apikey),
@@ -159,15 +160,16 @@ private[mail] case class MailChimpBulkMailList (apikey: String, datacenter: Stri
   }
 
   override def members : String = {
-    WS.url(actionUrl).withQueryString(
+    val futureResponse = WS.url(actionUrl).withQueryString(
       ("output", "json"),
       ("apikey", apikey),
       ("method", "listMembers"),
       ("id", newsletterListId)
-    ).get.await(10 * DateTimeConstants.MILLIS_PER_SECOND, TimeUnit.MILLISECONDS).get.body.toString
+    ).get
+    Await.result(futureResponse, 10 seconds).body.toString
   }
 
-  override def removeMember(email: String) : Promise[Response] = {
+  override def removeMember(email: String) : Future[Response] = {
     WS.url(actionUrl).post(
       Map(
         "output" -> Seq("json"),

@@ -1,14 +1,14 @@
 package services.mvc.celebrity
 
+import scala.concurrent._
+import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
 import java.util.Random
 import com.google.inject.Inject
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.agent.Agent
-import akka.dispatch.Await
-import akka.util.duration._
-import akka.util.Timeout
 import akka.pattern.ask
 import models.CelebrityStore
 import models.frontend.landing.CatalogStar
@@ -93,7 +93,7 @@ object UpdateCatalogStarsActor extends Logging {
   private[celebrity] val resultsCacheKey = "catalog-stars"
   private[celebrity] case class UpdateCatalogStars(catalogStarsAgent: Agent[IndexedSeq[CatalogStar]])
 
-  implicit val timeout: Timeout = 2 minutes
+  implicit val timeout = 2 minutes
 
   //
   // Private members

@@ -81,7 +81,8 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
             }
 
             Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
-              session.withCustomerId(customer.id))
+              session.withCustomerId(customer.id)
+            )
           }
 
           maybeRedirectSuccess.getOrElse(redirectAndLogError(fbUserInfo))

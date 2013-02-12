@@ -1,14 +1,15 @@
 package services.mvc.celebrity
 
+import scala.concurrent._
+import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits._
 import java.util.Random
 import com.google.inject.Inject
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.agent.Agent
-import akka.dispatch.Await
 import akka.pattern.ask
-import akka.util.duration._
 import akka.util.FiniteDuration
 import akka.util.Timeout
 import models.Celebrity
@@ -73,7 +74,7 @@ private[celebrity] class UpdateBatchTwitterFollowersActor() extends Actor with L
           error("Twitter exception in handling UpdateTwitterFollowers message for celebrities: " + celebrityNamesAndTwitter, e)
         }
         None
-      case e =>
+      case e: Throwable =>
         error("Exception in handling UpdateTwitterFollowers message for celebrities: " + celebrityNamesAndTwitter, e)
         None
     }
@@ -175,7 +176,7 @@ object UpdateTwitterFollowersActor extends Logging {
   private[celebrity] case class TwitterUserLookupResponse(celebrityIdsToFollowerCounts: Map[Long, Int])
   private[celebrity] case class LateTwitterUserLookupResponse(celebrityIdsToFollowerCounts: Map[Long, Int])
 
-  implicit val timeout: Timeout = 10 minutes
+  implicit val timeout = 10 minutes
 
   //
   // Private members

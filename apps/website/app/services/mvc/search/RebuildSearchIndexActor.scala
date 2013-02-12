@@ -1,14 +1,12 @@
 package services.mvc.search
 
+import scala.concurrent.duration._
 import scala.util.Random
 
 import com.google.inject.Inject
 
 import akka.actor.Actor
 import akka.actor.Props
-import akka.util.Timeout.durationToTimeout
-import akka.util.duration.intToDurationInt
-import akka.util.Timeout
 import models.CelebrityStore
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
@@ -51,7 +49,7 @@ object RebuildSearchIndexActor extends Logging {
 
   private val updatePeriod = 10 minutes
 
-  private implicit val timeout: Timeout = 10 minutes
+  private implicit val timeout = 10 minutes
 
   //
   // Private members
