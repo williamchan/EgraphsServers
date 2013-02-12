@@ -166,6 +166,7 @@ private[mail] case class MailChimpBulkMailList (apikey: String, datacenter: Stri
       ("method", "listMembers"),
       ("id", newsletterListId)
     ).get
+
     Await.result(futureResponse, 10 seconds).body.toString
   }
 
