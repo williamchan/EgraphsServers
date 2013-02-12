@@ -5,7 +5,7 @@ import models.frontend.email._
 
 object MailUtils {
 
-  def baseList(title: String) = List(("title", title))
+  def baseList(title: String) = List(("title", "<title>" + title + "</title>"))
 
   //TODO: think about whether EmailType enum is necessary or not
   def getAccountVerificationTemplateContentParts(emailType: EmailType.EnumVal, accountVerificationEmailStack: AccountVerificationEmailViewModel): List[(String, String)] = {
@@ -33,9 +33,15 @@ object MailUtils {
     List(("view_egraph", views.html.frontend.tags.email.view_egraph(viewEgraphEmailStack).body))
   }
 
-  def getViewGiftEgraphTemplateContentParts(emailType: EmailType.EnumVal, viewEgraphEmailStack: ViewEgraphEmailViewModel): List[(String, String)] = {
+  def getViewGiftReceivedEgraphTemplateContentParts(emailType: EmailType.EnumVal, viewEgraphEmailStack: ViewEgraphEmailViewModel): List[(String, String)] = {
     baseList(emailType.name) :::
-    List(("gift_header", views.html.frontend.tags.email.gift_header(viewEgraphEmailStack).body),
+    List(("gift_received_header", views.html.frontend.tags.email.gift_received_header(viewEgraphEmailStack).body),
+         ("view_egraph", views.html.frontend.tags.email.view_egraph(viewEgraphEmailStack).body))
+  }
+
+  def getViewGiftGivenEgraphTemplateContentParts(emailType: EmailType.EnumVal, viewEgraphEmailStack: ViewEgraphEmailViewModel): List[(String, String)] = {
+    baseList(emailType.name) :::
+    List(("gift_given_header", views.html.frontend.tags.email.gift_given_header(viewEgraphEmailStack).body),
          ("view_egraph", views.html.frontend.tags.email.view_egraph(viewEgraphEmailStack).body))
   }
 

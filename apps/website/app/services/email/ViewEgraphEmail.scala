@@ -16,24 +16,28 @@ case class ViewEgraphEmail(
   import ViewEgraphEmail.log
 
   def send() = {
-    val (emailStack, viewEgraphEmailStack) = prepareViewEgraphEmail
+    val (emailStack, viewEgraphEmailStack, maybeGiftEmailStack) = prepareViewEgraphEmail
 
     if (order.buyerId == order.recipientId) {
-      log("Sending view egraph mail to : " + order.buyer.account.email)
+      log("Sending view egraph mail to: " + order.buyer.account.email)
       order.services.mail.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(
           EmailType.ViewEgraph, viewEgraphEmailStack))
     } else {
-      log("Sending view gift egraph mail to : " + order.recipient.account.email)
-      order.services.mail.send(emailStack, MailUtils.getViewGiftEgraphTemplateContentParts(
+      log("Sending view gift egraph mail to: " + order.recipient.account.email)
+      order.services.mail.send(emailStack, MailUtils.getViewGiftReceivedEgraphTemplateContentParts(
+          EmailType.ViewEgraph, viewEgraphEmailStack))
+
+      log("Sending gift given mail to: " + order.buyer.account.email)
+      order.services.mail.send(maybeGiftEmailStack.get, MailUtils.getViewGiftGivenEgraphTemplateContentParts(
           EmailType.ViewEgraph, viewEgraphEmailStack))
     }    
   }
   
   // This function provides a hook for testing the email
   def prepareViewEgraphEmail
-  : (EmailViewModel, ViewEgraphEmailViewModel)  =
+  : (EmailViewModel, ViewEgraphEmailViewModel, Option[EmailViewModel])  =
   {
-    val (viewEgraphUrl, celebrity, emailStack) = prepareViewEgraphEmailHelper
+    val (viewEgraphUrl, celebrity, emailStack, maybeGiftEmailStack) = prepareViewEgraphEmailHelper
 
     val viewEgraphEmailStack = if (order.buyerId == order.recipientId) {
       RegularViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, order.recipientName)
@@ -41,10 +45,10 @@ case class ViewEgraphEmail(
       GiftViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, order.recipientName, order.buyer.name)
     }
 
-    (emailStack, viewEgraphEmailStack)
+    (emailStack, viewEgraphEmailStack, maybeGiftEmailStack)
   }
   
-  private def prepareViewEgraphEmailHelper: (String, Celebrity, EmailViewModel) = {
+  private def prepareViewEgraphEmailHelper: (String, Celebrity, EmailViewModel, Option[EmailViewModel]) = {
     val maybeCelebrity = order.services.celebrityStore.findByOrderId(order.id)
     maybeCelebrity match {
       case None => {
@@ -55,19 +59,21 @@ case class ViewEgraphEmail(
         val buyingCustomer = order.buyer
         val receivingCustomer = order.recipient
 
-        val toAddresses = List((receivingCustomer.account.email, None))
-        if (buyingCustomer != receivingCustomer) {
-          // TODO: change this to a CC address when Mandrill allows it
-          toAddresses ::: List(buyingCustomer.account.email, None)
-        }
-
         val emailStack = EmailViewModel(subject = "I just finished signing your Egraph",
                                         fromEmail = celebrity.urlSlug + "@egraphs.com",
                                         fromName = celebrity.publicName,
-                                        toAddresses = toAddresses)
+                                        toAddresses = List((receivingCustomer.account.email, None)))
+
+        val maybeGiftEmailStack: Option[EmailViewModel] =
+          if (buyingCustomer != receivingCustomer) {
+            Some(EmailViewModel(subject = "Your gift egraph has been delivered",
+                                fromEmail = "webserver@egraphs.com",
+                                fromName = "Egraphs",
+                                toAddresses = List((buyingCustomer.account.email, None))))
+          } else None
 
         val viewEgraphUrl = order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
-        (viewEgraphUrl, celebrity, emailStack)
+        (viewEgraphUrl, celebrity, emailStack, maybeGiftEmailStack)
       }
     }
   }  

@@ -41,18 +41,18 @@ private[mail] class StubTransactionalMail extends TransactionalMail {
   override def actionUrl = "#"
 
   override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)]) = {
-    println("don't forget to update this once we implement replyTo")
-    println("may want to do something with txt as well?")
-
     play.Logger.info("MOCK MAILER: send email")
     play.Logger.info("FROM: " + mailStack.fromEmail)
+    play.Logger.info("REPLY-TO: " + mailStack.replyToEmail)
 
     mailStack.toAddresses.foreach(emailNamePair => play.Logger.info("TO EMAIL: " +
-        emailNamePair._1 + ", TO NAME: " + emailNamePair._2.getOrElse("<none>")))
+        emailNamePair._1 + ", TO NAME: " + emailNamePair._2.getOrElse("none")))
 
     play.Logger.info("BCC: " + mailStack.bccAddress.getOrElse("none"))
 
-    templateContentParts.foreach(nameTemplatePair => play.Logger.info("HTML: " + nameTemplatePair._2))
+    // this won't include the header and footer, which are shared across all transactional mail;
+    // look at the General template from the Mandrill console to see header/footer html
+    templateContentParts.foreach(nameTemplatePair => play.Logger.info("HTML BODY: " + nameTemplatePair._2))
   }
 }
 
