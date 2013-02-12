@@ -37,8 +37,8 @@ case class Masthead (
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): Masthead = {
-    require(!headline.isEmpty, "You need a headline for a masthead")
+  override def save(): Masthead = {
+    require(!headline.isEmpty, "Mastheads need headlines to be considered valid")
     services.store.save(this)
   }
 
@@ -59,9 +59,8 @@ case class Masthead (
   override val keyBase = "masthead/" + id
 
   override def withLandingPageImageKey(key: Option[String]) : Masthead = {
-    this
+    this.copy(_landingPageImageKey = key)
   }
-
 
   override def imageAssetServices = services.imageAssetServices.get
 

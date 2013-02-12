@@ -85,7 +85,7 @@ class Schema @Inject() (
   // TODO(SER-499): Index declarations
 
   val coupons = table[Coupon]
-  on(coupons)(coupon => 
+  on(coupons)(coupon =>
     declare(
       columns(coupon.code, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
       columns(coupon._usageType, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
@@ -592,6 +592,7 @@ class Schema @Inject() (
       factoryFor(categoryValueRelationships) is CategoryValueRelationship(services = injector.instance[CategoryServices]),
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
+      factoryFor(mastheads) is Masthead(services = injector.instance[MastheadServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),
       factoryFor(printOrders) is PrintOrder(services = injector.instance[PrintOrderServices]),
       factoryFor(products) is Product(services = injector.instance[ProductServices]),

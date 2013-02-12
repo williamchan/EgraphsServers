@@ -9,15 +9,30 @@ class MastheadTests extends EgraphsUnitTest
   with CreatedUpdatedEntityTests[Long, Masthead]
   with DateShouldMatchers
   with DBTransactionPerTest
+  with LandingPageImageTests[Masthead]
   with HasPublishedStatusTests[Masthead]
 {
   def store = AppConfig.instance[MastheadStore]
 
 
+  "Masthead" should "require a headline" in new EgraphsTestApplication {
+    val exception = intercept[IllegalArgumentException] {
+      Masthead().save()
+    }
+    exception.getLocalizedMessage should include("Mastheads need headlines to be considered valid")
+  }
   //
-  //  HasPublishedStatus[Celebrity] methods
+  //  HasPublishedStatus[Masthead] methods
   //
   override def newPublishableEntity = {
+    Masthead(name = TestData.generateFullname(), headline = TestData.generateUsername())
+  }
+
+  //
+  // LandingPageImageTests[Masthead] methods
+  //
+  
+  override def newEntityWithLandingPageImage = {
     Masthead(name = TestData.generateFullname(), headline = TestData.generateUsername())
   }
 
@@ -38,7 +53,9 @@ class MastheadTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: Masthead) = {
     toTransform.copy(
-      name = "name"
+      name = "name",
+      headline= "headline",
+      subtitle = Option("something")
     )
   }
 
