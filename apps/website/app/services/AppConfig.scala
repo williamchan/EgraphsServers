@@ -66,7 +66,7 @@ object AppConfig extends Logging {
         Guice.createInjector(stage, new AppConfig)
       }
       catch {
-        case e =>
+        case e: Throwable =>
           e.printStackTrace()
           throw e
       }

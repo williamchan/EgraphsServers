@@ -15,7 +15,10 @@ object WebsiteBuild extends Build {
     val appVersion      = "2.0-SNAPSHOT"
 
     val appDependencies = Seq(
-   // Application dependencies. Keep these in alphabetical order.
+      // Playframework components
+      jdbc,
+
+      // Application dependencies. Keep these in alphabetical order.
       "batik" % "batik-rasterizer" % "1.6",
       "batik" % "batik-svggen" % "1.6",
       "com.googlecode.mp4parser" % "isoparser" % "1.0-RC-15", 

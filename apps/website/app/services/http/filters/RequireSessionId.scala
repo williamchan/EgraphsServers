@@ -3,7 +3,7 @@ package services.http.filters
 import java.util.UUID
 import com.google.inject.Inject
 import play.api.mvc.Action
-import egraphs.playutils.RichResult.resultToRichResult
+import egraphs.playutils.ResultUtils.RichResult
 import play.api.mvc.WrappedRequest
 import services.http.EgraphsSession
 import services.http.EgraphsSession.Conversions._

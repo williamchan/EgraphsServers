@@ -530,7 +530,7 @@ class Schema @Inject() (
         log("No egraphs schema was detected")
         false
 
-      case otherErrors =>
+      case otherErrors: Throwable =>
         throw otherErrors
     } finally {
       conn.rollback(savepoint)
