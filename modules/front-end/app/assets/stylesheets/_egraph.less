@@ -1,4 +1,7 @@
 .egraph-page {
+  #content {
+    padding-bottom:50px;
+  }
   #content #main {
     margin-left:auto;
     margin-right:auto;
@@ -17,12 +20,16 @@
     }
 
     .container {
-      margin: 0px 0px 0px 0px;
       max-width: 100%;
 
       #egraph-player {
         width: 100%;
         height: 100%;
+      }
+
+      .vjs-big-play-button {
+        border-radius:200px;
+        .opacity(90);
       }
 
       .egraph-container {
@@ -76,10 +83,13 @@
       .byline-name {
         text-align: left;
         font-size: 24px;
+        font-weight:300;
       }
       .byline-tagline {
         text-align: left;
         font-size: 18px;
+        font-weight:300;
+        color:rgb(150,150,150);
       }
       .byline-icon {
         float: right;
@@ -94,7 +104,7 @@
         font-size: 24px;
         margin-bottom:8px;
         font-style:italic;        
-        color: rgb(128, 128, 128);
+        color: rgb(150,150,150);
         font-weight:100;
 
         em {
@@ -107,40 +117,45 @@
       
 
       #social {
-        margin: 10px 0 10px 0;
-        display: inline-block;
-        vertical-align: top;
-        float: right;
+        position:relative;
+        margin: 10px auto 7px auto;
 
         ul {
-          margin: 0;
+          display:block;
+          text-align:center;
           list-style: none;
+          width:57%;
+          min-width:300px;
+          margin-left:auto;
+          margin-right:auto;
+          margin-bottom:0px;
+          
           li {
-            float: right;
+            vertical-align:top;
+            display:inline-block;
+            width:30%;
           }
           .fb-button {
-            margin: 0px 0px 0px 5px;
             padding-top: 2px;
           }
           .tweet-button {
-            margin: 0px 0px 0px 5px;
-            padding-top: 3px;
-          }
-          .pin-button {
-            margin: 0px 0px 0px 5px;
+            padding-top: 4px;
           }
         }
       }
 
       #comments {
         margin: 10px 0 0px 0;
+
+        .fb-comments, .fb-comments span, .fb-comments iframe { width: 100% !important; }        
       }
 
       #classic-link {
         text-decoration: none;
         float: right;
-        margin-right: 10%;
-        margin-bottom: 15px;
+        margin-bottom:5px;
+        font-size:12px;
+        font-style:italic;
       }
 
       .separator {
@@ -148,5 +163,9 @@
         width: 100%;
       }
     }
+  }
+
+  hr {
+    border-top:1px solid #d6d6d6;
   }
 }
