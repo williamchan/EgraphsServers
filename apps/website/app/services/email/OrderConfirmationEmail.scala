@@ -1,6 +1,5 @@
 package services.email
 
-import org.apache.commons.mail.HtmlEmail
 import services.mail.TransactionalMail
 import services.logging.Logging
 import models.frontend.email._
@@ -22,8 +21,8 @@ case class OrderConfirmationEmail(
                                         Some(orderConfirmationEmailStack.buyerName))))
 
     val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
-    log("Sending order confirmation mail to : " + orderConfirmationEmailStack.buyerName + " for order ID " + orderConfirmationEmailStack.orderId)
 
+    log("Sending order confirmation mail to : " + orderConfirmationEmailStack.buyerName + " for order ID " + orderConfirmationEmailStack.orderId)
     mailService.send(emailStack, orderConfirmationTemplateContentParts)
   }
 }

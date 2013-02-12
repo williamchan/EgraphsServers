@@ -29,7 +29,6 @@ import java.util.Calendar
 import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
 import models.frontend.email.{RegularViewEgraphEmailViewModel, GiftViewEgraphEmailViewModel}
-import services.email.ViewEgraphEmailPreparer
 import services.mail.MailUtils
 import models.frontend.email.{EmailViewModel, ViewEgraphEmailViewModel}
 
@@ -253,33 +252,6 @@ case class Order(
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
     require(reviewStatus == OrderReviewStatus.ApprovedByAdmin, "Must be ApprovedByAdmin before rejecting by celebrity")
     withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
-  }
-
-  def sendViewEgraphMail[A](implicit request: RequestHeader) {
-    val (emailStack, viewEgraphEmailStack) = prepareViewEgraphEmail
-
-    if (buyerId == recipientId) {
-      services.mail.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(
-          EmailType.ViewEgraph, viewEgraphEmailStack))
-    } else {
-      services.mail.send(emailStack, MailUtils.getViewGiftEgraphTemplateContentParts(
-          EmailType.ViewEgraph, viewEgraphEmailStack))
-    }
-  }
-  
-  // This function provides a hook for testing the email
-  def prepareViewEgraphEmail
-  : (EmailViewModel, ViewEgraphEmailViewModel)  =
-  {
-    val (viewEgraphUrl, celebrity, emailStack) = ViewEgraphEmailPreparer.prepareViewEgraphEmailHelper(this, services)
-
-    val viewEgraphEmailStack = if (buyerId == recipientId) {
-      RegularViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName)
-    } else {
-      GiftViewEgraphEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, this.buyer.name)
-    }
-
-    (emailStack, viewEgraphEmailStack)
   }
 
   /**

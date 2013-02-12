@@ -16,6 +16,7 @@ import play.api.mvc.AnyContent
 import services.ConsumerApplication
 import services.logging.Logging
 import services.http.EgraphsSession.Conversions._
+import services.email.AccountCreationEmail
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -48,12 +49,12 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   
         // Shoot out a welcome email
         dbSession.connected(TransactionReadCommitted) {
-          Customer.sendNewCustomerEmail(
-            account = account, 
-            verificationNeeded = true, 
-            mail = customer.services.mail, 
-            consumerApp = consumerApp
-           )
+          AccountCreationEmail(
+            account = account,
+            verificationNeeded = true,
+            consumerApp = consumerApp,
+            mailService = customer.services.mail
+          ).send()
         }
 
         Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(

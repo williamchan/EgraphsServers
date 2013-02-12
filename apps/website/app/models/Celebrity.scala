@@ -266,27 +266,6 @@ case class Celebrity(id: Long = 0,
     product.saveWithImageAssets(image, icon)
   }
 
-  /**
-  * Sends a welcome email to the celebrities email address with their Egraphs username and a blanked
-  * out password field.  We aren't sending the password, it is just a bunch of *****.  The email
-  * includes a link to download the latest iPad app.
-  */
-  def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
-
-    val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
-                                    fromEmail = "webserver@egraphs.com",
-                                    fromName = "Egraphs",
-                                    toAddresses = List((toAddress, Some(publicName))),
-                                    bccEmail)
-    
-    val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
-    val celebrityWelcomeEmailStack = CelebrityWelcomeEmailViewModel(celebrityName = publicName,
-                                                                    celebrityEmail = account.email,
-                                                                    appPlistUrl = appDownloadLink)
-
-    services.transactionalMail.send(emailStack, MailUtils.getCelebrityWelcomeTemplateContentParts(EmailType.CelebrityWelcome, celebrityWelcomeEmailStack))
-  }
-
   //
   // KeyedCaseClass[Long] methods
   //

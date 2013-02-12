@@ -120,30 +120,6 @@ case class Customer(
   }
 }
 
-object Customer {
-  def sendNewCustomerEmail(
-      account: Account, 
-      verificationNeeded: Boolean = false, 
-      mail: TransactionalMail, 
-      consumerApp: ConsumerApplication
-  )(implicit request: RequestHeader)
-  {
-    val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
-                                    fromEmail = "webserver@egraphs.com",
-                                    fromName = "Egraphs",
-                                    toAddresses = List((account.email, None)))
-
-    val templateContentParts = if (verificationNeeded) {
-      val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
-      MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification, AccountVerificationEmailViewModel(verifyPasswordUrl))
-    } else {
-      MailUtils.getAccountConfirmationTemplateContentParts(EmailType.AccountConfirmation)
-    }
-
-    mail.send(emailStack, templateContentParts)
-  }
-}
-
 class CustomerStore @Inject() (
   schema: Schema,
   accountStore: AccountStore,

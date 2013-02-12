@@ -14,6 +14,7 @@ import egraphs.authtoken.AuthenticityToken
 import models.frontend.email.{EmailViewModel, ResetPasswordEmailViewModel}
 import services.mail.MailUtils
 import models.enums.EmailType
+import services.email.ResetPasswordEmail
 
 private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -33,7 +34,12 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
           val accountWithResetPassKey = dbSession.connected(TransactionSerializable) {
             account.withResetPasswordKey.save()
           }
-          sendRecoveryPasswordEmail(accountWithResetPassKey)
+
+          ResetPasswordEmail(
+            account = accountWithResetPassKey,
+            consumerApp = consumerApp,
+            mailService = transactionalMail
+          ).send()
   
           val flashEmail = Utils.getFromMapFirstInSeqOrElse("email", "", request.queryString)
           
@@ -44,21 +50,5 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
         }
       }
     }
-  }
-
-  /**
-   * Sends an email so that the customer can reset password via the getResetPassword endpoint
-   */
-  private def sendRecoveryPasswordEmail(account: Account)(implicit request: RequestHeader) {
-    val emailStack = EmailViewModel(subject = "Egraphs Password Recovery",
-                                    fromEmail = "support@egraphs.com",
-                                    fromName = "Egraphs Support",
-                                    toAddresses = List((account.email, None)))
-
-    val resetPasswordUrl = consumerApp.absoluteUrl(getResetPassword(account.email, account.resetPasswordKey.get).url)
-    val resetPasswordEmailStack = ResetPasswordEmailViewModel(email = account.email,
-                                                              resetPasswordUrl = resetPasswordUrl)
-
-    transactionalMail.send(emailStack, MailUtils.getResetPasswordTemplateContentParts(EmailType.ResetPassword, resetPasswordEmailStack))
   }
 }

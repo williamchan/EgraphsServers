@@ -21,6 +21,8 @@ import services.blobs.Blobs.Conversions._
 import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
 import org.joda.time.DateTimeConstants
 import egraphs.playutils.Gender
+import services.ConsumerApplication
+import services.email.CelebrityWelcomeEmail
 
 trait PostCelebrityAdminEndpoint {
   this: Controller =>
@@ -30,6 +32,7 @@ trait PostCelebrityAdminEndpoint {
   protected def transactionalMail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
+  protected def consumerApp: ConsumerApplication
   
   def postCreateCelebrityAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { case (admin, adminAccount) =>
@@ -100,8 +103,13 @@ trait PostCelebrityAdminEndpoint {
               val acct = accountStore.findByEmail(validForm.celebrityEmail).getOrElse(Account(email = validForm.celebrityEmail))
               val savedAccount = acct.copy(celebrityId = Some(savedWithImages.id)).withPassword(validForm.celebrityPassword).right.get.save()
               
-              savedWithImages.sendWelcomeEmail(savedAccount.email)
-              
+              CelebrityWelcomeEmail(
+                toAddress = savedAccount.email,
+                consumerApp = consumerApp,
+                celebrity = savedWithImages,
+                mailService = transactionalMail
+              ).send()
+
               Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
             }
           )
