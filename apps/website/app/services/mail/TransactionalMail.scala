@@ -82,6 +82,12 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
           "from_email" -> Json.toJson(mailStack.fromEmail),
           "from_name" -> Json.toJson(mailStack.fromName),
           "to" -> Json.toJson(getToAddresses(mailStack)),
+          "headers" -> Json.toJson(
+            Map(
+              "Reply-To" -> Json.toJson(mailStack.replyToEmail)
+            )
+          ),
+          "auto_text" -> Json.toJson(true),
           "bcc_address" -> Json.toJson(mailStack.bccAddress.getOrElse("")) // TODO: need to make sure nothing weird happens here. test this.
         )
       ),

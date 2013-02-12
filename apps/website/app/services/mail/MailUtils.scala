@@ -4,9 +4,9 @@ import models.enums.EmailType
 import models.frontend.email._
 
 object MailUtils {
-  
+
   def baseList(title: String) = List(("title", title))
-  
+
   //TODO: think about whether EmailType enum is necessary or not
   def getAccountVerificationTemplateContentParts(emailType: EmailType.EnumVal, accountVerificationEmailStack: AccountVerificationEmailViewModel): List[(String, String)] = {
     baseList(emailType.name) ::: 

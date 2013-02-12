@@ -35,6 +35,11 @@ object EmailType extends Enum {
     val name = "View Egraph"
     val subject = "I just finished signing your egraph"
   }
+
+  val ViewGiftEgraph = new EnumVal {
+    val name = "View Gift Egraph"
+    val subject = "I just finished signing your egraph"
+  }
 }
 
 trait HasEmailType[T] {

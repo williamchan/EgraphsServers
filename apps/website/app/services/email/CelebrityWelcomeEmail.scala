@@ -29,7 +29,7 @@ case class CelebrityWelcomeEmail(
                                     fromEmail = "webserver@egraphs.com",
                                     fromName = "Egraphs",
                                     toAddresses = List((toAddress, Some(celebrity.publicName))),
-                                    bccEmail)
+                                    bccAddress = bccEmail)
 
     val appDownloadLink = consumerApp.getIOSClient(redirectToItmsLink=true).url
     val celebrityWelcomeEmailStack = CelebrityWelcomeEmailViewModel(celebrityName = celebrity.publicName,

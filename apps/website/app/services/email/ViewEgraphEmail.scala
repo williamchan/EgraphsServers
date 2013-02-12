@@ -52,10 +52,6 @@ case class ViewEgraphEmail(
         throw new IllegalStateException("There is no celebrity associated with order ID: " + order.id)
       }
       case Some(celebrity) => {
-
-        // TODO: figure out how to add this to the json header
-        //email.addReplyTo("webserver@egraphs.com")
-
         val buyingCustomer = order.buyer
         val receivingCustomer = order.recipient
 

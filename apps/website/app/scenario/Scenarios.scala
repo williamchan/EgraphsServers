@@ -410,9 +410,6 @@ class Scenarios extends DeclaresScenarios {
   """Sends egraph fulfilled email to will@egraphs.com using the configured SMTP server""", {
     () =>
 
-      // TODO: figure out how to add reply-to to header
-      //email.addReplyTo("webserver@egraphs.com")
-
       val emailStack = EmailViewModel(subject = "I just finished signing your egraph",
                                       fromEmail = "celebrity@egraphs.com",
                                       fromName = "Celebrity Jane",
