@@ -39,13 +39,11 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
   /** `LineItemType` that resolved/produced this `LineItem` */
   def itemType: LineItemType[T]
 
-
   //
   // HasLineItemNature and HasCodeType members
   //
   override def codeType: CheckoutCodeType = itemType.codeType
   override def nature: LineItemNature = itemType.nature
-
 
   //
   // LineItem Methods
@@ -68,10 +66,9 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
   protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
     desiredCodeType: OfCheckoutClass[LIT, LI]
   ): Option[LI] = {
-    if (codeType != desiredCodeType) None
+    if (codeType.name != desiredCodeType.name) None
     else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
   }
-
 
   /** helper for toJson method; optional values are left out of if not defined */
   protected def jsonify(name: String, description: String, id: Option[Long] = None, imageUrl: Option[String] = None)
@@ -90,8 +87,6 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
     )
   }
 }
-
-
 
 /** Provides queries for getting `LineItem`s */
 class LineItemStore @Inject() (schema: Schema) {
@@ -132,7 +127,7 @@ class LineItemStore @Inject() (schema: Schema) {
 
   /** Specifying the CheckoutCodeType allows the item to be fetched as its actual type safely */
   def findByIdWithCodeType[ LIT <: LineItemType[_], LI <: LineItem[_] ](
-    id: Long, codeType: CodeTypeFactory[LIT, LI]
+    id: Long, codeType: CheckoutCodeType with CodeTypeFactory[LIT, LI]
   ): Option[LI] = {
     findById(id) flatMap (_.asCodeTypeOption(codeType))
   }
@@ -179,7 +174,7 @@ trait SubLineItem[T] extends LineItem[T] {
 }
 
 
-
+// TODO: Why create a visual devider when you can just create a new file?
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 trait HasLineItemEntity[T <: LineItem[_]] extends HasEntity[LineItemEntity, Long] { this: T =>

@@ -36,6 +36,7 @@ package object checkout {
       def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD))( _ plus _.amount )
     }
 
+
     abstract class HasNatureAndCodeTypeToMemberDSL[T <: HasLineItemNature with HasCodeType](elements: Seq[T]) {
       def apply(nature: LineItemNature) = ofNature(nature)
 

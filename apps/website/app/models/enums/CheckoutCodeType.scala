@@ -30,7 +30,6 @@ trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] extends Of
   }
 }
 
-
 object CheckoutCodeType extends Enum {
   protected type ItemEntity = LineItemEntity
   protected type TypeEntity = LineItemTypeEntity
@@ -91,6 +90,5 @@ object CheckoutCodeType extends Enum {
     override def itemCompanion = TaxLineItem
   }
 }
-
 
 trait HasCodeType { def codeType: CheckoutCodeType }
