@@ -28,25 +28,6 @@ object Email extends Controller {
     ))
   }
 
-  def orderConfirmationText = Action {
-    Ok(views.txt.frontend.email.order_confirmation(
-      OrderConfirmationEmailViewModel(
-        buyerName = "Joshua Johnson",
-        buyerEmail = "joshua@johnson.com",
-        recipientName = "Carlos Pena",
-        recipientEmail = "carlos@egraphs.com",
-        celebrityName = "David Price",
-        productName = "First MLB Victory",
-        orderDate = "June 12, 2012",
-        orderId = "2387354",
-        pricePaid = "$50.00",
-        deliveredByDate = "June 19, 2012",
-        faqHowLongLink = "https://www.egraphs.com/faq#how-long",
-        hasPrintOrder = true
-      )
-    ))
-  }
-
   def verify = Action {
     Ok(views.html.frontend.email.account_verification(
       AccountVerificationEmailViewModel(

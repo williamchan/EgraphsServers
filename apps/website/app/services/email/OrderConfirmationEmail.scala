@@ -22,7 +22,7 @@ case class OrderConfirmationEmail(
 
     val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
 
-    log("Sending order confirmation mail to : " + orderConfirmationEmailStack.buyerName + " for order ID " + orderConfirmationEmailStack.orderId)
+    log("Sending order confirmation mail to: " + orderConfirmationEmailStack.buyerEmail + " for order ID: " + orderConfirmationEmailStack.orderId)
     mailService.send(emailStack, orderConfirmationTemplateContentParts)
   }
 }
