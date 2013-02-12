@@ -15,6 +15,7 @@ class CelebrityTests extends EgraphsUnitTest
   with DateShouldMatchers
   with DBTransactionPerTest
   with HasPublishedStatusTests[Celebrity]
+  with LandingPageImageTests[Celebrity]
 {
   def store = AppConfig.instance[CelebrityStore]
   
@@ -96,6 +97,10 @@ class CelebrityTests extends EgraphsUnitTest
   //
   override def newPublishableEntity = {
     Celebrity(publicName = TestData.generateFullname())
+  }
+
+  override def newEntityWithLandingPageImage = {
+    Celebrity(publicName = TestData.generateFullname()).save()
   }
 
   //

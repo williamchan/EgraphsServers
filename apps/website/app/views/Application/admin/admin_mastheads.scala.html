@@ -9,16 +9,18 @@ footerData: models.frontend.footer.FooterData)
 @import views.html.frontend.tags.ng
 @import views.html.frontend.base_template
 
-
+@createLink  = {
+ @routes.WebsiteControllers.getCreateMastheadAdmin
+}
 @body = {
 <section id="content" class="top" role="main">
     <div id="main" class="sub">
         <div class="container" id="celebrity-admin">
             <h1>
-                Celebrity Administration
+                Mastheads Administration
             </h1>
+            <a href="@createLink">Create a new masthead</a>
             <section>
-              <h2>Mastheads Y'all</h2>
                <table class="table table-hover table-condensed">
                  <thead>
                     <tr>
@@ -26,8 +28,6 @@ footerData: models.frontend.footer.FooterData)
                         <th>id</th>
                         <th>name</th>
                         <th>headline</th>
-
-
                     </tr>
                  </thead>
                  @for( masthead <- mastheads ) {

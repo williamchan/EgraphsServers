@@ -97,7 +97,7 @@ case class Celebrity(id: Long = 0,
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): Celebrity = {
+  override def save(): Celebrity = {
     require(!publicName.isEmpty, "A celebrity without a publicName is hardly a celebrity at all.")
     services.store.save(this)
   }
@@ -187,23 +187,6 @@ case class Celebrity(id: Long = 0,
   def saveWithImageAssets(/*profileImage: Option[BufferedImage], */ landingPageImage: Option[BufferedImage], logoImage: Option[BufferedImage]): Celebrity = {
     //TODO: refactor profile image saving to here
     saveWithLandingPageImage(landingPageImage).saveWithLogoImage(logoImage)
-  }
-
-  private def saveWithLandingPageImage(landingPageImage: Option[BufferedImage]): Celebrity = {
-    landingPageImage match {
-      case None => this
-      case Some(image) => {
-        val landingPageImageBytes = {
-          import ImageUtil.Conversions._
-
-          val croppedImage = ImageUtil.crop(image, Celebrity.defaultLandingPageImageDimensions)
-          croppedImage.asByteArray(ImageAsset.Jpeg)
-        }
-        val (celeb, newImage) = withLandingPageImage(landingPageImageBytes)
-        newImage.save()
-        celeb.save()
-      }
-    }
   }
 
   private def saveWithLogoImage(logoImage: Option[BufferedImage]): Celebrity = {

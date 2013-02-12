@@ -27,6 +27,7 @@ trait AllAdminEndpoints
   with GetEgraphsAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
+  with GetMastheadsAdminEndpoint
   with GetMastheadAdminEndpoint
   with GetOrderAdminEndpoint
   with GetOrdersAdminEndpoint
