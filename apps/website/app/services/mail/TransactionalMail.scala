@@ -62,58 +62,14 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
   override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)]) {
     val methodAndOutputFormat = "messages/send-template.json"
 
-    val jsonIterable = getJsonForEmailSend(mailStack, templateContentParts)
+    val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key)
 
-    // all of this is still unsafe, don't forget to make it better
-    val promiseResponse = WS.url(actionUrl + methodAndOutputFormat).
-        post(jsonIterable).await(DateTimeConstants.MILLIS_PER_MINUTE).get.body.toString
+    val promiseResponse = WS.url(actionUrl + methodAndOutputFormat).post(jsonIterable)
+    val notWaitingResponse = promiseResponse.await(DateTimeConstants.MILLIS_PER_MINUTE)
 
-    println("promiseResponse is " + promiseResponse)
-  }
-
-  private def getJsonForEmailSend(mailStack: EmailViewModel, templateContentParts: List[(String, String)]): JsValue = {
-    Json.toJson(Map(
-      "key" -> Json.toJson(key),
-      "template_name" -> Json.toJson("General"),
-      "template_content" -> Json.toJson(getTemplateContentPieces(templateContentParts)),
-      "message" -> Json.toJson(
-        Map(
-          "subject" -> Json.toJson(mailStack.subject),
-          "from_email" -> Json.toJson(mailStack.fromEmail),
-          "from_name" -> Json.toJson(mailStack.fromName),
-          "to" -> Json.toJson(getToAddresses(mailStack)),
-          "headers" -> Json.toJson(
-            Map(
-              "Reply-To" -> Json.toJson(mailStack.replyToEmail)
-            )
-          ),
-          "auto_text" -> Json.toJson(true),
-          "bcc_address" -> Json.toJson(mailStack.bccAddress.getOrElse("")) // TODO: need to make sure nothing weird happens here. test this.
-        )
-      ),
-      "async" -> Json.toJson(true)
-    ))
-  }
-
-  private def getTemplateContentPieces(templateContentPieces: List[(String, String)]): Seq[JsValue] = {
-    for ((name, content) <- templateContentPieces) yield {
-      Json.toJson(
-        Map(
-          "name" -> Json.toJson(name),
-          "content" -> Json.toJson(content)
-        )
-      )
-    }
-  }
-
-  private def getToAddresses(mailStack: EmailViewModel): Seq[JsValue] = {
-    for ((email, name) <- mailStack.toAddresses) yield {
-      Json.toJson(
-        Map(
-          "email" -> Json.toJson(email),
-          "name" -> Json.toJson(name.getOrElse(email)) // use email if no name given
-        )
-      )
-    }
+    notWaitingResponse.fold(
+      onError => throw new Exception("Something went wrong with email send"),
+      onSuccess => play.Logger.info("Send-template response: " + notWaitingResponse.get.body.toString)
+    )
   }
 }
