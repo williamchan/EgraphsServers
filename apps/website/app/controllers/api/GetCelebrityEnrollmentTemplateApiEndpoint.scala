@@ -1,12 +1,12 @@
 package controllers.api
 
+import play.api.libs.json._
 import models.Celebrity
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Result
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
-import sjson.json.Serializer
 
 private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint { this: Controller =>
 
@@ -42,10 +42,17 @@ private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint { this: Con
     val _1_thru_5: List[String] = List("One, two, three, four, five")
     val _6_thru_10: List[String] = List("Six, seven, eight, nine, ten")
     val enrollmentPhrases: List[String] = myNameIs ::: _1_thru_5 ::: phonymsPhrases ::: phonymsPhrases ::: _6_thru_10 ::: myNameIs
-    val enrollmentPhrasesWithFieldIdentifiers: List[Map[String, String]] = for (enrollmentPhrase <- enrollmentPhrases) yield Map(GetCelebrityEnrollmentTemplateApiEndpoint._text -> enrollmentPhrase)
+    val enrollmentPhrasesWithFieldIdentifiers: List[JsObject] = 
+      for {
+        enrollmentPhrase <- enrollmentPhrases
+      } yield {
+        Json.obj(GetCelebrityEnrollmentTemplateApiEndpoint._text -> enrollmentPhrase)
+      }
 
-    val enrollmentTemplate = Map(GetCelebrityEnrollmentTemplateApiEndpoint._enrollmentPhrases -> enrollmentPhrasesWithFieldIdentifiers)
-    Ok(Serializer.SJSON.toJSON(enrollmentTemplate))
+    val enrollmentTemplate = Json.obj(
+      GetCelebrityEnrollmentTemplateApiEndpoint._enrollmentPhrases -> Json.arr(enrollmentPhrasesWithFieldIdentifiers)
+    )
+    Ok(enrollmentTemplate)
   }
 }
 

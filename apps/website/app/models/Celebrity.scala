@@ -12,6 +12,7 @@ import org.squeryl.dsl.ManyToMany
 import anorm._
 import play.api.Play.current
 import play.api.libs.concurrent._
+import play.api.libs.json._
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
 import categories._
 import services.blobs.AccessPolicy
@@ -125,16 +126,6 @@ case class Celebrity(id: Long = 0,
    */
   def doesNotHaveTwitter = {
     twitterUsername.map(name => name.toLowerCase) == Some("none")
-  }
-  
-  /**
-   * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
-   * by the API (e.g. JSON)
-   */
-  def renderedForApi: Map[String, Any] = {
-    Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name,  "publicName" -> publicName,
-      "urlSlug" -> urlSlug) ++
-      renderCreatedUpdatedForApi
   }
 
   /**
@@ -339,6 +330,16 @@ object Celebrity {
       val savedImage = image.save(AccessPolicy.Public)
       val saved = celebrity.save()
       CelebrityWithImage(saved, savedImage)
+    }
+  }
+
+  implicit object CelebrityFormat extends Format[Celebrity] {
+    def writes(celebrity: Celebrity): JsValue = {
+      Json.obj(
+        "id" -> celebrity.id,
+        "enrollmentStatus" -> celebrity.enrollmentStatus.name,
+        "publicName" -> celebrity.publicName,
+        celebrity.renderCreatedUpdatedForApi: _*)
     }
   }
 }

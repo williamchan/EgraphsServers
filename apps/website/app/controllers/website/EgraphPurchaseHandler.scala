@@ -1,16 +1,16 @@
 package controllers.website
 
 import com.google.inject._
+import play.api.mvc._
+import play.api.libs.json._
 import models._
 import models.enums._
-import play.api.mvc._
 import services.email.OrderConfirmationEmail
+import services.mail.TransactionalMail
 import services.payment.{Charge, Payment}
-import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
 import services.logging.Logging
 import exception.InsufficientInventoryException
-import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.http.ServerSessionFactory
 import org.joda.money.Money
@@ -63,19 +63,25 @@ case class EgraphPurchaseHandler(
 )
 {
   import EgraphPurchaseHandler._
-  
-  private def purchaseData: String = Serializer.SJSON.toJSON(Map(
-    "recipientName" -> recipientName,
-    "recipientEmail" -> recipientEmail,
-    "buyerName" -> buyerName,
-    "buyerEmail" -> buyerEmail,
-    "stripeTokenId" -> stripeTokenId.getOrElse(""),
-    "desiredText" -> desiredText.getOrElse(""),
-    "personalNote" -> personalNote.getOrElse(""),
-    "productId" -> product.id,
-    "productPrice" -> totalAmountPaid.getAmount
-  ))
 
+  private def purchaseData: JsValue = {
+    val stripeTokenIdOrEmpty = stripeTokenId.getOrElse("")
+    val desiredTextOrEmpty = desiredText.getOrElse("")
+    val personalNoteOrEmpty = personalNote.getOrElse("")
+    val productPrice = totalAmountPaid.getAmount
+    Json.obj(
+      "recipientName" -> recipientName,
+      "recipientEmail" -> recipientEmail,
+      "buyerName" -> buyerName,
+      "buyerEmail" -> buyerEmail,
+      "stripeTokenId" -> stripeTokenIdOrEmpty,
+      "desiredText" -> desiredTextOrEmpty,
+      "personalNote" -> personalNoteOrEmpty,
+      "productId" -> product.id,
+      "productPrice" -> JsNumber(productPrice)
+    )
+  }
+  
   /**
    * Performs the purchase the purchase with error handling.
    * @return A Redirect to either an order confirmation page or some error page.
@@ -280,9 +286,9 @@ case class EgraphPurchaseHandler(
     }
   }
 
-  private def saveFailedPurchaseData(purchaseData: String, errorDescription: String): FailedPurchaseData =  {
+  private def saveFailedPurchaseData(purchaseData: JsValue, errorDescription: String): FailedPurchaseData =  {
     services.dbSession.connected(TransactionSerializable) {
-      FailedPurchaseData(purchaseData = purchaseData, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
+      FailedPurchaseData(purchaseData = purchaseData.toString, errorDescription = errorDescription.take(128 /*128 is the column width*/)).save()
     }
   }
 }

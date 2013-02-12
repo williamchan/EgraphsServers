@@ -1,11 +1,12 @@
 package models
 
-import enums.PublishedStatus.EnumVal
-import enums.{PublishedStatus, HasPublishedStatus}
 import java.sql.Timestamp
-import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import org.apache.commons.io.IOUtils
 import org.joda.money.Money
+import play.api.libs.json._
+import enums.PublishedStatus.EnumVal
+import enums.{PublishedStatus, HasPublishedStatus}
+import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import services.Finance.TypeConversions._
 import models.Product.ProductWithPhoto
 import java.awt.image.BufferedImage
@@ -197,21 +198,6 @@ case class Product(
     copy(priceInCurrency=money)
   }
 
-  def renderedForApi: Map[String, Any] = {
-    renderCreatedUpdatedForApi ++ Map(
-      "id" -> id,
-      "urlSlug" -> urlSlug,
-      "photoUrl" -> signingScalePhoto.url,
-      "iPadSigningPhotoUrl" -> signingScalePhoto.url,
-      "signingScaleW" -> signingScaleW,
-      "signingScaleH" -> signingScaleH,
-      "signingOriginX" -> signingOriginX,
-      "signingOriginY" -> signingOriginY,
-      "signingAreaW" -> signingAreaW,
-      "signingAreaH" -> signingAreaH
-    )
-  }
-
   /** Retrieves the celebrity from the database */
   def celebrity: Celebrity = {
     services.celebStore.get(celebrityId)
@@ -297,6 +283,23 @@ object Product {
       val savedProduct = product.save()
 
       ProductWithPhoto(savedProduct, savedPhoto)
+    }
+  }
+
+  implicit object ProductFormat extends Format[Product] {
+    def writes(product: Product): JsValue = {
+      Json.obj(
+        "id" -> product.id,
+        "urlSlug" -> product.urlSlug,
+        "photoUrl" -> product.signingScalePhoto.url,
+        "iPadSigningPhotoUrl" -> product.signingScalePhoto.url,
+        "signingScaleW" -> product.signingScaleW,
+        "signingScaleH" -> product.signingScaleH,
+        "signingOriginX" -> product.signingOriginX,
+        "signingOriginY" -> product.signingOriginY,
+        "signingAreaW" -> product.signingAreaW,
+        "signingAreaH" -> product.signingAreaH,
+        product.renderCreatedUpdatedForApi: _*)
     }
   }
 }

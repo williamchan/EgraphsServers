@@ -1,12 +1,20 @@
 package models
 
-import enums.OrderReviewStatus
 import java.sql.Timestamp
+import org.apache.commons.mail.HtmlEmail
+import play.api.libs.json._
+import play.api.templates.Html
+import play.api.mvc.RequestHeader
+
+import enums.OrderReviewStatus
 import services.{Time, AppConfig}
 import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
-import services.mail.TransactionalMail
+import org.apache.commons.mail.HtmlEmail
+import services.mail._
+import controllers.routes.WebsiteControllers.getVerifyAccount
+import services.ConsumerApplication
 import services.config.ConfigFileProxy
 
 /** Services used by each instance of Customer */
@@ -101,15 +109,21 @@ case class Customer(
     )
   }
 
-  def renderedForApi: Map[String, Any] = {
-    Map("id" -> id, "name" -> name)
-  }
-
   //
   // KeyedCaseClass[Long] methods
   //
   override def unapplied = {
     Customer.unapply(this)
+  }
+}
+
+object Customer {
+  implicit object CustomerFormat extends Format[Customer] {
+    def writes(customer: Customer): JsValue = {
+      Json.obj(
+        "id" -> customer.id,
+        "name" -> customer.name)
+    }
   }
 }
 

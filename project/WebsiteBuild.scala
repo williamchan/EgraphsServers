@@ -17,6 +17,7 @@ object WebsiteBuild extends Build {
     val appDependencies = Seq(
       // Playframework components
       jdbc,
+      anorm,
 
       // Application dependencies. Keep these in alphabetical order.
       "batik" % "batik-rasterizer" % "1.6",
@@ -29,6 +30,7 @@ object WebsiteBuild extends Build {
         ExclusionRule(organization="com.cedarsoft")
       ),
       "org.antlr" % "stringtemplate" % "4.0.2",
+      "commons-codec" % "commons-codec" % "1.7",
       "org.apache.commons" % "commons-email" % "1.2",
       "org.apache.commons" % "commons-lang3" % "3.1",
       "org.apache.pdfbox" % "pdfbox" % "1.7.1",
