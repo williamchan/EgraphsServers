@@ -67,12 +67,12 @@ object TestHelpers {
   def withActorUnderTest[ActorT <: Actor, ResultT]
   (actorInstance: => ActorT)(testcase: ActorRef => ResultT)(implicit app: Application) : ResultT =
   {
-    val actor = Akka.system.actorOf(Props(actorInstance))
+    val actor = Akka.system(app).actorOf(Props(actorInstance))
 
     try {
       testcase(actor)
     } finally {
-      Akka.system.stop(actor)
+      Akka.system(app).stop(actor)
     }
   }
 }

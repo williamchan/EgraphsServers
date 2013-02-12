@@ -2,11 +2,11 @@ package egraphs.playutils
 
 import scala.language.postfixOps
 import scala.language.implicitConversions
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import org.joda.time.DateTimeConstants
 import play.api.mvc._
 import play.api.http.HeaderNames.SET_COOKIE
-import scala.concurrent.Await
-import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits._
 
 object ResultUtils {

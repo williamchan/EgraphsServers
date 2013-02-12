@@ -1,12 +1,16 @@
 package services.social
 
+import scala.language.implicitConversions
+import scala.concurrent.duration._
+import scala.concurrent.Await
+import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.ws.WS
+import play.api.libs.json.JsValue
 import play.api.mvc.RequestHeader
-import sjson.json.Serializer
-import models.FulfilledOrder
 import play.api.http.Status
 import _root_.frontend.formatting.DateFormatting.Conversions._
 import controllers.routes.WebsiteControllers.getFacebookLoginCallback
+import models.FulfilledOrder
 
 object Facebook {
 
@@ -40,6 +44,7 @@ object Facebook {
    * @param fbCallbackUrl see Facebook documentation
    * @return an access token, which can be used to make calls to Facebook's API on behalf of a Facebook user
    */
+  //TODO: Should refactor this to return a promise instead of blocking.
   def getFbAccessToken(code: String, facebookAppId: String, fbAppSecret: String, fbCallbackUrl: String)
   (implicit request: RequestHeader)
   : String = 
@@ -63,25 +68,33 @@ object Facebook {
       }
     }
 
-    promisedAccessToken.await.fold(requestError => throw requestError, accessToken => accessToken)
+    promisedAccessToken onFailure {
+      case exception => throw new RuntimeException(exception)
+    }
+
+    Await.result(promisedAccessToken, 20 seconds)
   }
 
   /**
    * @param accessToken access token unique for a Facebook user and obtained from Facebook via getFbAccessToken
    * @return map of Facebook user data including id, name, and email
    */
-  def getFbUserInfo(accessToken: String): Map[String, AnyRef] = {
+  def getFbUserInfo(accessToken: String): JsValue = {
     val fields = List(_id, _name, _email).mkString(",")
     val fbUserInfoUrlStr = "https://graph.facebook.com/me?fields=" + fields + "&access_token=" + accessToken
     val promisedResponse = WS.url(fbUserInfoUrlStr).get()
-    val promisedJsonMap = promisedResponse.map { response =>
+    val promisedJson = promisedResponse.map { response =>
       response.status match {
-        case Status.OK => Serializer.SJSON.in[Map[String, AnyRef]](response.body)
+        case Status.OK => response.json
         case _ => throw new RuntimeException("Facebook access error encountered: " + response.body)
       }
     }
 
-    promisedJsonMap.await.fold(requestError => throw requestError, jsonMap => jsonMap)
+    promisedJson onFailure {
+      case exception => throw new RuntimeException(exception)
+    }
+
+    Await.result(promisedJson, 20 seconds)
   }
 
   /**

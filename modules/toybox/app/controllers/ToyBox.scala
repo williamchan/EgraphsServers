@@ -81,7 +81,7 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   // Cookie configuration
   lazy val initialRequestCookieName = config.getString(initRequestKey).getOrElse("toybox-initial-request")
   lazy val authCookieName = config.getString(authCookieKey).getOrElse("toybox-authenticated")
-  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(SECONDS_PER_DAY)
+  lazy val authTimeoutInSeconds = config.getInt(authTimeoutInSecondsKey).getOrElse(SECONDS_PER_DAY).max(0)
   lazy val authPath = config.getString(authPathKey).getOrElse("/")
   lazy val authDomain = config.getString(authDomainKey)
 
@@ -159,7 +159,7 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
          */
         handler
       }
-      case (_, Some(action: Action[AnyContent])) => Some(authenticate(action))
+      case (_, Some(action)) => Some(authenticate(action.asInstanceOf[Action[AnyContent]]))
       case (_, other) => other
     }
   }
@@ -178,7 +178,7 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
 
   /** Creates a Cookie holding the method and path of the given request */
   protected def makeInitialRequestCookie(request: RequestHeader): Cookie = {
-    new Cookie(initialRequestCookieName, request.method + request.path, -1, "/", None, false, true)
+    new Cookie(initialRequestCookieName, request.method + request.path, None, "/", None, false, true)
   }
 }
 
@@ -270,7 +270,7 @@ trait DefaultTBAuthenticator extends ToyBoxAuthenticator { this: ToyBoxBase =>
   protected def makeAuthCookie(request: RequestHeader): Cookie = {
     val ip = request.remoteAddress
     val signedValue = Crypto.sign(ip)
-    new Cookie(authCookieName, signedValue, authTimeoutInSeconds, authPath, authDomain, false, false)
+    new Cookie(authCookieName, signedValue, Some(authTimeoutInSeconds), authPath, authDomain, false, false)
   }
 
 }
