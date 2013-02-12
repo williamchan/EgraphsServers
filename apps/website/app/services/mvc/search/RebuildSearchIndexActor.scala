@@ -5,11 +5,13 @@ import scala.util.Random
 
 import com.google.inject.Inject
 
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
+
 import akka.actor.Actor
 import akka.actor.Props
 import models.CelebrityStore
-import play.api.Play.current
-import play.api.libs.concurrent.Akka
 import services.db.DBSession
 import services.db.TransactionSerializable
 import services.logging.Logging

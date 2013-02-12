@@ -2,28 +2,26 @@ package services.mvc.celebrity
 
 import scala.concurrent._
 import scala.concurrent.duration._
-import play.api.libs.concurrent.Execution.Implicits._
 import java.util.Random
 import com.google.inject.Inject
+import twitter4j.TwitterException
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.agent.Agent
 import akka.pattern.ask
-import akka.util.FiniteDuration
-import akka.util.Timeout
-import models.Celebrity
-import models.CelebrityStore
+import akka.util._
 import play.api.Play.current
 import play.api.libs.concurrent._
-import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
+import models.Celebrity
+import models.CelebrityStore
 import services.AppConfig
 import services.cache.CacheFactory
 import services.db.DBSession
 import services.db.TransactionSerializable
 import services.http.twitter.TwitterProvider
 import services.logging.Logging
-import twitter4j.TwitterException
 
 import akka.routing.SmallestMailboxRouter
 
@@ -176,7 +174,7 @@ object UpdateTwitterFollowersActor extends Logging {
   private[celebrity] case class TwitterUserLookupResponse(celebrityIdsToFollowerCounts: Map[Long, Int])
   private[celebrity] case class LateTwitterUserLookupResponse(celebrityIdsToFollowerCounts: Map[Long, Int])
 
-  implicit val timeout = 10 minutes
+  implicit val timeout: Timeout = 10 minutes
 
   //
   // Private members
