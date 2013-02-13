@@ -1,5 +1,6 @@
 package services.mvc.search
 
+import scala.language.postfixOps
 import scala.concurrent.duration._
 import scala.util.Random
 

@@ -1,5 +1,6 @@
 package controllers.api
 
+import scala.language.postfixOps
 import play.api.libs.json._
 import play.api.mvc.Action
 import play.api.mvc.Controller

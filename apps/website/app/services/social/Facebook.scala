@@ -1,6 +1,7 @@
 package services.social
 
 import scala.language.implicitConversions
+import scala.language.postfixOps
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import play.api.libs.concurrent.Execution.Implicits._

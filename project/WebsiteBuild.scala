@@ -32,7 +32,6 @@ object WebsiteBuild extends Build {
         ExclusionRule(organization="com.cedarsoft")
       ),
       "commons-codec" % "commons-codec" % "1.7",
-      "net.codingwell" % "scala-guice_2.10" % "3.0.2",
       "net.codingwell" %% "scala-guice" % "3.0.2",
       "org.antlr" % "stringtemplate" % "4.0.2",
       "org.apache.commons" % "commons-email" % "1.2",
@@ -82,6 +81,7 @@ object WebsiteBuild extends Build {
       path = websiteBaseDir
     ).settings(cloudBeesSettings: _*)
     .settings(
+      scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:postfixOps,implicitConversions,reflectiveCalls"),
       organization := "egraphs",
 
       testOptions in Test := Nil,

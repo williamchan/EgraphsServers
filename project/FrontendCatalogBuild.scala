@@ -23,6 +23,7 @@ object FrontendCatalogBuild extends Build {
       appDependencies,
       path = file(".") / "apps" / "front-end-catalog"
     ).settings(
+      scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
       organization := "egraphs",
       
       //This is because Play 2.0 by default will send some Specs 2 test options not recognized by ScalaTest
