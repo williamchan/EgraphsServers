@@ -7,7 +7,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import models.enums._
 import models.SavesCreatedUpdated
 import scalaz.Lens
-import services.db.{CanInsertAndUpdateAsThroughTransientServices, InsertsAndUpdatesAsEntity, HasEntity, Schema}
+import services.db.{CanInsertAndUpdateEntityThroughTransientServices, InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
 import org.squeryl.Query
 
@@ -134,6 +134,20 @@ class LineItemStore @Inject() (schema: Schema) {
 }
 
 
+/**
+ * Products that depend on other products, like physical prints, may naturally be thought of as add-ons.
+ * This trait provides a `transactAsSubItem` method for such items that will be transacted directly by
+ * the item they depend on (e.g. for a PrintOrder, by the Order is belongs to).
+ *
+ * It also allows the item to be included in a checkouts' LineItems as normal without worry of it being
+ * transacted multiple times by the checkout and the item it depends on.
+ */
+trait SubLineItem[T] extends LineItem[T] {
+
+  override def transact(checkout: Checkout) = this
+
+  def transactAsSubItem(checkout: Checkout): SubLineItem[T]
+}
 
 
 
@@ -146,14 +160,16 @@ trait HasLineItemEntity[T <: LineItem[_]] extends HasEntity[LineItemEntity, Long
 trait SavesAsLineItemEntityThroughServices[
   T <: LineItem[_] with HasLineItemEntity[T],
   ServicesT <: SavesAsLineItemEntity[T]
-] extends CanInsertAndUpdateAsThroughTransientServices[T, LineItemEntity, ServicesT] { this: T with Serializable => }
+] extends CanInsertAndUpdateEntityThroughTransientServices[T, LineItemEntity, ServicesT] {
+  this: T with Serializable =>
+}
 
 
 /** Allows LineItems' Services to insert and update LineItems */
-trait SavesAsLineItemEntity[T <: LineItem[_] with HasLineItemEntity[T]]
-  extends InsertsAndUpdatesAsEntity[T, LineItemEntity]
-  with SavesCreatedUpdated[LineItemEntity]
-{
+trait SavesAsLineItemEntity[
+  T <: LineItem[_] with HasLineItemEntity[T]
+] extends InsertsAndUpdatesAsEntity[T, LineItemEntity] with SavesCreatedUpdated[LineItemEntity] {
+
   protected def schema: Schema
   override protected val table = schema.lineItems
 

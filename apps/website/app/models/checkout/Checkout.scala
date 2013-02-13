@@ -48,7 +48,7 @@ case class CheckoutServices @Inject() (
 //
 // Base Model
 //
-abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
+abstract class Checkout extends CanInsertAndUpdateEntityThroughServices[Checkout, CheckoutEntity]
   with HasEntity[CheckoutEntity, Long]
 {
   import Checkout._
@@ -337,6 +337,11 @@ object Checkout {
   // Create
   def create(types: LineItemTypes, maybeBuyer: Option[Customer], zipcode: Option[String] = None): FreshCheckout = {
     FreshCheckout(types, _buyer = maybeBuyer, zipcode = zipcode)
+  }
+
+  def create(types: LineItemTypes, maybeBuyer: Option[Customer], address: Address): FreshCheckout = {
+    val zipcode = address.postalCode
+    FreshCheckout(types, _buyer = maybeBuyer, shippingAddress = Some(address), zipcode = Some(zipcode))
   }
 
   // Restore

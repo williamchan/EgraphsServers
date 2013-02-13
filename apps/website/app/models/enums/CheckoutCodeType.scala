@@ -15,6 +15,26 @@ sealed abstract class CheckoutCodeType(val name: String) { this: OfCheckoutClass
 }
 
 
+/** trait for tagging type parameters onto the enum, which didn't seem to want to work directly. */
+trait OfCheckoutClass[TypeT <: LineItemType[_], ItemT <: LineItem[_]] { this: CheckoutCodeType => }
+
+
+/** Helper for CodeTypes whose companions have an apply method that mirrors the use of itemInstance */
+trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] extends OfCheckoutClass[TypeT, ItemT] {
+  this: CheckoutCodeType =>
+
+  def itemCompanion: { def apply(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): ItemT }
+
+  override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): ItemT = {
+    itemCompanion(itemEntity, typeEntity)
+  }
+}
+
+
+
+
+
+
 object CheckoutCodeType extends Enum {
   protected type ItemEntity = LineItemEntity
   protected type TypeEntity = LineItemTypeEntity
@@ -79,24 +99,7 @@ object CheckoutCodeType extends Enum {
 
 
 
-/** trait for tagging type parameters onto the enum, which didn't seem to want to work directly. */
-trait OfCheckoutClass[TypeT <: LineItemType[_], ItemT <: LineItem[_]]
-
-
-/** Helper for CodeTypes whose companions have an apply method that mirrors the use of itemInstance */
-trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] extends OfCheckoutClass[TypeT, ItemT] { this: CheckoutCodeType =>
-
-  def itemCompanion: { def apply(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): ItemT }
-
-  override def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): ItemT = {
-    itemCompanion(itemEntity, typeEntity)
-  }
-}
 
 
 
 trait HasCodeType { def codeType: CheckoutCodeType }
-
-
-
-

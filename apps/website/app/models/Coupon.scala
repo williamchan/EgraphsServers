@@ -158,7 +158,7 @@ class CouponStore @Inject()(schema: Schema,
 
   def findByLineItemTypeId(id: Long): Query[Coupon] = {
     from(schema.coupons)(coupon =>
-      where(coupon.lineItemTypeId === id)
+      where(coupon.lineItemTypeId === Some(id))
       select(coupon)
       orderBy(coupon.updated desc)
     )

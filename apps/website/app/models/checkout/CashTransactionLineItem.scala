@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import models.{CashTransaction, CashTransactionStore}
 import scalaz.Lens
 import services.AppConfig
-import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
+import services.db.{Schema, CanInsertAndUpdateEntityThroughServices}
 import services.payment.Payment
 
 
@@ -72,7 +72,7 @@ case class CashTransactionLineItem(
   }
 
   override def transact(checkout: Checkout) = {
-    if (id > 0) { this }
+    if (id > 0) { this.update() }
     else {
       require( checkout.account.id > 0 )
 

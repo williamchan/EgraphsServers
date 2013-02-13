@@ -10,7 +10,7 @@ import services.cache.CacheFactory
 
 class CashTransactionLineItemTests extends EgraphsUnitTest
   with LineItemTests[CashTransactionLineItemType, CashTransactionLineItem]
-  with CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[CashTransactionLineItem]
+  with SavesAsLineItemEntityThroughServicesTests[CashTransactionLineItem, CashTransactionLineItemServices]
   with DateShouldMatchers
   with DBTransactionPerTest
 {

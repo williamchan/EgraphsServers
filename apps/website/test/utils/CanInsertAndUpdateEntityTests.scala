@@ -7,10 +7,10 @@ import scala.Some
 import services.cache.Cache
 
 
-trait CanInsertAndUpdateAsThroughServicesWithLongKeyTests[
-  ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT, Long],
+trait CanInsertAndUpdateEntityWithLongKeyTests[
+  ModelT <: CanInsertAndUpdateEntity[ModelT,  EntityT] with HasEntity[EntityT, Long],
   EntityT <: KeyedCaseClass[Long]
-] extends CanInsertAndUpdateAsThroughServicesTests[ModelT, EntityT, Long] {
+] extends CanInsertAndUpdateEntityTests[ModelT, EntityT, Long] {
   this: FlatSpec with ShouldMatchers =>
 
   override def newIdValue: Long = 0L
@@ -19,8 +19,10 @@ trait CanInsertAndUpdateAsThroughServicesWithLongKeyTests[
 
 
 
-trait CanInsertAndUpdateAsThroughServicesTests[
-  ModelT <: CanInsertAndUpdateAsThroughServices[ModelT,  EntityT] with HasEntity[EntityT, KeyT],
+
+
+trait CanInsertAndUpdateEntityTests[
+  ModelT <: CanInsertAndUpdateEntity[ModelT,  EntityT] with HasEntity[EntityT, KeyT],
   EntityT <: KeyedCaseClass[KeyT],
   KeyT
 ] {

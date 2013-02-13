@@ -3,10 +3,31 @@ package models.checkout
 import checkout.Conversions._
 import com.google.inject.Inject
 import models.enums.{LineItemNature, CheckoutCodeType}
-import models.PrintOrder
+import models.{Order, PrintOrder}
 import services.db.{InsertsAndUpdates, HasTransientServices, Schema}
-import scalaz.Lens
 import services.AppConfig
+
+
+case class PrintOrderLineItemTypeServices @Inject() (schema: Schema) extends InsertsAndUpdates[LineItemTypeEntity] {
+
+  override protected def table = schema.lineItemTypes
+
+  def findOrCreateEntity() = existingEntity getOrElse insert(baseEntity)
+
+  private def existingEntity = {
+    import org.squeryl.PrimitiveTypeMode._
+    table.where(_._codeType === PrintOrderLineItemType.codeType.name).headOption
+  }
+
+  private def baseEntity = LineItemTypeEntity(
+    "Order of Framed Print",
+    PrintOrderLineItemType.nature,
+    PrintOrderLineItemType.codeType
+  )
+}
+
+
+
 
 /**
  * Singleton LineItemType for PrintOrders.
@@ -21,7 +42,7 @@ import services.AppConfig
  * renaming to FramedPrintOrder or something).
  */
 case class PrintOrderLineItemType(
-  egraphOrderType: EgraphOrderLineItemType,
+  forOrder: Order = Order(), // could be just order
   @transient _services: PrintOrderLineItemTypeServices = AppConfig.instance[PrintOrderLineItemTypeServices]
 )
   extends LineItemType[PrintOrder]
@@ -30,37 +51,22 @@ case class PrintOrderLineItemType(
 {
 
   override lazy val _entity = services.findOrCreateEntity()
+
   override def id = _entity.id
 
-  override def lineItems(resolved: LineItems, unresolved: LineItemTypes): Option[LineItems] = None
+  override def lineItems(resolved: LineItems, unresolved: LineItemTypes): Option[LineItems] = Some {
+    Seq( PrintOrderLineItem(this, printOrder) )
+  }
 
   override def toJson = ""
+
+  def printOrder = PrintOrder(orderId = forOrder.id)
 }
+
+
+
 
 object PrintOrderLineItemType {
   def codeType = CheckoutCodeType.PrintOrder
   def nature = LineItemNature.Product
-}
-
-case class PrintOrderLineItemTypeServices @Inject() (
-  schema: Schema
-) extends InsertsAndUpdates[LineItemTypeEntity] {
-  import org.squeryl.PrimitiveTypeMode._
-
-  override protected def table = schema.lineItemTypes
-
-  def findOrCreateEntity() = {
-    val maybeEntity = from(table)( entity =>
-      where(entity._codeType === PrintOrderLineItemType.codeType.name)
-      select(entity)
-    ).headOption
-
-    maybeEntity getOrElse { insert(baseEntity) }
-  }
-
-  private def baseEntity = LineItemTypeEntity(
-    "Order of Framed Print",
-    PrintOrderLineItemType.nature,
-    PrintOrderLineItemType.codeType
-  )
 }

@@ -14,12 +14,12 @@ import LineItemTestData._
 
 
 class CheckoutTests extends EgraphsUnitTest
-  with CanInsertAndUpdateAsThroughServicesWithLongKeyTests[Checkout, CheckoutEntity]
+  with CanInsertAndUpdateEntityWithLongKeyTests[Checkout, CheckoutEntity]
   with DateShouldMatchers
   with DBTransactionPerTest
 {
   //
-  // CanInsertAndUpdateAsThroughServicesTests members
+  // CanInsertAndUpdateEntityTests members
   //
   override def newModel(): FreshCheckout = newCheckout
 

@@ -3,7 +3,7 @@ package models.checkout
 import checkout.Conversions._
 import models.{GiftCertificateStore, GiftCertificate}
 import services.AppConfig
-import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
+import services.db.{CanInsertAndUpdateEntityThroughServices, Schema}
 import scalaz.Lens
 import com.google.inject.Inject
 

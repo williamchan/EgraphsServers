@@ -56,11 +56,16 @@ trait CanInsertAndUpdateThroughServices[T <: KeyedEntity[_]] { this: T =>
 }
 
 
+trait CanInsertAndUpdateEntity[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedCaseClass[_]] { this: ModelT => }
+
+
 /**
  * Mixin for Model classes with separate Entities to be able to persist their entities through services as if
  * persisting themselves.
  */
-trait CanInsertAndUpdateAsThroughServices[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedCaseClass[_]]{
+trait CanInsertAndUpdateEntityThroughServices[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedCaseClass[_]]
+  extends CanInsertAndUpdateEntity[ModelT, EntityT]
+{
   this: ModelT =>
 
   def services: InsertsAndUpdatesAsEntity[ModelT, EntityT]
@@ -73,11 +78,12 @@ trait CanInsertAndUpdateAsThroughServices[ModelT <: HasEntity[EntityT, _], Entit
  * Mixin for Model classes with separate Entities need to be serializable and able to persist their entities through
  * services as if persisting themselves.
  */
-trait CanInsertAndUpdateAsThroughTransientServices[
+trait CanInsertAndUpdateEntityThroughTransientServices[
   ModelT <: HasEntity[EntityT, _],
   EntityT <: KeyedCaseClass[_],
   ServiceT <: InsertsAndUpdatesAsEntity[ModelT, EntityT]
-] extends HasTransientServices[ServiceT] { this: ModelT with Serializable =>
+] extends CanInsertAndUpdateEntity[ModelT, EntityT] with HasTransientServices[ServiceT] {
+  this: ModelT with Serializable =>
 
   def insert()(implicit manifest: Manifest[ServiceT]): ModelT = services.insert(this)
   def update()(implicit manifest: Manifest[ServiceT]): ModelT = services.update(this)

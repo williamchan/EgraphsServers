@@ -60,7 +60,7 @@ trait HasLineItemTypeEntity[T <: LineItemType[_]] extends HasEntity[LineItemType
 trait SavesAsLineItemTypeEntityThroughServices[
   T <: LineItemType[_] with HasLineItemTypeEntity[T],
   ServicesT <: SavesAsLineItemTypeEntity[T]
-] extends CanInsertAndUpdateAsThroughTransientServices[T, LineItemTypeEntity, ServicesT] { this: T with Serializable => }
+] extends CanInsertAndUpdateEntityThroughTransientServices[T, LineItemTypeEntity, ServicesT] { this: T with Serializable => }
 
 
 

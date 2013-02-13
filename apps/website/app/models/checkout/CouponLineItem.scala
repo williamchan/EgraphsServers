@@ -9,7 +9,8 @@ import com.google.inject.Inject
 
 case class CouponLineItemServices @Inject() (
   schema: Schema,
-  couponStore: CouponStore
+  couponStore: CouponStore,
+  couponTypeServices: CouponLineItemTypeServices
 ) extends SavesAsLineItemEntity[CouponLineItem] {
 
 }
@@ -25,21 +26,30 @@ case class CouponLineItem(
   with SavesAsLineItemEntityThroughServices[CouponLineItem, CouponLineItemServices]
 {
 
-  override def itemType: CouponLineItemType = _type.get
-  override def domainObject = (couponFromType orElse couponFromTypeId).get
-  override def transact(checkout: Checkout) = this
   override def toJson = ""
 
+  override def itemType: CouponLineItemType = (_type orElse itemTypeById).get
+  override lazy val domainObject: Coupon = (couponFromType orElse couponFromTypeId).get
+  override def transact(checkout: Checkout) = {
+    if (id > 0) { this.update() }
+    else {
+      domainObject.use(checkout.subtotal.amount).save()
+      this.withCheckoutId(checkout.id).insert().copy(_type = None)
+    }
+  }
+
   private def couponFromType = _type map { _.coupon }
-  private def couponFromTypeId = services.couponStore.findByLineItemTypeId(1L).headOption
+  private def couponFromTypeId = services.couponStore.findByLineItemTypeId(itemTypeId).headOption
+  private def itemTypeById = services.couponTypeServices.findById(itemTypeId)
 
   override protected def entityLens = EntityLens( get = _._entity, set = _ copy _)
 }
 
 
-object CouponLineItem{
+object CouponLineItem {
   def apply(itemType: CouponLineItemType, amount: Money) = {
-    val entity = LineItemEntity(0,0,itemType.id).withAmount(amount)
+    assert(itemType.id > 0)
+    val entity = LineItemEntity(_itemTypeId = itemType.id).withAmount(amount)
     new CouponLineItem(entity, Some(itemType))
   }
 

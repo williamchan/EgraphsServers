@@ -15,7 +15,10 @@ case class CouponLineItemTypeServices @Inject() (
   schema: Schema,
   couponStore: CouponStore,
   lineItemStore: LineItemStore
-) extends SavesAsLineItemTypeEntity[CouponLineItemType] with QueriesAsLineItemTypeEntity[CouponLineItemType] {
+)
+  extends SavesAsLineItemTypeEntity[CouponLineItemType]
+  with QueriesAsLineItemTypeEntity[CouponLineItemType]
+{
 
   override def entityToModel(convert: LineItemTypeEntity) = {
     for (coupon <- couponStore.findByLineItemTypeId(convert.id).headOption)
@@ -23,12 +26,12 @@ case class CouponLineItemTypeServices @Inject() (
   }
 
   def findByCouponCode(code: String) = couponStore.findValid(code) map { coupon =>
-    def couponWithExistingEntity = coupon.lineItemTypeId flatMap { id =>
+    lazy val couponWithExistingEntity = coupon.lineItemTypeId flatMap { id =>
       assert(findEntityById(id) isDefined, "Coupon has invalid lineItemTypeId")
       findEntityById(id) map { entity => new CouponLineItemType(entity, coupon)}
     }
 
-    def couponWithNewEntity = {
+    lazy val couponWithNewEntity = {
       val savedEntity = insert(CouponLineItemType.baseEntityForCoupon(coupon))
       val updatedCoupon = coupon.withLineItemTypeId(savedEntity.id).save()
       new CouponLineItemType(savedEntity, updatedCoupon)
@@ -57,9 +60,15 @@ case class CouponLineItemType(
 {
 
   override def toJson = ""
-  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some{ Seq(
-    CouponLineItem(this, Money.zero(CurrencyUnit.USD))
-  )}
+  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
+    pendingResolution(CheckoutCodeType.Subtotal) match {
+      case Nil => resolvedItems(CheckoutCodeType.Subtotal).headOption map { subtotal =>
+        val discountAmount = coupon.calculateDiscount(subtotal.amount)
+        Seq{ CouponLineItem(this, discountAmount) }
+      }
+      case _ => None
+    }
+  }
 
 
   override protected val entityLens = Lens[CouponLineItemType, LineItemTypeEntity](

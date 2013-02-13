@@ -4,7 +4,7 @@ import checkout.Conversions._
 import com.google.inject.Inject
 import org.joda.money.Money
 import scalaz.Lens
-import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
+import services.db.{CanInsertAndUpdateEntityThroughServices, Schema}
 import services.AppConfig
 
 

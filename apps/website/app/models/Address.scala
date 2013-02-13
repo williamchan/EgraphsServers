@@ -17,6 +17,7 @@ case class Address(
   city: String = "",
   _state: String = "",
   postalCode: String = "",
+  name: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   @transient _services: AddressServices = AppConfig.instance[AddressServices]
@@ -24,6 +25,8 @@ case class Address(
   with HasCreatedUpdated
   with HasTransientServices[AddressServices]
 {
+
+
   //
   // Public methods
   //
@@ -34,6 +37,13 @@ case class Address(
 
   def account: Account = {
     services.accountStore.get(accountId)
+  }
+
+  def streetAddressString = {
+    val address = List(Some(addressLine1), addressLine2).flatten.mkString(" ")
+    val stateAndZip = List(_state, postalCode).mkString(" ")
+    val streetAddressAsList = name.toList ++ List(address, city, stateAndZip)
+    streetAddressAsList.mkString(", ")
   }
 
   //

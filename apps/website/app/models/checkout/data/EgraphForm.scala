@@ -2,7 +2,7 @@ package models.checkout.data
 
 import play.api.data.Form
 import models.{OrderStore, Order}
-import models.checkout.{EgraphOrderLineItemType, Checkout, LineItem, LineItemType}
+import models.checkout._
 import services.AppConfig
 import services.db.HasTransientServices
 import org.joda.money.{CurrencyUnit, Money}
@@ -25,6 +25,7 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
     val desiredText = "desiredText"
     val messageToCeleb = "messageToCeleb"
     val framedPrint = "framedPrint"
+    val services = "_services"
   }
 
 
@@ -40,7 +41,8 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
         isGift -> boolean,
         desiredText -> optional(text(maxLength = 80)),
         messageToCeleb -> optional(text(maxLength = 180)),
-        framedPrint -> boolean
+        framedPrint -> boolean,
+        services -> ignored(AppConfig.instance[EgraphOrderLineItemTypeServices])
       )(EgraphOrderLineItemType.apply)(EgraphOrderLineItemType.unapply)
     )
   }

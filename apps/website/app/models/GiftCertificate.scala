@@ -66,7 +66,7 @@ case class GiftCertificate protected (
   _coupon: Coupon,
   services: GiftCertificateServices = AppConfig.instance[GiftCertificateServices]
 ) extends HasEntity[GiftCertificateEntity, Long]
-  with CanInsertAndUpdateAsThroughServices[GiftCertificate, GiftCertificateEntity]
+  with CanInsertAndUpdateEntityThroughServices[GiftCertificate, GiftCertificateEntity]
 {
   import MemberLens.Conversions._
 
