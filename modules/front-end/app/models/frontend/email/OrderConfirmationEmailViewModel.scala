@@ -1,6 +1,6 @@
 package models.frontend.email
 
-case class OrderConfirmationViewModel(
+case class OrderConfirmationEmailViewModel(
   buyerName: String,
   buyerEmail: String,
   recipientName: String,

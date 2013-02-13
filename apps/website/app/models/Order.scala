@@ -13,7 +13,6 @@ import com.google.inject._
 import mail.TransactionalMail
 import payment.{Charge, Payment}
 import org.squeryl.Query
-import org.apache.commons.mail.HtmlEmail
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
@@ -28,8 +27,9 @@ import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
-import models.frontend.email.{RegularEgraphSignedEmailViewModel, GiftEgraphSignedEmailViewModel}
-import services.email.EgraphSignedEmailPreparer
+import models.frontend.email.{RegularViewEgraphEmailViewModel, GiftViewEgraphEmailViewModel}
+import services.mail.MailUtils
+import models.frontend.email.{EmailViewModel, ViewEgraphEmailViewModel}
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -251,27 +251,6 @@ case class Order(
     require(celebrity.id == product.celebrityId, "Must be rejected by Celebrity associated with this Order")
     require(reviewStatus == OrderReviewStatus.ApprovedByAdmin, "Must be ApprovedByAdmin before rejecting by celebrity")
     withReviewStatus(OrderReviewStatus.RejectedByCelebrity).copy(rejectionReason = rejectionReason)
-  }
-
-  def sendEgraphSignedMail[A](implicit request: RequestHeader) {
-    val (email, htmlMsg, textMsg) = prepareEgraphSignedEmail
-    services.mail.send(email, Some(textMsg), Some(htmlMsg))
-  }
-  
-  // This function provides a hook for testing the email
-  def prepareEgraphSignedEmail
-  : (HtmlEmail, Html, String)  = 
-  {
-    val (viewEgraphUrl, celebrity, email, coupon) = EgraphSignedEmailPreparer.prepareEgraphSignedEmailHelper(this, services)
-
-    val egraphSignedEmailStack = if (buyerId == recipientId) {
-      RegularEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code)
-    } else {
-      GiftEgraphSignedEmailViewModel(viewEgraphUrl, celebrity.publicName, this.recipientName, coupon.discountAmount.toInt, coupon.code, this.buyer.name)
-    }
-
-    val (htmlMsg, textMsg) = EgraphSignedEmailPreparer.getHtmlAndTextMsgs(egraphSignedEmailStack)
-    (email, htmlMsg, textMsg)
   }
 
   /**

@@ -7,12 +7,14 @@ import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
-import services.mail.TransactionalMail
+import services.mail.{TransactionalMail, MailUtils}
 import play.api.mvc.RequestHeader
 import controllers.routes.WebsiteControllers.getVerifyAccount
 import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
+import models.enums.EmailType
+import models.frontend.email.{AccountVerificationEmailViewModel, EmailViewModel}
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -116,36 +118,6 @@ case class Customer(
   override def unapplied = {
     Customer.unapply(this)
   }
-}
-
-object Customer {
-  def sendNewCustomerEmail(
-      account: Account, 
-      verificationNeeded: Boolean = false, 
-      mail: TransactionalMail, 
-      consumerApp: ConsumerApplication
-  )(implicit request: RequestHeader)
-  {
-    val email = new HtmlEmail()
-    email.setFrom("webserver@egraphs.com")
-    email.addReplyTo("webserver@egraphs.com")
-    email.addTo(account.email)
-    email.setSubject("Welcome to Egraphs!")
-
-    val (textMsg: String, htmlMsg: Html) = if (verificationNeeded) {
-      val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
-      val html = views.html.frontend.email.account_verification(verifyPasswordUrl = verifyPasswordUrl)
-      val text = views.txt.frontend.email.account_verification(verifyPasswordUrl).toString()
-      (text, html)
-    } else {
-      val html = views.html.frontend.email.account_confirmation()
-      val text = views.txt.frontend.email.account_confirmation.toString()
-      (text, html)
-    }
-
-    mail.send(email, Some(textMsg), Some(htmlMsg))
-  }
-
 }
 
 class CustomerStore @Inject() (

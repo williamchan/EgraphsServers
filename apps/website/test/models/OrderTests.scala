@@ -14,6 +14,8 @@ import java.util.Date
 import java.util.Calendar
 import org.joda.time.DateTimeConstants
 import org.joda.time.DateTime
+import models.frontend.email.EmailViewModel
+import services.email.ViewEgraphEmail
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -254,13 +256,13 @@ class OrderTests extends EgraphsUnitTest
     refundTxn.currencyCode should be(CurrencyUnit.USD.getCode)
   }
 
-  "prepareEgraphsSignedEmail" should "not use celebrity's email" in new EgraphsTestApplication {
+  "prepareViewEgraphEmail" should "not use celebrity's email" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
     implicit val request = FakeRequest()
-    val (email, _, _) = order.prepareEgraphSignedEmail
-    email.getFromAddress.getAddress should not be (celebrity.account.email)
-    email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("webserver@egraphs.com")
+    val (emailViewModel, _, _) = ViewEgraphEmail(order).prepareViewEgraphEmail
+    emailViewModel.fromEmail should not be (celebrity.account.email)
+    emailViewModel.replyToEmail should be ("webserver@egraphs.com")
   }
 
   "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in new EgraphsTestApplication {

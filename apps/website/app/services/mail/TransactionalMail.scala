@@ -1,73 +1,72 @@
 package services.mail
 
+import com.google.inject.Inject
 import play.api.Play.current
-import com.typesafe.plugin.use
-import com.typesafe.plugin.MailerAPI
-import com.typesafe.plugin.MailerPlugin
-import org.apache.commons.mail.Email
-import org.apache.commons.mail.HtmlEmail
-import com.google.inject.{Inject, Provider}
-import services.Utils
-import collection.mutable.ListBuffer
-import play.api.templates.Html
-import scala.collection.JavaConversions._
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
+import play.api.libs.ws.WS.WSRequestHolder
+import play.api.libs.ws.WS
+import services.config.ConfigFileProxy
 import services.inject.InjectionProvider
+import models.frontend.email.EmailViewModel
+import org.joda.time.DateTimeConstants
 import play.api.libs.concurrent.Akka
 
-/** Interface for sending transactional mails. Transactional mails are  */
+/** Interface for sending transactional mails. Transactional mails are
+ *  one-off recipient-specific mail, such as account confirmation, order
+ *  confirmation, or view egraph email. We now send transactional mail
+ *  through Mandrill. API docs here: https://mandrillapp.com/api/docs/
+ */
 trait TransactionalMail {
-  def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None)
-  protected def newEmail: MailerAPI
-  
-  private[mail] def toMailerAPI(email: Email): MailerAPI = {
-    def addressStringsFromList(addressList: java.util.List[_]): Seq[String] = {
-      import scala.collection.JavaConversions._
-      for (addresses <- Option(addressList).toSeq; address <- addresses) yield address.toString
-    }
-
-    val replyToAddresses = addressStringsFromList(email.getReplyToAddresses)
-    val maybeReplyTo = replyToAddresses.headOption
-
-    // Extract the content into the MailerAPI format
-    val maybeRepliableEmail = maybeReplyTo.map(address => newEmail.setReplyTo(address.toString))
-
-    maybeRepliableEmail.getOrElse(newEmail)
-      .setSubject(email.getSubject)
-      .addFrom(email.getFromAddress.toString)
-      .addRecipient(addressStringsFromList(email.getToAddresses): _*)
-      .addCc(addressStringsFromList(email.getCcAddresses): _*)
-      .addBcc(addressStringsFromList(email.getBccAddresses): _*)
-  }
+  def actionUrl: String
+  def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)])
 }
 
 /**
  * Provides a TransactionalMail implementation given the play configuration
  */
-class MailProvider @Inject() extends InjectionProvider[TransactionalMail]
+class MailProvider @Inject()(config: ConfigFileProxy) extends InjectionProvider[TransactionalMail]
 {
   def get(): TransactionalMail = {
-    new DefaultTransactionalMail
+    if (!config.smtpMock) {
+      new MandrillTransactionalMail(key = config.smtpOption.get.smtpPassword)
+    } else {
+      new StubTransactionalMail
+    }
   }
 }
 
-/**
- * Implementation of the TransactionalMail library that delegates to TypeSafe's Play Plug-in behavior as configured in application.conf.
- * See https://github.com/typesafehub/play-plugins/blob/master/mailer/README.md
- */
-private[mail] class DefaultTransactionalMail extends TransactionalMail {
-  override def send(mail: HtmlEmail, text: Option[String] = None, html: Option[Html] = None) {
-    val mailer = toMailerAPI(mail)
-    def performSendMail = (text, html) match {
-      case (Some(text), Some(html)) => mailer.send(text, html.toString().trim())
-      case (Some(text), None) => mailer.send(text)
-      case (None, Some(html)) => mailer.sendHtml(html.toString().trim())
-      case _ => throw new IllegalStateException("We can't send an email without either text or html in the body.")
-    }
-    
-    // Figure out why using Akka.future(performSendMail) fails, as per https://egraphs.atlassian.net/browse/SER-421
-    performSendMail
+private[mail] class StubTransactionalMail extends TransactionalMail {
+  override def actionUrl = "#"
+
+  override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)]) = {
+    play.Logger.info("MOCK MAILER: send email")
+    play.Logger.info("FROM: " + mailStack.fromEmail)
+    play.Logger.info("REPLY-TO: " + mailStack.replyToEmail)
+
+    mailStack.toAddresses.foreach(emailNamePair => play.Logger.info("TO EMAIL: " +
+        emailNamePair._1 + ", TO NAME: " + emailNamePair._2.getOrElse("none")))
+
+    play.Logger.info("BCC: " + mailStack.bccAddress.getOrElse("none"))
+
+    // this won't include the header and footer, which are shared across all transactional mail;
+    // look at the General template from the Mandrill console to see header/footer html
+    templateContentParts.foreach{ case (name, htmlContent) => play.Logger.info("HTML BODY: " + htmlContent) }
   }
+}
 
-  override protected def newEmail: MailerAPI = use[MailerPlugin].email
-} 
+private[mail] class MandrillTransactionalMail (key: String) extends TransactionalMail {
+  override def actionUrl = "https://mandrillapp.com/api/1.0/"
 
+  override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)]) {
+    val methodAndOutputFormat = "messages/send-template.json"
+
+    val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key)
+
+    val promiseResponse = WS.url(actionUrl + methodAndOutputFormat).post(jsonIterable)
+
+    promiseResponse.onRedeem {
+      response => play.Logger.info("Send-template response: " + response.body)
+    }
+  }
+}

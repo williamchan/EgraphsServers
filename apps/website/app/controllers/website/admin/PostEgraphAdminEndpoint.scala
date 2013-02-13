@@ -8,6 +8,7 @@ import services.http.filters.HttpFilters
 import play.api.mvc.Action
 import play.api.data._
 import play.api.data.Forms._
+import services.email.ViewEgraphEmail
 
 trait PostEgraphAdminEndpoint { this: Controller =>
 
@@ -32,7 +33,7 @@ trait PostEgraphAdminEndpoint { this: Controller =>
 		    }
 		    case Some(EgraphState.Published) => {
 		      egraph.publish(admin).save()
-		      egraph.order.sendEgraphSignedMail(request)
+		      ViewEgraphEmail(order = egraph.order).send() // send view egraph email
 		      Redirect(GetEgraphAdminEndpoint.url(egraphId))
 		    }
 		    case _ => Forbidden("Unsupported operation")

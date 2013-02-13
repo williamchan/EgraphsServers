@@ -11,15 +11,13 @@ import services._
 import java.awt.image.BufferedImage
 import services.mail.TransactionalMail
 import org.apache.commons.io.IOUtils
-import org.apache.commons.mail.HtmlEmail
 import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
 import org.squeryl.dsl.ManyToMany
-import views.html.frontend.email.{celebrity_welcome => celebrity_welcome_html}
-import views.txt.frontend.email.{celebrity_welcome => celebrity_welcome_txt}
 import anorm._
 import services.mvc.celebrity.CelebrityViewConversions
+import services.mail.MailUtils
 import play.api.libs.concurrent.Promise
 import models.frontend.marketplace.MarketplaceCelebrity
 import play.api.libs.concurrent.Akka
@@ -30,6 +28,7 @@ import services.mvc.celebrity.CatalogStarsQuery
 import java.util.Date
 import org.apache.commons.codec.binary.Base64
 import egraphs.playutils.{Gender, HasGender}
+import models.enums.EmailType
 
 /**
  * Services used by each celebrity instance
@@ -261,27 +260,6 @@ case class Celebrity(id: Long = 0,
     ).withPublishedStatus(publishedStatus)
 
     product.saveWithImageAssets(image, icon)
-  }
-
-  /**
-  * Sends a welcome email to the celebrities email address with their Egraphs username and a blanked
-  * out password field.  We aren't sending the password, it is just a bunch of *****.  The email
-  * includes a link to download the latest iPad app.
-  */
-  def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
-    val email = new HtmlEmail()
-
-    email.setFrom("webserver@egraphs.com", "Egraphs")
-    email.addTo(toAddress, publicName)
-    bccEmail.map(bcc => email.addBcc(bcc))
-    email.setSubject("Welcome to Egraphs")
-    
-    val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
-    services.transactionalMail.send(
-      email, 
-      text=Some(celebrity_welcome_txt(publicName, account.email, appDownloadLink).toString),
-      html=Some(celebrity_welcome_html(publicName, account.email, appDownloadLink))
-    )
   }
 
   //

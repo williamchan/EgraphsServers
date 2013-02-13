@@ -13,6 +13,7 @@ import play.api.libs.concurrent.Akka
 import services.config.ConfigFileProxy
 import play.api.mvc.RequestHeader
 import services.blobs.AccessPolicy
+import services.email.ViewEgraphEmail
 
 /**
  * Actor that performs most of the work of creating an egraph and running it through our biometrics
@@ -70,7 +71,7 @@ case class EgraphActor @Inject() (
               // If admin review is turned off (eg to expedite demos), immediately publish regardless of biometric results
               if (config.adminreviewSkip) {
                 val publishedEgraph = testedEgraph.withEgraphState(EgraphState.Published).save()
-                publishedEgraph.order.sendEgraphSignedMail(requestHeader)
+                ViewEgraphEmail(order = publishedEgraph.order).send() // send view egraph email
               }
             }
           }

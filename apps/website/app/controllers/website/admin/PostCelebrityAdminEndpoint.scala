@@ -16,11 +16,12 @@ import java.io.File
 import play.api.mvc.MultipartFormData
 import java.awt.image.BufferedImage
 import services.{ImageUtil, Utils}
-import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
 import org.joda.time.DateTimeConstants
 import egraphs.playutils.Gender
+import services.ConsumerApplication
+import services.email.CelebrityWelcomeEmail
 import services.http.forms.FormConstraints
 
 trait PostCelebrityAdminEndpoint {
@@ -28,9 +29,9 @@ trait PostCelebrityAdminEndpoint {
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
-  protected def transactionalMail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
+  protected def consumerApp: ConsumerApplication
   protected def formConstraints: FormConstraints
   
   def postCreateCelebrityAdmin = postController() {
@@ -100,8 +101,12 @@ trait PostCelebrityAdminEndpoint {
               val acct = accountStore.findByEmail(validForm.celebrityEmail).getOrElse(Account(email = validForm.celebrityEmail))
               val savedAccount = acct.copy(celebrityId = Some(savedWithImages.id)).withPassword(validForm.celebrityPassword).right.get.save()
               
-              savedWithImages.sendWelcomeEmail(savedAccount.email)
-              
+              CelebrityWelcomeEmail(
+                toAddress = savedAccount.email,
+                consumerApp = consumerApp,
+                celebrity = savedWithImages
+              ).send()
+
               Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
             }
           )

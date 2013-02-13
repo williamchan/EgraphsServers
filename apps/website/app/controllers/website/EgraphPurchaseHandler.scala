@@ -4,8 +4,7 @@ import com.google.inject._
 import models._
 import models.enums._
 import play.api.mvc._
-import services.mail.TransactionalMail
-import services.mvc.OrderConfirmationEmail
+import services.email.OrderConfirmationEmail
 import services.payment.{Charge, Payment}
 import sjson.json.Serializer
 import services.db.{DBSession, TransactionSerializable}
@@ -18,12 +17,12 @@ import org.joda.money.Money
 import services.http.forms.purchase.CheckoutShippingForm
 import controllers.routes.WebsiteControllers.getFAQ
 import services._
+import models.frontend.email.OrderConfirmationEmailViewModel
 import services.http.EgraphsSession.Conversions._
-import models.frontend.email.OrderConfirmationViewModel
 import services.Finance.TypeConversions._
 import _root_.frontend.formatting.DateFormatting.Conversions._
+
 case class EgraphPurchaseHandlerServices @Inject() (
-  mail: TransactionalMail,
   customerStore: CustomerStore,
   accountStore: AccountStore,
   cashTransactionStore: CashTransactionStore,
@@ -175,7 +174,7 @@ case class EgraphPurchaseHandler(
 
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
     OrderConfirmationEmail(
-      OrderConfirmationViewModel(
+      OrderConfirmationEmailViewModel(
         buyerName = buyerName,
         buyerEmail = buyerEmail,
         recipientName = recipientName,
@@ -188,7 +187,7 @@ case class EgraphPurchaseHandler(
         deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
         faqHowLongLink = services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
         hasPrintOrder = maybePrintOrder.isDefined
-      ), services.mail
+      )
     ).send()
 
     // Clear out the shopping cart and redirect

@@ -14,6 +14,7 @@ import services.config.ConfigFileProxy
 import services.http.EgraphsSession.Conversions._
 import play.api.data._
 import play.api.data.Forms._
+import services.email.AccountCreationEmail
 
 private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { this: Controller =>
 
@@ -63,12 +64,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           if (shouldSendWelcomeEmail) {
             dbSession.connected(TransactionSerializable) {
               val account = customer.account.withResetPasswordKey.save()
-              Customer.sendNewCustomerEmail(
-                account = account, 
-                verificationNeeded = false, 
-                mail = customer.services.mail,
-                consumerApp = consumerApp
-              )
+              AccountCreationEmail(account = account, verificationNeeded = false).send()
             }
           }
 
