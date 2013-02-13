@@ -5,10 +5,8 @@ import scala.concurrent.duration._
 import java.util.Random
 import com.google.inject.Inject
 import twitter4j.TwitterException
-import akka.actor.Actor
-import akka.actor.ActorRef
-import akka.actor.Props
-import akka.agent.Agent
+import akka.actor._
+import akka.agent._
 import akka.pattern.ask
 import akka.util._
 import play.api.Play.current

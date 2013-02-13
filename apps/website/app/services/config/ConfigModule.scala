@@ -2,7 +2,7 @@ package services.config
 
 import com.google.inject.{Singleton, AbstractModule, Provider}
 
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 import play.api.Play
 
 /**

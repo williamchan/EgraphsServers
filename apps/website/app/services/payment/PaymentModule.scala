@@ -1,6 +1,6 @@
 package services.payment
 
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 import services.Utils
 import com.google.inject.{Inject, Provider, AbstractModule, Singleton}
 import services.inject.InjectionProvider

@@ -26,7 +26,8 @@ object WebsiteBuild extends Build {
       "com.google.zxing" % "core" % "2.0",
       "com.google.zxing" % "javase" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
-      "com.typesafe.akka" % "akka-agent" % "2.0.2",
+      "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0",
+      "com.typesafe.akka" % "akka-agent_2.10" % "2.1.0",
       "com.typesafe" %% "play-plugins-mailer" % "2.1.0" excludeAll(
         ExclusionRule(organization="com.cedarsoft")
       ),

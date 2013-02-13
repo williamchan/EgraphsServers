@@ -1,6 +1,6 @@
 package services.blobs
 
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 import com.google.inject.{ Singleton, AbstractModule }
 import services.http.twitter.TwitterProvider
 import twitter4j.api.UsersResources

@@ -6,7 +6,7 @@ import models.categories.CategoryServices
 import services.mvc.marketplace.MarketplaceServices
 import vbg._
 import xyzmo._
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 
 /**
  * Guice bindings for all model services.
