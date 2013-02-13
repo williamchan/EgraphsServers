@@ -164,14 +164,16 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           availableOnly = availableOnly
         ))
       } else {
-        // No search options so serve the landing page. Every vertical has a category value which decides what to
-        // display here. Limit to three results to keep both verticals above the fold. What is a newspaper?
-        val resultSets = for(vertical <- verticalStore.verticals) yield {
-          val categoryValue = vertical.categoryValue
-          val results = celebrityStore.marketplaceSearch(Option(vertical.featuredQuery), List(Seq(categoryValue.id)))
-          ResultSetViewModel(subtitle = Option(categoryValue.publicName),
-                             verticalUrl = Option(vertical.urlSlug),
-                             celebrities = results.slice(0,3))
+        // No search options so serve the landing page. If a vertical has a category value which feature stars, it is
+        // displayed via this query.  Limit to three results to keep verticals above the fold.
+        val resultSets =
+          for(vertical <- verticalStore.verticals;
+             featuredQuery <- vertical.featuredQuery) yield {
+            val categoryValue = vertical.categoryValue
+            val results = celebrityStore.marketplaceSearch(Option(featuredQuery), List(Seq(categoryValue.id)))
+            ResultSetViewModel(subtitle = Option(categoryValue.publicName),
+                               verticalUrl = Option(vertical.urlSlug),
+                               celebrities = results.slice(0,3))
         }
         // Serve the landing page.
         Ok(views.html.frontend.marketplace_landing(

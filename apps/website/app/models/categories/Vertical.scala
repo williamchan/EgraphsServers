@@ -26,9 +26,9 @@ object VerticalStore {
 case class Vertical(categoryValue: CategoryValue,
                     shortName: String,
                     urlSlug: String,
-                    iconUrl: String,
-                    tileUrl: String,
-                    featuredQuery: String) {
+                    iconUrl: Option[String] = None,
+                    tileUrl: Option[String] = None,
+                    featuredQuery: Option[String] = None) {
   lazy val categories = {
     categoryValue.categories
   }
@@ -38,13 +38,20 @@ case class Vertical(categoryValue: CategoryValue,
 class VerticalStore @Inject() (categoryStore: CategoryStore) {
 
   lazy val verticals : Iterable[Vertical] = {
-    for(cv <- category.categoryValues) yield {
+    val maybeVerticals = for(cv <- category.categoryValues) yield {
       cv.name match {
-        case "MLB" => Vertical(categoryValue = cv, shortName = "MLB", urlSlug = "major-league-baseball",
-          iconUrl = "images/icon-logo-mlb.png", tileUrl = "images/mlb-stadium.jpg", featuredQuery ="mlb-featured")
-        case "NBA" => Vertical(categoryValue = cv, tileUrl ="images/nba-stadium.jpg", shortName = "NBA", urlSlug = "national-basketball-association",
-          iconUrl = "images/icon-logo-nba.png", featuredQuery ="nba-featured")
+        case "MLB" => Some(Vertical(categoryValue = cv, shortName = "MLB", urlSlug = "major-league-baseball",
+          iconUrl = Some("images/icon-logo-mlb.png"), tileUrl = Some("images/mlb-stadium.jpg"), featuredQuery =Some("mlb-featured")))
+        case "NBA" => Some(Vertical(categoryValue = cv, tileUrl = Some("images/nba-stadium.jpg"), shortName = "NBA", urlSlug = "national-basketball-association",
+          iconUrl = Some("images/icon-logo-nba.png"), featuredQuery =Some("nba-featured")))
+        case "Racing" => Some(Vertical(categoryValue = cv, shortName = "Racing", urlSlug = "racing"))
+        case _ => None // Don't shit a brick if someone inadvertently adds a vertical
       }
+    }
+
+    for(maybeVertical <- maybeVerticals;
+        vertical <- maybeVertical ) yield {
+      vertical
     }
   }
 
