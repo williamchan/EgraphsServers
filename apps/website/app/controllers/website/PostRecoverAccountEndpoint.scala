@@ -2,12 +2,11 @@ package controllers.website
 
 import play.api.mvc._
 import services.db.{DBSession, TransactionSerializable}
-import models.{Account, CustomerStore, AccountStore}
-import services.mail.TransactionalMail
+import models.Account
 import org.apache.commons.mail.HtmlEmail
 import services.http.POSTControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
-import services.{ConsumerApplication, Utils}
+import services.Utils
 import services.http.filters.HttpFilters
 import controllers.routes.WebsiteControllers.getResetPassword
 import egraphs.authtoken.AuthenticityToken
@@ -21,11 +20,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
 
   protected def dbSession: DBSession
   protected def postController: POSTControllerMethod
-  protected def accountStore: AccountStore
-  protected def customerStore: CustomerStore
   protected def httpFilters: HttpFilters  
-  protected def transactionalMail: TransactionalMail
-  protected def consumerApp: ConsumerApplication
 
   def postRecoverAccount() = postController() {
     AuthenticityToken.makeAvailable() { implicit authToken =>
@@ -35,12 +30,7 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
             account.withResetPasswordKey.save()
           }
 
-          ResetPasswordEmail(
-            account = accountWithResetPassKey,
-            consumerApp = consumerApp,
-            mailService = transactionalMail
-          ).send()
-  
+          ResetPasswordEmail(account = accountWithResetPassKey).send()
           val flashEmail = Utils.getFromMapFirstInSeqOrElse("email", "", request.queryString)
           
           // TODO: Replace this OK with a Redirect to a GET.

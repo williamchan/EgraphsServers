@@ -64,12 +64,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           if (shouldSendWelcomeEmail) {
             dbSession.connected(TransactionSerializable) {
               val account = customer.account.withResetPasswordKey.save()
-              AccountCreationEmail(
-                account = account,
-                verificationNeeded = false,
-                consumerApp = consumerApp,
-                mailService = customer.services.mail
-              ).send()
+              AccountCreationEmail(account = account, verificationNeeded = false).send()
             }
           }
 

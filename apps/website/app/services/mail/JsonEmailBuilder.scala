@@ -22,6 +22,8 @@ object JsonEmailBuilder {
               "Reply-To" -> Json.toJson(mailStack.replyToEmail)
             )
           ),
+          "track_opens" -> Json.toJson(true),
+          "track_clicks" -> Json.toJson(true),
           "auto_text" -> Json.toJson(true),
           "bcc_address" -> Json.toJson(mailStack.bccAddress.getOrElse(""))
         )

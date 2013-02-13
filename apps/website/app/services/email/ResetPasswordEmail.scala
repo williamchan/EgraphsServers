@@ -1,18 +1,19 @@
 package services.email
 
+import models.frontend.email._
+import models.enums.EmailType
+import models.Account
 import services.mail.TransactionalMail
 import services.logging.Logging
-import models.frontend.email._
+import services.AppConfig
 import services.mail.MailUtils
-import models.enums.EmailType
 import services.ConsumerApplication
-import models.Account
 import controllers.routes.WebsiteControllers.getResetPassword
 
 case class ResetPasswordEmail(
   account: Account,
-  consumerApp: ConsumerApplication,
-  mailService: TransactionalMail
+  consumerApp: ConsumerApplication = AppConfig.instance[ConsumerApplication],
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
 ) {
 
   import ResetPasswordEmail.log
@@ -21,10 +22,12 @@ case class ResetPasswordEmail(
    * Sends an email so that the customer can reset password via the getResetPassword endpoint
    */
   def send() = {
-    val emailStack = EmailViewModel(subject = "Egraphs Password Recovery",
-                                    fromEmail = "support@egraphs.com",
-                                    fromName = "Egraphs Support",
-                                    toAddresses = List((account.email, None)))
+    val emailStack = EmailViewModel(
+      subject = "Egraphs Password Recovery",
+      fromEmail = "support@egraphs.com",
+      fromName = "Egraphs Support",
+      toAddresses = List((account.email, None))
+    )
 
     val resetPasswordUrl = consumerApp.absoluteUrl(getResetPassword(account.email, account.resetPasswordKey.get).url)
     val resetPasswordEmailStack = ResetPasswordEmailViewModel(email = account.email,

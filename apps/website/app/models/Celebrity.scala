@@ -11,7 +11,6 @@ import services._
 import java.awt.image.BufferedImage
 import services.mail.TransactionalMail
 import org.apache.commons.io.IOUtils
-import org.apache.commons.mail.HtmlEmail
 import models.Celebrity.CelebrityWithImage
 import play.api.Play.current
 import services.Dimensions
@@ -21,7 +20,6 @@ import services.mvc.celebrity.CelebrityViewConversions
 import services.mail.MailUtils
 import play.api.libs.concurrent.Promise
 import models.frontend.marketplace.MarketplaceCelebrity
-import models.frontend.email.{EmailViewModel, CelebrityWelcomeEmailViewModel}
 import play.api.libs.concurrent.Akka
 import services.db.DBSession
 import org.joda.time.DateTimeConstants

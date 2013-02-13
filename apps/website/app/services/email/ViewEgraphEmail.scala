@@ -1,16 +1,20 @@
 package services.email
 
+import models.frontend.email._
+import models.enums.EmailType
+import models.Order
+import models.{Celebrity, CelebrityStore}
 import services.mail.TransactionalMail
 import services.logging.Logging
-import models.frontend.email._
+import services.AppConfig
 import services.mail.MailUtils
-import models.enums.EmailType
 import services.ConsumerApplication
-import models.Order
-import models.Celebrity
 
 case class ViewEgraphEmail(
-  order: Order
+  order: Order,
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail],
+  celebrityStore: CelebrityStore = AppConfig.instance[CelebrityStore],
+  consumerApp: ConsumerApplication = AppConfig.instance[ConsumerApplication]
 ) {
   
   import ViewEgraphEmail.log
@@ -20,15 +24,15 @@ case class ViewEgraphEmail(
 
     if (order.buyerId == order.recipientId) {
       log("Sending view egraph mail to: " + order.buyer.account.email)
-      order.services.mail.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(
+      mailService.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(
           EmailType.ViewEgraph, viewEgraphEmailStack))
     } else {
       log("Sending view gift egraph mail to: " + order.recipient.account.email)
-      order.services.mail.send(emailStack, MailUtils.getViewGiftReceivedEgraphTemplateContentParts(
+      mailService.send(emailStack, MailUtils.getViewGiftReceivedEgraphTemplateContentParts(
           EmailType.ViewEgraph, viewEgraphEmailStack))
 
       log("Sending gift given mail to: " + order.buyer.account.email)
-      order.services.mail.send(maybeGiftEmailStack.get, MailUtils.getViewGiftGivenEgraphTemplateContentParts(
+      mailService.send(maybeGiftEmailStack.get, MailUtils.getViewGiftGivenEgraphTemplateContentParts(
           EmailType.ViewEgraph, viewEgraphEmailStack))
     }    
   }
@@ -49,7 +53,7 @@ case class ViewEgraphEmail(
   }
   
   private def prepareViewEgraphEmailHelper: (String, Celebrity, EmailViewModel, Option[EmailViewModel]) = {
-    val maybeCelebrity = order.services.celebrityStore.findByOrderId(order.id)
+    val maybeCelebrity = celebrityStore.findByOrderId(order.id)
     maybeCelebrity match {
       case None => {
         play.Logger.error("There is no celebrity associated with order ID: " + order.id)
@@ -59,20 +63,24 @@ case class ViewEgraphEmail(
         val buyingCustomer = order.buyer
         val receivingCustomer = order.recipient
 
-        val emailStack = EmailViewModel(subject = "I just finished signing your Egraph",
-                                        fromEmail = celebrity.urlSlug + "@egraphs.com",
-                                        fromName = celebrity.publicName,
-                                        toAddresses = List((receivingCustomer.account.email, None)))
+        val emailStack = EmailViewModel(
+          subject = "I just finished signing your Egraph",
+          fromEmail = celebrity.urlSlug + "@egraphs.com",
+          fromName = celebrity.publicName,
+          toAddresses = List((receivingCustomer.account.email, None))
+        )
 
         val maybeGiftEmailStack: Option[EmailViewModel] =
           if (buyingCustomer != receivingCustomer) {
-            Some(EmailViewModel(subject = "Your gift egraph has been delivered",
-                                fromEmail = "webserver@egraphs.com",
-                                fromName = "Egraphs",
-                                toAddresses = List((buyingCustomer.account.email, None))))
+            Some(EmailViewModel(
+              subject = "Your gift egraph has been delivered",
+              fromEmail = "webserver@egraphs.com",
+              fromName = "Egraphs",
+              toAddresses = List((buyingCustomer.account.email, None))
+            ))
           } else None
 
-        val viewEgraphUrl = order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
+        val viewEgraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
         (viewEgraphUrl, celebrity, emailStack, maybeGiftEmailStack)
       }
     }

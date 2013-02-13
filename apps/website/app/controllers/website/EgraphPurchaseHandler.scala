@@ -4,7 +4,6 @@ import com.google.inject._
 import models._
 import models.enums._
 import play.api.mvc._
-import services.mail.TransactionalMail
 import services.email.OrderConfirmationEmail
 import services.payment.{Charge, Payment}
 import sjson.json.Serializer
@@ -24,7 +23,6 @@ import services.Finance.TypeConversions._
 import _root_.frontend.formatting.DateFormatting.Conversions._
 
 case class EgraphPurchaseHandlerServices @Inject() (
-  mail: TransactionalMail,
   customerStore: CustomerStore,
   accountStore: AccountStore,
   cashTransactionStore: CashTransactionStore,
@@ -189,7 +187,7 @@ case class EgraphPurchaseHandler(
         deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
         faqHowLongLink = services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
         hasPrintOrder = maybePrintOrder.isDefined
-      ), services.mail
+      )
     ).send()
 
     // Clear out the shopping cart and redirect

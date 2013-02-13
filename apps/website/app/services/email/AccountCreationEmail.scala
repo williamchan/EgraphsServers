@@ -1,28 +1,31 @@
 package services.email
 
+import models.frontend.email._
+import models.enums.EmailType
+import models.Account
 import services.mail.TransactionalMail
 import services.logging.Logging
-import models.frontend.email._
 import services.mail.MailUtils
-import models.enums.EmailType
+import services.AppConfig
 import services.ConsumerApplication
-import models.Account
 import controllers.routes.WebsiteControllers.getVerifyAccount
 
 case class AccountCreationEmail(
   account: Account, 
   verificationNeeded: Boolean = false, 
-  consumerApp: ConsumerApplication,
-  mailService: TransactionalMail
+  consumerApp: ConsumerApplication = AppConfig.instance[ConsumerApplication],
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
 ) {
 
   import AccountCreationEmail.log
   
   def send() {  
-    val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
-                                    fromEmail = "webserver@egraphs.com",
-                                    fromName = "Egraphs",
-                                    toAddresses = List((account.email, None)))
+    val emailStack = EmailViewModel(
+      subject = "Welcome to Egraphs!",
+      fromEmail = "webserver@egraphs.com",
+      fromName = "Egraphs",
+      toAddresses = List((account.email, None))
+    )
 
     val templateContentParts = if (verificationNeeded) {
       val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)

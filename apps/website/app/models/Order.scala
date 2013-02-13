@@ -13,7 +13,6 @@ import com.google.inject._
 import mail.TransactionalMail
 import payment.{Charge, Payment}
 import org.squeryl.Query
-import org.apache.commons.mail.HtmlEmail
 import com.google.inject.Inject
 import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints

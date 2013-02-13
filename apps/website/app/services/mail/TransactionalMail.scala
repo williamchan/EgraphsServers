@@ -52,7 +52,7 @@ private[mail] class StubTransactionalMail extends TransactionalMail {
 
     // this won't include the header and footer, which are shared across all transactional mail;
     // look at the General template from the Mandrill console to see header/footer html
-    templateContentParts.foreach(nameTemplatePair => play.Logger.info("HTML BODY: " + nameTemplatePair._2))
+    templateContentParts.foreach{ case (name, htmlContent) => play.Logger.info("HTML BODY: " + htmlContent) }
   }
 }
 
@@ -69,7 +69,7 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
 
     notWaitingResponse.fold(
       onError => throw new Exception("Something went wrong with email send"),
-      onSuccess => play.Logger.info("Send-template response: " + notWaitingResponse.get.body.toString)
+      onSuccess => play.Logger.info("Send-template response: " + notWaitingResponse.get.body)
     )
   }
 }

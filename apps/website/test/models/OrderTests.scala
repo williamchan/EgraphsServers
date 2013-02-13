@@ -256,7 +256,7 @@ class OrderTests extends EgraphsUnitTest
     refundTxn.currencyCode should be(CurrencyUnit.USD.getCode)
   }
 
-  "prepareEgraphsSignedEmail" should "not use celebrity's email" in new EgraphsTestApplication {
+  "prepareViewEgraphEmail" should "not use celebrity's email" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
     implicit val request = FakeRequest()

@@ -1,24 +1,26 @@
 package services.email
 
+import models.frontend.email._
+import models.enums.EmailType
 import services.mail.TransactionalMail
 import services.logging.Logging
-import models.frontend.email._
+import services.AppConfig
 import services.mail.MailUtils
-import models.enums.EmailType
 
 case class OrderConfirmationEmail(
   orderConfirmationEmailStack: OrderConfirmationEmailViewModel,
-  mailService: TransactionalMail
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
 ) {
 
   import OrderConfirmationEmail.log
   
   def send() {
-    val emailStack = EmailViewModel(subject = "Order Confirmation",
-                                    fromEmail = "webserver@egraphs.com",
-                                    fromName = "Egraphs",
-                                    toAddresses = List((orderConfirmationEmailStack.buyerEmail,
-                                        Some(orderConfirmationEmailStack.buyerName))))
+    val emailStack = EmailViewModel(
+      subject = "Order Confirmation",
+      fromEmail = "webserver@egraphs.com",
+      fromName = "Egraphs",
+      toAddresses = List((orderConfirmationEmailStack.buyerEmail, Some(orderConfirmationEmailStack.buyerName)))
+    )
 
     val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
 

@@ -1,7 +1,6 @@
 package controllers.website.admin
 
 import models._
-import services.mail.TransactionalMail
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import controllers.WebsiteControllers
@@ -25,7 +24,6 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   protected def httpFilters: HttpFilters
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
-  protected def transactionalMail: TransactionalMail
   protected def consumerApp: ConsumerApplication
 
   def postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = postController() {
@@ -42,7 +40,6 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
                   toAddress = emailAddress,
                   consumerApp = consumerApp,
                   celebrity = celebrity,
-                  mailService = transactionalMail,
                   bccEmail = Some(adminAccount.email)
                 ).send()
 

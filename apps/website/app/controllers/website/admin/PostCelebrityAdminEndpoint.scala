@@ -16,7 +16,6 @@ import java.io.File
 import play.api.mvc.MultipartFormData
 import java.awt.image.BufferedImage
 import services.{ImageUtil, Utils}
-import services.mail.TransactionalMail
 import services.blobs.Blobs.Conversions._
 import controllers.routes.WebsiteControllers.{getCreateCelebrityAdmin, getCelebrityAdmin}
 import org.joda.time.DateTimeConstants
@@ -30,7 +29,6 @@ trait PostCelebrityAdminEndpoint {
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
-  protected def transactionalMail: TransactionalMail
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
   protected def consumerApp: ConsumerApplication
@@ -106,8 +104,7 @@ trait PostCelebrityAdminEndpoint {
               CelebrityWelcomeEmail(
                 toAddress = savedAccount.email,
                 consumerApp = consumerApp,
-                celebrity = savedWithImages,
-                mailService = transactionalMail
+                celebrity = savedWithImages
               ).send()
 
               Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")

@@ -360,10 +360,12 @@ class Scenarios extends DeclaresScenarios {
   servicesCategory,
   """Sends account verification email to will@egraphs.com using the configured SMTP server""", {
     () =>
-      val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
-                                      fromEmail = "webserver@egraphs.com",
-                                      fromName = "Egraphs",
-                                      toAddresses = List(("will@egraphs.com", Some("Wizzle"))))
+      val emailStack = EmailViewModel(
+        subject = "Welcome to Egraphs!",
+        fromEmail = "webserver@egraphs.com",
+        fromName = "Egraphs",
+        toAddresses = List(("will@egraphs.com", Some("Wizzle")))
+      )
 
       val verifyPasswordUrl = "https://www.google.com"
       val accountVerificationTemplateContentParts = MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification,
@@ -378,10 +380,12 @@ class Scenarios extends DeclaresScenarios {
   servicesCategory,
   """Sends order confirmation email to will@egraphs.com using the configured SMTP server""", {
     () =>
-      val emailStack = EmailViewModel(subject = "Order Confirmation",
-                                      fromEmail = "webserver@egraphs.com",
-                                      fromName = "Egraphs",
-                                      toAddresses = List(("will@egraphs.com", Some("Wizzle"))))
+      val emailStack = EmailViewModel(
+        subject = "Order Confirmation",
+        fromEmail = "webserver@egraphs.com",
+        fromName = "Egraphs",
+        toAddresses = List(("will@egraphs.com", Some("Wizzle")))
+      )
 
       val orderConfirmationEmailStack =
         OrderConfirmationEmailViewModel(
@@ -399,8 +403,8 @@ class Scenarios extends DeclaresScenarios {
           hasPrintOrder = true
         )
 
-        val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
-        mail.send(emailStack, orderConfirmationTemplateContentParts)
+      val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
+      mail.send(emailStack, orderConfirmationTemplateContentParts)
   }
   )
 
@@ -410,10 +414,12 @@ class Scenarios extends DeclaresScenarios {
   """Sends egraph fulfilled email to will@egraphs.com using the configured SMTP server""", {
     () =>
 
-      val emailStack = EmailViewModel(subject = "I just finished signing your egraph",
-                                      fromEmail = "celebrity@egraphs.com",
-                                      fromName = "Celebrity Jane",
-                                      toAddresses = List(("will@egraphs.com", Some("Wizzle"))))
+      val emailStack = EmailViewModel(
+        subject = "I just finished signing your egraph",
+        fromEmail = "celebrity@egraphs.com",
+        fromName = "Celebrity Jane",
+        toAddresses = List(("will@egraphs.com", Some("Wizzle")))
+      )
 
       val viewEgraphUrl = "http://www.google.com"
       val viewEgraphEmailStack =

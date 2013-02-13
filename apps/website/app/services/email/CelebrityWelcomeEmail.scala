@@ -1,19 +1,20 @@
 package services.email
 
-import services.mail.TransactionalMail
-import services.logging.Logging
 import models.frontend.email._
-import services.mail.MailUtils
 import models.enums.EmailType
-import services.ConsumerApplication
 import models.Account
 import models.Celebrity
+import services.mail.TransactionalMail
+import services.logging.Logging
+import services.AppConfig
+import services.mail.MailUtils
+import services.ConsumerApplication
 
 case class CelebrityWelcomeEmail(
   toAddress: String,
   consumerApp: ConsumerApplication,
   celebrity: Celebrity,
-  mailService: TransactionalMail,
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail],
   bccEmail: Option[String] = None  
 ) {
 
@@ -25,11 +26,13 @@ case class CelebrityWelcomeEmail(
   * includes a link to download the latest iPad app.
   */  
   def send() = {
-    val emailStack = EmailViewModel(subject = "Welcome to Egraphs!",
-                                    fromEmail = "webserver@egraphs.com",
-                                    fromName = "Egraphs",
-                                    toAddresses = List((toAddress, Some(celebrity.publicName))),
-                                    bccAddress = bccEmail)
+    val emailStack = EmailViewModel(
+      subject = "Welcome to Egraphs!",
+      fromEmail = "webserver@egraphs.com",
+      fromName = "Egraphs",
+      toAddresses = List((toAddress, Some(celebrity.publicName))),
+      bccAddress = bccEmail
+    )
 
     val appDownloadLink = consumerApp.getIOSClient(redirectToItmsLink=true).url
     val celebrityWelcomeEmailStack = CelebrityWelcomeEmailViewModel(celebrityName = celebrity.publicName,
