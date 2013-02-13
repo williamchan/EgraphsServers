@@ -1,7 +1,5 @@
 package services.mail
 
-import scala.collection.JavaConversions._
-
 import com.google.inject.Inject
 import play.api.Play.current
 import play.api.libs.json.JsValue
@@ -12,6 +10,7 @@ import services.config.ConfigFileProxy
 import services.inject.InjectionProvider
 import models.frontend.email.EmailViewModel
 import org.joda.time.DateTimeConstants
+import play.api.libs.concurrent.Akka
 
 /** Interface for sending transactional mails. Transactional mails are
  *  one-off recipient-specific mail, such as account confirmation, order
@@ -65,11 +64,9 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
     val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key)
 
     val promiseResponse = WS.url(actionUrl + methodAndOutputFormat).post(jsonIterable)
-    val notWaitingResponse = promiseResponse.await(DateTimeConstants.MILLIS_PER_MINUTE)
 
-    notWaitingResponse.fold(
-      onError => throw new Exception("Something went wrong with email send"),
-      onSuccess => play.Logger.info("Send-template response: " + notWaitingResponse.get.body)
-    )
+    promiseResponse.onRedeem {
+      response => play.Logger.info("Send-template response: " + response.body)
+    }
   }
 }
