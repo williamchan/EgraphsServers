@@ -59,10 +59,12 @@
     <h2>Find your team on Egraphs</h2>
       <div class="row">
         <div class="clearfix">
-          @for(vertical <- verticalViewModels) {
+          @for(vertical <- verticalViewModels;
+               iconUrl <- vertical.iconUrl
+            ) {
 
             <article class="span6">
-              <a id="@vertical.shortName" class="vertical-button" name="@vertical.shortName" data-vertical="@vertical.urlSlug"><img src="@EgraphsAssets.at(vertical.iconUrl)"/>
+              <a id="@vertical.shortName" class="vertical-button" name="@vertical.shortName" data-vertical="@vertical.urlSlug"><img src="@EgraphsAssets.at(iconUrl)"/>
                 <h3>@vertical.shortName</h3>
               </a>
               <ul>
@@ -89,12 +91,15 @@
   <div id="verticals" class="module">
     <div class="row">
       <div class="clearfix">
-        @for(vertical <- verticals) {
+        @for(vertical <- verticals;
+             tileUrl <- vertical.tileUrl;
+             iconUrl <- vertical.iconUrl
+        ) {
           <div class="vertical-select span4">
             <a class="glowborder vertical-tile" title="Shop @vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" href="#">
-              <div class="backdrop" style="background-image: url('@EgraphsAssets.at(vertical.tileUrl).url')">
+              <div class="backdrop" style="background-image: url('@EgraphsAssets.at(tileUrl).url')">
                 <h3>@vertical.shortName &gt;&gt;</i></h3>
-                <img class="icon" src="@EgraphsAssets.at(vertical.iconUrl).url"/>
+                <img class="icon" src="@EgraphsAssets.at(iconUrl).url"/>
               </div>
             </a>
           </div> 

@@ -46,8 +46,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
 
   def verticalSet: List[VerticalViewModel] = {
     List(
-      VerticalViewModel(id = 1, urlSlug="major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = "images/icon-logo-mlb.png", active = true, categoryViewModels = mlbCategories()),
-      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = "images/icon-logo-nba.png", categoryViewModels = nbaCategories() )
+      VerticalViewModel(id = 1, urlSlug="major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = Some("images/icon-logo-mlb.png"), active = true, categoryViewModels = mlbCategories()),
+      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = Some("images/icon-logo-nba.png"), categoryViewModels = nbaCategories() )
     )
   }
 
@@ -59,8 +59,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         verticalName = "mlb",
         publicName = "Major League Baseball",
         shortName = "MLB",
-        iconUrl = "images/icon-logo-mlb.png",
-        tileUrl = "images/mlb-stadium.jpg",
+        iconUrl = Some("images/icon-logo-mlb.png"),
+        tileUrl = Some("images/mlb-stadium.jpg"),
         categoryViewModels = mlbCategories(Option(false))
       ),
       VerticalViewModel(id = 2,
@@ -69,8 +69,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         verticalName = "nba",
         publicName = "National Basketball Association",
         shortName = "NBA",
-        iconUrl = "images/icon-logo-nba.png",
-        tileUrl = "images/nba-stadium.jpg",
+        iconUrl = Some("images/icon-logo-nba.png"),
+        tileUrl = Some("images/nba-stadium.jpg"),
         categoryViewModels = mlbCategories(Option(false))
       )
     )

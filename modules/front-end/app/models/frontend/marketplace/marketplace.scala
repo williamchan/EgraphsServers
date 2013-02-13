@@ -148,8 +148,8 @@ case class VerticalViewModel(
   publicName: String,
   shortName: String,
   urlSlug: String,
-  iconUrl: String,
-  tileUrl: String = "",
+  iconUrl: Option[String] = None,
+  tileUrl: Option[String] = None,
   active: Boolean = false,
   id: Long,
   categoryViewModels : Iterable[CategoryViewModel]

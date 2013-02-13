@@ -135,22 +135,23 @@ class Scenarios extends DeclaresScenarios {
   "Creates a celebrity named William 'Wizzle' Chan. His login/password are" +
     Scenarios.willsEmail + "/" + TestData.defaultPassword + ". He has a profile photo."
   , {
-    () =>
-      Scenarios.createAdmin()
-      import Blobs.Conversions._
-      val celebrity = Celebrity(
-        publicName = "Wizzle",
-        bio = "Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
-        organization = "Major League Baseball",
-        roleDescription = "Egraphs"
-      ).withPublishedStatus(PublishedStatus.Published).save()
-      Account(email = Scenarios.willsEmail,
-        celebrityId = Some(celebrity.id)
-      ).withPassword(TestData.defaultPassword).right.get.save()
-      celebrity.saveWithProfilePhoto(Play.getFile("test/resources/will_chan_celebrity_profile.jpg"))
-      celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save()
-      featured.updateFeaturedCelebrities(List(celebrity.id))
-  }
+      () =>
+        Scenarios.createAdmin()
+        import Blobs.Conversions._
+        Scenarios.getWillCelebrityAccount.getOrElse {
+          val celebrity = Celebrity(
+            publicName = "Wizzle",
+            bio = "Love my fans from New York to Tokyo, from Seoul to the Sudetenland. And for all you haters out there -- don't mess around. I sleep with one eye closed, the other fixed on my Vespene gas supply.",
+            organization = "Major League Baseball",
+            roleDescription = "Egraphs").withPublishedStatus(PublishedStatus.Published).save()
+          Account(email = Scenarios.willsEmail,
+            celebrityId = Some(celebrity.id)).withPassword(TestData.defaultPassword).right.get.save()
+          celebrity.saveWithProfilePhoto(Play.getFile("test/resources/will_chan_celebrity_profile.jpg"))
+          celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save()
+
+          featured.updateFeaturedCelebrities(List(celebrity.id))
+        }
+    }
   )
 
   toScenarios add Scenario(
@@ -163,7 +164,7 @@ class Scenarios extends DeclaresScenarios {
     first established dominance in the arena of Pweendom.
   """, {
     () =>
-      val will = Scenarios.getWillCelebrityAccount
+      val will = Scenarios.getWillCelebrityAccount.get
       val photoImage = Some(Product().defaultPhoto.renderFromMaster)
       val iconImage = Some(Product().defaultIcon.renderFromMaster)
       val product1 = will.addProduct(
@@ -336,7 +337,7 @@ class Scenarios extends DeclaresScenarios {
     biometric profiles for him on real services.
   """, {
     () =>
-      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+      Scenarios.getWillCelebrityAccount.get.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
   }
   )
 
@@ -348,7 +349,7 @@ class Scenarios extends DeclaresScenarios {
     attempt to make biometric profiles for him on real services.
   """, {
     () =>
-      Scenarios.getWillCelebrityAccount.withEnrollmentStatus(EnrollmentStatus.FailedEnrollment).save()
+      Scenarios.getWillCelebrityAccount.get.withEnrollmentStatus(EnrollmentStatus.FailedEnrollment).save()
   }
   )
 
@@ -529,7 +530,7 @@ class Scenarios extends DeclaresScenarios {
   private[this] def createAndSaveStarcraftProduct: Product = {
     Scenario.play("Will-Chan-is-a-celebrity")
 
-    val will = Scenarios.getWillCelebrityAccount
+    val will = Scenarios.getWillCelebrityAccount.get
     createProduct(celebrity = will,
       priceInCurrency=100,
       name="2010 Starcraft 2 Championships",
@@ -564,12 +565,12 @@ object Scenarios {
   private val willsEmail = "wchan83@egraphs.com"
   private val eremEmail = "erem_mere@egraphs.com"
 
-  def getWillAccount: Account = {
-    accountStore.findByEmail(willsEmail).get
+  def getWillAccount: Option[Account] = {
+    accountStore.findByEmail(willsEmail)
   }
 
-  def getWillCelebrityAccount: Celebrity = {
-    celebrityStore.get(getWillAccount.celebrityId.get)
+  def getWillCelebrityAccount: Option[Celebrity] = {
+    getWillAccount.map{ will => celebrityStore.get(will.celebrityId.get) }
   }
 
   def getWillsTwoProducts: (Product, Product) = {

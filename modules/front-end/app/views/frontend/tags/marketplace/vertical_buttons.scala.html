@@ -6,8 +6,13 @@
 @import views.frontend.Utils
 @import models.frontend.egraphs._
 <ul class="top-verticals-nav">
-@for(vertical <- verticalViewModels) {
-     <li><a id="@vertical.shortName" class="vertical-button btn btn-primary @if(vertical.active){active}" data-vertical="@vertical.urlSlug"><img src='@EgraphsAssets.at(vertical.iconUrl)'> <span>@vertical.shortName</span></a></li>
-  
+@for(vertical <- verticalViewModels;
+     iconUrl <- vertical.iconUrl) {
+     <li>
+       <a id="@vertical.shortName" class="vertical-button btn btn-primary @if(vertical.active){active}" data-vertical="@vertical.urlSlug">
+         <img src='@EgraphsAssets.at(iconUrl)'>
+         <span>@vertical.shortName</span>
+       </a>
+     </li>
 }
 </ul> <!-- end .top-verticals-nav -->

@@ -5,6 +5,8 @@ import services.AppConfig
 import services.db.Schema
 import services.cache.CacheFactory
 import services.Utils
+import java.sql.BatchUpdateException
+import play.Logger
 
 /**
  * An executable scenario.
@@ -33,7 +35,10 @@ case class Scenario(name: String, category: String = "Uncategorized", descriptio
       instructions()
     }
     catch {
-      case exc:Throwable =>
+      case sqlEx: BatchUpdateException => 
+        Logger.info("SQL error: ", sqlEx.getNextException)
+        throw new RuntimeException("Error while executing scenario \"" + name + "\"" + sqlEx.getMessage(), sqlEx)
+      case exc: Throwable =>
         throw new RuntimeException("Error while executing scenario \"" + name + "\"" + exc.getMessage, exc)
     }
   }
