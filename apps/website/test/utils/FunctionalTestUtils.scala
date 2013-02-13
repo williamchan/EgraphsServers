@@ -1,7 +1,9 @@
 package utils
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import play.api.test.FakeRequest
-import play.api.mvc.{ AnyContent, Call }
+import play.api.mvc.{ AnyContent, AnyContentAsEmpty, Call }
 import play.api.Play
 import play.api.test.Helpers._
 import play.api.Configuration
@@ -28,22 +30,45 @@ import scenario.RepeatableScenarios
  */
 object FunctionalTestUtils {
 
-  def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
+  implicit class EgraphsFakeRequest[A](request: FakeRequest[A]) {
+    def withCustomerId(id: Long): FakeRequest[A] = {
+      request.withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
+    }
+
+    def withAdminId(id: Long): FakeRequest[A] = {
+      request.withSession(EgraphsSession.Key.AdminId.name -> id.toString)
+    }
+
+    def withCredentials(user: String, password: String): FakeRequest[A] = {
+      val auth = BasicAuth.Credentials(user, password)
+      request.withHeaders(auth.toHeader)
+    }
+
+    def withCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[A] = {
+      withCredentials(account.email, password)
+    }
+  }
+
+  @deprecated("use EgraphsFakeRequest.withCustomerId instead", "as of play 2.10")
+  def requestWithCustomerId(id: Long): FakeRequest[AnyContentAsEmpty.type] = {
     FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
   }
 
-  def requestWithAdminId(id: Long): FakeRequest[AnyContent] = {
+  @deprecated("use EgraphsFakeRequest.withAdminId instead", "as of play 2.10")
+  def requestWithAdminId(id: Long): FakeRequest[AnyContentAsEmpty.type] = {
     FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
   }
 
   /**
    * Makes an API request verified by the credentials from provided account
    */
-  def requestWithCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[AnyContent] = {
+  @deprecated("use EgraphsFakeRequest.withCredentials instead", "as of play 2.10")
+  def requestWithCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[AnyContentAsEmpty.type] = {
     requestWithCredentials(account.email, password)
   }
 
-  def requestWithCredentials(user: String, password: String): FakeRequest[AnyContent] = {
+  @deprecated("use EgraphsFakeRequest.withCredentials instead", "as of play 2.10")
+  def requestWithCredentials(user: String, password: String): FakeRequest[AnyContentAsEmpty.type] = {
     val auth = BasicAuth.Credentials(user, password)
 
     FakeRequest().withHeaders(auth.toHeader)
@@ -73,9 +98,10 @@ object FunctionalTestUtils {
         val chunkedByteResult = chunkedResult.asInstanceOf[ChunkedResult[Array[Byte]]]
         var bytesVec = Vector.empty[Byte]
         val countIteratee = Iteratee.fold[Array[Byte], Unit](0) { (_, bytes) => bytesVec = bytesVec ++ bytes }
-        val promisedIteratee = chunkedByteResult.chunks(countIteratee).asInstanceOf[Promise[Iteratee[Array[Byte], Unit]]]
+        val futureIteratee = chunkedByteResult.chunks(countIteratee).asInstanceOf[Future[Iteratee[Array[Byte], Unit]]]
 
-        promisedIteratee.await(5000).get.run.await(5000).get
+        val future = Await.result(futureIteratee, 5 seconds).run
+        Await.result(future, 5 seconds)
 
         bytesVec
 
@@ -95,7 +121,7 @@ object FunctionalTestUtils {
   trait NonProductionEndpointTests { this: EgraphsUnitTest =>
     import play.api.test.Helpers._
     protected def routeUnderTest: Call
-    protected def successfulRequest: FakeRequest[AnyContent] = {
+    protected def successfulRequest: FakeRequest[_] = {
       FakeRequest(routeUnderTest.method, routeUnderTest.url)
     }
 
@@ -124,8 +150,9 @@ object FunctionalTestUtils {
 
     val authToken = "fake-auth-token"
 
+    @deprecated("Just set this on for FakeRequest directly.", "Since Play 2.1")
     def toRoute(route: Call): FakeRequest[T] = {
-      request.copy(method = route.method, uri = route.url)
+      throw new UnsupportedOperationException("This no longer works in Play 2.1")
     }
 
     def withCustomer(customerId: Long): FakeRequest[T] = {
@@ -171,11 +198,12 @@ object FunctionalTestUtils {
       val existingDataParts = multipartEncodedRequest.body.dataParts
       val existingFiles = multipartEncodedRequest.body.files
       val existingBadParts = multipartEncodedRequest.body.badParts
-      val existingMissingFileParts = multipartEncodedRequest.body.missingFileParts
+      //TODO: verify, this seems to be removed in Play 2.1 this might be okay
+      //val existingMissingFileParts = multipartEncodedRequest.body.missingFileParts
 
       val newDataParts = existingDataParts + ("authenticityToken" -> Seq(authToken))
 
-      val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts, existingMissingFileParts)
+      val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts)
       val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)
       newRequest.asInstanceOf[FakeRequest[T]]
     }

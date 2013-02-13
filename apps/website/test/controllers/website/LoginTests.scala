@@ -25,7 +25,7 @@ import services.http.forms.FormError
 import controllers.routes.WebsiteControllers.{getLogin, postLogin}
 import play.api.test.Helpers._
 import services.db.TransactionSerializable
-import egraphs.playutils.RichResult._
+import egraphs.playutils.ResultUtils.RichResult
 import services.http.forms.CustomerLoginForm.Fields
 import services.http.EgraphsSession.Conversions._
 import utils.CsrfProtectedResourceTests
