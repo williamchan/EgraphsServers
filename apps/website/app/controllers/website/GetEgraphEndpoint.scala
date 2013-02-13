@@ -44,10 +44,6 @@ private[controllers] trait GetEgraphEndpoint extends ImplicitHeaderAndFooterData
     }
   }
 
-  // Keeping this route for the time being because our Twitter Card application was submitted with www.egraphs.com/66/new
-  // See https://dev.twitter.com/form/participate-twitter-cards
-  def getEgraphTemp = { getEgraph(66) }
-
   /**
    * Serves up a single egraph HTML page. The egraph number is actually the number
    * of the associated order, as several attempts to satisfy an egraph could have
