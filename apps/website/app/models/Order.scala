@@ -74,6 +74,32 @@ object Order {
     Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes)
   }
 
+  def apply(
+    id: Long,
+    product: Product,
+    buyerId: Long,
+    recipientId: Long,
+    recipientName: String,
+    amountPaidInCents: BigDecimal,
+    _reviewStatus: String,
+    _orderType: String,
+    requestedMessage: Option[String],
+    messageToCelebrity: Option[String]
+  ): Order = {
+    new Order(
+      id = id,
+      productId = product.id,
+      buyerId = buyerId,
+      recipientId = recipientId,
+      recipientName = recipientName,
+      amountPaidInCurrency = amountPaidInCents, //TODO make sure this is correct amount
+      _reviewStatus = _reviewStatus,
+      _orderType = _orderType,
+      requestedMessage = requestedMessage,
+      messageToCelebrity = messageToCelebrity
+    )
+  }
+
   implicit object OrderFormat extends Format[Order] {
     def writes(order: Order): JsValue = {
       val buyer = order.buyer
@@ -94,7 +120,6 @@ object Order {
         )
       )
 
-      import models.Product.ProductFormat._
       val amountPaidInCents = JsNumber(order.amountPaid.getAmountMinor)
       Json.obj(
         "id" -> order.id,
@@ -106,10 +131,28 @@ object Order {
         "amountPaidInCents" -> amountPaidInCents,
         "reviewStatus" -> order.reviewStatus.name,
         "audioPrompt" -> ("Recipient: " + order.recipientName),
-        "orderType" -> writtenMessageRequestToWrite.name, // Oops, this should be more accurately named writtenMessageType
-        order.renderCreatedUpdatedForApi: _*,
-        optionalFields.toSeq: _*
-      )
+        "orderType" -> writtenMessageRequestToWrite.name // Oops, this should be more accurately named writtenMessageType
+      ) ++
+      Json.obj(order.renderCreatedUpdatedForApi: _*) ++
+      Json.obj(optionalFields.toSeq: _*)
+    }
+
+    def reads(json: JsValue): JsResult[Order] = {
+      JsSuccess {
+        val order = Order(
+          (json \ "id").as[Long],
+          (json \ "product").as[Product],
+          (json \ "buyerId").as[Long],
+          (json \ "recipientId").as[Long],
+          (json \ "recipientName").as[String],
+          (json \ "amountPaidInCents").as[BigDecimal],
+          (json \ "reviewStatus").as[String],
+          (json \ "orderType").as[String],
+          (json \ "requestedMessage").asOpt[String],
+          (json \ "messageToCelebrity").asOpt[String]
+        )
+        order.services.store.withCreatedUpdatedFromJson(order, json)
+      }
     }
   }
 }

@@ -333,13 +333,28 @@ object Celebrity {
     }
   }
 
+  def apply(id: Long, _enrollmentStatus: String, publicName: String): Celebrity = {
+    new Celebrity(id = id, _enrollmentStatus = _enrollmentStatus, publicName = publicName)
+  }
+
   implicit object CelebrityFormat extends Format[Celebrity] {
     def writes(celebrity: Celebrity): JsValue = {
       Json.obj(
         "id" -> celebrity.id,
         "enrollmentStatus" -> celebrity.enrollmentStatus.name,
-        "publicName" -> celebrity.publicName,
-        celebrity.renderCreatedUpdatedForApi: _*)
+        "publicName" -> celebrity.publicName
+      ) ++ Json.obj(celebrity.renderCreatedUpdatedForApi: _*)
+    }
+
+    def reads(json: JsValue): JsResult[Celebrity] = {
+      JsSuccess {
+        val celebrity = Celebrity(
+          (json \ "id").as[Long],
+          (json \ "enrollmentStatus").as[String],
+          (json \ "publicName").as[String]
+        )
+        celebrity.services.store.withCreatedUpdatedFromJson(celebrity, json)
+      }
     }
   }
 }

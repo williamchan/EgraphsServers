@@ -44,7 +44,7 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
   import viewConverting._
   import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriod, resultsCacheKey}
 
-  protected def receive = {
+  def receive = {
     case UpdateCatalogStars(catalogStarsAgent) => {
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.

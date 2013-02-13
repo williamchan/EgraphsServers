@@ -286,6 +286,18 @@ object Product {
     }
   }
 
+  def apply(id: Long, signingScaleW: Int, signingScaleH: Int, signingOriginX: Int, signingOriginY: Int, signingAreaW: Int, signingAreaH: Int): Product = {
+    new Product(
+      id = id,
+      signingScaleW = signingScaleW,
+      signingScaleH = signingScaleH,
+      signingOriginX = signingOriginX,
+      signingOriginY = signingOriginY,
+      signingAreaW = signingAreaW,
+      signingAreaH = signingAreaH
+    )
+  }
+
   implicit object ProductFormat extends Format[Product] {
     def writes(product: Product): JsValue = {
       Json.obj(
@@ -298,8 +310,23 @@ object Product {
         "signingOriginX" -> product.signingOriginX,
         "signingOriginY" -> product.signingOriginY,
         "signingAreaW" -> product.signingAreaW,
-        "signingAreaH" -> product.signingAreaH,
-        product.renderCreatedUpdatedForApi: _*)
+        "signingAreaH" -> product.signingAreaH
+      ) ++ Json.obj(product.renderCreatedUpdatedForApi: _*)
+    }
+
+    def reads(json: JsValue): JsResult[Product] = {
+      JsSuccess {
+        val product = Product(
+          (json \ "id").as[Long],
+          (json \ "signingScaleW").as[Int],
+          (json \ "signingScaleH").as[Int],
+          (json \ "signingOriginX").as[Int],
+          (json \ "signingOriginY").as[Int],
+          (json \ "signingAreaW").as[Int],
+          (json \ "signingAreaH").as[Int]
+        )
+        product.services.store.withCreatedUpdatedFromJson(product, json)
+      }
     }
   }
 }

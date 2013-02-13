@@ -28,7 +28,8 @@ import akka.routing.SmallestMailboxRouter
 // for single celebrity batch
 private[celebrity] class UpdateBatchTwitterFollowersActor() extends Actor with Logging {
   import UpdateTwitterFollowersActor.{ twitter, UpdateTwitterFollowers, LateUpdateTwitterFollowers, TwitterUserLookupResponse, LateTwitterUserLookupResponse }
-  protected def receive = {
+
+  def receive = {
     case UpdateTwitterFollowers(celebritiesWithTwitter) => {
       val twitterFollowers = lookupTwitterDataOrScheduleRetry(celebritiesWithTwitter).getOrElse(Map.empty[Long, Int])
       sender ! TwitterUserLookupResponse(twitterFollowers)
@@ -91,10 +92,9 @@ private[celebrity] class UpdateTwitterFollowersActor @Inject() (
 
   private val TWITTER_MAX_LOOKUP = 100
 
-
   def cache = cacheFactory.applicationCache
 
-  protected def receive = {
+  def receive = {
     case UpdateAllTwitterFollowers => {
       val twitterFollowerCounts = cache.cacheing(resultsCacheKey, cachingPeriod.toSeconds.toInt) {
         // Due to cache miss, this instance must update from twitter.

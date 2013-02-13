@@ -26,11 +26,14 @@ object WebsiteBuild extends Build {
       "com.google.zxing" % "core" % "2.0",
       "com.google.zxing" % "javase" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
+      "com.typesafe.akka" % "akka-agent" % "2.0.2",
       "com.typesafe" %% "play-plugins-mailer" % "2.1.0" excludeAll(
         ExclusionRule(organization="com.cedarsoft")
       ),
-      "org.antlr" % "stringtemplate" % "4.0.2",
       "commons-codec" % "commons-codec" % "1.7",
+      "net.codingwell" % "scala-guice_2.10" % "3.0.2",
+      "net.codingwell" %% "scala-guice" % "3.0.2",
+      "org.antlr" % "stringtemplate" % "4.0.2",
       "org.apache.commons" % "commons-email" % "1.2",
       "org.apache.commons" % "commons-lang3" % "3.1",
       "org.apache.pdfbox" % "pdfbox" % "1.7.1",
@@ -54,7 +57,6 @@ object WebsiteBuild extends Build {
           ExclusionRule(organization = "junit"),
           ExclusionRule(organization = "org.scalatest")
       ),
-      "com.typesafe.akka" % "akka-agent" % "2.0.2",
       "org.scalaz" %% "scalaz-core" % "6.0.4",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
@@ -92,8 +94,7 @@ object WebsiteBuild extends Build {
       EclipseKeys.classpathTransformerFactories += BuildHelpers.playEclipseClasspathAdditions,
 
       resolvers ++= Seq(
-        "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java",
-        "scala-guice" at "https://jenkins-codingwell.rhcloud.com/job/Scala-Guice/lastSuccessfulBuild/artifact/repo"
+        "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java"
       ),
 
       CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml -Dpidfile.path=/dev/null -DdeploymentTime=" + timestamp + " -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$app_dir -XX:ErrorFile=$app_dir/java_error%p.log",

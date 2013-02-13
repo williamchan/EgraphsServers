@@ -18,9 +18,8 @@ private[controllers] trait GetCustomerEgraphsApiEndpoint { this: Controller =>
     httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCustomerId.inAccount(account) { customer =>
         Action {
-          import FulfilledOrderBundle.FulfilledOrderBundleFormat._
           val egraphBundles = orderStore.findFulfilledForCustomer(customer)
-          Ok(Json.arr(egraphBundles))
+          Ok(Json.arr(egraphBundles.map(_.toJson)))
         }
       }
     }
@@ -32,30 +31,42 @@ case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, 
   private val desiredWidth = 480
 
   private def imageUrl = egraph.getEgraphImage(LandscapeEgraphFrame.imageWidthPixels).getSavedUrl(accessPolicy = AccessPolicy.Public)
-}
 
-object FulfilledOrderBundle {
-  implicit object FulfilledOrderBundleFormat extends Format[FulfilledOrderBundle] {
-    def writes(bundle: FulfilledOrderBundle): JsValue = {
-      import _root_.frontend.formatting.DateFormatting.Conversions._
-      val FulfilledOrderBundle(egraph, order, product, celebrity) = bundle
-      val messageToCelebrity = order.messageToCelebrity.getOrElse("")
-      Json.obj(
-        "orderId" -> order.id,
-        "egraphId" -> egraph.id,
-        "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url),
-        "image" -> bundle.imageUrl,
-        "audio" -> egraph.assets.audioMp3Url,
-        "video" -> "",
-        "icon" -> product.iconUrl,
-        "signedAt" -> egraph.getSignedAt.formatDayAsPlainLanguage,
-        "messageToCelebrity" -> messageToCelebrity,
-        "celebrityName" -> celebrity.publicName,
-        "celebritySubtitle" -> celebrity.roleDescription,
-        "celebrityMasthead" -> celebrity.landingPageImage.resizedWidth(bundle.desiredWidth).getSaved(AccessPolicy.Public, Some(0.8f)).url,
-        "productTitle" -> product.name,
-        "recipientName" -> order.recipientName,
-        "recipientId" -> order.recipientId)
-    }
+  def toJson: JsObject = {
+    import _root_.frontend.formatting.DateFormatting.Conversions._
+    val messageToCelebrity = order.messageToCelebrity.getOrElse("")
+    Json.obj(
+      "orderId" -> order.id,
+      "egraphId" -> egraph.id,
+      "url" -> order.services.consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url),
+      "image" -> imageUrl,
+      "audio" -> egraph.assets.audioMp3Url,
+      "video" -> "",
+      "icon" -> product.iconUrl,
+      "signedAt" -> egraph.getSignedAt.formatDayAsPlainLanguage,
+      "messageToCelebrity" -> messageToCelebrity,
+      "celebrityName" -> celebrity.publicName,
+      "celebritySubtitle" -> celebrity.roleDescription,
+      "celebrityMasthead" -> celebrity.landingPageImage.resizedWidth(desiredWidth).getSaved(AccessPolicy.Public, Some(0.8f)).url,
+      "productTitle" -> product.name,
+      "recipientName" -> order.recipientName,
+      "recipientId" -> order.recipientId)
   }
 }
+
+//object FulfilledOrderBundle {
+//  implicit object FulfilledOrderBundleFormat extends Format[FulfilledOrderBundle] {
+//    def writes(bundle: FulfilledOrderBundle): JsValue = {
+//
+//    }
+//
+//    def reads(json: JsValue): JsResult[FulfilledOrderBundle] = {
+//      JsSuccess {
+//        val egraph(
+//          (json \ "egraphId").as[Long],
+//          (json \ "audio").as[String]
+//        )
+//      }
+//    }
+//  }
+//}

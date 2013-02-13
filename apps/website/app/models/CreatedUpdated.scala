@@ -37,6 +37,12 @@ trait HasCreatedUpdated {
 trait SavesCreatedUpdated[T <: KeyedCaseClass[_] with HasCreatedUpdated] {
   this: InsertAndUpdateHooks[T] =>
 
+  def withCreatedUpdatedFromJson(toUpdate: T, json: JsValue): T = {
+    val created = Time.fromApiFormat((json \ "created").as[String])
+    val updated = Time.fromApiFormat((json \ "updated").as[String])
+    withCreatedUpdated(toUpdate, created, updated)
+  }
+
   //
   // Abstract members
   //

@@ -26,7 +26,7 @@ class RebuildSearchIndexActor @Inject() (
   celebrityStore: CelebrityStore) extends Actor with Logging {
   import RebuildSearchIndexActor.RebuildSearchIndex
 
-  protected def receive = {
+  def receive = {
     case RebuildSearchIndex => {
       log("Rebuilding search index starting.")
       db.connected(isolation = TransactionSerializable, readOnly = false) {

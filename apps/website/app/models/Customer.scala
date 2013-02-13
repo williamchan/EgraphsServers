@@ -118,11 +118,24 @@ case class Customer(
 }
 
 object Customer {
+  def apply(id: Long, name: String): Customer = {
+    new Customer(id = id, name = name)
+  }
+
   implicit object CustomerFormat extends Format[Customer] {
     def writes(customer: Customer): JsValue = {
       Json.obj(
         "id" -> customer.id,
         "name" -> customer.name)
+    }
+
+    def reads(json: JsValue): JsResult[Customer] = {
+      JsSuccess {
+        Customer(
+          (json \ "id").as[Long],
+          (json \ "name").as[String]
+        )
+      }
     }
   }
 }

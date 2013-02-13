@@ -88,6 +88,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
     
               case PrintingOption.DoNotPrint =>
                 None
+
+              case other => throw new IllegalStateException("models.enums.PrintingOption cannot have value = " + other)
             }
     
             // View for the billing form.
@@ -240,6 +242,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
 
       case PrintingOption.DoNotPrint =>
         Right((None, None))
+
+      case other => throw new IllegalStateException("models.enums.PrintingOption cannot have value = " + other)
     }
   }
 
