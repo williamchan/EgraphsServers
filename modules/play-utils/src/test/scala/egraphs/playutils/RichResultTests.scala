@@ -1,19 +1,16 @@
 package egraphs.playutils
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.FlatSpec
+import org.specs2.mock.Mockito
 import play.api.mvc.Results._
 import play.api.test._
 import play.api.test.Helpers._
-import org.scalatest.FlatSpec
-import RichResult._
-import org.scalatest.matchers.ShouldMatchers
-import play.api.mvc.Session
-import org.specs2.mock.Mockito
-import play.api.mvc.RequestHeader
+import play.api.mvc._
 import play.api.test.FakeRequest
-import play.api.mvc.WrappedRequest
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
-import play.api.mvc.Result
+import ResultUtils.RichResult
 
 @RunWith(classOf[JUnitRunner])
 class RichResultTests extends FlatSpec with ShouldMatchers {
