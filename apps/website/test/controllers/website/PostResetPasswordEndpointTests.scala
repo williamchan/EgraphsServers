@@ -7,7 +7,8 @@ import controllers.WebsiteControllers
 import utils.EgraphsUnitTest
 import play.api.test._
 import play.api.test.Helpers._
-import egraphs.playutils.RichResult._
+import egraphs.playutils.ResultUtils.RichResult
+
 import play.api.mvc.Result
 import controllers.routes.WebsiteControllers.{postResetPassword, getResetPassword}
 import services.AppConfig

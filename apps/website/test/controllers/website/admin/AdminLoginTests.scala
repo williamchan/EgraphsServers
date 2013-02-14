@@ -2,7 +2,6 @@ package controllers.website.admin
 
 import utils.TestData
 import models.Celebrity
-
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.mvc.Result
@@ -27,9 +26,9 @@ class AdminLoginTests extends EgraphsUnitTest {
       (TestData.newSavedAdministrator(), TestData.newSavedCelebrity())
     }
     
-    val req = FakeRequest().withAdmin(admin.id)
+    val req = FakeRequest(GET, url).withAdmin(admin.id)
     val url = WebsiteControllers.getCelebritiesAdmin().url
-    status(routeAndCall(req.copy(method=GET, uri=url)).get) should be(OK)
+    status(route(req).get) should be(OK)
 
 //    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url))
 //    assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", celebrityIdMap).url))

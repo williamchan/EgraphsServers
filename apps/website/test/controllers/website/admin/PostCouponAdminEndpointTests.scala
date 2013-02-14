@@ -2,7 +2,7 @@ package controllers.website.admin
 
 import play.api.test._
 import play.api.test.Helpers._
-import egraphs.playutils.RichResult._
+import egraphs.playutils.ResultUtils.RichResult
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
 import utils.{AdminProtectedResourceTests, EgraphsUnitTest, FunctionalTestUtils}

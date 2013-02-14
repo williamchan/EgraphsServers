@@ -19,7 +19,6 @@ import play.api.mvc.Result
 import play.api.mvc.AnyContent
 import utils.CsrfProtectedResourceTests
 
-
 class PostOrderConfigureEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
   private def orderStore = AppConfig.instance[OrderStore]
   private def db = AppConfig.instance[DBSession]
@@ -33,8 +32,8 @@ class PostOrderConfigureEndpointTests extends EgraphsUnitTest with CsrfProtected
       (order, order.recipient, TestData.newSavedCustomer())
     }
 
-    private def perform(
-      request: FakeRequest[AnyContent], 
+    private def perform[A](
+      request: FakeRequest[A], 
       newPrivacy: String=PrivacyStatus.Public.name
     ): Result = 
     {

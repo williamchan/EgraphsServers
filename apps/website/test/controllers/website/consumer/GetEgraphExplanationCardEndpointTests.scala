@@ -45,11 +45,12 @@ class GetEgraphExplanationCardEndpointTests extends EgraphsUnitTest {
     status(requestAsCustomer(Some(recipient.id))) should be(OK)
     
     val adminReq = FakeRequest(GET, getEgraphExplanationCard(orderId).url).withAdmin(admin.id)
-    status(routeAndCall(adminReq).get) should be (OK)
+    status(route(adminReq).get) should be (OK)
   }
 
   private def getEgraphExplanationCardRequestAsCustomer(orderId: Long, customerId: Option[Long]): Result = {
-    val req = customerId.map(id => FakeRequest().withCustomer(id)).getOrElse(FakeRequest())
-    routeAndCall(req.copy(method = GET, uri = getEgraphExplanationCard(orderId).url)).get
+    val baseRequest = FakeRequest(GET, getEgraphExplanationCard(orderId).url)
+    val req = customerId.map(id => baseRequest.withCustomer(id)).getOrElse(baseRequest)
+    route(req).get
   }
 }

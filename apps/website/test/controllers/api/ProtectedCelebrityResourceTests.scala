@@ -2,8 +2,8 @@ package controllers.api
 
 import utils.{EgraphsUnitTest, TestConstants, TestData}
 import play.api.test.Helpers._
-import play.api.mvc.{AnyContent, Call}
-import utils.FunctionalTestUtils.{routeName, requestWithCredentials}
+import play.api.mvc._
+import utils.FunctionalTestUtils._
 import play.api.test.FakeRequest
 import services.AppConfig
 import services.http.BasicAuth
@@ -13,7 +13,7 @@ import org.apache.commons.lang3.RandomStringUtils
 
 trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
   protected def routeUnderTest: Call
-  protected def validRequestBodyAndQueryString: Option[FakeRequest[AnyContent]] = None
+  protected def validRequestBodyAndQueryString: Option[FakeRequest[AnyContentAsEmpty.type]] = None
   private def db = AppConfig.instance[DBSession]
   
   aBasicAuthProtectedCelebApiResource should "forbid requests with the wrong password for a valid celebrity account" in new EgraphsTestApplication {
@@ -42,15 +42,11 @@ trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
   private def executingRequestWithCredentials(account: Account, password: String): Int = {
     val auth = BasicAuth.Credentials(account.email, password)
 
-    val requestBodyAndQuery = validRequestBodyAndQueryString.getOrElse(FakeRequest())
-
-    val request = requestBodyAndQuery
-      .copy(method=routeUnderTest.method, uri=routeUnderTest.url)
-      .withHeaders(auth.toHeader)
+    val requestBodyAndQuery = validRequestBodyAndQueryString.getOrElse(FakeRequest(routeUnderTest.method, routeUnderTest.url))
+    val request = requestBodyAndQuery.withCredentials(account, password)
 
     // Execute the request
-    val Some(result) = routeAndCall(request)
-    status(result)
+    status(route(request).get)
   }
 
   private def aBasicAuthProtectedCelebApiResource = routeName(routeUnderTest) + ", as a basic-auth protected celebrity API resource,"

@@ -43,7 +43,7 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
     status(requestAsCustomer(Some(recipient.id))) should be (OK)
     
     val adminReq = FakeRequest(GET, getEgraph(orderId).url).withAdmin(admin.id)
-    status(routeAndCall(adminReq).get) should be (OK)
+    status(route(adminReq).get) should be (OK)
   }
   
   "A public egraph" should "be viewable by all" in new EgraphsTestApplication {
@@ -55,17 +55,16 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr())).save()
       order.id
     }
-   
-    val Some(result) = routeAndCall(FakeRequest(GET, getEgraph(orderId).url))
-    
+
+    val Some(result) = route(FakeRequest(GET, getEgraph(orderId).url))
+
     status(result) should be (OK)
   }
   
   private def egraphRequestAsCustomer(orderId: Long, customerId: Option[Long]): Result = {
-    val req = customerId.map(id => FakeRequest().withCustomer(id)).getOrElse(FakeRequest())
-    
-    routeAndCall(req.copy(method=GET, uri=getEgraph(orderId).url)).get
-  }
+    val requestBase = FakeRequest(GET, getEgraph(orderId).url)
+    val req = customerId.map(id => requestBase.withCustomer(id)).getOrElse(requestBase)
 
-  
+    route(req).get
+  }  
 }

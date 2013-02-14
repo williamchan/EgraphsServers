@@ -18,7 +18,8 @@ object ResultUtils {
    * Usage:
    * {{{
    *   def insertSomethingIntoTheSessionOnTheWayOut[A](action: Action[A]): Action[A] {
-   *     import egraphs.playutils.RichResult._
+   *     import egraphs.playutils.ResultUtils.RichResult
+
    *     Action { implicit request =>
    *       val result = action(request)
    *       result.addingToSession("newSessionKey" -> "newSessionValue")

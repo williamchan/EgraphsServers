@@ -8,7 +8,7 @@ import models.VideoAsset
 import services.db.{ DBSession, TransactionSerializable, Schema }
 import play.api.test._
 import play.api.test.Helpers._
-import egraphs.playutils.RichResult._
+import egraphs.playutils.ResultUtils.RichResult
 import models.VideoAssetStore
 import models.enums.VideoStatus
 import utils.FunctionalTestUtils.Conversions._
