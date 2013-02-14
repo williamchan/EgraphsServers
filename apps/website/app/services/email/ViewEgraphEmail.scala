@@ -64,7 +64,7 @@ case class ViewEgraphEmail(
         val receivingCustomer = order.recipient
 
         val emailStack = EmailViewModel(
-          subject = "I just finished signing your Egraph",
+          subject = "I just finished creating an egraph for you",
           fromEmail = celebrity.urlSlug + "@egraphs.com",
           fromName = celebrity.publicName,
           toAddresses = List((receivingCustomer.account.email, None))
