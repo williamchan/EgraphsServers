@@ -11,10 +11,8 @@ import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
 import services.AppConfig
 import services.db.DBSession
 import utils.EgraphsUnitTest
-import utils.FunctionalTestUtils.requestWithCustomerId
+import utils.FunctionalTestUtils._
 import services.http.EgraphsSession
-import utils.FunctionalTestUtils
-import FunctionalTestUtils.Conversions._
 import controllers.routes.WebsiteControllers
 
 class AdminLoginTests extends EgraphsUnitTest {

@@ -1,14 +1,13 @@
 package controllers.website.admin
 
+import play.api.data._
+import play.api.data.Forms._
+import play.api.data.validation._
+import play.api.mvc._
 import models.categories._
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
-import play.api.data._
-import play.api.data.Forms._
-import play.api.data.validation.Constraint
-import play.api.data.validation.Valid
-import play.api.data.validation.Invalid
-import play.api.mvc._
+
 /**
  * This controller manages the associations category values have with categories as well as basic data
  * around the category value object in the database.
@@ -73,7 +72,7 @@ trait PostCategoryValueAdminEndpoint {
           }
         )
       }
-	  }  
+	}  
   }
 	
   private def isUniqueName(categoryValueId: Long): Constraint[PostCategoryValueForm] = {

@@ -3,8 +3,7 @@ package controllers.website
 import play.api.test._
 import play.api.test.Helpers._
 import egraphs.playutils.ResultUtils.RichResult
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 import controllers.routes.WebsiteControllers.postSubscribeEmail
 import utils.EgraphsUnitTest
 import utils.CsrfProtectedResourceTests

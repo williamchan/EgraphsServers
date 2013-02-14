@@ -13,8 +13,7 @@ import play.api.mvc.Result
 import controllers.routes.WebsiteControllers.{postResetPassword, getResetPassword}
 import services.AppConfig
 import services.http.forms.AccountPasswordResetForm.Fields
-import utils.FunctionalTestUtils.Conversions._
-import utils.FunctionalTestUtils.routeName
+import utils.FunctionalTestUtils._
 import services.db.DBSession
 import play.api.mvc.Controller
 import com.google.inject.Inject

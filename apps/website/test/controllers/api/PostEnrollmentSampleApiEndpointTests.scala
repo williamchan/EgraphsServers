@@ -46,7 +46,7 @@ class PostEnrollmentSampleApiEndpointTests
       (celebrity, celebrity.account)
     }
 
-    val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+    val result = routePostEnrollmentSample(celebrityAccount)
 
     val enrollmentBatch = db.connected(TransactionSerializable) {
       enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
@@ -65,7 +65,7 @@ class PostEnrollmentSampleApiEndpointTests
       (celebrity, celebrity.account)
     }
 
-    val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+    val result = routePostEnrollmentSample(celebrityAccount)
 
     val enrollmentBatch = db.connected(TransactionSerializable) {
       enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
@@ -79,14 +79,14 @@ class PostEnrollmentSampleApiEndpointTests
       enrollmentBatch.id)
 
     for (i <- 1 until EnrollmentBatch.batchSize - 1) {
-      val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+      val result = routePostEnrollmentSample(celebrityAccount)
       assertPostEnrollmentSample(
         result,
         isBatchComplete = false,
         numEnrollmentSamplesInBatch = i + 1,
         enrollmentBatch.id)
     }
-    val lastSampleResult = routeAndCallPostEnrollmentSample(celebrityAccount)
+    val lastSampleResult = routePostEnrollmentSample(celebrityAccount)
     assertPostEnrollmentSample(
       lastSampleResult,
       isBatchComplete = true,
@@ -112,7 +112,7 @@ class PostEnrollmentSampleApiEndpointTests
   /**
    * Assemble the request and get the result.
    */
-  private def routeAndCallPostEnrollmentSample(celebrityAccount: Account,
+  private def routePostEnrollmentSample(celebrityAccount: Account,
     signatureStr: String = TestConstants.shortWritingStr,
     voiceStr: String = TestConstants.voiceStr_8khz): Result = {
 

@@ -5,7 +5,7 @@ import org.junit.runner.RunWith
 import play.api.test.Helpers.SEE_OTHER
 import play.api.test.Helpers.status
 import play.api.test.FakeRequest
-import utils.FunctionalTestUtils.Conversions.fakeAnyContentRequestToDomainRequest
+import utils.FunctionalTestUtils._
 import utils.DBTransactionPerTest
 import utils.EgraphsUnitTest
 import utils.TestData

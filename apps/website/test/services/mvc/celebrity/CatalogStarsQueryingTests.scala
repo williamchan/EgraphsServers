@@ -19,7 +19,7 @@ class CatalogStarsQueryingTests extends EgraphsUnitTest {
     val mockStars = IndexedSeq(mock[CatalogStar])
 
     lazy val updateActorInstance = new Actor {
-      protected def receive = {
+      def receive = {
         case UpdateCatalogStars(_) =>
           throw new RuntimeException("I should never have been called.")
       }
@@ -39,7 +39,7 @@ class CatalogStarsQueryingTests extends EgraphsUnitTest {
     val mockStars = IndexedSeq(mock[CatalogStar])
 
     lazy val updateActorInstance = new Actor {
-      protected def receive = {
+      def receive = {
         case UpdateCatalogStars(catalogStarsAgent) =>
           catalogStarsAgent send mockStars
           catalogStarsAgent.await(10 seconds)

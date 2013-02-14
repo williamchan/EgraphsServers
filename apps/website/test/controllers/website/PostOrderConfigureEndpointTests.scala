@@ -2,8 +2,7 @@ package controllers.website
 
 import play.api.test._
 import play.api.test.Helpers._
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 import controllers.routes.WebsiteControllers.{postOrderPrivacy, getLogin}
 import scala.collection.JavaConversions._
 import services.AppConfig

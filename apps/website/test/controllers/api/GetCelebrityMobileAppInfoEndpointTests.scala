@@ -31,7 +31,7 @@ class GetCelebrityMobileAppInfoEndpointTests
     }
 
     val url = controllers.routes.ApiControllers.getCelebrityMobileAppInfo.url
-    val Some(result) = routeAndCall(
+    val Some(result) = route(
       FakeRequest(GET, url).withCredentials(celebrityAccount)
     )
 

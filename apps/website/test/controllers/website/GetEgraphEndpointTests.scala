@@ -13,6 +13,7 @@ import egraphs.playutils.Encodings.Base64
 import controllers.routes.WebsiteControllers.getEgraph
 import utils.FunctionalTestUtils
 import FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 
 class GetEgraphEndpointTests extends EgraphsUnitTest {
   

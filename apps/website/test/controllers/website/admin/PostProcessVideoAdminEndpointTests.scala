@@ -11,7 +11,7 @@ import play.api.test.Helpers._
 import egraphs.playutils.ResultUtils.RichResult
 import models.VideoAssetStore
 import models.enums.VideoStatus
-import utils.FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 import models.VideoAsset
 
 class PostProcessVideoAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
@@ -28,7 +28,7 @@ class PostProcessVideoAdminEndpointTests extends EgraphsUnitTest with AdminProte
 
     videoAsset._videoStatus should be(VideoStatus.Unprocessed.name)
 
-    val Some(result) = routeAndCall(FakeRequest(POST, controllers.routes.WebsiteControllers.postProcessVideoAdmin(
+    val Some(result) = route(FakeRequest(POST, controllers.routes.WebsiteControllers.postProcessVideoAdmin(
       VideoStatus.Approved.name, videoAsset.id).url).withAdmin(admin.id).withAuthToken)
     status(result) should be(SEE_OTHER)
 

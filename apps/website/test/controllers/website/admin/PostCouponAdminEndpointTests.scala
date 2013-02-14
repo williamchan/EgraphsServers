@@ -6,8 +6,7 @@ import egraphs.playutils.ResultUtils.RichResult
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
 import utils.{AdminProtectedResourceTests, EgraphsUnitTest, FunctionalTestUtils}
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 import models.{Coupon, CouponStore}
 import models.enums.{CouponType, CouponDiscountType, CouponUsageType}
 

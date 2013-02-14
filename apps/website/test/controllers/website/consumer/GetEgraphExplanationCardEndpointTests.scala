@@ -1,13 +1,13 @@
 package controllers.website.consumer
 
-import controllers.routes.WebsiteControllers.getEgraphExplanationCard
 import play.api.mvc.Result
 import play.api.test._
 import play.api.test.Helpers._
+import controllers.routes.WebsiteControllers.getEgraphExplanationCard
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
 import utils.{EgraphsUnitTest, FunctionalTestUtils, TestData}
-import FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 
 class GetEgraphExplanationCardEndpointTests extends EgraphsUnitTest {
 

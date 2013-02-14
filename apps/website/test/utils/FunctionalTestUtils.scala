@@ -31,6 +31,21 @@ import scenario.RepeatableScenarios
 object FunctionalTestUtils {
 
   implicit class EgraphsFakeRequest[A](request: FakeRequest[A]) {
+    def toCall(call: Call): FakeRequest[A] = {
+      // make a new FakeRequest using the old one since the copy doesn't work exactly
+      // as we would like it to since it would return a play.api.mvc.RequestHeader
+      new FakeRequest(
+        method = call.method,
+        uri = call.url,
+        headers = request.headers,
+        body = request.body,
+        remoteAddress = request.remoteAddress,
+        version = request.version,
+        id = request.id,
+        tags = request.tags
+      )
+    }
+
     def withCustomerId(id: Long): FakeRequest[A] = {
       request.withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
     }
@@ -47,31 +62,6 @@ object FunctionalTestUtils {
     def withCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[A] = {
       withCredentials(account.email, password)
     }
-  }
-
-  @deprecated("use EgraphsFakeRequest.withCustomerId instead", "as of play 2.10")
-  def requestWithCustomerId(id: Long): FakeRequest[AnyContentAsEmpty.type] = {
-    FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
-  }
-
-  @deprecated("use EgraphsFakeRequest.withAdminId instead", "as of play 2.10")
-  def requestWithAdminId(id: Long): FakeRequest[AnyContentAsEmpty.type] = {
-    FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
-  }
-
-  /**
-   * Makes an API request verified by the credentials from provided account
-   */
-  @deprecated("use EgraphsFakeRequest.withCredentials instead", "as of play 2.10")
-  def requestWithCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[AnyContentAsEmpty.type] = {
-    requestWithCredentials(account.email, password)
-  }
-
-  @deprecated("use EgraphsFakeRequest.withCredentials instead", "as of play 2.10")
-  def requestWithCredentials(user: String, password: String): FakeRequest[AnyContentAsEmpty.type] = {
-    val auth = BasicAuth.Credentials(user, password)
-
-    FakeRequest().withHeaders(auth.toHeader)
   }
 
   /**
@@ -119,9 +109,8 @@ object FunctionalTestUtils {
   }
 
   trait NonProductionEndpointTests { this: EgraphsUnitTest =>
-    import play.api.test.Helpers._
     protected def routeUnderTest: Call
-    protected def successfulRequest: FakeRequest[_] = {
+    protected def successfulRequest: FakeRequest[AnyContentAsEmpty.type] = {
       FakeRequest(routeUnderTest.method, routeUnderTest.url)
     }
 
@@ -134,7 +123,7 @@ object FunctionalTestUtils {
     }
 
     routeName(routeUnderTest) + ", as a test-only endpoint, " should "be available during test mode" in new EgraphsTestApplication {
-      val Some(result) = routeAndCall(successfulRequest)
+      val Some(result) = route(successfulRequest)
       status(result) should not be (NOT_FOUND)
     }
 
@@ -149,11 +138,6 @@ object FunctionalTestUtils {
     def requestWithAuthTokenInBody: FakeRequest[T]
 
     val authToken = "fake-auth-token"
-
-    @deprecated("Just set this on for FakeRequest directly.", "Since Play 2.1")
-    def toRoute(route: Call): FakeRequest[T] = {
-      throw new UnsupportedOperationException("This no longer works in Play 2.1")
-    }
 
     def withCustomer(customerId: Long): FakeRequest[T] = {
       request.withSession(request.session.withCustomerId(customerId).data.toSeq: _*)
@@ -174,7 +158,7 @@ object FunctionalTestUtils {
    * (Overriden method requestWithAuthTokenInBody used by withAuthToken in trait DomainRequestBase:
    *   type checks for anything that can be cast as AnyContentAsFormUrlEncoded)
    */
-  class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
+  implicit class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
     override def requestWithAuthTokenInBody: FakeRequest[T] = {
       val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
       val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
@@ -190,7 +174,7 @@ object FunctionalTestUtils {
    * (Overriden method requestWithAuthTokenInBody used by withAuthToken in trait DomainRequestBase:
    *   type checks for MultipartFormData[TemporaryFile])
    */
-  class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
+  implicit class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
     override def requestWithAuthTokenInBody: FakeRequest[T] = {
 
       val multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
@@ -206,16 +190,6 @@ object FunctionalTestUtils {
       val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts)
       val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)
       newRequest.asInstanceOf[FakeRequest[T]]
-    }
-  }
-
-  object Conversions {
-    implicit def fakeAnyContentRequestToDomainRequest[T <: AnyContent](fakeRequest: FakeRequest[T]) = {
-      new DomainRequest(fakeRequest)
-    }
-
-    implicit def fakeMultipartContentRequestToDomainRequest[T](fakeRequest: FakeRequest[T]) = {
-      new MultipartDomainRequest(fakeRequest)
     }
   }
 }
