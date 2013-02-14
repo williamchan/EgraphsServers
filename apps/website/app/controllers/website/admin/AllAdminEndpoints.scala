@@ -50,6 +50,7 @@ trait AllAdminEndpoints
   with PostFreegraphAdminEndpoint
   with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
+  with PostMastheadAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
   with PostProcessVideoAdminEndpoint

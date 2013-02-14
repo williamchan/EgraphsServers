@@ -1,6 +1,6 @@
 package models
 
-import services.{ImageUtil, Time}
+import services.{Dimensions, ImageUtil, Time}
 import scala.Some
 import java.awt.image.BufferedImage
 
@@ -34,7 +34,7 @@ trait LandingPageImage[T] {
         val landingPageImageBytes = {
           import services.ImageUtil.Conversions._
           // Crops that ish so it doesn't mess with the page layouts.
-          val croppedImage = ImageUtil.crop(image, Celebrity.defaultLandingPageImageDimensions)
+          val croppedImage = ImageUtil.crop(image, LandingPageImage.defaultLandingPageImageDimensions)
           croppedImage.asByteArray(ImageAsset.Jpeg)
         }
         val (entity, newImage) = withLandingPageImage(landingPageImageBytes)
@@ -50,4 +50,11 @@ trait LandingPageImage[T] {
       case None => defaultLandingPageImage
     }
   }
+}
+
+object LandingPageImage {
+  val minImageWidth = 1550
+  val minImageHeight = 556
+  val defaultLandingPageImageDimensions = Dimensions(width = minImageWidth, height = minImageHeight)
+  val landingPageImageAspectRatio = minImageWidth.toDouble / minImageHeight
 }

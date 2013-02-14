@@ -52,12 +52,11 @@ trait PostCelebrityAdminEndpoint {
               "twitterUsername" -> text
           )(PostCreateCelebrityForm.apply)(PostCreateCelebrityForm.unapply)
             .verifying(
-                isUniqueUrlSlug(),
-                profileImageIsValid(profileImageFile),
-                landingPageImageIsValid(landingPageImageOption),
-                logoImageIsValid(logoImageOption)
-      		)
-          )
+              isUniqueUrlSlug(),
+              profileImageIsValid(profileImageFile),
+              landingPageImageIsValid(landingPageImageOption),
+              logoImageIsValid(logoImageOption)
+      		))
         
         form.bindFromRequest.fold(
             formWithErrors => {
@@ -306,10 +305,10 @@ trait PostCelebrityAdminEndpoint {
     Constraint { form: PostCelebrityForm =>
       landingPageImageOption.map { landingPageImage =>
         val (width, height) = (landingPageImage.getWidth, landingPageImage.getHeight)
-        if (width >= Celebrity.minLandingPageImageWidth && height >= Celebrity.minLandingPageImageHeight) {
+        if (width >= LandingPageImage.minImageWidth && height >= LandingPageImage.minImageHeight) {
           Valid
         } else {
-          Invalid("Landing Page Image must be at least " + Celebrity.minLandingPageImageWidth + " in width and " + Celebrity.minLandingPageImageHeight + " in height - resolution was " + width + "x" + height)
+          Invalid("Landing Page Image must be at least " + LandingPageImage.minImageWidth + " in width and " + LandingPageImage.minImageHeight + " in height - resolution was " + width + "x" + height)
         }
       }.getOrElse(Valid)
     }

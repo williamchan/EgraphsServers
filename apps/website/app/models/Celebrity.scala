@@ -327,12 +327,7 @@ case class Celebrity(id: Long = 0,
 
 object Celebrity {
   val minProfileImageWidth = 100
-  val minLandingPageImageWidth = 1550
-  val minLandingPageImageHeight = 556
   val minLogoWidth = 40
-
-  val defaultLandingPageImageDimensions = Dimensions(width = minLandingPageImageWidth, height = minLandingPageImageHeight)
-  val landingPageImageAspectRatio = minLandingPageImageWidth.toDouble / minLandingPageImageHeight
   val defaultLogoDimensions = Dimensions(width = minLogoWidth, height = minLogoWidth)
 
   // Similar to ProductWithPhoto
