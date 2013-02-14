@@ -12,12 +12,10 @@ footerData: models.frontend.footer.FooterData)
 @createLink  = {
  @routes.WebsiteControllers.getCreateMastheadAdmin
 }
-<<<<<<< HEAD
 @editLink(id: Long) = {
  @routes.WebsiteControllers.getMastheadAdmin(id).url
 }
-=======
->>>>>>> 38b186c1ace05a975f964d59f7ef30d2e80da114
+
 @body = {
 <section id="content" class="top" role="main">
     <div id="main" class="sub">
@@ -30,30 +28,19 @@ footerData: models.frontend.footer.FooterData)
                <table class="table table-hover table-condensed">
                  <thead>
                     <tr>
-<<<<<<< HEAD
                         <th>ID</th>
                         <th>Name</th>
                         <th>Headline</th>
                         <th>Subtitle</th>
                         <th>Image</th>
-=======
-                        <th></th>
-                        <th>id</th>
-                        <th>name</th>
-                        <th>headline</th>
->>>>>>> 38b186c1ace05a975f964d59f7ef30d2e80da114
                     </tr>
                  </thead>
                  @for( masthead <- mastheads ) {
                    <tr>
                      <td>
-<<<<<<< HEAD
                        <a href="@editLink(masthead.id)">
                          @masthead.id
                        </a>
-=======
-                       @masthead.id
->>>>>>> 38b186c1ace05a975f964d59f7ef30d2e80da114
                      </td>
                      <td>
                        @masthead.name
@@ -61,15 +48,12 @@ footerData: models.frontend.footer.FooterData)
                      <td>
                        @masthead.headline
                      </td>
-<<<<<<< HEAD
                      <td>
                        @masthead.subtitle
                      </td>
                      <td>
                        <img src="@masthead.landingPageImage.resizedWidth(400).getSaved(services.blobs.AccessPolicy.Public).url">
                      </td>
-=======
->>>>>>> 38b186c1ace05a975f964d59f7ef30d2e80da114
                    </tr>
                  }
                </table>
