@@ -1,0 +1,49 @@
+@(implicit authToken: egraphs.authtoken.AuthenticityToken)
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags
+@import controllers._
+@import tags.tooltip
+
+@**  
+   Renders a modal that allows a user to request a star.
+*@
+
+@fieldTooltip(link: String)(body: => Html) = {
+  @tooltip(link, Seq("field-tooltip"))(body)
+}
+
+<div class="modal signup hide fade" id="requestStarForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-body">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <div>
+      <h2><span class="bold">Let us know</span> who you want on Egraphs</h2>
+      <p>
+        We'll do our best to sign them up!
+      </p>
+    </div>
+    <br>
+    <img src='@EgraphsAssets.at("images/modal-request-star.jpg")'/>
+
+    <form ng-controller="ModalController" ng-submit="subscribe()">
+      <div>
+        <label>Requested Star:</label>
+        <input class="input-xlarge" type="text" name="star-name" ng-model="star-name"/>        
+        <label>Email:</label>
+        <input class="input-xlarge" type="email" name="email" ng-model="email"/>
+      </div>
+      <div>
+        <button id="signup-button" type="submit" class="button">
+          <strong><em>Submit</em></strong>
+          <span>&raquo;</span>
+        </button>
+        <br>
+        <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true">Maybe Later</a>
+      </div>
+      <p class="privacy-statement">
+        We won't share your email, ever.
+        <a href="/privacy">Privacy Policy</a>
+      </p>
+    </form>
+  </div>
+</div>

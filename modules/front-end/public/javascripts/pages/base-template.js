@@ -40,7 +40,10 @@ function(page, window, logging, requireModule) {
 
     go: function () {
       $(document).ready(function(){
+
+        var requestStarModal = $('#requestStarForm');
         var signupModal = $('#emailSignupForm');
+
         // highlight action on top menu
         $('#top .account').hover(function(){
           $(this).addClass('hover');
@@ -75,6 +78,11 @@ function(page, window, logging, requireModule) {
           e.preventDefault();
         });
 
+        $("#request-star-link").click(function(e) {
+          requestStarModal.modal({});
+          e.preventDefault();
+        });
+
         var mobileNavOut = false;
         // use the .flyout-pull-right class to specify any items outside of the
         // the normal #top, #bottom, #content heirarchy that must slide out from the
@@ -97,7 +105,7 @@ function(page, window, logging, requireModule) {
           }
         });
 
-        // set modal to visible if toggled.
+        // Set modal to visible if toggled.
         if(page.modalOn === true) {
           $(window).load(function(){
             signupModal.modal({});
