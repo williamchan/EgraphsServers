@@ -1,10 +1,6 @@
 package controllers.api
 
-import sjson.json.Serializer
-import utils.FunctionalTestUtils.{
-  requestWithCredentials,
-  routeName
-}
+import play.api.libs.json.Json
 import play.api.mvc.{ AnyContent, AnyContentAsFormUrlEncoded }
 import utils.TestConstants
 import models.EnrollmentBatch
@@ -22,6 +18,7 @@ import models._
 import controllers.WebsiteControllers
 import controllers.ApiControllers
 import utils.TestData
+import utils.FunctionalTestUtils._
 
 class PostEnrollmentSampleApiEndpointTests
   extends EgraphsUnitTest
@@ -34,11 +31,11 @@ class PostEnrollmentSampleApiEndpointTests
   protected override def validRequestBodyAndQueryString = {
     // TODO: Once we're on Play 2.1 then get rid of this necessary indirection to satisfy
     //   invariance of FakeRequest[A], which should be FakeRequest[+A]    
-    val formRequest = FakeRequest().withFormUrlEncodedBody(
+    val formRequest = newRouteUnderTestFakeRequest.withFormUrlEncodedBody(
       "signature" -> TestConstants.shortWritingStr,
       "audio" -> TestConstants.voiceStr_8khz())
 
-    val anyContentRequest = formRequest.copy(body = (formRequest.body: AnyContent))
+    val anyContentRequest = formRequest.withBody(formRequest.body)
 
     Some(anyContentRequest)
   }
@@ -103,13 +100,13 @@ class PostEnrollmentSampleApiEndpointTests
     enrollmentBatchId: Long) {
 
     status(result) should be(OK)
-    val json = Serializer.SJSON.in[Map[String, Any]](contentAsString(result))
-    json("id") == null should not be (true)
-    json("batch_complete").toString.toBoolean should be(isBatchComplete)
+    val json = Json.parse(contentAsString(result))
+    (json \ "id").as[Long] > 0 should not be (true)
+    (json \ "batch_complete").as[Boolean] should be(isBatchComplete)
 
-    json("numEnrollmentSamplesInBatch").asInstanceOf[BigDecimal].intValue() should be(numEnrollmentSamplesInBatch)
-    json("enrollmentBatchSize").asInstanceOf[BigDecimal].intValue() should be(EnrollmentBatch.batchSize)
-    json("enrollmentBatchId").asInstanceOf[BigDecimal].longValue() should be(enrollmentBatchId)
+    (json \ "numEnrollmentSamplesInBatch").as[BigDecimal].intValue should be(numEnrollmentSamplesInBatch)
+    (json \ "enrollmentBatchSize").as[BigDecimal].intValue should be(EnrollmentBatch.batchSize)
+    (json \ "enrollmentBatchId").as[BigDecimal].longValue should be(enrollmentBatchId)
   }
 
   /**
@@ -120,10 +117,10 @@ class PostEnrollmentSampleApiEndpointTests
     voiceStr: String = TestConstants.voiceStr_8khz): Result = {
 
     val url = controllers.routes.ApiControllers.postEnrollmentSample.url
-    val req = requestWithCredentials(celebrityAccount).copy(method = POST, uri = url).withFormUrlEncodedBody(
+    val req = FakeRequest(POST, url).withCredentials(celebrityAccount).withFormUrlEncodedBody(
       "signature" -> signatureStr,
       "audio" -> voiceStr)
-    val Some(result) = routeAndCall(req)
+    val Some(result) = route(req)
     result
   }
 }

@@ -6,10 +6,7 @@ import play.api.http.HeaderNames
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc.MultipartFormData
-import play.api.test.Helpers.OK
-import play.api.test.Helpers.POST
-import play.api.test.Helpers.routeAndCall
-import play.api.test.Helpers.status
+import play.api.test.Helpers._
 import play.api.test.FakeHeaders
 import play.api.test.FakeRequest
 import services.blobs.Blobs
@@ -53,12 +50,12 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
       play.api.libs.Files.TemporaryFile(tempFile))
 
     val fakeVideoFile = Seq(fakeVideoPart)
-    val postBody = MultipartFormData[TemporaryFile](nonFiles, fakeVideoFile, Seq(), Seq())
+    val postBody = MultipartFormData[TemporaryFile](nonFiles, fakeVideoFile, Seq())
 
     val Some(result) = routeAndCall(FakeRequest(POST, controllers.routes.ApiControllers.postVideoAsset.url,
-      FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody).withHeaders(auth.toHeader))
+      FakeHeaders(Seq(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))), postBody).withHeaders(auth.toHeader))
 
-    myStatus(result) should be(OK)
+    status(result) should be(OK)
 
     val blob: Blobs = AppConfig.instance[Blobs]
     val videoAssetCelebrityStore: VideoAssetCelebrityStore = AppConfig.instance[VideoAssetCelebrityStore]
@@ -74,13 +71,6 @@ class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCeleb
         val maybeFileLocation = blob.getUrlOption(key = videoKey)
         maybeFileLocation.isDefined should be(true)
       }
-    }
-  }
-
-  private def myStatus(result: Result): Int = {
-    result match {
-      case asyncResult: AsyncResult => myStatus(asyncResult.result.await(30 * DateTimeConstants.MILLIS_PER_SECOND).get)
-      case anythingElse => status(result)  
     }
   }
 }

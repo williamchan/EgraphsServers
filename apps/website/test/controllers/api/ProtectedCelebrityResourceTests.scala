@@ -13,8 +13,11 @@ import org.apache.commons.lang3.RandomStringUtils
 
 trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
   protected def routeUnderTest: Call
-  protected def validRequestBodyAndQueryString: Option[FakeRequest[AnyContentAsEmpty.type]] = None
+  protected def validRequestBodyAndQueryString: Option[FakeRequest[_]] = None
   private def db = AppConfig.instance[DBSession]
+  protected def newRouteUnderTestFakeRequest: FakeRequest[AnyContentAsEmpty.type] = {
+    FakeRequest(routeUnderTest.method, routeUnderTest.url)
+  }
   
   aBasicAuthProtectedCelebApiResource should "forbid requests with the wrong password for a valid celebrity account" in new EgraphsTestApplication {
     val celebrityAccount = db.connected(TransactionSerializable) {
@@ -42,11 +45,12 @@ trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
   private def executingRequestWithCredentials(account: Account, password: String): Int = {
     val auth = BasicAuth.Credentials(account.email, password)
 
-    val requestBodyAndQuery = validRequestBodyAndQueryString.getOrElse(FakeRequest(routeUnderTest.method, routeUnderTest.url))
-    val request = requestBodyAndQuery.withCredentials(account, password)
-
-    // Execute the request
-    status(route(request).get)
+    validRequestBodyAndQueryString match {
+      // TODO: Replace this before it get deprecated.  Problem is that requests can have different content types
+      // so it cannot chose the proper writeable to hook up.  May just need a case statement to get this going.
+      case Some(req) => status(routeAndCall(req.withCredentials(account, password)).get)
+      case None => status(route(newRouteUnderTestFakeRequest.withCredentials(account, password)).get)
+    }
   }
 
   private def aBasicAuthProtectedCelebApiResource = routeName(routeUnderTest) + ", as a basic-auth protected celebrity API resource,"
