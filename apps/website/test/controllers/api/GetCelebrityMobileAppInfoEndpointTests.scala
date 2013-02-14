@@ -1,7 +1,9 @@
 package controllers.api
 
-import sjson.json.Serializer
-import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
+import play.api.libs.json._
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import utils.FunctionalTestUtils._
 import utils.TestConstants
 import play.api.test.Helpers._
 import utils.EgraphsUnitTest
@@ -30,17 +32,16 @@ class GetCelebrityMobileAppInfoEndpointTests
 
     val url = controllers.routes.ApiControllers.getCelebrityMobileAppInfo.url
     val Some(result) = routeAndCall(
-      requestWithCredentials(celebrityAccount).copy(GET, url)
+      FakeRequest(GET, url).withCredentials(celebrityAccount)
     )
 
     status(result) should be (OK)
-    val json = Serializer.SJSON.in[Map[String, Map[String, String]]](contentAsString(result))
-    val ipadJson = json("ipad")
+    val json = Json.parse(contentAsString(result))
+    val ipadJson = (json \ "ipad").as[JsObject]
 
     val expectedVersion = config.ipadBuildVersion
-    ipadJson("version") should be (expectedVersion)
-    val ipaUrl = ipadJson("ipaURL")
+    (ipadJson \ "version").as[String] should be (expectedVersion)
+    val ipaUrl = (ipadJson \ "ipaURL").as[String]
     ipaUrl.takeWhile(nextChar => nextChar != '?') should be ("https://egraphs-static-resources.s3.amazonaws.com/ipad/Egraphs_" + expectedVersion + ".ipa")
   }
-
 }

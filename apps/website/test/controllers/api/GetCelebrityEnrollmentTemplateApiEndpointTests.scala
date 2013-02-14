@@ -1,9 +1,10 @@
 package controllers.api
 
+import play.api.libs.json._
+import play.api.test._
 import play.api.test.Helpers._
-import sjson.json.Serializer
 import utils.EgraphsUnitTest
-import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
+import utils.FunctionalTestUtils._
 import utils.TestConstants
 import utils.TestData
 import models.EnrollmentBatch
@@ -28,37 +29,38 @@ class GetCelebrityEnrollmentTemplateApiEndpointTests
     }
 
     val url = controllers.routes.ApiControllers.getCelebrityEnrollmentTemplate.url
-    val Some(result) = routeAndCall(
-      requestWithCredentials(celebrityAccount).copy(GET, url)
+    val Some(result) = route(
+      FakeRequest(GET, url).withCredentials(celebrityAccount)
     )
     
     status(result) should be (OK)
 
-    val json = Serializer.SJSON.in[Map[String, List[Map[String, String]]]](contentAsString(result))
-    json.size should be (1)
+    val json = Json.parse(contentAsString(result)).as[JsObject]
+    json.fields.size should be (1)
     
-    val enrollmentPhrases: List[Map[String, String]] = json(_enrollmentPhrases)
+    val enrollmentPhrases = (json \ _enrollmentPhrases).as[JsArray].value
     
     enrollmentPhrases.size should be (EnrollmentBatch.batchSize)
-    "My name is " + celebrity.publicName should be (enrollmentPhrases(0)(_text))
-    "One, two, three, four, five" should be (enrollmentPhrases(1)(_text))
-    "Stop each car if it's little" should be (enrollmentPhrases(2)(_text))
-    "Play in the street up ahead" should be (enrollmentPhrases(3)(_text))
-    "A fifth wheel caught speeding" should be (enrollmentPhrases(4)(_text))
-    "It's been about two years since Davey kept shotguns" should be (enrollmentPhrases(5)(_text))
-    "Charlie did you think to measure the tree" should be (enrollmentPhrases(6)(_text))
-    "Tina got cued to make a quicker escape" should be (enrollmentPhrases(7)(_text))
-    "Joe books very few judges" should be (enrollmentPhrases(8)(_text))
-    "Here I was in Miami and Illinois" should be (enrollmentPhrases(9)(_text))
-    "Stop each car if it's little" should be (enrollmentPhrases(10)(_text))
-    "Play in the street up ahead" should be (enrollmentPhrases(11)(_text))
-    "A fifth wheel caught speeding" should be (enrollmentPhrases(12)(_text))
-    "It's been about two years since Davey kept shotguns" should be (enrollmentPhrases(13)(_text))
-    "Charlie did you think to measure the tree" should be (enrollmentPhrases(14)(_text))
-    "Tina got cued to make a quicker escape" should be (enrollmentPhrases(15)(_text))
-    "Joe books very few judges" should be (enrollmentPhrases(16)(_text))
-    "Here I was in Miami and Illinois" should be (enrollmentPhrases(17)(_text))
-    "Six, seven, eight, nine, ten" should be (enrollmentPhrases(18)(_text))
-    "My name is " + celebrity.publicName should be (enrollmentPhrases(19)(_text))
+    // these are all reversed from the order they should be acutal/expected
+    "My name is " + celebrity.publicName should be ((enrollmentPhrases(0) \ _text).as[String])
+    "One, two, three, four, five" should be ((enrollmentPhrases(1) \ _text).as[String])
+    "Stop each car if it's little" should be ((enrollmentPhrases(2) \ _text).as[String])
+    "Play in the street up ahead" should be ((enrollmentPhrases(3) \ _text).as[String])
+    "A fifth wheel caught speeding" should be ((enrollmentPhrases(4) \ _text).as[String])
+    "It's been about two years since Davey kept shotguns" should be ((enrollmentPhrases(5) \ _text).as[String])
+    "Charlie did you think to measure the tree" should be ((enrollmentPhrases(6) \ _text).as[String])
+    "Tina got cued to make a quicker escape" should be ((enrollmentPhrases(7) \ _text).as[String])
+    "Joe books very few judges" should be ((enrollmentPhrases(8) \ _text).as[String])
+    "Here I was in Miami and Illinois" should be ((enrollmentPhrases(9) \ _text).as[String])
+    "Stop each car if it's little" should be ((enrollmentPhrases(10) \ _text).as[String])
+    "Play in the street up ahead" should be ((enrollmentPhrases(11) \ _text).as[String])
+    "A fifth wheel caught speeding" should be ((enrollmentPhrases(12) \ _text).as[String])
+    "It's been about two years since Davey kept shotguns" should be ((enrollmentPhrases(13) \ _text).as[String])
+    "Charlie did you think to measure the tree" should be ((enrollmentPhrases(14) \ _text).as[String])
+    "Tina got cued to make a quicker escape" should be ((enrollmentPhrases(15) \ _text).as[String])
+    "Joe books very few judges" should be ((enrollmentPhrases(16) \ _text).as[String])
+    "Here I was in Miami and Illinois" should be ((enrollmentPhrases(17) \ _text).as[String])
+    "Six, seven, eight, nine, ten" should be ((enrollmentPhrases(18) \ _text).as[String])
+    "My name is " + celebrity.publicName should be ((enrollmentPhrases(19) \ _text).as[String])
   }
 }

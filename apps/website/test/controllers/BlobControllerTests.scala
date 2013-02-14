@@ -1,21 +1,17 @@
 package controllers
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import play.api.Play
-import play.api.mvc.Request
-import play.api.mvc.Controller
-import play.api.test.Helpers._
-import play.api.test.FakeRequest
-import _root_.utils.EgraphsUnitTest
-import _root_.utils.TestHelpers
-import _root_.utils.FunctionalTestUtils.{routeName, NonProductionEndpointTests}
-import controllers.routes.WebsiteControllers.getBlob
-import play.api.mvc.ChunkedResult
 import play.api.libs.iteratee.Iteratee
-import play.api.libs.concurrent.Promise
 import play.api.libs.iteratee.Input
-import play.api.mvc.ChunkedResult
-import play.api.mvc.Call
-import play.api.test.FakeRequest$
+import play.api.mvc._
+import play.api.test._
+import play.api.test.Helpers._
+import utils.EgraphsUnitTest
+import utils.TestHelpers
+import utils.FunctionalTestUtils._
+import controllers.routes.WebsiteControllers.getBlob
 
 class BlobControllersTests extends EgraphsUnitTest with NonProductionEndpointTests {
   override def routeUnderTest: Call = getBlob("a/b/derp.jpg")
@@ -27,23 +23,21 @@ class BlobControllersTests extends EgraphsUnitTest with NonProductionEndpointTes
   }
   
   routeName(routeUnderTest) should "make transmit the blob's data" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(FakeRequest(GET, getBlob("a/b/derp.jpg").url))
+    val Some(result) = route(FakeRequest(GET, getBlob("a/b/derp.jpg").url))
     
     status(result) should be (OK)
     
     result match {
-      case chunkedResult: ChunkedResult[Array[Byte]] =>
+      case result =>
         val actualFile = Play.getFile("test/resources/derp.jpg")
+        val chunkedResult = result.asInstanceOf[ChunkedResult[Array[Byte]]]
         chunkedContentLength(chunkedResult) should be (actualFile.length)
-        
-      case otherType =>
-        fail("Expected ChunkedResult instead of " + otherType.getClass)
     }
     
   }
   
   it should "404 if the blob was not found" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(FakeRequest(GET, getBlob("b/aioehroauher.jpg").url))
+    val Some(result) = route(FakeRequest(GET, getBlob("b/aioehroauher.jpg").url))
     
     status(result) should be (NOT_FOUND)
   }
@@ -51,9 +45,10 @@ class BlobControllersTests extends EgraphsUnitTest with NonProductionEndpointTes
   def chunkedContentLength(chunkedResult: ChunkedResult[Array[Byte]]): Int =  {
     var numBytes = 0
     val countIteratee = Iteratee.fold[Array[Byte], Unit](0) { (_, bytes) => numBytes += bytes.size }
-    val promisedIteratee = chunkedResult.chunks(countIteratee).asInstanceOf[Promise[Iteratee[Array[Byte], Unit]]]
+    val futureIteratee = chunkedResult.chunks(countIteratee).asInstanceOf[Future[Iteratee[Array[Byte], Unit]]]
     
-    promisedIteratee.await(5000).get.run.await(5000).get
+    val future = Await.result(futureIteratee, 5 seconds).run
+    Await.result(future, 5 seconds)
 
     numBytes
   }
