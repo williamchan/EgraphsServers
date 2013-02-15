@@ -844,13 +844,33 @@
 			.masthead {
 
 			 background: transparent;
-       height: 45px;
-			 margin-bottom: 0;
+       height: 75px;
+       margin-top: 10px;
+       margin-bottom: 10px;
 
-			 img { display: none; }
+       img { display: none; }
 
   			.search-form {
-          display: none;
+          margin: 0;
+          position: static;
+          width: 360px;   
+          margin-left: auto;
+          margin-right: auto;  
+
+          .search-control {
+            width: 100%;
+
+            input[type="search"] {
+              width: 310px;
+            }
+          }     
+          
+          .help-block {
+            text-shadow: none;
+            color: @gray;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
         }
 
 			}
