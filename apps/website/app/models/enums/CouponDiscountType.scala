@@ -1,6 +1,5 @@
 package models.enums
 
-import services.Utils
 import egraphs.playutils.Enum
 
 sealed abstract class CouponDiscountType(val name: String)

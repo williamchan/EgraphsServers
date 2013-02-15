@@ -7,7 +7,7 @@ import services.http.filters.HttpFilters
 import services.{Utils, ImageUtil}
 import java.awt.image.BufferedImage
 import play.api.data.validation.{Invalid, Valid, Constraint}
-import models.enums.PublishedStatus
+import models.enums.{CallToActionType, PublishedStatus}
 import play.api.data._
 import play.api.data.Forms._
 
@@ -31,7 +31,10 @@ trait PostMastheadAdminEndpoint {
           "mastheadId" -> longNumber,
           "headline" -> nonEmptyText,
           "subtitle" -> text,
-          "publishedStatusString" -> nonEmptyText.verifying(isMastheadPublishedStatus)
+          "publishedStatusString" -> nonEmptyText.verifying(isMastheadPublishedStatus),
+          "callToActionTypeString" -> nonEmptyText.verifying(isCallToActionType),
+          "callToActionTarget" -> text,
+          "callToActionText" -> text
         )(PostMastheadForm.apply)(PostMastheadForm.unapply).verifying(
           landingPageImageIsValid(landingPageImageOption)
         ))
@@ -54,11 +57,15 @@ trait PostMastheadAdminEndpoint {
               ("name" -> data.get("name").getOrElse("")),
               ("headline" -> data.get("headline").getOrElse("")),
               ("subtitle" -> data.get("subtitle").getOrElse("")),
-              ("publishedStatusString" -> data.get("publishedStatusString").getOrElse(""))
+              ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")),
+              ("callToActionTypeString" -> data.get("callToActionTypeStrine").getOrElse("")),
+              ("callToActionTarget" -> data.get("callToActionTarget").getOrElse("")),
+              ("callToActionText" -> data.get("callToActionText").getOrElse(""))
             )
           },
           validForm => {
             val publishedStatus = PublishedStatus(validForm.publishedStatusString).get
+            val callToActionType = CallToActionType(validForm.callToActionTypeString).get
             val mastheadId = validForm.mastheadId
             val mastheadOption: Option[Masthead] = mastheadId match {
               case 0 => Option(Masthead())
@@ -70,8 +77,10 @@ trait PostMastheadAdminEndpoint {
                 val savedMasthead = masthead.copy(
                   name = validForm.name,
                   headline = validForm.headline,
-                  subtitle = Utils.toOption(validForm.subtitle)
-                ).withPublishedStatus(publishedStatus).save().saveWithLandingPageImage(landingPageImageOption)
+                  subtitle = Utils.toOption(validForm.subtitle),
+                  callToActionTarget = validForm.callToActionTarget,
+                  callToActionText = validForm.callToActionText
+                ).withPublishedStatus(publishedStatus).withCallToActionType(callToActionType).save().saveWithLandingPageImage(landingPageImageOption)
 
                 Redirect(controllers.routes.WebsiteControllers.getMastheadAdmin(savedMasthead.id))
               }
@@ -88,7 +97,10 @@ trait PostMastheadAdminEndpoint {
     mastheadId: Long,
     headline: String,
     subtitle: String,
-    publishedStatusString: String
+    publishedStatusString: String,
+    callToActionTypeString: String,
+    callToActionTarget: String,
+    callToActionText: String
   )
 
   private def landingPageImageIsValid(landingPageImageOption: Option[BufferedImage]): Constraint[PostMastheadForm] = {
@@ -108,7 +120,16 @@ trait PostMastheadAdminEndpoint {
     Constraint { s: String =>
       PublishedStatus(s) match {
         case Some(providedStatus) => Valid
-        case None => Invalid("Error setting product's published status, please contact support")
+        case None => Invalid("Error setting masthead's published status, please contact support")
+      }
+    }
+  }
+
+  private def isCallToActionType: Constraint[String] = {
+    Constraint { t: String =>
+      CallToActionType(t) match {
+        case Some(providedType) => Valid
+        case None => Invalid("Error setting masthead's CTA type, please contact support")
       }
     }
   }

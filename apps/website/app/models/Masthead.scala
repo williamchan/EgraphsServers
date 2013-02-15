@@ -1,6 +1,6 @@
 package models
 
-import enums.{HasPublishedStatus, PublishedStatus}
+import enums.{CallToActionType, HasCallToActionType, HasPublishedStatus, PublishedStatus}
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db.{Schema, SavesWithLongKey, DBSession, KeyedCaseClass}
@@ -8,6 +8,7 @@ import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import org.apache.commons.io.IOUtils
 import play.api.Play._
+import controllers.WebsiteControllers
 
 case class MastheadServices @Inject() (
   store: MastheadStore,
@@ -23,6 +24,9 @@ case class Masthead (
   headline: String = "",
   subtitle: Option[String] = None,
   _landingPageImageKey: Option[String] = None,
+  _callToActionType: String = CallToActionType.SimpleLink.name,
+  callToActionTarget: String = "#",
+  callToActionText: String = "",
   _publishedStatus: String = PublishedStatus.Unpublished.name,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
@@ -31,6 +35,7 @@ case class Masthead (
   with HasCreatedUpdated
   with HasPublishedStatus[Masthead]
   with LandingPageImage[Masthead]
+  with HasCallToActionType[Masthead]
 {
 
   //
@@ -52,6 +57,14 @@ case class Masthead (
   //
   override def withPublishedStatus(status: PublishedStatus.EnumVal) :  Masthead = {
     this.copy(_publishedStatus = status.name)
+  }
+
+  //
+  //
+  // CallToAction[Masthead] methods
+
+  override def withCallToActionType(action: CallToActionType.EnumVal) : Masthead = {
+    this.copy(_callToActionType = action.name)
   }
 
   // LandingPageImage

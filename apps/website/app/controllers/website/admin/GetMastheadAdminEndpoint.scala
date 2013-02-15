@@ -5,6 +5,9 @@ import play.api.mvc.{Request, Action, Controller}
 import services.http.ControllerMethod
 import models.{Masthead, MastheadStore}
 import services.http.filters.HttpFilters
+import models.enums.CallToActionType.EnumVal
+import models.enums.CallToActionType
+import models.frontend.masthead.{VideoPlayerViewModel, CallToActionViewModel}
 
 
 private[controllers] trait GetMastheadAdminEndpoint extends ImplicitHeaderAndFooterData {
@@ -21,7 +24,8 @@ private[controllers] trait GetMastheadAdminEndpoint extends ImplicitHeaderAndFoo
       Action {implicit request =>
         val maybeMasthead = mastheadStore.findById(mastheadId)
         maybeMasthead match {
-          case Some(masthead) => Ok(views.html.Application.admin.admin_masthead_detail(masthead, postMastheadUrl, errorFields))
+          case Some(masthead) => Ok(views.html.Application.admin.admin_masthead_detail(masthead,
+            postMastheadUrl, callToActionViewModel = CallToActionTypeToViewModel(masthead.callToActionType), errorFields))
           case None => NotFound("No masthead with this ID exists")
         }
 
@@ -34,9 +38,17 @@ private[controllers] trait GetMastheadAdminEndpoint extends ImplicitHeaderAndFoo
       Action {implicit request =>
         Ok(views.html.Application.admin.admin_masthead_detail(Masthead(
           headline = "An Example headline",
-          subtitle = Some("an example subtitle")
-        ), postMastheadUrl, errorFields))
+          subtitle = Some("an example subtitle"), 
+          callToActionText = "Click here!"
+        ), postMastheadUrl, callToActionViewModel = CallToActionTypeToViewModel(CallToActionType.VideoPlayer), errorFields))
       }
+    }
+  }
+
+  private def CallToActionTypeToViewModel(actionType: CallToActionType.EnumVal) : CallToActionViewModel = {
+    actionType match {
+      case CallToActionType.VideoPlayer => VideoPlayerViewModel(text= "{{masthead.text}}", target = "{{masthead.target}}")
+      case _ => VideoPlayerViewModel(text= "{{masthead.text}}", target = "{{masthead.target}}")
     }
   }
 
