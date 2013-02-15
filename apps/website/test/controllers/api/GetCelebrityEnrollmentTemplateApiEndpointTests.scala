@@ -37,7 +37,7 @@ class GetCelebrityEnrollmentTemplateApiEndpointTests
 
     val json = Json.parse(contentAsString(result)).as[JsObject]
     json.fields.size should be (1)
-    
+
     val enrollmentPhrases = (json \ _enrollmentPhrases).as[JsArray].value
     
     enrollmentPhrases.size should be (EnrollmentBatch.batchSize)

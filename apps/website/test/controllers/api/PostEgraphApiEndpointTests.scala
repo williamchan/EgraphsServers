@@ -18,6 +18,7 @@ import utils.TestData
 import models.Account
 import models.Celebrity
 import utils.FunctionalTestUtils._
+import play.api.mvc.AnyContentAsFormUrlEncoded
 
 class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
   private def blobs = AppConfig.instance[Blobs]
@@ -43,6 +44,10 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
     val anyContentRequest = formRequest.withBody(formRequest.body)
 
     Some(anyContentRequest)
+  }
+
+  protected override def routeRequest(request: FakeRequest[_]): Option[Result] = {
+    route(request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]])
   }
 
   "postEgraph" should "accept a well-formed egraph as its first submission" in new EgraphsTestApplication {

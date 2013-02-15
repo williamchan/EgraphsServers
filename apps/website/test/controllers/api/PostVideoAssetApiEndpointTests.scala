@@ -1,29 +1,25 @@
 package controllers.api
 
+import java.util.Date
 import java.io.File
-import controllers.routes.ApiControllers.postVideoAsset
+import org.apache.commons.io.FileUtils
+import org.joda.time.DateTimeConstants
+
 import play.api.http.HeaderNames
 import play.api.libs.Files.TemporaryFile
 import play.api.mvc.MultipartFormData.FilePart
-import play.api.mvc.MultipartFormData
+import play.api.mvc._
 import play.api.test.Helpers._
-import play.api.test.FakeHeaders
-import play.api.test.FakeRequest
+import play.api.test._
+
+import controllers.routes.ApiControllers.postVideoAsset
 import services.blobs.Blobs
-import services.db.DBSession
-import services.db.TransactionSerializable
+import services.db._
 import services.http.BasicAuth
 import services.AppConfig
 import utils.EgraphsUnitTest
 import utils.TestData
-import play.api.mvc.SimpleResult
-import play.api.mvc.Result
-import play.api.mvc.AsyncResult
-import play.api.mvc.PlainResult
-import org.joda.time.DateTimeConstants
 import models.VideoAssetCelebrityStore
-import org.apache.commons.io.FileUtils
-import java.util.Date
 
 class PostVideoAssetApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
   protected override def routeUnderTest = postVideoAsset

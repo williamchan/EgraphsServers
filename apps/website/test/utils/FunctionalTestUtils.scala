@@ -133,9 +133,9 @@ object FunctionalTestUtils {
     it should "be unavailable outside of test mode" in (pending)
   }
 
-  trait DomainRequestBase[T] {
+  trait DomainRequestBase[T, U] {
     def request: FakeRequest[T]
-    def requestWithAuthTokenInBody: FakeRequest[T]
+    def requestWithAuthTokenInBody: FakeRequest[U]
 
     val authToken = "fake-auth-token"
 
@@ -147,7 +147,7 @@ object FunctionalTestUtils {
       request.withSession(request.session.withAdminId(adminId).data.toSeq: _*)
     }
 
-    def withAuthToken: FakeRequest[T] = {
+    def withAuthToken: FakeRequest[U] = {
       val newSession = request.session + ("authenticityToken" -> authToken)
       requestWithAuthTokenInBody.withSession(newSession.data.toSeq: _*)
     }
@@ -158,14 +158,14 @@ object FunctionalTestUtils {
    * (Overriden method requestWithAuthTokenInBody used by withAuthToken in trait DomainRequestBase:
    *   type checks for anything that can be cast as AnyContentAsFormUrlEncoded)
    */
-  implicit class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
-    override def requestWithAuthTokenInBody: FakeRequest[T] = {
+  implicit class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T, AnyContentAsFormUrlEncoded] {
+    override def requestWithAuthTokenInBody: FakeRequest[AnyContentAsFormUrlEncoded] = {
       val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
       val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
       val newBody = existingBody + ("authenticityToken" -> Seq(authToken))
       val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
 
-      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*).asInstanceOf[FakeRequest[T]]
+      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*)
     }
   }
 
@@ -174,8 +174,8 @@ object FunctionalTestUtils {
    * (Overriden method requestWithAuthTokenInBody used by withAuthToken in trait DomainRequestBase:
    *   type checks for MultipartFormData[TemporaryFile])
    */
-  implicit class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
-    override def requestWithAuthTokenInBody: FakeRequest[T] = {
+  implicit class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T, MultipartFormData[TemporaryFile]] {
+    override def requestWithAuthTokenInBody: FakeRequest[MultipartFormData[TemporaryFile]] = {
 
       val multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
 
@@ -189,7 +189,7 @@ object FunctionalTestUtils {
 
       val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts)
       val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)
-      newRequest.asInstanceOf[FakeRequest[T]]
+      newRequest
     }
   }
 }

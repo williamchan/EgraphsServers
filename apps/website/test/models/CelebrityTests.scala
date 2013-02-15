@@ -35,8 +35,8 @@ class CelebrityTests extends EgraphsUnitTest
     celebFromJson.id should be (celeb.id)
     celebFromJson.publicName should be (celeb.publicName)
     celebFromJson.urlSlug should be (celeb.urlSlug)
-    celebFromJson.created should be (celeb.created)
-    celebFromJson.updated should be (celeb.updated)
+    celebFromJson.created.getTime should be (celeb.created.getTime)
+    celebFromJson.updated.getTime should be (celeb.updated.getTime)
   }
 
   "A Celebrity" should "start with the default profile photo" in new EgraphsTestApplication {

@@ -50,7 +50,7 @@ private[controllers] trait GetCelebrityEnrollmentTemplateApiEndpoint { this: Con
       }
 
     val enrollmentTemplate = Json.obj(
-      GetCelebrityEnrollmentTemplateApiEndpoint._enrollmentPhrases -> Json.arr(enrollmentPhrasesWithFieldIdentifiers)
+      GetCelebrityEnrollmentTemplateApiEndpoint._enrollmentPhrases -> enrollmentPhrasesWithFieldIdentifiers
     )
     Ok(enrollmentTemplate)
   }

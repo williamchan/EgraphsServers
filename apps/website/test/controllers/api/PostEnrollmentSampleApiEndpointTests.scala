@@ -40,6 +40,10 @@ class PostEnrollmentSampleApiEndpointTests
     Some(anyContentRequest)
   }
 
+  protected override def routeRequest(request: FakeRequest[_]): Option[Result] = {
+    route(request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]])
+  }
+
   routeName(routeUnderTest) should "accept a well-formed enrollment sample" in new EgraphsTestApplication {
     val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {      
       val celebrity = TestData.newSavedCelebrity()
