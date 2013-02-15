@@ -23,6 +23,7 @@ import services.config.ConfigFileProxy
 import services.blobs.Blobs
 import services.db.Schema
 import services.mvc.marketplace.MarketplaceServices
+import services.mvc.landing.LandingMastheadsQuery
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -74,6 +75,7 @@ case class TestWebsiteControllers @Inject()(
   override def formConstraints = instance[FormConstraints]
 
   override def catalogStarsQuery = instance[CatalogStarsQuery]
+  override def landingMastheadsQuery = instance[LandingMastheadsQuery]
   override def orderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
   override def egraphQueryFilters = instance[EgraphQueryFilters]
   override def categoryStore = instance[CategoryStore]

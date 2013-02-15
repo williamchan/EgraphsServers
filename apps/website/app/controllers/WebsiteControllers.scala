@@ -21,6 +21,7 @@ import services.mvc.marketplace._
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.config.ConfigFileProxy
 import services.db.Schema
+import services.mvc.landing.LandingMastheadsQuery
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -39,6 +40,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val accountRecoverForms = instance[AccountRecoverFormFactory]
 
   override protected val catalogStarsQuery: CatalogStarsQuery = instance[CatalogStarsQuery]
+  override protected val landingMastheadsQuery: LandingMastheadsQuery = instance[LandingMastheadsQuery]
   override protected val orderCompleteViewModelFactory: OrderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 
   override protected val checkPurchaseField: PurchaseFormChecksFactory = instance[PurchaseFormChecksFactory]

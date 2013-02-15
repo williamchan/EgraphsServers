@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db.{SavesWithLongKey, Schema, KeyedCaseClass, Deletes}
 import com.google.inject.{Inject, Provider}
-import models.{Celebrity, HasCreatedUpdated, SavesCreatedUpdated}
+import models.{Masthead, Celebrity, HasCreatedUpdated, SavesCreatedUpdated}
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
 
@@ -35,6 +35,7 @@ case class CategoryValue(
    */
   lazy val categories = services.categoryStore.categories(this)
   lazy val celebrities = services.celebrityStore.celebrities(this)
+  lazy val mastheads = services.mastheadStore.mastheads(this)
 
   def save(): CategoryValue = {
     require(!name.isEmpty, "CategoryValue: name must be specified")
@@ -104,6 +105,10 @@ class CategoryValueStore @Inject() (
 
   def categoryValues(celebrity: Celebrity): Query[CategoryValue] with ManyToMany[CategoryValue, CelebrityCategoryValue] = {
     schema.celebrityCategoryValues.left(celebrity)
+  }
+
+  def categoryValues(masthead: Masthead): Query[CategoryValue] with ManyToMany[CategoryValue, MastheadCategoryValue] = {
+    schema.mastheadCategoryValues.left(masthead)
   }
   
   /**

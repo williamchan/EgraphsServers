@@ -1,6 +1,8 @@
 package models.frontend.landing
 
- /**
+import models.frontend.masthead.CallToActionViewModel
+
+/**
  * A "Catalog Star" as seen in the celebrity catalog and in the Featured Stars on the
  * home page
  *
@@ -24,3 +26,12 @@ case class CatalogStar(
 ) {
   def hasInventoryRemaining: Boolean = (inventoryRemaining > 0)
 }
+
+case class LandingMasthead(
+  id:Long,
+  name: String,
+  headline: String,
+  subtitle: Option[String],
+  landingPageImageUrl: String,
+  callToActionViewModel : CallToActionViewModel
+)

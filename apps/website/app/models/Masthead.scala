@@ -1,6 +1,8 @@
 package models
 
+import categories.{MastheadCategoryValue, CelebrityCategoryValue, CategoryValue}
 import enums.{CallToActionType, HasCallToActionType, HasPublishedStatus, PublishedStatus}
+import frontend.landing.LandingMasthead
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db.{Schema, SavesWithLongKey, DBSession, KeyedCaseClass}
@@ -9,6 +11,8 @@ import com.google.inject.{Provider, Inject}
 import org.apache.commons.io.IOUtils
 import play.api.Play._
 import controllers.WebsiteControllers
+import org.squeryl.Query
+import org.squeryl.dsl.ManyToMany
 
 case class MastheadServices @Inject() (
   store: MastheadStore,
@@ -93,6 +97,29 @@ class MastheadStore @Inject() (
 ) extends SavesWithLongKey[Masthead] with SavesCreatedUpdated[Masthead] {
   import org.squeryl.PrimitiveTypeMode._
 
+  /**
+   * Returns all celebrities associated with the provided CategoryValue.
+   */
+  def mastheads(categoryValue: CategoryValue) : Query[Masthead] with ManyToMany[Masthead, MastheadCategoryValue] = {
+    schema.mastheadCategoryValues.right(categoryValue)
+  }
+
+  def getLandingMastheads : Iterable[LandingMasthead] = {
+    for(masthead <- getAll) yield {
+      LandingMasthead(
+        id = masthead.id,
+        name=masthead.name,
+        headline = masthead.headline,
+        subtitle = masthead.subtitle,
+        landingPageImageUrl = masthead.landingPageImage.resizedWidth(1550).getSaved(services.blobs.AccessPolicy.Public).url,
+        callToActionViewModel = CallToActionType.toViewModel(
+          masthead.callToActionType,
+          masthead.callToActionText,
+          masthead.callToActionTarget
+        )
+      )
+    }
+  }
 
   def getAll: Iterable[Masthead] = {
     for(masthead <- schema.mastheads) yield masthead

@@ -8,6 +8,7 @@ import models.CelebrityStore
 import models.categories.{ VerticalStore, Featured }
 import services.mvc.marketplace._
 import services.http.SignupModal
+import services.mvc.landing.LandingMastheadsQuery
 
 /**
  * The main landing page for the consumer website.
@@ -24,7 +25,7 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   protected def featured: Featured
   protected def marketplaceServices: MarketplaceServices
   protected def signupModal: SignupModal
-
+  protected def landingMastheadsQuery: LandingMastheadsQuery
   //
   // Controllers
   //

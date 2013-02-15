@@ -204,6 +204,11 @@ class Schema @Inject() (
     declare(
       columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are unique))
 
+  val mastheadCategoryValues = manyToManyRelation(mastheads, categoryValues).via[MastheadCategoryValue] ((m, cv, mcv) =>
+      (mcv.mastheadId === m.id, mcv.categoryValueId === cv.id))
+  mastheadCategoryValues.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
+  mastheadCategoryValues.rightForeignKeyDeclaration.constrainReference(onDelete cascade)
+
   val videoAssetsCelebrity = manyToManyRelation(videoAssets, celebrities)
     .via[VideoAssetCelebrity]((videoAsset, celebrity, join) => (join.videoId === videoAsset.id, join.celebrityId === celebrity.id))
   on(videoAssetsCelebrity)(videoAssetCelebrity =>
@@ -593,6 +598,7 @@ class Schema @Inject() (
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
       factoryFor(mastheads) is Masthead(services = injector.instance[MastheadServices]),
+      factoryFor(mastheadCategoryValues) is MastheadCategoryValue(services = injector.instance[CategoryServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),
       factoryFor(printOrders) is PrintOrder(services = injector.instance[PrintOrderServices]),
       factoryFor(products) is Product(services = injector.instance[ProductServices]),

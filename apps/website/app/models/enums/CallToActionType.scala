@@ -1,6 +1,7 @@
 package models.enums
 
 import egraphs.playutils.Enum
+import models.frontend.masthead.{InPageActionViewModel, SearchBoxViewModel, VideoPlayerViewModel, SimpleLinkViewModel}
 
 object CallToActionType extends Enum {
   sealed trait EnumVal extends Value
@@ -19,6 +20,15 @@ object CallToActionType extends Enum {
 
   val VideoPlayer = new EnumVal {
     val name = "VideoPlayer"
+  }
+
+  def toViewModel(callToActionType: CallToActionType.EnumVal, text: String, target: String) = {
+    callToActionType match {
+      case SimpleLink => SimpleLinkViewModel(text, target)
+      case InPageAction => InPageActionViewModel(text,target)
+      case SearchBox => SearchBoxViewModel(text, target)
+      case VideoPlayer => VideoPlayerViewModel(text, target)
+    }
   }
 }
 

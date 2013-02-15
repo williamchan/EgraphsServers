@@ -7,6 +7,7 @@ import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
 import play.api.Play.current
 import scala.io.Source
+import services.mvc.landing.UpdateLandingMastheadsActor
 import services.{AppConfig, TempFile, Time, Utils}
 import services.blobs.Blobs
 import services.config.ConfigFileProxy
@@ -68,6 +69,9 @@ object Global extends controllers.ToyBox with Logging {
         // Schedule catalog stars updating
         UpdateCatalogStarsActor.init()
 
+        // Schedule masthead updating
+        UpdateLandingMastheadsActor.init()
+  
         // Schedule search index rebuilding
         if (configProxy.adminToolsEnabled == "full") {
           RebuildSearchIndexActor.init()

@@ -13,4 +13,14 @@ create table Masthead (
   );
 create sequence s_Masthead_id;
 
+
+create table MastheadCategoryValue (
+    mastheadId bigint not null,
+    id bigint primary key not null,
+    categoryValueId bigint not null
+  );
+
+create sequence s_MastheadCategoryValue_id;
+alter table MastheadCategoryValue add constraint MastheadCategoryValueFK7 foreign key (mastheadId) references Masthead(id) on delete cascade;
+alter table MastheadCategoryValue add constraint MastheadCategoryValueFK8 foreign key (categoryValueId) references CategoryValue(id) on delete cascade;
 # --- !Downs
