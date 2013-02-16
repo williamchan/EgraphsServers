@@ -82,7 +82,7 @@ function(page, window, logging, requireModule) {
         var pushedElements = $("#top, #bottom, #content, .flyout-pull-right");
         var mobileMenu = $("#left-flyout");
         log("Binding things");
-        $(".navbar-expand").click(function() {
+        $(".navbar-expand, .btn-navbar").click(function() {
           log("click");
           if(mobileNavOut === false) {
             log("expanding");
