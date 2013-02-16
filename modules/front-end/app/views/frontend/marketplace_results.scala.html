@@ -87,7 +87,7 @@
           @if(viewAsList) {
             @tags.marketplace.result_set_list(results)
           } else {
-            @tags.marketplace.result_set(availableOnly)
+            @tags.marketplace.result_set(availableOnly, results)
           }
         </div>
       </div>
@@ -100,6 +100,8 @@
   
 </section>
 
+<!-- include request star modal -->
+@tags.request_star_modal.apply(query)
 }
 
 @base_template(title="Stars", jsMain = "pages/marketplace-results", headJs = init, body=baseBody)

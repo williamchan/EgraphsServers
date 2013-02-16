@@ -1,10 +1,11 @@
-@(availableOnly: Boolean = false)
+@(availableOnly: Boolean = false,
+  results: models.frontend.marketplace.ResultSetViewModel)
 
 <div class="verticals">
   <section class="clearfix" ng-cloak ng-controller="MarketplaceCtrl">
     <section>
       <div class="clearfix">
-        <h1><span>{{results.subtitle}}</span></h1> 
+        <h1><span>{{results.subtitle}}</span></h1>
         <div class="available-only">
             <ol>
               <li>
@@ -15,8 +16,14 @@
               }
               </li>
             </ol>
-        </div>    
+        </div>
       </div>
+      @if(results.celebrities.size == 0) {
+        <button id="request-star-button" type="button" class="button">
+          <strong><em>Request a Star</em></strong>
+          <span>&raquo;</span>
+        </button>
+      }
       <div class="clearfix">
         <article ng-repeat="celebrity in celebrities" when-scrolled="loadCelebrities()" class="celebrity-result">
           <figure>

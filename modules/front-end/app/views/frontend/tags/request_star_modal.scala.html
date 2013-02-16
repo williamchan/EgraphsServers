@@ -1,4 +1,4 @@
-@(implicit authToken: egraphs.authtoken.AuthenticityToken)
+@(query: String)(implicit authToken: egraphs.authtoken.AuthenticityToken)
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
 @import views.html.frontend.tags
@@ -13,7 +13,7 @@
   @tooltip(link, Seq("field-tooltip"))(body)
 }
 
-<div class="modal signup hide fade" id="requestStarForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal request hide fade" id="requestStarForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-body">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <div>
@@ -27,9 +27,19 @@
 
     <form ng-controller="ModalController" ng-submit="subscribe()">
       <div>
-        <label>Requested Star:</label>
-        <input class="input-xlarge" type="text" name="star-name" ng-model="star-name"/>        
-        <label>Email:</label>
+        <label>
+          Requested Star:
+          @fieldTooltip("Why is this important?") {
+            <strong>These requests</strong> show your star<br>how much their fans want<br>to connect with them!
+          }
+        </label>
+        <input class="input-xlarge" type="text" name="star-name" ng-model="star-name" value="@query"/>
+        <label>
+          Your Email:
+          @fieldTooltip("What for?") {
+            <strong>We'll let you know</strong> when<br>this star becomes available!
+          }
+        </label>
         <input class="input-xlarge" type="email" name="email" ng-model="email"/>
       </div>
       <div>

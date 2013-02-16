@@ -4,7 +4,7 @@
 // from the site footer.
 //
 
-.modal.signup {
+.modal.request {
   background-color: @white;
   width: 610px;
   margin: -250px 0 0 -310px;
@@ -93,9 +93,18 @@
         cursor: pointer;
       }
 
-      .cool {
-        display: inline;
+      .tooltip-link {
+        color: #29abe2;
+        font-size: 11px;
+        text-transform: none;
+        border-bottom: none;
+        text-decoration: underline;
+        margin-left: 5px;
+      }
+
+      .tooltip-link:hover {
         color: @orange;
+        text-decoration: none;
       }
     }
 
@@ -106,12 +115,6 @@
     #submit-email {
       float: left;
     }
-
-    .cool {
-      font-size: 11px;
-      color: @orange;
-      display: inline;
-    }    
   }
 }
 

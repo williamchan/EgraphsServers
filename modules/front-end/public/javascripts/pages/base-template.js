@@ -4,9 +4,10 @@ define(
  "window",
  "services/logging",
  "module",
+ "libs/tooltip",
  "services/ng/mail-services",
  "services/responsive-modal"],
-function(page, window, logging, requireModule) {
+function(page, window, logging, requireModule, tooltip) {
   var menuStatus = "closed";
   var log = logging.namespace(requireModule.id);
 
@@ -78,8 +79,9 @@ function(page, window, logging, requireModule) {
           e.preventDefault();
         });
 
-        $("#request-star-link").click(function(e) {
+        $("#request-star-button").click(function(e) {
           requestStarModal.modal({});
+          tooltip.apply();
           e.preventDefault();
         });
 
