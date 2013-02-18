@@ -70,6 +70,8 @@ case class GiftCertificate protected (
 {
   import MemberLens.Conversions._
 
+  def id: Long = _entity.id
+
   def saveWithLineItem(item: GiftCertificateLineItem) = {
     this.typeId.set(item.itemType.id)
       .itemId.set(item.id)

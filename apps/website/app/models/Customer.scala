@@ -151,6 +151,9 @@ class CustomerStore @Inject() (
     customer
   }
 
+  def findOrCreateByEmail(email: String): Customer = findOrCreateByEmail(email, email takeWhile (_ != '@'))
+
+
   def findByEmail(email: String) = {
     join (table, schema.accounts) ( (customer, account) =>
       where (account.email === email)

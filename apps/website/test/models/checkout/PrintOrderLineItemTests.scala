@@ -40,8 +40,4 @@ class PrintOrderLineItemTests extends EgraphsUnitTest
 
     true
   }
-
-
-
-  "A PrintOrderLineItem" should "do shit right and shit" in (pending)
 }

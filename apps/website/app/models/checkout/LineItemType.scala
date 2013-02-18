@@ -145,6 +145,7 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemT
 trait LineItemTypeEntityGetters[T <: LineItemType[_]] { this: T =>
 
   def _entity: LineItemTypeEntity
+  override def id = _entity.id
   override lazy val description = _entity._desc
   override lazy val nature = _entity.nature
   override lazy val codeType = _entity.codeType

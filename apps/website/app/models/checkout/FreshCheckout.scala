@@ -4,33 +4,43 @@ import java.sql.{Connection, Timestamp}
 import models._
 import checkout.Conversions._
 import services.AppConfig
-
+import scalaz.Lens
 
 
 /** NOTE(CE-13): this checkout instance needs to be serializable */
 case class FreshCheckout(
+  id: Long = 0L,
   _itemTypes: LineItemTypes,
-
-  _buyer: Option[Customer] = None,
-  recipient: Option[Customer] = None,
+  _buyerAccount: Option[Account],
+  recipientAccount: Option[Account] = None,
   shippingAddress: Option[Address] = None,
   stripeToken: Option[String] = None,
-
   zipcode: Option[String] = None,
   services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends Checkout {
+  require(savedIfDefined(_buyerAccount), "Buyer's account must be saved.")
+  require(savedIfDefined(recipientAccount), "Recipient account must be saved.")
 
   //
   // CE-13 Changes
   //
-  override def buyer = _buyer.getOrElse(Customer())
-  override def payment = stripeToken map (token => CashTransactionLineItemType(Some(token), zipcode))
+  override def payment = stripeToken map (token => CashTransactionLineItemType.create(Some(token), zipcode))
+
+  override lazy val buyerAccount: Account = _buyerAccount getOrElse (
+    throw new Exception("Attempting operation requiring buyer without defining buyer first.")
+  )
+
+  override lazy val buyerCustomer: Customer = services.customerStore.findOrCreateByEmail(buyerAccount.email)
+
+  override lazy val recipientCustomer: Option[Customer] = recipientAccount map { account =>
+    services.customerStore.findOrCreateByEmail(account.email)
+  }
 
 
   //
   // Checkout members
   //
-  override def _entity = CheckoutEntity(0, buyer.id)
+  override def _entity = CheckoutEntity(id, buyerCustomer.id)
   override lazy val itemTypes: LineItemTypes = summaryTypes ++ (_derivedTypes ++ _itemTypes)
   override lazy val lineItems: LineItems = resolveTypes(itemTypes)
   override def pendingTypes: LineItemTypes = _itemTypes
@@ -42,22 +52,29 @@ case class FreshCheckout(
   // Checkout methods
   //
   override def withAdditionalTypes(newTypes: LineItemTypes): FreshCheckout = copy(_itemTypes = newTypes ++ _itemTypes)
-  override def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout = PersistedCheckout(savedEntity)
+  override def withEntity(entity: CheckoutEntity): FreshCheckout = this.copy(entity.id)
 
-  override def save() = this.withSavedBuyerAndRecipient().insert()
+  override def save() = {
+    this.withShippingAddress(savedShippingAddress).insert()
+  }
 
 
   //
   // Helper methods
   //
-  def withRecipient(newRecipient: Option[Customer]) = this.copy(recipient = newRecipient)
-  def withBuyer(newBuyer: Customer) = this.copy(_buyer = Some(newBuyer))
+  def withBuyer(newBuyer: Account) = this.copy(_buyerAccount = Some(newBuyer))
+  def withRecipient(newRecipient: Option[Account]) = this.copy(recipientAccount = newRecipient)
   def withZipcode(newZipcode: Option[String]) = this.copy(zipcode = newZipcode)
   def withShippingAddress(newAddress: Option[Address]) = this.copy(shippingAddress = newAddress)
 
-  private def withSavedBuyerAndRecipient() = withRecipient (recipient map { _.save() }) withBuyer (buyer.save())
+  private def savedIfDefined(maybeAccount: Option[Account]) = maybeAccount map (_.id > 0) getOrElse true
+
+  private def savedShippingAddress() = shippingAddress map { address =>
+    address.copy(accountId = buyerAccount.id).save()
+  }
+
+  private def customerId = Lens[FreshCheckout, Long](
+    get = _ => _entity.customerId,
+    set = (checkout, newId) => checkout.withEntity(_entity.copy(customerId = newId))
+  )
 }
-
-
-
-

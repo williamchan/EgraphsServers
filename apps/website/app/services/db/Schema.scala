@@ -257,6 +257,8 @@ class Schema @Inject() (
 
   val lineItemTypeToLineItem = oneToManyRelation(lineItemTypes, lineItems)
     .via((lineItemType, lineItem) => lineItemType.id === lineItem._itemTypeId)
+  val lineItemTypeToProduct = oneToManyRelation(lineItemTypes, products)
+    .via((lineItemType, product) => lineItemType.id === product.lineItemTypeId)
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)

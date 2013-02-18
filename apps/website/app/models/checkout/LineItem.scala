@@ -58,7 +58,7 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
 
   /** Rough approximation for equality between line items based on  */
   def equalsLineItem(that: LineItem[_]) = { that != null && this.unpacked == that.unpacked }
-  protected def unpacked = (id, amount, itemType.id, codeType, nature, domainObject)
+  protected[checkout] def unpacked = (id, amount, itemType.id, codeType, nature)
 
   /** Returns option of this if it has the desired code type, otherwise None. */
   protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
@@ -237,6 +237,7 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity[T]
 
 
 trait LineItemEntityGetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T] =>
+  override def id = _entity.id
   override lazy val checkoutId = checkoutIdField()
   override lazy val amount = amountField()
   lazy val itemTypeId = itemTypeIdField()

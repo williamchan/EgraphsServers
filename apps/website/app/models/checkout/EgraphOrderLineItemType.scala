@@ -1,7 +1,7 @@
 package models.checkout
 
 import models.enums.{CheckoutCodeType, LineItemNature}
-import models.{ProductStore, OrderStore, Order}
+import models.{ProductStore, OrderStore, Order, Product}
 import org.joda.money.{CurrencyUnit, Money}
 import com.google.inject.Inject
 import services.db.{HasTransientServices, InsertsAndUpdates, Schema}
@@ -16,20 +16,19 @@ case class EgraphOrderLineItemTypeServices @Inject() (
   import org.squeryl.PrimitiveTypeMode._
   override protected def table = schema.lineItemTypes
 
-  def findOrCreateEntityByProductId(id: Long) = {
-    import org.squeryl.PrimitiveTypeMode._
-    for (product <- productStore.findById(id).headOption) yield {
-      lazy val existingEntity = product.lineItemTypeId flatMap { typeId =>
-        table.lookup(typeId).headOption
-      }
-      lazy val createEntity = insert(baseEntityByProductId(product.id))
-      existingEntity getOrElse createEntity
+  def findOrCreateEntityForProduct(product: Product): LineItemTypeEntity = {
+    def existingEntity = product.lineItemTypeId flatMap { typeId => table.lookup(typeId).headOption }
+    def createEntity = {
+      val entity = insert( baseEntityByProduct(product) )
+      product.copy(lineItemTypeId = Some(entity.id)).save()
+      entity
     }
+    existingEntity getOrElse createEntity
   }
 
 
-  private def baseEntityByProductId(id: Long) = LineItemTypeEntity(
-    "Egraph Order for product " + id,
+  private def baseEntityByProduct(product: Product) = LineItemTypeEntity(
+    "Egraph Order for product " + product.id,
     EgraphOrderLineItemType.nature,
     EgraphOrderLineItemType.codeType
   )
@@ -56,32 +55,40 @@ case class EgraphOrderLineItemType(
   with LineItemTypeEntityGetters[EgraphOrderLineItemType]
   with HasTransientServices[EgraphOrderLineItemTypeServices]
 {
-
   import models.checkout.checkout.Conversions._
   import models.enums.{LineItemNature, CheckoutCodeType}
 
-  override lazy val _entity = services.findOrCreateEntityByProductId(productId).get
+  override lazy val _entity = services.findOrCreateEntityForProduct(product)
 
   override def id = _entity.id
 
   override def toJson = ""
 
-  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some(
-    Seq( EgraphOrderLineItem(this, price.get) )
-  )
+  override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some {
+    val print: LineItems = if (!framedPrint) Nil else PrintOrderLineItemType(order).lineItems().getOrElse(Nil)
+    print ++ Seq( EgraphOrderLineItem(this, price) )
+  }
 
   // TODO(CE-13): look into inventory batch use
-  lazy val product = services.productStore.findById(productId).get
   lazy val order = Order(
     productId = productId,
     recipientName = recipientName,
     messageToCelebrity = messageToCeleb,
     requestedMessage = desiredText,
-    inventoryBatchId = product.availableInventoryBatches.head.id
+
+    // TODO(CE-13): this may be redundant, and may cause a problem if the product sells out between navigating to the product page and adding to the checkout
+    inventoryBatchId = inventoryBatch.id
   )
 
+  lazy val product = services.productStore.findById(productId) getOrElse {
+    throw new IllegalArgumentException("Valid product id required.")
+  }
 
-  def price = services.productStore.findById(productId) map (_.price)
+  def price = product.price
+
+  def inventoryBatch = product.availableInventoryBatches find (_.hasInventory) getOrElse {
+    throw new IllegalArgumentException("Product is out of inventory.")
+  }
 }
 
 

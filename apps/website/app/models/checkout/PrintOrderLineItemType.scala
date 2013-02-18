@@ -54,7 +54,7 @@ case class PrintOrderLineItemType(
 
   override def id = _entity.id
 
-  override def lineItems(resolved: LineItems, unresolved: LineItemTypes): Option[LineItems] = Some {
+  override def lineItems(resolved: LineItems = Nil, unresolved: LineItemTypes = Nil): Option[Seq[PrintOrderLineItem]] = Some {
     Seq( PrintOrderLineItem(this, printOrder) )
   }
 

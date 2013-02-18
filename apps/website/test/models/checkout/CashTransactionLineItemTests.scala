@@ -42,7 +42,7 @@ class CashTransactionLineItemTests extends EgraphsUnitTest
     val txn = lineItem.domainObject
 
     txn.id should not be (0)
-    txn.accountId should be (checkout.account.id)
+    txn.accountId should be (checkout.buyerAccount.id)
     txn.stripeCardTokenId should be (newItemType.stripeCardTokenId)
     txn.lineItemId should be (Some(lineItem.id))
 

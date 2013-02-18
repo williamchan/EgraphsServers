@@ -52,13 +52,13 @@ object TotalLineItemType extends TotalLineItemType {
   override def lineItems(resolvedItems: LineItems, pendingTypes: LineItemTypes) = {
     import LineItemNature._
 
-    def pendingNeeded = pendingTypes.ofCodeType(CheckoutCodeType.Subtotal) ++ pendingTypes.ofNatures(Tax, Fee)
+    def pendingNeeded = pendingTypes.ofCodeType(CheckoutCodeType.Subtotal) ++ pendingTypes.ofNatures(Tax, Fee, Discount)
     def maybeSubtotal = resolvedItems(CheckoutCodeType.Subtotal).headOption.map(_.amount)
 
     (pendingNeeded, maybeSubtotal) match {
       case (Nil, Some(subtotal: Money)) => Some {
-        val taxesAndFees = resolvedItems.ofNatures(Tax, Fee).sumAmounts
-        Seq(TotalLineItem(taxesAndFees plus subtotal))
+        val taxesFeesDiscounts = resolvedItems.ofNatures(Tax, Fee, Discount).sumAmounts
+        Seq(TotalLineItem(taxesFeesDiscounts plus subtotal))
       }
       case _ => None
     }

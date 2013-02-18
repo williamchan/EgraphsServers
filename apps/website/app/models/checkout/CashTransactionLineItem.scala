@@ -59,27 +59,23 @@ case class CashTransactionLineItem(
    *
    * TODO(CE-16): refactor, possibly apply to other line items
    */
-  override lazy val itemType: CashTransactionLineItemType =
-    CashTransactionLineItemType(_typeEntity, _entity)
+  override lazy val itemType: CashTransactionLineItemType = CashTransactionLineItemType.restore(_typeEntity, _entity)
 
   override def toJson = ""
 
 
-  override lazy val domainObject: CashTransaction = _maybeCashTransaction.getOrElse {
-    services.cashTransactionStore.findByLineItemId(id).getOrElse (
-      throw new IllegalArgumentException("No cash transaction provided or found in database.")
-    )
-  }
+  override lazy val domainObject: CashTransaction = (_maybeCashTransaction orElse getTxnFromDb) getOrElse (
+    throw new IllegalArgumentException("No cash transaction provided or found in database.")
+  )
+
 
   override def transact(checkout: Checkout) = {
     if (id > 0) { this.update() }
     else {
-      require( checkout.account.id > 0 )
-
       // note: type is not saved since the entities are singular
       val savedItem = this.withCheckoutId(checkout.id).insert()
       val savedCashTxn = domainObject.copy(
-        accountId = checkout.account.id,
+        accountId = checkout.buyerAccount.id,
         lineItemId = Some(savedItem.id)
       ).save()
 
@@ -105,7 +101,8 @@ case class CashTransactionLineItem(
       require(_maybeCashTransaction.isDefined, "Required CashTransaction information is not present.")
 
       val txn = domainObject
-      val charge = services.payment.charge(txn.cash, txn.stripeCardTokenId.get, "Checkout #" + checkout.id)
+      val token = txn.stripeCardTokenId getOrElse (throw new IllegalArgumentException("Stripe token required."))
+      val charge = services.payment.charge(txn.cash, token, "Checkout #" + checkout.id)
       val newTransaction = txn.copy(stripeChargeId = Some(charge.id))
       this.copy(_maybeCashTransaction = Some(newTransaction))
     }
@@ -127,8 +124,16 @@ case class CashTransactionLineItem(
     set = (txnItem, newEntity) => txnItem copy newEntity
   )
 
+  def withPaymentService(newPayment: Payment) = this.copy(
+    _services = _services.copy(payment = newPayment)
+  )
 
-  override def withEntity(newEntity: LineItemEntity) = entity.set(newEntity)
+
+  //
+  // Helpers
+  //
+  private def getTxnFromDb = services.cashTransactionStore.findByLineItemId(id)
+
 }
 
 

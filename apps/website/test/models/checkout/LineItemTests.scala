@@ -1,21 +1,21 @@
 package models.checkout
 
 import checkout.Conversions._
-import org.scalatest.matchers.{ShouldMatchers}
+import org.scalatest.matchers.{Matcher, MatchResult, ShouldMatchers}
 import org.scalatest.FlatSpec
 import LineItemMatchers._
 import utils.TestData
 import utils.CanInsertAndUpdateEntityWithLongKeyTests
 import services.db.{CanInsertAndUpdateEntityThroughTransientServices, CanInsertAndUpdateEntityThroughServices}
 import models.{Coupon, CashTransaction}
-import services.payment.StripeTestPayment
+import services.payment.{Payment, YesMaamPayment, StripeTestPayment}
 import services.AppConfig
+import models.enums.OfCheckoutClass
 
 /** mixin for testing a LineItemType's lineItems method */
 trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   this: FlatSpec with ShouldMatchers =>
   import LineItemTestData._
-  import TestData._
 
   //
   // Abstract LineItemType-related members
@@ -74,15 +74,19 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   "A LineItem" should "have the expected domain object when restored" in {
     val restored = restoreLineItem(saveLineItem(newLineItem).id).get
 
-    hasExpectedRestoredDomainObject(restored) should be (true)
+    restored should haveExpectedRestoredDomainObject
   }
 
 
   //
   // Helpers
   //
-  def newLineItem: ItemT = newItemType.lineItems(resolvableItemSets.head, Nil)
-    .get.head.asInstanceOf[ItemT]
+  def resolve(itemType: TypeT) = itemType.lineItems(resolvableItemSets.head, Nil)
+    .get
+
+  def newLineItem: ItemT = resolve(newItemType).ofCodeType(
+    newItemType.codeType.asInstanceOf[OfCheckoutClass[TypeT, ItemT]]
+  ).head
 
   def saveLineItem(item: ItemT): ItemT = item match {
     case subItem: SubLineItem[_] => subItem.transactAsSubItem(checkout).asInstanceOf[ItemT]
@@ -92,6 +96,15 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   lazy val checkout = newSavedCheckout()
 
   lazy val lineItemStore = AppConfig.instance[LineItemStore]
+
+
+  def haveExpectedRestoredDomainObject = Matcher { left: ItemT =>
+    MatchResult(
+      hasExpectedRestoredDomainObject(left),
+      "Bad bad, wtf is this: " + left.domainObject,
+      "Good good."
+    )
+  }
 }
 
 
@@ -135,61 +148,3 @@ trait SavesAsLineItemEntityThroughServicesTests[
 
 
 
-/**
- * Collection of helpers for generating line items and types of various sorts, primarily to use
- * for LineItemTests. Unless named as 'saved' whatever, these are not saved.
- */
-object LineItemTestData {
-  import services.Finance.TypeConversions._
-  import TestData._
-
-  def seqOf[T](gen: => T)(n: Int): Seq[T] = (0 to n).toSeq.map(_ => gen)
-
-
-  def randomEgraphOrderType = EgraphOrderLineItemType(
-    productId = newSavedProduct().id,
-    recipientName = generateFullname()
-  )
-  def randomEgraphOrderItem = randomEgraphOrderType.lineItems(Nil, Nil).get.head
-
-  def randomPrintOrderType = PrintOrderLineItemType(newSavedOrder())
-  def randomPrintOrderItem = randomPrintOrderType.lineItems(Nil, Nil).get.head
-
-  def randomGiftCertificateItem = randomGiftCertificateType.lineItems().get.head
-  def randomGiftCertificateType = GiftCertificateLineItemType(generateFullname, randomMoney)
-
-  def randomCouponType(coupon: Coupon = newSavedCoupon()) = {
-    val couponTypeServices = AppConfig.instance[CouponLineItemTypeServices]
-    couponTypeServices.findByCouponCode(coupon.code).get
-  }
-
-  def taxItemOn(subtotal: SubtotalLineItem): TaxLineItem = randomTaxType.lineItems(Seq(subtotal), Nil).get.head
-  def randomTaxItem: TaxLineItem = taxItemOn(randomSubtotalItem)
-  def randomTaxType: TaxLineItemType = TaxLineItemType("98888", randomTaxRate, Some("Test tax"))
-
-  def randomSubtotalItem: SubtotalLineItem = SubtotalLineItem(randomMoney)
-  def randomTotalItem = TotalLineItem(randomMoney)
-  def randomBalanceItem = BalanceLineItem(randomMoney)
-
-  def randomCashTransactionType = CashTransactionLineItemType(Some(payment.testToken().id), zipcode)
-  def randomCashTransactionItem = randomCashTransactionType.lineItems(Seq(randomBalanceItem)).get.head
-
-  def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
-  def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
-
-
-  def newCheckout: FreshCheckout = {
-    val account = Some(newSavedAccount())
-    val customer = newSavedCustomer(account)
-    val address = newSavedAddress(account)
-    Checkout.create(Seq(randomGiftCertificateType), Some(customer), address)
-  }
-  def newSavedCheckout() = newCheckout.insert()
-  def newTransactedCheckout() = newCheckout.transact(Some(randomCashTransactionType))
-
-  def payment: StripeTestPayment = {
-    val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap(); pment
-  }
-
-  protected def zipcode = Some("98888")
-}

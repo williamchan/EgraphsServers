@@ -107,9 +107,9 @@ object TestData {
   def newSavedCoupon(
     discountType: CouponDiscountType = CouponDiscountType.Flat,
     usageType: CouponUsageType = CouponUsageType.OneUse,
-    maxAmount: Double = 25.0
+    maxAmount: BigDecimal = BigDecimal(25.0)
   ): Coupon = {
-    Coupon(discountAmount = BigDecimal(random.nextDouble() * maxAmount))
+    Coupon(discountAmount = BigDecimal(random.nextDouble()) * maxAmount)
       .withDiscountType(CouponDiscountType.Flat)
       .withUsageType(usageType).save()
   }

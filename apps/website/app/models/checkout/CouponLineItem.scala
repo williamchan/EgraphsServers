@@ -28,8 +28,8 @@ case class CouponLineItem(
 
   override def toJson = ""
 
-  override def itemType: CouponLineItemType = (_type orElse itemTypeById).get
-  override lazy val domainObject: Coupon = (couponFromType orElse couponFromTypeId).get
+  override def itemType: CouponLineItemType = (_type orElse itemTypeById) getOrElse (throw new IllegalArgumentException("CouponLineItemType required."))
+  override lazy val domainObject: Coupon = (couponFromType orElse couponFromTypeId) getOrElse (throw new IllegalArgumentException("Coupon required."))
   override def transact(checkout: Checkout) = {
     if (id > 0) { this.update() }
     else {

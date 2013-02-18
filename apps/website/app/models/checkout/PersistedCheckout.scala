@@ -11,29 +11,29 @@ import services.AppConfig
 case class PersistedCheckout(
   _entity: CheckoutEntity,
   _addedTypes: LineItemTypes = Nil,
-
   stripeToken: Option[String] = None,      // used for payment or refund
   zipcode: Option[String] = None,
-
   services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends Checkout {
 
   //
   // CE-13 Changes
   //
-  /** buyer ought not to change, so just get from store */
-  override lazy val buyer: Customer = services.customerStore.findById(buyerId).get
+  override def id = _entity.id
+  override lazy val buyerCustomer: Customer = services.customerStore.findById(_entity.customerId).head
+  override lazy val buyerAccount: Account = buyerCustomer.account
 
-  /** if there's a use for thise field, can be taken in constructor */
-  override lazy val recipient: Option[Customer] = None
+  // todo: provide real implementation when these are needed after point of transaction
+  override def recipientAccount: Option[Account] = None
+  override def recipientCustomer: Option[Customer] = None
 
   /** cash transaction to be made if changes are transacted */
   override def payment: Option[CashTransactionLineItemType] = {
     for ( token <- stripeToken; zip <- zipcode) yield
-      CashTransactionLineItemType(Some(token), Some(zip))
+      CashTransactionLineItemType.create(Some(token), Some(zip))
   }
 
-  override def shippingAddress = addresses.headOption
+  override lazy val shippingAddress = buyerAccount.addresses.headOption
 
 
   //
@@ -69,9 +69,7 @@ case class PersistedCheckout(
     copy(_addedTypes = newTypes ++ _addedTypes)
   }
 
-  override def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout = {
-    this.copy(savedEntity)
-  }
+  override def withEntity(entity: CheckoutEntity): PersistedCheckout = this.copy(entity)
 
   override def save(): Checkout = this.update()
 
@@ -81,12 +79,4 @@ case class PersistedCheckout(
   //
   /** restored items from db */
   protected lazy val _lineItems: LineItems = services.lineItemStore.getItemsByCheckoutId(id)
-}
-
-object PersistedCheckout {
-  /** convenience constructor */
-  def apply(checkout: Checkout) = {
-    require(checkout.id > 0, "PersistedCheckout requires a saved checkout entity.")
-    new PersistedCheckout(checkout._entity)
-  }
 }

@@ -1,7 +1,7 @@
 package models.checkout
 
 import org.joda.money.{Money, CurrencyUnit}
-import models.{Order, OrderStore}
+import models.{PrintOrder, Order, OrderStore}
 import services.db.{Schema, CanInsertAndUpdateEntityThroughTransientServices, InsertsAndUpdatesAsEntity, HasTransientServices}
 import services.AppConfig
 import com.google.inject.Inject
@@ -34,15 +34,14 @@ case class EgraphOrderLineItem(
   //
   override def toJson = ""
 
-  override def domainObject: Order = (orderFromType orElse orderFromDb) get
+  override def domainObject: Order = (orderFromType orElse orderFromDb) getOrElse (throw new IllegalArgumentException("Order required."))
 
-  override def itemType: EgraphOrderLineItemType = (_type orElse restoreItemType) get
+  override def itemType: EgraphOrderLineItemType = (_type orElse restoreItemType) getOrElse (throw new IllegalArgumentException("EgraphOrderLineItemType required."))
 
   override def transact(checkout: Checkout) = {
     if (id > 0) { this.update() } else {
       val savedItem = this.withCheckoutId(checkout.id).insert()
-      savedItem.saveOrder(checkout)
-      savedItem.clearGivenItemType  // clear because _type's order is no longer current
+      savedItem.withSavedOrder(checkout)
     }
   }
 
@@ -57,14 +56,23 @@ case class EgraphOrderLineItem(
   }
 
   private def clearGivenItemType = this.copy(_type = None)
-  private def saveOrder(checkout: Checkout) = {
-    val buyerId = checkout.buyerId
-    val recipientId = checkout.recipient map (_.id) getOrElse buyerId
-    domainObject.copy(
+
+  private def withSavedOrder(checkout: Checkout) = {
+    val buyerId = checkout.buyerCustomer.id
+    val recipientId = checkout.recipientCustomer map (_.id) getOrElse buyerId
+
+    val savedOrder = domainObject.copy(
       lineItemId = Some(id),
       buyerId = buyerId,
       recipientId = recipientId
     ).withPaymentStatus(PaymentStatus.Charged).save()
+
+    if (itemType.framedPrint) {
+      val printItem = PrintOrderLineItemType(savedOrder).lineItems().flatten.headOption
+      printItem map { item => item.transactAsSubItem(checkout) }
+    }
+
+    this.clearGivenItemType // clear because its Order is no longer current
   }
 
   override protected lazy val entityLens = EntityLens(

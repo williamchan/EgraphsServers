@@ -46,13 +46,13 @@ case class TaxLineItemType protected (
 
     (resolvedItems(CheckoutCodeType.Subtotal).headOption, pendingResolution(Discount)) match {
       // Want to have the subtotal and no pending discounts
-      case (Some(subtotal: SubtotalLineItem), Nil) =>
-        // Sum discounts since there may be multiple (eventually)
+      case (Some(subtotal: SubtotalLineItem), Nil) => Some {
         val totalDiscount = resolvedItems(Discount).sumAmounts
 
         // (subtotal - discounts) * tax rate
         val taxAmount = (subtotal.amount minus totalDiscount) multipliedBy (taxRate.bigDecimal, java.math.RoundingMode.UP)
-        Some(Seq(TaxLineItem(this, taxAmount)))
+        Seq(TaxLineItem(this, taxAmount))
+      }
 
       case _ => None
     }

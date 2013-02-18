@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import services.db.Schema
 import services.AppConfig
 import scalaz.Lens
+import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
 
 
 //
@@ -26,11 +27,8 @@ case class PrintOrderLineItem(
   // LineItem members
   //
   override def toJson = ""
-  override def itemType = (_type orElse typeFromOrder) get
-  override def domainObject = (_printOrder orElse printOrderFromDb) getOrElse {
-    println("whaaat?")
-    _printOrder.get
-  }
+  override def itemType = (_type orElse typeFromOrder) getOrElse (throw new ItemTypeNotFoundException("PrintOrderLineItemType"))
+  override def domainObject = (_printOrder orElse printOrderFromDb) getOrElse (throw new DomainObjectNotFoundException("PrintOrder"))
 
   //
   // SubLineItem members
@@ -65,8 +63,9 @@ case class PrintOrderLineItem(
   /** save `PrintOrder` and copy into _printOrder */
   private def withSavedPrintOrder(checkout: Checkout) = {
     // TODO(CE-13): add name to shipping address
+    val address = checkout.shippingAddress getOrElse (throw new MissingRequiredAddressException("PrintOrderLineItemType"))
     val savedPrint = domainObject.copy(lineItemId = Some(id))
-      .withShippingAddress(checkout.shippingAddress.get)
+      .withShippingAddress(address)
       .save()
     this.copy(_printOrder = Some(savedPrint))
   }
