@@ -80,7 +80,7 @@ trait PostMastheadAdminEndpoint {
                   subtitle = Utils.toOption(validForm.subtitle),
                   callToActionTarget = validForm.callToActionTarget,
                   callToActionText = validForm.callToActionText
-                ).withPublishedStatus(publishedStatus).withCallToActionType(callToActionType).save().saveWithLandingPageImage(landingPageImageOption)
+                ).withPublishedStatus(publishedStatus).withCallToActionType(callToActionType).saveWithLandingPageImage(landingPageImageOption)
 
                 Redirect(controllers.routes.WebsiteControllers.getMastheadAdmin(savedMasthead.id))
               }

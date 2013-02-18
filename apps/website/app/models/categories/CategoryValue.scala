@@ -156,6 +156,22 @@ class CategoryValueStore @Inject() (
     )
   }
 
+  /**
+   * Update a masthead
+   */
+
+  def updateMastheads(categoryValue: CategoryValue, mastheadIds: Iterable[Long]) {
+    categoryValue.mastheads.dissociateAll
+
+    val newMastheadCategoryValues = for (mastheadId <-  mastheadIds)  yield {
+      MastheadCategoryValue(mastheadId = mastheadId, categoryValueId = categoryValue.id)
+    }
+
+    schema.mastheadCategoryValues.insert(
+      newMastheadCategoryValues
+    )
+  }
+
   //
   // SavesWithLongKey[CategoryValue] methods
   //

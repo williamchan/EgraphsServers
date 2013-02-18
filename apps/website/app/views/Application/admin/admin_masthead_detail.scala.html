@@ -11,6 +11,7 @@
 @import views.html.frontend.tags.ng
 @import views.html.frontend.base_template
 @import models.enums.CallToActionType
+@import models.enums.PublishedStatus
 
 @headJs = {
   Egraphs.page.masthead = {
@@ -47,7 +48,6 @@
                 <fieldset>
                   @errorMessage(errorFields)
                   <input name="mastheadId" type="hidden" value="@masthead.id">
-                  <input id="publishedStatus" name="publishedStatusString" value="@masthead._publishedStatus" type="hidden">
                   <label class="control-label">Name</label>
                   <div class="controls">
                     <input name="name" ng-model="masthead.name"  type="text" class="input-large">
@@ -66,10 +66,9 @@
                     <span class="help-block">
                       A CTA is a <a href="http://en.wikipedia.org/wiki/Call_to_action_(marketing)">call to action.</a> 
                     </span>        
-                  </div>
-
+                  </div>>
                   <label class="control-label">CTA Type</label>
-                  <div class="controls">                  
+                  <div class="controls">
                     @for(cta <- CallToActionType.values) {
                       <input type="radio" name="callToActionTypeString" value="@cta.name" @if(cta.name == masthead.callToActionType.name) {checked="checked"}>@cta.name
                     }
@@ -90,6 +89,14 @@
                     <span class="help-block">
                       JPG must be at least @LandingPageImage.minImageWidth x @LandingPageImage.minImageHeight. Should be center-balanced photo of celebrity. Server will crop in an unattractive way if needed.
                     </span>
+                  </div>
+                  <div class="controls">
+                    <select name="publishedStatusString">
+                      @for(status <- PublishedStatus.values) {
+                      <option value="@status.name" @if(masthead._publishedStatus == status.name){selected="selected"})>@status.name</option>
+                      }
+
+                    </select>
                   </div>
                   <div class="controls">
                     <button type="submit" class="btn btn-primary">Save</button>

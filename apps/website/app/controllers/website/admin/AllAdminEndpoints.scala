@@ -51,6 +51,7 @@ trait AllAdminEndpoints
   with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
   with PostMastheadAdminEndpoint
+  with PostFeaturedMastheadsAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
   with PostProcessVideoAdminEndpoint

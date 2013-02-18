@@ -13,6 +13,8 @@ import play.api.Play._
 import controllers.WebsiteControllers
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
+import services.mvc.celebrity.CatalogStarsQuery
+import services.mvc.landing.LandingMastheadsQuery
 
 case class MastheadServices @Inject() (
   store: MastheadStore,
@@ -93,6 +95,7 @@ case class Masthead (
 
 class MastheadStore @Inject() (
   schema: Schema,
+  landingMastheadsQuery: LandingMastheadsQuery,
   dbSession: DBSession
 ) extends SavesWithLongKey[Masthead] with SavesCreatedUpdated[Masthead] {
   import org.squeryl.PrimitiveTypeMode._

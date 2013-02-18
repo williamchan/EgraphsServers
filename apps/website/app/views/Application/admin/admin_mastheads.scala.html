@@ -1,4 +1,4 @@
-@(mastheads: Iterable[models.Masthead] = List())(implicit authToken: egraphs.authtoken.AuthenticityToken,
+@(mastheads: Iterable[models.Masthead] = List(), featuredIds: Iterable[Long])(implicit authToken: egraphs.authtoken.AuthenticityToken,
 headerData: models.frontend.header.HeaderData,
 footerData: models.frontend.footer.FooterData)
 
@@ -16,10 +16,14 @@ footerData: models.frontend.footer.FooterData)
  @routes.WebsiteControllers.getMastheadAdmin(id).url
 }
 
+@postFeaturedAction = @{
+  routes.WebsiteControllers.postFeaturedMastheads
+} 
+
 @body = {
 <section id="content" class="top" role="main">
     <div id="main" class="sub">
-        <div class="container" id="celebrity-admin">
+        <div class="container">
             <h1>
                 Mastheads Administration
             </h1>
@@ -27,11 +31,15 @@ footerData: models.frontend.footer.FooterData)
             <h2>
               Featured Mastheads
             </h2>
-          @safeForm('id -> "postFeaturedMastheads-form", 'method -> "POST", 'action -> "#") {
+          @safeForm('id -> "postFeaturedMastheads-form", 'method -> "POST", 'action -> postFeaturedAction.url) {
             <div class="row-fluid">
               <div class="span5">
-                <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
-
+                <select data-placeholder="Choose mastheads to feature on the homepage" name="mastheadIds" style="width:350px" multiple class="chzn-select">
+                  @for(masthead <- mastheads) {
+                    <option name=@{"mastheadIds[" + (masthead.id-1) + "]"} value="@masthead.id" @if(featuredIds.exists(_ == masthead.id)){selected}>
+                    @masthead.name
+                  </option>
+                  }  
                 </select>
               </div>
               <div class="span7">
@@ -78,4 +86,4 @@ footerData: models.frontend.footer.FooterData)
 </section>
 }
 
-@base_template(title="Admin - Mastheads", body=body, jsMain="")
+@base_template(title="Admin - Mastheads", body=body, jsMain="pages/admin/mastheads")
