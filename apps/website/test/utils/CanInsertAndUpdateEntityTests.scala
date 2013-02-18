@@ -4,7 +4,8 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FlatSpec
 import services.db._
 import scala.Some
-import services.cache.Cache
+import services.cache.{CacheFactory, Cache}
+import services.AppConfig
 
 
 trait CanInsertAndUpdateEntityWithLongKeyTests[
@@ -77,11 +78,9 @@ trait HasTransientServicesTests[ModelT] {
 
 
   def newModel: ModelT
+  def assertModelsEqual(a: ModelT, b: ModelT): Unit
 
-  def modelsEqual(a: ModelT, b: ModelT): Boolean
-  def cacheInstance: Cache
-
-
+  def cacheInstance: Cache = AppConfig.instance[CacheFactory].applicationCache
 
 
   "A model with transient services" should "serialize and deserialize as expected" in {
@@ -89,7 +88,7 @@ trait HasTransientServicesTests[ModelT] {
     writeModel(model)
     val deserialized = readModel()
 
-    assert(modelsEqual(model, deserialized), "Deserialized model did not have expected value.")
+    assertModelsEqual(model, deserialized)
   }
 
   it should "be cacheable" in {
@@ -101,7 +100,7 @@ trait HasTransientServicesTests[ModelT] {
     val fromCache = cacheInstance.get(key)
 
     fromCache should be ('defined)
-    assert(modelsEqual(model, fromCache.get), "Model from cache did not have expected value.")
+    assertModelsEqual(model, fromCache.get)
   }
 
 

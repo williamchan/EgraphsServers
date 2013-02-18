@@ -58,7 +58,7 @@ trait CheckoutTestCases { this: FlatSpec with ShouldMatchers =>
     val restoredItems = restoredCheckout.lineItems
 
     savedItems.size should be (restoredItems.size)
-    savedItems should beContainedIn (restoredItems)
+    savedItems should haveLineItemEqualityTo (restoredItems)
   }
 
   it should "update when transacted with additional types" in (eachScenario where updateDefined and buyerAndPaymentDefined) {
@@ -95,7 +95,7 @@ trait CheckoutTestCases { this: FlatSpec with ShouldMatchers =>
     val updatedSaved = transactedCheckout.updated.transacted
     val updatedRestored  = updatedSaved.restored
 
-    updatedSaved.lineItems should beContainedIn (updatedRestored.lineItems)
+    updatedSaved.lineItems should haveLineItemEqualityTo (updatedRestored.lineItems)
   }
 
   it should "not do anything on transact without any changes being made" in (eachScenario where buyerAndPaymentDefined) {

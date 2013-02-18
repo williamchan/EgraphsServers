@@ -68,10 +68,8 @@ class CashTransactionLineItemTypeTests extends EgraphsUnitTest
   //
   override def newModel = LineItemTestData.randomCashTransactionType
 
-  override def modelsEqual(a: CashTransactionLineItemType, b: CashTransactionLineItemType) = {
+  override def assertModelsEqual(a: CashTransactionLineItemType, b: CashTransactionLineItemType) {
     def withoutServices(c: CashTransactionLineItemType) = c.productIterator.slice(0,c.productArity-1).toList
-    withoutServices(a) == withoutServices(b)
+    assert(withoutServices(a) == withoutServices(b))
   }
-
-  override def cacheInstance = AppConfig.instance[CacheFactory].applicationCache
 }

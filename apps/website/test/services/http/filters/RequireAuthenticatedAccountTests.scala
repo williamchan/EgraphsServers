@@ -23,7 +23,7 @@ class RequireAuthenticatedAccountTests extends EgraphsUnitTest {
     val userEmail = "myyk@dadshouse.com"
     val password = "catdoghouse"
     val accountStore = mock[AccountStore]
-    val account = Account(email = userEmail, services = mock[AccountServices]).withPassword(password).fold(ex => throw new Exception("Bad test setup."), a => a)
+    val account = Account(email = userEmail, _services = mock[AccountServices]).withPassword(password).fold(ex => throw new Exception("Bad test setup."), a => a)
     accountStore.authenticate(userEmail, password) returns Right(account)
 
     // Set up the request to look right with proper credentials

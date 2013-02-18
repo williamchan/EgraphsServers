@@ -5,7 +5,7 @@ import models._
 import models.enums._
 import checkout.Conversions._
 import services.AppConfig
-
+import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientServices}
 
 
 case class PersistedCheckout(
@@ -13,7 +13,7 @@ case class PersistedCheckout(
   _addedTypes: LineItemTypes = Nil,
   stripeToken: Option[String] = None,      // used for payment or refund
   zipcode: Option[String] = None,
-  services: CheckoutServices = AppConfig.instance[CheckoutServices]
+  @transient _services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends Checkout {
 
   //

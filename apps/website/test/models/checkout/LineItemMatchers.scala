@@ -14,7 +14,7 @@ object LineItemMatchers {
    * @param rightItems line items which is a super set of left if a positive match is made
    * @return positive MatchResult if left is subset of otherItems
    */
-  def beContainedIn(rightItems: LineItems) = Matcher { leftItems: LineItems =>
+  def haveLineItemEqualityTo(rightItems: LineItems) = Matcher { leftItems: LineItems =>
     val (leftUnmatched, rightUnmatched) = unmatchedItems(leftItems, rightItems)
     val successMessage = "Items where \"equal\""
     val failMessage = "Not found in right: %s\n\nNot found in left: %s\n\n".format(leftUnmatched, rightUnmatched)

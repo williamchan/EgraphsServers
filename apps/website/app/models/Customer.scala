@@ -139,9 +139,11 @@ class CustomerStore @Inject() (
     findByEmail(email).getOrElse(createByEmail(email, name))
   }
 
+  def findOrCreateByEmail(email: String): Customer = findOrCreateByEmail(email, email takeWhile (_ != '@'))
+
   def createByEmail(email: String, name: String): Customer = {
     val accountOption = accountStore.findByEmail(email)
-    val account = accountOption.getOrElse(Account(email = email, services = accountServices.get))
+    val account = accountOption.getOrElse(Account(email = email, _services = accountServices.get))
     val unsavedCustomer = account.createCustomer(name)
     val unsavedUsernameHistory = account.createUsername()
     val customer = unsavedCustomer.save()
@@ -150,9 +152,6 @@ class CustomerStore @Inject() (
 
     customer
   }
-
-  def findOrCreateByEmail(email: String): Customer = findOrCreateByEmail(email, email takeWhile (_ != '@'))
-
 
   def findByEmail(email: String) = {
     join (table, schema.accounts) ( (customer, account) =>

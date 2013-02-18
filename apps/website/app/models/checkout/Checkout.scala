@@ -9,7 +9,7 @@ import checkout.Conversions._
 import services.AppConfig
 import services.db._
 import services.payment.Charge
-
+import services.config.ConfigFileProxy
 
 
 //
@@ -22,6 +22,7 @@ case class CheckoutServices @Inject() (
   accountStore: AccountStore,
   addressStore: AddressStore,
   dbSession: DBSession,
+  config: ConfigFileProxy,
   @CurrentTransaction currentTxnConnectionFactory: () => Connection
 ) extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity] with SavesCreatedUpdated[CheckoutEntity] {
   import org.squeryl.PrimitiveTypeMode._
@@ -48,9 +49,10 @@ case class CheckoutServices @Inject() (
 //
 // Base Model
 //
-abstract class Checkout extends CanInsertAndUpdateEntityThroughServices[Checkout, CheckoutEntity]
+abstract class Checkout
+  extends CanInsertAndUpdateEntityThroughTransientServices[Checkout, CheckoutEntity, CheckoutServices]
   with HasEntity[CheckoutEntity, Long]
-{
+{ this: Serializable =>
   import Checkout._
 
   //
@@ -58,7 +60,6 @@ abstract class Checkout extends CanInsertAndUpdateEntityThroughServices[Checkout
   //
   def id: Long
   def _entity: CheckoutEntity
-  def services: CheckoutServices
 
   def buyerAccount: Account
   def buyerCustomer: Customer
@@ -85,7 +86,11 @@ abstract class Checkout extends CanInsertAndUpdateEntityThroughServices[Checkout
   lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
     // TODO(refunds): will probably want to add the refund transaction here
     // TODO(fees): will want to add any fees we charge here
-    TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
+
+    // TODO(taxes): remove the if to enable adding taxes based on billing zipcode
+    if (services.config.applicationMode != "dev") Nil else {
+      TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
+    }
   }
 
 

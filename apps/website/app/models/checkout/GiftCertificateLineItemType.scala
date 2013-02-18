@@ -18,7 +18,7 @@ import com.google.inject.Inject
 case class GiftCertificateLineItemType (
   _entity: LineItemTypeEntity,
   recipient: String,
-  amount: Money,
+  @transient amount: Money,
   @transient _services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
 )
 	extends LineItemType[GiftCertificate]
@@ -38,8 +38,6 @@ case class GiftCertificateLineItemType (
     val giftCertificate = GiftCertificate(recipient, amount)
     Some(Seq(GiftCertificateLineItem(this, giftCertificate)))
   }
-
-  override def id = _entity.id
 
   override protected lazy val entityLens = Lens[GiftCertificateLineItemType, LineItemTypeEntity] (
     get = cert => cert._entity,

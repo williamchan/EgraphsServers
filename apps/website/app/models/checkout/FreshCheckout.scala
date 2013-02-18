@@ -5,6 +5,7 @@ import models._
 import checkout.Conversions._
 import services.AppConfig
 import scalaz.Lens
+import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientServices}
 
 
 /** NOTE(CE-13): this checkout instance needs to be serializable */
@@ -16,7 +17,7 @@ case class FreshCheckout(
   shippingAddress: Option[Address] = None,
   stripeToken: Option[String] = None,
   zipcode: Option[String] = None,
-  services: CheckoutServices = AppConfig.instance[CheckoutServices]
+  @transient _services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends Checkout {
   require(savedIfDefined(_buyerAccount), "Buyer's account must be saved.")
   require(savedIfDefined(recipientAccount), "Recipient account must be saved.")
@@ -40,7 +41,7 @@ case class FreshCheckout(
   //
   // Checkout members
   //
-  override def _entity = CheckoutEntity(id, buyerCustomer.id)
+  override lazy val _entity = CheckoutEntity(id, buyerCustomer.id)
   override lazy val itemTypes: LineItemTypes = summaryTypes ++ (_derivedTypes ++ _itemTypes)
   override lazy val lineItems: LineItems = resolveTypes(itemTypes)
   override def pendingTypes: LineItemTypes = _itemTypes
