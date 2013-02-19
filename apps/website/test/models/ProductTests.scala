@@ -95,8 +95,8 @@ class ProductTests extends EgraphsUnitTest
     productFromJson.signingOriginY should be (product.signingOriginY)
     productFromJson.signingAreaW should be (product.signingAreaW)
     productFromJson.signingAreaH should be (product.signingAreaH)
-    productFromJson.created should be (product.created)
-    productFromJson.updated should be (product.updated)
+    productFromJson.created.getTime should be (product.created.getTime)
+    productFromJson.updated.getTime should be (product.updated.getTime)
 
     // fields not read from json to an Order, because they are derived.
     val iPadSigningPhotoUrl: String = product.photo.resizedWidth(product.signingScaleW).url

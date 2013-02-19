@@ -22,7 +22,7 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
 
-    blobs.get(blobKey).get.asByteArray.length should be(11335) // If this breaks, check the rendered image
+    blobs.get(blobKey).get.asByteArray.length should be(11331) // If this breaks, check the rendered image
   }
 
   "saveAndGetUrl" should "use signing origin offsets" in new EgraphsTestApplication {
@@ -37,7 +37,7 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
 
-    blobs.get(blobKey).get.asByteArray.length should be(11385) // If this breaks, check the rendered image
+    blobs.get(blobKey).get.asByteArray.length should be(11381) // If this breaks, check the rendered image
   }
 
 //  TODO: single-point strokes are not being rendered, see SER-3
@@ -66,7 +66,7 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
     
-    blobs.get(blobKey).get.asByteArray.length should be(1285) // If this breaks, check the rendered image
+    blobs.get(blobKey).get.asByteArray.length should be(1284) // If this breaks, check the rendered image
   }
 
   "saveAndGetUrl" should "render three-point stroke" in new EgraphsTestApplication {
@@ -80,7 +80,7 @@ class EgraphImageTests extends EgraphsUnitTest
     val frameFittedImageUrl = frameFittedImage.saveAndGetUrl(AccessPolicy.Public)
     val blobKey = TestHelpers.getBlobKeyFromTestBlobUrl(frameFittedImageUrl)
 
-    blobs.get(blobKey).get.asByteArray.length should be(1304) // If this breaks, check the rendered image
+    blobs.get(blobKey).get.asByteArray.length should be(1302) // If this breaks, check the rendered image
   }
 
 }
