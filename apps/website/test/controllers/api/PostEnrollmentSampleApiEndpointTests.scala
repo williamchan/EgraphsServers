@@ -51,6 +51,7 @@ class PostEnrollmentSampleApiEndpointTests
     }
 
     val result = routePostEnrollmentSample(celebrityAccount)
+    status(result) should be(OK)
 
     val enrollmentBatch = db.connected(TransactionSerializable) {
       enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
@@ -70,6 +71,7 @@ class PostEnrollmentSampleApiEndpointTests
     }
 
     val result = routePostEnrollmentSample(celebrityAccount)
+    status(result) should be(OK)
 
     val enrollmentBatch = db.connected(TransactionSerializable) {
       enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
@@ -105,7 +107,7 @@ class PostEnrollmentSampleApiEndpointTests
 
     status(result) should be(OK)
     val json = Json.parse(contentAsString(result))
-    (json \ "id").as[Long] > 0 should not be (true)
+    (json \ "id").as[Long] should be > 0L
     (json \ "batch_complete").as[Boolean] should be(isBatchComplete)
 
     (json \ "numEnrollmentSamplesInBatch").as[BigDecimal].intValue should be(numEnrollmentSamplesInBatch)

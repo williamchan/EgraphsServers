@@ -23,9 +23,9 @@ class AdminLoginTests extends EgraphsUnitTest {
     val (admin, celebrity) = db.connected(TransactionSerializable) {
       (TestData.newSavedAdministrator(), TestData.newSavedCelebrity())
     }
-    
-    val req = FakeRequest(GET, url).withAdmin(admin.id)
+
     val url = WebsiteControllers.getCelebritiesAdmin().url
+    val req = FakeRequest(GET, url).withAdmin(admin.id)
     status(route(req).get) should be(OK)
 
 //    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url))
