@@ -68,7 +68,7 @@ case class EgraphOrderLineItemType(
 
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some {
     val print: LineItems = if (!framedPrint) Nil else PrintOrderLineItemType(order).lineItems().getOrElse(Nil)
-    print ++ Seq( EgraphOrderLineItem(this, price) )
+    Seq( EgraphOrderLineItem(this, price) ) ++ print
   }
 
   //
@@ -79,9 +79,7 @@ case class EgraphOrderLineItemType(
     recipientName = recipientName,
     messageToCelebrity = messageToCeleb,
     requestedMessage = desiredText,
-
-    // TODO(CE-13): this may be redundant, and may cause a problem if the product sells out between navigating to the product page and adding to the checkout -- should make sure to be checking product inventory at transaction
-    inventoryBatchId = inventoryBatch.id
+    inventoryBatchId = inventoryBatch.id // TODO(CE-13): move inventory batch check to EgraphOrderLineItem#transact
   )
 
   lazy val product = services.productStore.findById(productId) getOrElse {
@@ -91,6 +89,7 @@ case class EgraphOrderLineItemType(
   def price = product.price
 
   def inventoryBatch = product.availableInventoryBatches find (_.hasInventory) getOrElse {
+    // TODO(CE-13): remove this from here, move to transact as above
     throw new IllegalArgumentException("Product is out of inventory.")
   }
 }

@@ -69,7 +69,7 @@ case class EgraphOrderLineItem(
   // Helpers
   //
   /** get actual print order */
-  def printOrderItem = _printOrderItem orElse { services.printOrderItemServices.findByOrderId(domainObject.id) }
+  protected def printOrderItem = _printOrderItem orElse { services.printOrderItemServices.findByOrderId(domainObject.id) }
 
   private def orderFromType = _type map { _.order}
 

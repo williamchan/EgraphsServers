@@ -54,7 +54,10 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
   def withAmount(newAmount: Money): LineItem[T]
   def withCheckoutId(newCheckoutId: Long): LineItem[T]
 
-  /** Transforms and persists a T and potentially any objects it contains, as needed. */
+  /**
+   * Transforms and persists a T and potentially any objects it contains, as needed.
+   * TODO(CE-13): provide an abstraction for update condition check (`id > 0`)
+   */
   def transact(checkout: Checkout): LineItem[T]
 
   /** Rough approximation for equality between line items based on  */
@@ -161,7 +164,10 @@ class LineItemStore @Inject() (schema: Schema) {
  * It also allows the item to be included in a checkouts' LineItems as normal without worry of it being
  * transacted multiple times by the checkout and the item it depends on.
  *
- * (Not married to this and not convinced there isn't a more elegant solution.)
+ * In practice, the containing LineItemType will resolve to a seq of its corresponding item (as usual) and the SubItem
+ * when whatever logical condition is met that triggers the inclusion of the subitem. Then the subitem itself is
+ * transacted by the containing item because it may need data from it, rather than being transacted as normal. For
+ * example, a print order needs the order's id.
  */
 trait SubLineItem[T] extends LineItem[T] {
 

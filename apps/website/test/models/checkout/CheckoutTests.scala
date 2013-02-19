@@ -14,7 +14,6 @@ class CheckoutTests extends EgraphsUnitTest
   with DateShouldMatchers
   with DBTransactionPerTest
   with CanInsertAndUpdateEntityWithLongKeyTests[Checkout, CheckoutEntity]
-//  with HasTransientServicesTests[Checkout]
 {
   import CheckoutScenario.RichCheckoutConversions._
 
@@ -31,16 +30,6 @@ class CheckoutTests extends EgraphsUnitTest
     toTransform.withAdditionalTypes(Seq(giftCertificateTypeForLesserFriend))
   }
 
-  //
-  // HasTransientServicesTests members
-  //
-//  override def assertModelsEqual(a: Checkout, b: Checkout) {
-//    import LineItemMatchers._
-//    a.lineItems should haveLineItemEqualityTo(b.lineItems)
-//    a._entity should be (b._entity)
-//  }
-
-  "A cachable checkout" should "be cachable" in (pending)
 
   //
   // CheckoutTestCases members

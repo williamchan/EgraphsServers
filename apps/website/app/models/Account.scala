@@ -38,7 +38,7 @@ case class Account(
    * @param name name of Customer
    * @return newly created Customer
    */
-  def createCustomer(name: String = createUsernameStringFromEmail()): Customer = {
+  def createCustomer(name: String): Customer = {
     require(customerId.isEmpty, "Cannot create Customer on Account that already has one")
     Customer(name = name, username = createUsernameStringFromEmail())
   }

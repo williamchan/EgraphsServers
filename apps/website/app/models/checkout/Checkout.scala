@@ -1,16 +1,17 @@
 package models.checkout
 
+import _root_.exception.InsufficientInventoryException
 import com.google.inject.Inject
-import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException, InsufficientInventoryException}
+import checkout.Conversions._
+import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
 import java.sql.{Connection, Timestamp}
 import models._
 import models.enums._
-import checkout.Conversions._
+import play.api.libs.json.{JsValue, JsArray, JsNull}
 import services.AppConfig
 import services.db._
 import services.payment.Charge
 import services.config.ConfigFileProxy
-import play.api.libs.json.{JsValue, JsArray, JsNull}
 
 
 //
@@ -147,14 +148,15 @@ abstract class Checkout
         Right(services.findById(savedCheckout.id).get)
 
       } catchAndRollback {
-        case exc: Exception => {
+        // TODO: this could be implemented more elegantly if LineItems return some Left error case directly
+        case exc: Exception => Left {
           val refunded = txnItem flatMap (_.abortTransaction())
-          exc match {
-            case e: MissingRequiredAddressException => Left { CheckoutFailedShippingAddressMissing(this, refunded, e.msg) }
-            case e: InsufficientInventoryException => Left { CheckoutFailedInsufficientInventory(this, txnItem, refunded) }
-            case e: DomainObjectNotFoundException => Left { CheckoutFailedDomainObjectNotFound(this, refunded, e.msg) }
-            case e: ItemTypeNotFoundException => Left { CheckoutFailedItemTypeNotFound(this, refunded, e.msg) }
-            case e: Exception => Left { CheckoutFailedError(this, txnItem, refunded, e) }
+           exc match {
+            case e: MissingRequiredAddressException => CheckoutFailedShippingAddressMissing(this, refunded, e.msg)
+            case e: InsufficientInventoryException => CheckoutFailedInsufficientInventory(this, txnItem, refunded)
+            case e: DomainObjectNotFoundException => CheckoutFailedDomainObjectNotFound(this, refunded, e.msg)
+            case e: ItemTypeNotFoundException => CheckoutFailedItemTypeNotFound(this, refunded, e.msg)
+            case e: Exception => CheckoutFailedError(this, txnItem, refunded, e)
           }
         }
       }
@@ -320,6 +322,12 @@ abstract class Checkout
   def taxes: Seq[TaxLineItem] = lineItems(CheckoutCodeType.Tax)
   def coupons: Seq[CouponLineItem] = lineItems(CheckoutCodeType.Coupon)
   def payments: LineItems = lineItems(LineItemNature.Payment)
+
+  /**
+   * Note that these methods are as safe as the lineItems method since the corresponding item types should be included
+   * by the implementation where appropriate. So, if these fail, it should be in lineItems, rather than from calling
+   * head on an empty seq.
+   */
   def balance: BalanceLineItem = lineItems(CheckoutCodeType.Balance).head
   def subtotal: SubtotalLineItem = lineItems(CheckoutCodeType.Subtotal).head
   def total: TotalLineItem = lineItems(CheckoutCodeType.Total).head

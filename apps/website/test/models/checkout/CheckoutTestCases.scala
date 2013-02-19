@@ -66,7 +66,7 @@ trait CheckoutTestCases { this: FlatSpec with ShouldMatchers =>
     val updatedRestored = updatedTransacted.restored
 
     updatedTransacted.id should be (transactedCheckout.id)
-//    updatedTransacted._entity.created.getTime should be (transactedCheckout._entity.created.getTime)
+    updatedTransacted._entity.created.getTime should be (transactedCheckout._entity.created.getTime)
     updatedTransacted._entity.updated.getTime should be > (transactedCheckout._entity.updated.getTime)
     updatedTransacted._entity.updated.getTime should be (updatedRestored._entity.updated.getTime)
   }

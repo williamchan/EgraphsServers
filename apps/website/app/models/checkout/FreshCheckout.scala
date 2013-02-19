@@ -23,29 +23,34 @@ case class FreshCheckout(
 ) extends Checkout {
 
   //
-  // CE-13 Changes
+  // Checkout members
   //
-  override def payment = stripeToken map (token => CashTransactionLineItemType.create(Some(token), zipcode))
+  override lazy val _entity = CheckoutEntity(id, buyerCustomer.id)
 
-  override lazy val buyerAccount: Account = _buyerAccount getOrElse (
-    throw new Exception("Attempting operation requiring buyer without defining buyer first.")
-  )
+  /** all `LineItemType`s */
+  override lazy val itemTypes: LineItemTypes = summaryTypes ++ (_derivedTypes ++ _itemTypes)
+
+  /** all `LineItem`s */
+  override lazy val lineItems: LineItems = resolveTypes(itemTypes)
+
+  /** `LineItemType`s of items that are to be transacted (all of them) */
+  override def pendingTypes: LineItemTypes = _itemTypes
+
+  /** `LineItem`s to be transacted (all of them) */
+  override def pendingItems: LineItems = lineItems
 
   override lazy val buyerCustomer: Customer = services.customerStore.findOrCreateByEmail(buyerAccount.email)
+
+  override lazy val buyerAccount: Account = _buyerAccount getOrElse {
+    throw new Exception("Attempting operation requiring buyer without defining buyer first.")
+  }
 
   override lazy val recipientCustomer: Option[Customer] = recipientAccount map { account =>
     services.customerStore.findOrCreateByEmail(account.email)
   }
 
+  override def payment = stripeToken map (token => CashTransactionLineItemType.create(Some(token), zipcode))
 
-  //
-  // Checkout members
-  //
-  override lazy val _entity = CheckoutEntity(id, buyerCustomer.id)
-  override lazy val itemTypes: LineItemTypes = summaryTypes ++ (_derivedTypes ++ _itemTypes)
-  override lazy val lineItems: LineItems = resolveTypes(itemTypes)
-  override def pendingTypes: LineItemTypes = _itemTypes
-  override def pendingItems: LineItems = lineItems
   override protected def _dirty: Boolean = !_itemTypes.isEmpty
 
 
