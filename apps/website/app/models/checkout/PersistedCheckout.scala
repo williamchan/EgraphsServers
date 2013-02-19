@@ -5,26 +5,41 @@ import models._
 import models.enums._
 import checkout.Conversions._
 import services.AppConfig
-
+import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientServices}
 
 
 case class PersistedCheckout(
   _entity: CheckoutEntity,
   _addedTypes: LineItemTypes = Nil,
-  services: CheckoutServices = AppConfig.instance[CheckoutServices]
+  stripeToken: Option[String] = None,      // used for payment or refund
+  zipcode: Option[String] = None,
+  @transient _services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends Checkout {
+
+  //
+  // CE-13 Changes
+  //
+  override def id = _entity.id
+  override lazy val buyerCustomer: Customer = services.customerStore.findById(_entity.customerId).head
+  override lazy val buyerAccount: Account = buyerCustomer.account
+
+  // todo: provide real implementation when these are needed after point of transaction
+  override def recipientAccount: Option[Account] = None
+  override def recipientCustomer: Option[Customer] = None
+
+  /** cash transaction to be made if changes are transacted */
+  override def payment: Option[CashTransactionLineItemType] = {
+    for ( token <- stripeToken; zip <- zipcode) yield
+      CashTransactionLineItemType.create(Some(token), Some(zip))
+  }
+
+  override lazy val shippingAddress = buyerAccount.addresses.headOption
+
 
   //
   // Checkout members
   //
-  override protected def _persisted: Boolean = true
   override protected def _dirty: Boolean = !_addedTypes.isEmpty
-
-  override lazy val customer: Option[Customer] = services.customerStore.findById(customerId)
-
-  override lazy val zipcode: Option[String] = {
-    _lineItems(CheckoutCodeType.CashTransaction).headOption flatMap (_.domainObject.billingPostalCode)
-  }
 
   /** all LineItemTypes */
   override lazy val itemTypes: LineItemTypes = summaryTypes ++ (pendingTypes ++ _lineItems.map(_.itemType))
@@ -54,9 +69,9 @@ case class PersistedCheckout(
     copy(_addedTypes = newTypes ++ _addedTypes)
   }
 
-  override def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout = {
-    this.copy(savedEntity)
-  }
+  override def withEntity(entity: CheckoutEntity): PersistedCheckout = this.copy(entity)
+
+  override def save(): Checkout = this.update()
 
 
   //
@@ -64,12 +79,4 @@ case class PersistedCheckout(
   //
   /** restored items from db */
   protected lazy val _lineItems: LineItems = services.lineItemStore.getItemsByCheckoutId(id)
-}
-
-object PersistedCheckout {
-  /** convenience constructor */
-  def apply(checkout: Checkout) = {
-    require(checkout.id > 0, "PersistedCheckout requires a saved checkout entity.")
-    new PersistedCheckout(checkout._entity)
-  }
 }

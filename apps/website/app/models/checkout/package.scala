@@ -17,22 +17,24 @@ package object checkout {
     //
     // LineItems and LineItemTypes DSL conversion
     //
-    implicit def itemTypeSeqToMemberDSL(types: LineItemTypes) =
-      new HasNatureAndCodeTypeToMemberDSL(types) {
-        def apply(codeType: CheckoutCodeType): LineItemTypes = ofCodeType(codeType)
-        def ofCodeType(codeType: CheckoutCodeType): LineItemTypes = types.filter(_.codeType == codeType)
-      }
+    implicit def itemTypeSeqToMemberDSL(types: LineItemTypes) = new HasNatureAndCodeTypeToMemberDSL(types) {
 
-    implicit def lineItemSeqToMemberDSL(items: LineItems) =
-      new HasNatureAndCodeTypeToMemberDSL(items) {
-        def apply[LIT <: LineItemType[_], LI <: LineItem[_]](codeType: CodeTypeFactory[LIT, LI])
-        : Seq[LI] = { ofCodeType(codeType) }
+      def apply(codeType: CheckoutCodeType): LineItemTypes = ofCodeType(codeType)
 
-        def ofCodeType[LIT <: LineItemType[_], LI <: LineItem[_]] (codeType: CodeTypeFactory[LIT, LI])
-        : Seq[LI] = { items.flatMap(_.asCodeTypeOption(codeType)) }
+      def ofCodeType(codeType: CheckoutCodeType): LineItemTypes = types.filter(_.codeType == codeType)
+    }
 
-        def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD))( _ plus _.amount )
-      }
+
+    implicit def lineItemSeqToMemberDSL(items: LineItems) = new HasNatureAndCodeTypeToMemberDSL(items) {
+
+      def apply[LIT <: LineItemType[_], LI <: LineItem[_]](codeType: OfCheckoutClass[LIT, LI])
+      : Seq[LI] = { ofCodeType(codeType) }
+
+      def ofCodeType[LIT <: LineItemType[_], LI <: LineItem[_]] (codeType: OfCheckoutClass[LIT, LI])
+      : Seq[LI] = { items.flatMap(_.asCodeTypeOption(codeType)) }
+
+      def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD))( _ plus _.amount )
+    }
 
     abstract class HasNatureAndCodeTypeToMemberDSL[T <: HasLineItemNature with HasCodeType](elements: Seq[T]) {
       def apply(nature: LineItemNature) = ofNature(nature)

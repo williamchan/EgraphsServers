@@ -7,7 +7,7 @@ import services.AppConfig
 
 
 class GiftCertificateTests extends EgraphsUnitTest
-//  with CanInsertAndUpdateAsThroughServicesTests[GiftCertificate, GiftCertificateEntity, Long]
+//  with CanInsertAndUpdateEntityTests[GiftCertificate, GiftCertificateEntity, Long]
   with DateShouldMatchers
   with DBTransactionPerTest
 {
@@ -33,4 +33,5 @@ class GiftCertificateTests extends EgraphsUnitTest
    *
    * -create gift certificate and then make purchase with the coupon it creates :O
    */
+  "A GiftCertificate" should "do shit right" in (pending)
 }

@@ -21,6 +21,9 @@ case class LineItemTypeEntity private (
 
   def nature = LineItemNature(_nature).get
   def codeType = CheckoutCodeType(_codeType).get
+
+  def withNature(newNature: LineItemNature) = this.copy(_nature = newNature.name)
+  def withCodeType(newCodeType: CheckoutCodeType) = this.copy(_codeType = newCodeType.name)
 }
 
 object LineItemTypeEntity {

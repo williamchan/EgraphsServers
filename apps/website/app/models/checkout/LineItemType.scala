@@ -5,8 +5,9 @@ import java.sql.Timestamp
 import models.enums._
 import models.SavesCreatedUpdated
 import scalaz.Lens
-import services.MemberLens
+import services.{AppConfig, MemberLens}
 import services.db._
+import play.api.libs.json.{Json, JsValue}
 
 
 /**
@@ -24,7 +25,12 @@ trait LineItemType[+T] extends HasLineItemNature with HasCodeType {
 
   def id: Long
   def description: String
-  def toJson: String
+  def toJson: JsValue = Json.toJson {
+    Map(
+      "id" -> Json.toJson(id),
+      "codeType" -> Json.toJson(codeType.name)
+    )
+  }
 
   /**
    * Creates one or more [[models.checkout.LineItem]]s from an existing set of resolved
@@ -46,34 +52,43 @@ trait LineItemType[+T] extends HasLineItemNature with HasCodeType {
    *         being ready to resolve, in which case it should return Some(Nil).
    */
   def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes)
-  : Option[Seq[LineItem[T]]]
+  : Option[LineItems]
 }
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-trait HasLineItemTypeEntity extends HasEntity[LineItemTypeEntity, Long] { this: LineItemType[_] => }
+trait HasLineItemTypeEntity[T <: LineItemType[_]] extends HasEntity[LineItemTypeEntity, Long] { this: T => 
+  def withEntity(entity: LineItemTypeEntity): T
+}
+
+trait SavesAsLineItemTypeEntityThroughServices[
+  T <: LineItemType[_] with HasLineItemTypeEntity[T],
+  ServicesT <: SavesAsLineItemTypeEntity[T]
+] extends CanInsertAndUpdateEntityThroughTransientServices[T, LineItemTypeEntity, ServicesT] { this: T with Serializable => }
+
+
 
 /** Service trait, enables saving of LineItemTypeEntities through their enclosing LineItemType */
-trait SavesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
-  extends InsertsAndUpdatesAsEntity[ModelT, LineItemTypeEntity]
+trait SavesAsLineItemTypeEntity[T <: LineItemType[_] with HasLineItemTypeEntity[T]]
+  extends InsertsAndUpdatesAsEntity[T, LineItemTypeEntity]
   with SavesCreatedUpdated[LineItemTypeEntity]
 {
   protected def schema: Schema
   override protected def table = schema.lineItemTypes
 
+  override protected def modelWithNewEntity(model: T, entity: LineItemTypeEntity) = model.withEntity(entity)
   override protected def withCreatedUpdated(toUpdate: LineItemTypeEntity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
 }
 
 /** For adding queries for LineItemTypes by id */
-trait QueriesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
-  extends QueriesAsEntity[ModelT, LineItemTypeEntity, Long]
+trait QueriesAsLineItemTypeEntity[T <: LineItemType[_] with HasLineItemTypeEntity[T]]
+  extends QueriesAsEntity[T, LineItemTypeEntity, Long]
 {
   protected def schema: Schema
-  override protected def table = schema.lineItemTypes
 }
 
 
@@ -87,7 +102,7 @@ trait QueriesAsLineItemTypeEntity[ModelT <: HasLineItemTypeEntity]
  * [[models.checkout.LineItemTypeEntitySetters]], which automatically generate members / mutators
  * for the fields below.
  */
-trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemTypeEntity =>
+trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemTypeEntity[T] =>
   import MemberLens.Conversions._
 
   /**
@@ -107,37 +122,46 @@ trait LineItemTypeEntityLenses[T <: LineItemType[_]] { this: T with HasLineItemT
    *
    */
   protected def entityLens: Lens[T, LineItemTypeEntity]
+
   def entity = entityLens.asMemberOf(this)
 
   //
   // Private members
   //
-  private[checkout] lazy val descField =
-    entityField(get = _._desc)(set = desc => entity().copy(_desc=desc))
-  private[checkout] lazy val natureField = entityField(
-    get = (entity: LineItemTypeEntity) => entity.nature)(
-    set = (nature: LineItemNature) => entity().copy(_nature=nature.name))
-  private[checkout] lazy val codeTypeField = entityField(
-    get = (entity: LineItemTypeEntity) => entity.codeType)(
-    set = (codeType: CheckoutCodeType) => entity().copy(_codeType=codeType.name))
+  private[checkout] lazy val descField = entityField(
+    getter = entity._desc,
+    setter = (desc: String) => entity().copy(_desc = desc))
 
+  private[checkout] lazy val natureField = entityField[LineItemNature](
+    getter = entity.nature,
+    setter = entity.withNature(_))
 
-  private def entityField[PropT](get: LineItemTypeEntity => PropT)(set: PropT => LineItemTypeEntity)
-  : MemberLens[T, PropT] =
-  {
-    entity.xmap(entity => get(entity))(newProp => set(newProp)).asMemberOf(this)
-  }
+  private[checkout] lazy val codeTypeField = entityField[CheckoutCodeType](
+    getter = entity.codeType,
+    setter = entity.withCodeType(_))
+
+  /** helper for making member lenses */
+  private def entityField[PropT](getter: => PropT, setter: PropT => LineItemTypeEntity) = MemberLens[T, PropT](this)(
+    getter = getter,
+    setter = (prop: PropT) => entity.set( setter(prop) )
+  )
 }
 
 
-trait LineItemTypeEntityGetters[T <: LineItemType[_]] { this: T with LineItemTypeEntityLenses[T] =>
-  override lazy val description = descField()
-  override lazy val nature = natureField()
-  override lazy val codeType = codeTypeField()
+trait LineItemTypeEntityGetters[T <: LineItemType[_]] { this: T =>
+
+  def _entity: LineItemTypeEntity
+  override def id = _entity.id
+  override lazy val description = _entity._desc
+  override lazy val nature = _entity.nature
+  override lazy val codeType = _entity.codeType
 }
 
 
-trait LineItemTypeEntitySetters[T <: LineItemType[_]] { this: T with LineItemTypeEntityLenses[T] =>
+trait LineItemTypeEntitySetters[T <: LineItemType[_]] extends LineItemTypeEntityLenses[T] {
+  this: T with HasLineItemTypeEntity[T] =>
+
+  override def withEntity(newEntity: LineItemTypeEntity) = entity.set(newEntity)
   lazy val withDescription = descField.set _
   lazy val withNature = natureField.set _
   lazy val withCodeType = codeTypeField.set _
@@ -146,4 +170,4 @@ trait LineItemTypeEntitySetters[T <: LineItemType[_]] { this: T with LineItemTyp
 trait LineItemTypeEntityGettersAndSetters[T <: LineItemType[_]]
   extends LineItemTypeEntityLenses[T]
   with LineItemTypeEntityGetters[T]
-  with LineItemTypeEntitySetters[T] { this: T with HasLineItemTypeEntity => }
+  with LineItemTypeEntitySetters[T] { this: T with HasLineItemTypeEntity[T] => }

@@ -4,7 +4,7 @@ import services.Time
 import java.text.SimpleDateFormat
 import org.joda.time.DateTime
 import models._
-import enums.{EgraphState, EnrollmentStatus, PublishedStatus}
+import enums._
 import egraphs.playutils.Encodings.Base64
 import org.apache.commons.lang3.RandomStringUtils
 import categories.{Category, CategoryValue}
@@ -103,6 +103,17 @@ object TestData {
   def newSavedCategoryValue(categoryId: Long) : CategoryValue = {
     CategoryValue(name = TestData.generateUsername(), publicName = TestData.generateUsername(), categoryId = categoryId).save()
   }
+
+  def newSavedCoupon(
+    discountType: CouponDiscountType = CouponDiscountType.Flat,
+    usageType: CouponUsageType = CouponUsageType.OneUse,
+    maxAmount: BigDecimal = BigDecimal(25.0)
+  ): Coupon = {
+    Coupon(discountAmount = BigDecimal(random.nextDouble()) * maxAmount)
+      .withDiscountType(CouponDiscountType.Flat)
+      .withUsageType(usageType).save()
+  }
+
 
   private def newProduct(celebrity: Celebrity): Product = {
     celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod").withPublishedStatus(PublishedStatus.Published)

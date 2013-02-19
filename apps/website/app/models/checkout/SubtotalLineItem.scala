@@ -17,7 +17,7 @@ case class SubtotalLineItem (
 
   override val itemType = SubtotalLineItemType
 
-  override def toJson = ""
+  override def toJson = jsonify("Subtotal", "Cost of purchase before taxes, fees, and discounts")
 
   override val id: Long = -1
   override def domainObject = amount
@@ -35,7 +35,6 @@ object SubtotalLineItemType extends SubtotalLineItemType {
   override val description = "Subtotal"
   override val nature = LineItemNature.Summary
   override val codeType = CheckoutCodeType.Subtotal
-  override val toJson = ""
 
   /**
    * Sums all the products and creates a SubtotalLineItem for that amount, unless there are products

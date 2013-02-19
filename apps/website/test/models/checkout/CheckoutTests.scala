@@ -1,162 +1,97 @@
 package models.checkout
 
-import utils._
-import org.joda.money.Money
-import org.scalatest.matchers.{MatchResult, Matcher}
+import LineItemTestData._
+import models.checkout.checkout.Conversions._
 import services.AppConfig
 import services.Finance.TypeConversions._
-import LineItemMatchers._
-import models.checkout.checkout.Conversions._
-import models.checkout.Checkout._
-import models.enums.LineItemNature._
-import TestData._
-import LineItemTestData._
+import utils._
+import org.scalatest.matchers.{MatchResult, Matcher}
+import play.api.libs.json.JsNull
 
 
 class CheckoutTests extends EgraphsUnitTest
-  with CanInsertAndUpdateAsThroughServicesWithLongKeyTests[Checkout, CheckoutEntity]
+  with CheckoutTestCases
   with DateShouldMatchers
   with DBTransactionPerTest
+  with CanInsertAndUpdateEntityWithLongKeyTests[Checkout, CheckoutEntity]
+//  with HasTransientServicesTests[Checkout]
 {
+  import CheckoutScenario.RichCheckoutConversions._
+
   //
-  // CanInsertAndUpdateAsThroughServicesTests members
+  // CanInsertAndUpdateEntityTests members
   //
-  override def newModel: Checkout = Checkout(Seq(giftCertificateTypeForFriend), taxedZip, Some(newSavedCustomer()))
-  override def saveModel(toSave: Checkout): Checkout = toSave.transact(cashTxnTypeFor(toSave)) match {
+  override def newModel(): FreshCheckout = newCheckout
+  override def saveModel(toSave: Checkout): Checkout = toSave.transact(Some(randomCashTransactionType)) match {
     case Right(checkout: Checkout) => checkout
     case Left(failure) => fail("saveModel failed with " + failure)
   }
-  override def restoreModel(id: Long): Option[Checkout] = checkoutServices.findById(id)
-
+  override def restoreModel(id: Long): Option[Checkout] = Checkout.restore(id)
   override def transformModel(toTransform: Checkout) = {
     toTransform.withAdditionalTypes(Seq(giftCertificateTypeForLesserFriend))
   }
 
+  //
+  // HasTransientServicesTests members
+  //
+//  override def assertModelsEqual(a: Checkout, b: Checkout) {
+//    import LineItemMatchers._
+//    a.lineItems should haveLineItemEqualityTo(b.lineItems)
+//    a._entity should be (b._entity)
+//  }
 
+  "A cachable checkout" should "be cachable" in (pending)
 
   //
-  // Checkout test cases
+  // CheckoutTestCases members
   //
-  "A checkout" should "fail to transact without a customer" in {
-    val checkout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
-    lazy val failedTransaction: FailureOrCheckout = checkout.transact(Some(randomCashTransactionType))
+  override def scenarios = Seq(
+    CheckoutScenario(oneGiftCertificate, twoGiftCertificates),
+    CheckoutScenario(twoGiftCertificates, Nil)
+  )
 
-    failedTransaction should be ('left)
+  //
+  // Checkout Tests
+  //
+  "A checkout" should "add taxes for taxed zipcodes" in eachScenario { implicit scenario =>
+    val untaxedCheckout = initialCheckout.withZipcode(untaxedZip)
+    val taxedCheckout = initialCheckout.withZipcode(taxedZip)
+    val untaxedRestored = untaxedCheckout.restored
+    val taxedRestored = taxedCheckout.restored
+
+    untaxedCheckout.taxes should be (Nil)
+    untaxedRestored.taxes should be (Nil)
+    taxedCheckout.taxes should not be (Nil)
+    taxedRestored.taxes should not be (Nil)
   }
 
-  it should "have a balance of zero after transaction" in {
-    val transacted: Checkout = saveModel(newModel)
-    transacted.total should haveNegatedAmountOf (transacted.payments.head)
-    transacted.balance should haveAmount (zeroDollars)
-  }
-
-  it should "charge the customer for the total on checkout" in {
-    val total: TotalLineItem = newModel.total
-    val transacted: Checkout = saveModel(newModel)
-    val txnItem = transacted.payments.head
-
-    txnItem should haveNegatedAmountOf (total)
-  }
-
-  it should "not have duplicate summaries" in {
-    val taxedCheckout: Checkout = Checkout(oneGiftCertificate, taxedZip, Some(newSavedCustomer()))
-    val untaxedCheckout: Checkout = Checkout(oneGiftCertificate, untaxedZip, Some(newSavedCustomer()))
-    val checkoutWithoutZip: Checkout = Checkout(oneGiftCertificate, None, Some(newSavedCustomer()))
-    val checkoutWithoutCustomer: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
+  it should "not have duplicate summaries" in eachScenario { implicit scenario =>
+    val taxedCheckout = initialCheckout.withZipcode(taxedZip)
+    val taxedRestored = taxedCheckout.restored
+    val untaxedCheckout = initialCheckout.withZipcode(untaxedZip)
+    val untaxedRestored = untaxedCheckout.restored
+    val checkoutWithoutZip = initialCheckout.withZipcode(None)
+    val withoutZipRestored = checkoutWithoutZip.restored
 
     // check that checkouts only have one of each summary (e.g. subtotal, total, balance)
     taxedCheckout should notHaveDuplicateSummaries
+    taxedRestored should notHaveDuplicateSummaries
     untaxedCheckout should notHaveDuplicateSummaries
+    untaxedRestored should notHaveDuplicateSummaries
     checkoutWithoutZip should notHaveDuplicateSummaries
-    checkoutWithoutCustomer should notHaveDuplicateSummaries
+    withoutZipRestored should notHaveDuplicateSummaries
   }
 
-  it should "add taxes for taxed zipcodes" in {
-    val taxedCheckout: Checkout = Checkout(oneGiftCertificate, taxedZip, None)
-    val untaxedCheckout: Checkout = Checkout(oneGiftCertificate, untaxedZip, None)
-
-    taxedCheckout.taxes should not be (Nil)
-    untaxedCheckout.taxes should be (Nil)  // NOTE: this should change if we have some universal tax of sorts
+  it should "be previewable without a buyer Account" in {
+    val checkout = Checkout.create(twoGiftCertificates, None, None)
+    checkout.toJson should not be (JsNull)
   }
 
-
-
-
-  "A restored checkout" should "contain same line items as saved checkout" in {
-    val saved: Checkout = saveModel(newModel)
-    val savedItems: LineItems = saved.lineItems
-    val restoredItems: LineItems = restoreModel(saved.id).get.lineItems
-
-    savedItems should beContainedIn (restoredItems, "restored")
-    restoredItems should beContainedIn (savedItems, "saved")
-  }
-
-  it should "update when transacted with additional types" in {
-    val savedRestored: Checkout = restoreModel(saveModel(newModel).id).get
-    val transformed: Checkout = transformModel(savedRestored) // adds additional types
-    val updated: Checkout = saveModel(transformed)    // updates
-    val updatedRestored: Checkout = restoreModel(updated.id).get
-
-    savedRestored.id should be (updated.id)
-    updated._entity.updated.getTime should be > (savedRestored._entity.updated.getTime)
-    updated._entity.updated.getTime should be (updatedRestored._entity.updated.getTime)
-  }
-
-  
-  it should "have correct balance" in {
-    val fresh: Checkout = newModel
-    val freshRestored: Checkout = restoreModel(saveModel(fresh).id).get
-    val transformed: Checkout = transformModel(freshRestored)
-    val transformedRestored: Checkout = restoreModel(saveModel(transformed).id).get
-
-    fresh.balance should haveAmount (expectedBalanceOf(fresh))
-    freshRestored.balance should haveAmount (expectedBalanceOf(freshRestored))
-    freshRestored.balance should haveAmount (zeroDollars)
-    transformed.balance should haveAmount (expectedBalanceOf(transformed))
-    transformedRestored.balance should haveAmount (expectedBalanceOf(transformedRestored))
-    transformedRestored.balance should haveAmount (zeroDollars)
-  }
-
-  it should "require payment for only updates with non-zero balance" in {
-    // TODO(CE-16): add a checkout in which the balance is zero from discount use
-    val paymentRequired: Checkout = newModel
-    def transactFails = paymentRequired.transact(None)
-
-    transactFails match {
-      case Right(_) => fail()
-      case Left(error: CheckoutFailed) =>
-    }
-  }
-
-  it should "contain same line items as after most recent update" in {
-    val saved: Checkout = saveModel(newModel)
-    val updated: Checkout = saveModel(transformModel(saved))
-    val restored: Checkout = restoreModel(updated.id).get
-
-    updated.lineItems should beContainedIn (restored.lineItems, "restored")
-    restored.lineItems should beContainedIn (updated.lineItems, "updated")
-  }
-
-  it should "not do anything on transact without any changes being made" in {
-    val restoredUnchanged = restoreModel(saveModel(newModel).id).get
-    val transactedWithCash = restoredUnchanged.transact(None)
-    val transactedWithoutCash = restoredUnchanged.transact(cashTxnTypeFor(restoredUnchanged))
-
-    transactedWithCash should be (Right(restoredUnchanged))
-    transactedWithoutCash should be (Right(restoredUnchanged))
-
-  }
-
-
-
-
-
+  "Checkout#toJson" should "match the api endpoint spec" in (pending)
 
   //
-  // Data helpers
+  // Helpers
   //
-  def checkoutServices: CheckoutServices = AppConfig.instance[CheckoutServices]
-
   def giftCertificateTypeForFriend = GiftCertificateLineItemType("My friend", BigDecimal(75).toMoney())
   def giftCertificateTypeForLesserFriend = GiftCertificateLineItemType("My lesser friend", BigDecimal(25).toMoney())
 
@@ -166,28 +101,19 @@ class CheckoutTests extends EgraphsUnitTest
   val taxedZip = Some("98111") // Washington
   val untaxedZip = Some("12345")  // not Washington
 
-  def zeroDollars: Money = BigDecimal(0).toMoney()
-
-  // txn type is associated with the checkout's customer's account
-  def cashTxnTypeFor(checkout: Checkout) = Some(
-    randomCashTransactionType.copy(accountId = Some(checkout.accountId))
-  )
-
-  def expectedTotalOf(checkout: Checkout) = checkout.lineItems.notOfNatures(Summary, Payment).sumAmounts
-  def totalPaymentsOf(checkout: Checkout) = checkout.payments.sumAmounts
-  def expectedBalanceOf(checkout: Checkout) = expectedTotalOf(checkout) plus totalPaymentsOf(checkout)
+  def checkoutServices: CheckoutServices = AppConfig.instance[CheckoutServices]
 
 
   //
-  // Matchers
+  // Checkout Matchers
   //
-  def notHaveDuplicateSummaries = Matcher { checkout: Checkout =>
-    val numSubtotals = checkout.itemTypes.filter(SubtotalLineItemType eq _).length
-    val numTotals = checkout.itemTypes.filter(TotalLineItemType eq _).length
+  def notHaveDuplicateSummaries: Matcher[Checkout] = Matcher { checkout: Checkout =>
+    val numSubtotals = checkout.itemTypes.filter(SubtotalLineItemType eq _).size
+    val numTotals = checkout.itemTypes.filter(TotalLineItemType eq _).size
 
     MatchResult(numSubtotals == 1 && numTotals == 1,
-      "%d and %d subtotals and totals found.".format(numSubtotals, numTotals),
-      "Only 1 subtotal and subtotal found"
+      "Only 1 subtotal and subtotal found",
+      "%d and %d subtotals and totals found.".format(numSubtotals, numTotals)
     )
   }
 }

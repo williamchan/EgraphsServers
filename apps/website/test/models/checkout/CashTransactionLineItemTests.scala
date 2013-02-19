@@ -9,7 +9,7 @@ import LineItemTestData._
 
 class CashTransactionLineItemTests extends EgraphsUnitTest
   with LineItemTests[CashTransactionLineItemType, CashTransactionLineItem]
-  with CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[CashTransactionLineItem]
+  with SavesAsLineItemEntityThroughServicesTests[CashTransactionLineItem, CashTransactionLineItemServices]
   with DateShouldMatchers
   with DBTransactionPerTest
 {
@@ -41,10 +41,27 @@ class CashTransactionLineItemTests extends EgraphsUnitTest
     val txn = lineItem.domainObject
 
     txn.id should not be (0)
-    txn.accountId should be (checkout.accountId)
+    txn.accountId should be (checkout.buyerAccount.id)
     txn.stripeCardTokenId should be (newItemType.stripeCardTokenId)
     txn.lineItemId should be (Some(lineItem.id))
 
     true
+  }
+}
+
+
+class CashTransactionLineItemTypeTests extends EgraphsUnitTest
+  with HasTransientServicesTests[CashTransactionLineItemType]
+  with DateShouldMatchers
+  with DBTransactionPerTest
+{
+  //
+  // CanInsertAndUpdateAsThroughTransientServicesTests members
+  //
+  override def newModel = LineItemTestData.randomCashTransactionType
+
+  override def assertModelsEqual(a: CashTransactionLineItemType, b: CashTransactionLineItemType) {
+    def withoutServices(c: CashTransactionLineItemType) = c.productIterator.slice(0,c.productArity-1).toList
+    assert(withoutServices(a) == withoutServices(b))
   }
 }

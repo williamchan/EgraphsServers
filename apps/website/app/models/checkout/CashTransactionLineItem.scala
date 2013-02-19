@@ -4,8 +4,9 @@ import com.google.inject.Inject
 import models.{CashTransaction, CashTransactionStore}
 import scalaz.Lens
 import services.AppConfig
-import services.db.{Schema, CanInsertAndUpdateAsThroughServices}
+import services.db.{Schema, CanInsertAndUpdateEntityThroughServices}
 import services.payment.Payment
+import models.enums.LineItemNature
 
 
 //
@@ -15,12 +16,7 @@ case class CashTransactionLineItemServices @Inject() (
   schema: Schema,
   payment: Payment,
   cashTransactionStore: CashTransactionStore
-) extends SavesAsLineItemEntity[CashTransactionLineItem] {
-
-  override protected def modelWithNewEntity(txnItem: CashTransactionLineItem, newEntity: LineItemEntity) = {
-    txnItem.entity.set(newEntity)
-  }
-}
+) extends SavesAsLineItemEntity[CashTransactionLineItem]
 
 
 
@@ -28,8 +24,8 @@ case class CashTransactionLineItemServices @Inject() (
 // Model
 //
 /**
- * Once resolved from an item type, CashTransactionLineItem is used make charges for the amount of
- * holds the domain object representing the exchange of funds.
+ * Once resolved from an item type, CashTransactionLineItem holds the domain object representing
+ * the exchange of funds.
  *
  * When new/untransacted, initially takes the cash transaction, which may be incomplete since some
  * information is not known til the charge is made. When restored, only the entities are needed
@@ -38,16 +34,17 @@ case class CashTransactionLineItemServices @Inject() (
  * @param _entity new or persisted LineItemEntity
  * @param _typeEntity entity of CashTransactionLineItemType resolved from
  * @param _maybeCashTransaction CashTransaction given by item type, otherwise None
- * @param services
  */
 case class CashTransactionLineItem(
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
   _maybeCashTransaction: Option[CashTransaction],
-  services: CashTransactionLineItemServices = AppConfig.instance[CashTransactionLineItemServices]
-) extends LineItem[CashTransaction] with HasLineItemEntity
+  @transient _services: CashTransactionLineItemServices = AppConfig.instance[CashTransactionLineItemServices]
+)
+  extends LineItem[CashTransaction]
+  with HasLineItemEntity[CashTransactionLineItem]
   with LineItemEntityGettersAndSetters[CashTransactionLineItem]
-  with CanInsertAndUpdateAsThroughServices[CashTransactionLineItem, LineItemEntity]
+  with SavesAsLineItemEntityThroughServices[CashTransactionLineItem, CashTransactionLineItemServices]
 {
 
   //
@@ -59,31 +56,26 @@ case class CashTransactionLineItem(
    * and return the contained item type if right and use the existing implementation if left.
    *
    * However, in this period of time, the original item type ought to be stored within the containing
-   * checkout, so it might not be an issue. Has not caused any noticable issues so far.
+   * checkout, so it might not be an issue. Has not caused any noticeable issues so far.
    *
    * TODO(CE-16): refactor, possibly apply to other line items
    */
-  override lazy val itemType: CashTransactionLineItemType =
-    CashTransactionLineItemType(_typeEntity, _entity)
+  override lazy val itemType: CashTransactionLineItemType = CashTransactionLineItemType.restore(_typeEntity, _entity)
 
-  override def toJson = ""
+  override def toJson = jsonify("Cash Transaction", nature.name, Some(id))
 
+  override lazy val domainObject: CashTransaction = (_maybeCashTransaction orElse getTxnFromDb) getOrElse (
+    throw new IllegalArgumentException("No cash transaction provided or found in database.")
+  )
 
-  override lazy val domainObject: CashTransaction = _maybeCashTransaction.getOrElse {
-    services.cashTransactionStore.findByLineItemId(id).getOrElse (
-      throw new IllegalArgumentException("No cash transaction provided or found in database.")
-    )
-  }
 
   override def transact(checkout: Checkout) = {
-    if (id > 0) { this }
+    if (id > 0) { this.update() }
     else {
-      require( checkout.accountId > 0 )
-
       // note: type is not saved since the entities are singular
       val savedItem = this.withCheckoutId(checkout.id).insert()
       val savedCashTxn = domainObject.copy(
-        accountId = checkout.accountId,
+        accountId = checkout.buyerAccount.id,
         lineItemId = Some(savedItem.id)
       ).save()
 
@@ -109,7 +101,8 @@ case class CashTransactionLineItem(
       require(_maybeCashTransaction.isDefined, "Required CashTransaction information is not present.")
 
       val txn = domainObject
-      val charge = services.payment.charge(txn.cash, txn.stripeCardTokenId.get, "Checkout #" + checkout.id)
+      val token = txn.stripeCardTokenId getOrElse (throw new IllegalArgumentException("Stripe token required."))
+      val charge = services.payment.charge(txn.cash, token, "Checkout #" + checkout.id)
       val newTransaction = txn.copy(stripeChargeId = Some(charge.id))
       this.copy(_maybeCashTransaction = Some(newTransaction))
     }
@@ -130,6 +123,17 @@ case class CashTransactionLineItem(
     get = txnItem => txnItem._entity,
     set = (txnItem, newEntity) => txnItem copy newEntity
   )
+
+  def withPaymentService(newPayment: Payment) = this.copy(
+    _services = _services.copy(payment = newPayment)
+  )
+
+
+  //
+  // Helpers
+  //
+  private def getTxnFromDb = services.cashTransactionStore.findByLineItemId(id)
+
 }
 
 

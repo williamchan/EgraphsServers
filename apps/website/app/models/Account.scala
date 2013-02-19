@@ -1,7 +1,7 @@
 package models
 
 import java.sql.Timestamp
-import services.db.{KeyedCaseClass, SavesWithLongKey, Schema}
+import services.db.{HasTransientServices, KeyedCaseClass, SavesWithLongKey, Schema}
 import com.google.inject.Inject
 import java.util.UUID
 import org.apache.commons.codec.binary.Base64
@@ -23,8 +23,9 @@ case class Account(
   administratorId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  services: AccountServices = AppConfig.instance[AccountServices]
+  @transient _services: AccountServices = AppConfig.instance[AccountServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
+  with HasTransientServices[AccountServices]
 {
   def save(): Account = {
     require(!email.isEmpty, "Account: email must be specified")
@@ -37,7 +38,7 @@ case class Account(
    * @param name name of Customer
    * @return newly created Customer
    */
-  def createCustomer(name: String): Customer = {
+  def createCustomer(name: String = createUsernameStringFromEmail()): Customer = {
     require(customerId.isEmpty, "Cannot create Customer on Account that already has one")
     Customer(name = name, username = createUsernameStringFromEmail())
   }

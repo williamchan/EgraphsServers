@@ -16,7 +16,7 @@ class RequireAccountEmailTests extends EgraphsUnitTest {
   val emailWithAccount = "myyk.seok@gmail.com"
   val emailWithoutAccount = "joe.phoney@gmail.com"
 
-  val validAccount = Account(email = emailWithAccount, services = null)
+  val validAccount = Account(email = emailWithAccount, _services = null)
 
   "filter" should "allow emails that have an account associated with them" in {
     val errorOrAccount = filterWithMocks.filter(emailWithAccount)

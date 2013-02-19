@@ -11,6 +11,8 @@ trait QueriesAsEntity[ModelT <: HasEntity[EntityT, KeyT], EntityT <: KeyedEntity
   protected def entityToModel(convert: EntityT): Option[ModelT]
   protected def table: Table[EntityT]
 
+  def findEntityById(id: KeyT) = table.lookup(id)
+
   def findById(id: KeyT): Option[ModelT] = {
     for (entity <- table.lookup(id); model <- entityToModel(entity)) yield model
   }
