@@ -26,6 +26,12 @@ object ToyBoxBuild extends Build {
     appDependencies,
     path = baseDir
   ).settings(
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
+
+    parallelExecution in Test := false,
+    Keys.fork in Test := false,
+    testOptions in Test := Nil,
+
     // Copied from build helpers
     resolvers ++= Seq(
       "Typesafe Releases Repository" at "http://repo.typesafe.com/typesafe/releases/",
@@ -33,7 +39,6 @@ object ToyBoxBuild extends Build {
     ),
 
     shellPrompt := playPrompt,
-    testOptions in Test := Nil,
     commands ++= Seq(playCommand)
   ).dependsOn(PlayUtilsBuild.main)
 

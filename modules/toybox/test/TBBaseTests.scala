@@ -18,6 +18,9 @@ import org.scalatest.junit.JUnitRunner
 
 import java.lang.ExceptionInInitializerError
 
+//TODO: This file should be renamed to match the file it is testing.
+// For example if testing ToyBoxBase, should be ToyBoxBaseTests.
+
 /** Tests implementation of the methods of the ToyBoxBase trait */
 @RunWith(classOf[JUnitRunner])
 class DefaultTBBaseTests extends FlatSpec with ShouldMatchers {
