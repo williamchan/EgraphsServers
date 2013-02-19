@@ -6,6 +6,7 @@ import scalaz.Lens
 import services.AppConfig
 import services.db.{Schema, CanInsertAndUpdateEntityThroughServices}
 import services.payment.Payment
+import models.enums.LineItemNature
 
 
 //
@@ -61,8 +62,7 @@ case class CashTransactionLineItem(
    */
   override lazy val itemType: CashTransactionLineItemType = CashTransactionLineItemType.restore(_typeEntity, _entity)
 
-  override def toJson = ""
-
+  override def toJson = jsonify("Cash Transaction", nature.name, Some(id))
 
   override lazy val domainObject: CashTransaction = (_maybeCashTransaction orElse getTxnFromDb) getOrElse (
     throw new IllegalArgumentException("No cash transaction provided or found in database.")

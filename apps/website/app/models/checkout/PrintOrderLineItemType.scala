@@ -58,8 +58,6 @@ case class PrintOrderLineItemType(
     Seq( PrintOrderLineItem(this, printOrder) )
   }
 
-  override def toJson = ""
-
   def printOrder = PrintOrder(orderId = forOrder.id)
 }
 

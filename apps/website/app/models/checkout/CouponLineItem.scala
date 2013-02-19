@@ -26,7 +26,12 @@ case class CouponLineItem(
   with SavesAsLineItemEntityThroughServices[CouponLineItem, CouponLineItemServices]
 {
 
-  override def toJson = ""
+  override def toJson = jsonify(
+    name = if (domainObject.isGiftCertificate) "Gift Certificate" else "Coupon",
+    description = domainObject.name,
+    id = Some(id)
+  )
+
 
   override def itemType: CouponLineItemType = (_type orElse itemTypeById) getOrElse (throw new IllegalArgumentException("CouponLineItemType required."))
   override lazy val domainObject: Coupon = (couponFromType orElse couponFromTypeId) getOrElse (throw new IllegalArgumentException("Coupon required."))

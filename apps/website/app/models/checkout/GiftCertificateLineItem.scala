@@ -28,7 +28,7 @@ case class GiftCertificateLineItem (
 
   override def itemType = GiftCertificateLineItemType(this)
 
-  override def toJson: String = ""
+  override def toJson = jsonify("Gift Certificate", itemType.description, Some(id))
 
   override def domainObject: GiftCertificate = {
     _maybeGiftCertificate.getOrElse {

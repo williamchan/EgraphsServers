@@ -10,6 +10,7 @@ import scalaz.Lens
 import services.db.{CanInsertAndUpdateEntityThroughTransientServices, InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
 import org.squeryl.Query
+import play.api.libs.json.{Json, JsValue}
 
 /**
  * Represents an actual item or data within a checkout. Has the responsibility of persisting itself,
@@ -49,7 +50,7 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
   //
   // LineItem Methods
   //
-  def toJson: String  // TODO(CE-16):
+  def toJson: JsValue  // TODO(CE-16):
   def withAmount(newAmount: Money): LineItem[T]
   def withCheckoutId(newCheckoutId: Long): LineItem[T]
 
@@ -66,6 +67,23 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
   ): Option[LI] = {
     if (codeType != desiredCodeType) None
     else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
+  }
+
+
+  /** helper for toJson method; optional values are left out of if not defined */
+  protected def jsonify(name: String, description: String, id: Option[Long] = None, imageUrl: Option[String] = None)
+  :JsValue = Json.toJson {
+    import Json.{toJson => js}
+    val emptyMap = Map.empty[String, JsValue]
+    val idMap = id map { (anId: Long) => Map("id" -> js(anId)) } getOrElse emptyMap
+    val urlMap = imageUrl map { (url: String) => Map("imageUrl" -> js(url)) } getOrElse emptyMap
+
+    idMap ++ urlMap ++ Map(
+      "name" -> js(name),
+      "description" -> js(description),
+      "amount" -> js(amount.getAmount.doubleValue),
+      "lineItemType" -> itemType.toJson
+    )
   }
 }
 

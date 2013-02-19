@@ -3,6 +3,7 @@ package models.checkout
 import models.checkout.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.Money
+import play.api.libs.json.Json
 
 /**
  * Summary item for the sum of all charges and credits incurred by the customer (e.g. everything,
@@ -17,7 +18,7 @@ case class TotalLineItem (amount: Money) extends LineItem[Money] {
   override def itemType = TotalLineItemType
   override def withAmount(newAmount: Money) = this.copy(newAmount)
 
-  override def toJson = ""
+  override def toJson = jsonify("Total", "Final cost of purchase")
 
   override val id: Long = -1
   override def domainObject = amount
@@ -35,7 +36,6 @@ object TotalLineItemType extends TotalLineItemType {
   override val description = "Total"
   override val nature = LineItemNature.Summary
   override val codeType = CheckoutCodeType.Total
-  override val toJson = ""
 
 
   /**

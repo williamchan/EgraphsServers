@@ -30,7 +30,7 @@ case class TaxLineItem private (
   override def domainObject: Money = amount
 
 
-  override def toJson: String = ""
+  override def toJson = jsonify("Tax", itemType.description, Some(id))
 
 
   override def transact(checkout: Checkout): TaxLineItem = {

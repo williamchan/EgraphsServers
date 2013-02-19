@@ -59,7 +59,6 @@ case class CouponLineItemType(
   with SavesAsLineItemTypeEntityThroughServices[CouponLineItemType, CouponLineItemTypeServices]
 {
 
-  override def toJson = ""
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
     pendingResolution(CheckoutCodeType.Subtotal) match {
       case Nil => resolvedItems(CheckoutCodeType.Subtotal).headOption map { subtotal =>

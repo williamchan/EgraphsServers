@@ -7,6 +7,7 @@ import services.AppConfig
 import com.google.inject.Inject
 import scalaz.Lens
 import models.enums.PaymentStatus
+import play.api.libs.json.{JsValue, Json}
 
 
 case class EgraphOrderLineItemServices @Inject() (
@@ -32,7 +33,11 @@ case class EgraphOrderLineItem(
   //
   // LineItem members
   //
-  override def toJson = ""
+  override def toJson = {
+    val product = domainObject.product
+    jsonify(product.name, product.description, Some(id), Some(product.defaultIcon.url))
+  }
+
 
   override def domainObject: Order = (orderFromType orElse orderFromDb) getOrElse (throw new IllegalArgumentException("Order required."))
 

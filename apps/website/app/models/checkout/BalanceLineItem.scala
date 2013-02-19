@@ -9,7 +9,7 @@ case class BalanceLineItem(amount: Money) extends LineItem[Money] {
   override def itemType = BalanceLineItemType
   override def withAmount(newAmount: Money) = this.copy(newAmount)
 
-  override def toJson = ""
+  override def toJson = jsonify("Balance", "Amount due to complete transaction")
 
 
   override val id: Long = -1
@@ -27,8 +27,6 @@ case object BalanceLineItemType extends BalanceLineItemType {
   override val description = "Balance"
   override val nature = LineItemNature.Summary
   override val codeType = CheckoutCodeType.Balance
-  override val toJson = ""
-
 
   override def lineItems(resolved: LineItems, pendingResolution: LineItemTypes) = {
     import LineItemNature._

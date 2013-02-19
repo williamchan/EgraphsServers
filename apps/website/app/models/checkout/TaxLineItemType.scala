@@ -32,8 +32,6 @@ case class TaxLineItemType protected (
   with SavesAsLineItemTypeEntityThroughServices[TaxLineItemType, TaxLineItemTypeServices]
 {
 
-  override def toJson: String = ""
-
   /**
    * Calculates tax as applied to the value of the subtotal and discounts.
    * @param resolvedItems

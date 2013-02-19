@@ -7,6 +7,7 @@ import models.SavesCreatedUpdated
 import scalaz.Lens
 import services.{AppConfig, MemberLens}
 import services.db._
+import play.api.libs.json.{Json, JsValue}
 
 
 /**
@@ -24,7 +25,12 @@ trait LineItemType[+T] extends HasLineItemNature with HasCodeType {
 
   def id: Long
   def description: String
-  def toJson: String
+  def toJson: JsValue = Json.toJson {
+    Map(
+      "id" -> Json.toJson(id),
+      "codeType" -> Json.toJson(codeType.name)
+    )
+  }
 
   /**
    * Creates one or more [[models.checkout.LineItem]]s from an existing set of resolved

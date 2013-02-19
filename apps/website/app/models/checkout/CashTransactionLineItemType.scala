@@ -40,8 +40,6 @@ case class CashTransactionLineItemType protected (
   with HasTransientServices[CashTransactionLineItemTypeServices]
 {
 
-  override def toJson = ""
-
   /**
    * @param resolved should have a BalanceLineItem in order to resolve
    * @param unresolved should have no BalanceLineItemType in order to resolve

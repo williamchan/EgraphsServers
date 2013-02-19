@@ -12,7 +12,7 @@ import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
 import services.Finance.TypeConversions._
 import util.Random
 
-case class CouponServices @Inject()(store: CouponStore)
+case class CouponServices @Inject()(store: CouponStore, giftCertificateStore: GiftCertificateStore)
 
 case class Coupon(
   id: Long = 0,
@@ -111,6 +111,10 @@ case class Coupon(
   override def withUsageType(value: CouponUsageType) = this.copy(_usageType = value.name)
 
   def withLineItemTypeId(typeId: Long) = this.copy(lineItemTypeId = Some(typeId))
+
+  def giftCertificates = services.giftCertificateStore.findByCoupon(this)
+
+  def isGiftCertificate = giftCertificates.headOption isDefined
 }
 
 object Coupon {

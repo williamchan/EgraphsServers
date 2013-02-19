@@ -62,8 +62,6 @@ case class EgraphOrderLineItemType(
 
   override def id = _entity.id
 
-  override def toJson = ""
-
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some {
     val print: LineItems = if (!framedPrint) Nil else PrintOrderLineItemType(order).lineItems().getOrElse(Nil)
     print ++ Seq( EgraphOrderLineItem(this, price) )

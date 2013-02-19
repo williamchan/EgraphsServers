@@ -27,10 +27,6 @@ case class GiftCertificateLineItemType (
   with SavesAsLineItemTypeEntityThroughServices[GiftCertificateLineItemType, GiftCertificateLineItemTypeServices]
 {
 
-  override def toJson: String = {
-    ""
-  }
-
   override def lineItems(
     resolvedItems: LineItems = Nil,
     pendingResolution: LineItemTypes = Nil

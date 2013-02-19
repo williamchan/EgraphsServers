@@ -6,6 +6,7 @@ import services.db.Schema
 import services.AppConfig
 import scalaz.Lens
 import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
+import play.api.libs.json.Json
 
 
 //
@@ -26,9 +27,10 @@ case class PrintOrderLineItem(
   //
   // LineItem members
   //
-  override def toJson = ""
+  override def toJson = jsonify("High quality print", "Framed print of digital egraph", Some(id))
   override def itemType = (_type orElse typeFromOrder) getOrElse (throw new ItemTypeNotFoundException("PrintOrderLineItemType"))
   override def domainObject = (_printOrder orElse printOrderFromDb) getOrElse (throw new DomainObjectNotFoundException("PrintOrder"))
+
 
   //
   // SubLineItem members

@@ -190,5 +190,10 @@ class GiftCertificateStore @Inject() (
     ) yield GiftCertificate(entity, coupon)
   }
 
+  def findByCoupon(coupon: Coupon) = {
+    val query = table.where(certificate => certificate.couponId.get === coupon.id)
+    query map { GiftCertificate(_, coupon) }
+  }
+
   // TODO(SER-471): get by gifter, recipient?
 }
