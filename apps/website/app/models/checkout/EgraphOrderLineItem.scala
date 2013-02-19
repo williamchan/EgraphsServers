@@ -29,9 +29,8 @@ case class EgraphOrderLineItem(
   _type: Option[EgraphOrderLineItemType] = None,
   _printOrderItem: Option[PrintOrderLineItem] = None,
   @transient _services: EgraphOrderLineItemServices = AppConfig.instance[EgraphOrderLineItemServices]
-)
-	extends LineItem[Order]
-	with HasLineItemEntity[EgraphOrderLineItem]
+) extends LineItem[Order]
+  with HasLineItemEntity[EgraphOrderLineItem]
   with SavesAsLineItemEntityThroughServices[EgraphOrderLineItem, EgraphOrderLineItemServices]
   with LineItemEntityGettersAndSetters[EgraphOrderLineItem]
 {
@@ -71,7 +70,6 @@ case class EgraphOrderLineItem(
   //
   /** get actual print order */
   def printOrderItem = _printOrderItem orElse { services.printOrderItemServices.findByOrderId(domainObject.id) }
-
 
   private def orderFromType = _type map { _.order}
 

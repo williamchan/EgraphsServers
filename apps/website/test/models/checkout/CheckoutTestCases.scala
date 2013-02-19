@@ -49,8 +49,6 @@ trait CheckoutTestCases { this: FlatSpec with ShouldMatchers =>
     total should haveAmount (txnItem map (_.amount.negated) getOrElse zeroDollars )
   }
 
-
-
   "A restored checkout" should "contain same line items as saved checkout" in (eachScenario where buyerAndPaymentDefined) {
     implicit scenario =>
 

@@ -24,8 +24,8 @@ case class CashTransactionLineItemServices @Inject() (
 // Model
 //
 /**
- * Once resolved from an item type, CashTransactionLineItem is used make charges for the amount of
- * holds the domain object representing the exchange of funds.
+ * Once resolved from an item type, CashTransactionLineItem holds the domain object representing
+ * the exchange of funds.
  *
  * When new/untransacted, initially takes the cash transaction, which may be incomplete since some
  * information is not known til the charge is made. When restored, only the entities are needed
@@ -56,7 +56,7 @@ case class CashTransactionLineItem(
    * and return the contained item type if right and use the existing implementation if left.
    *
    * However, in this period of time, the original item type ought to be stored within the containing
-   * checkout, so it might not be an issue. Has not caused any noticable issues so far.
+   * checkout, so it might not be an issue. Has not caused any noticeable issues so far.
    *
    * TODO(CE-16): refactor, possibly apply to other line items
    */

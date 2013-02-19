@@ -40,9 +40,6 @@ case class EgraphOrderLineItemTypeServices @Inject() (
 }
 
 
-
-
-
 //
 // Model
 //
@@ -97,7 +94,6 @@ case class EgraphOrderLineItemType(
     throw new IllegalArgumentException("Product is out of inventory.")
   }
 }
-
 
 
 //

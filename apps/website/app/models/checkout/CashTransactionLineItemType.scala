@@ -100,10 +100,6 @@ case class CashTransactionLineItemType protected (
 }
 
 
-
-
-
-
 object CashTransactionLineItemType {
 
   def codeType = CheckoutCodeType.CashTransaction
@@ -136,7 +132,6 @@ object CashTransactionLineItemType {
 
   // todo(refunds): define a method to create refund transactions
 
-
   def restore(entity: LineItemTypeEntity, itemEntity: LineItemEntity) = {
     new CashTransactionLineItemType(
       _entity = entity,
@@ -146,13 +141,6 @@ object CashTransactionLineItemType {
     )
   }
 }
-
-
-
-
-
-
-
 
 
 case class CashTransactionLineItemTypeServices @Inject() (

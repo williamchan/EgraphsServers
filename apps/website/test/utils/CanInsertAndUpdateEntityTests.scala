@@ -19,9 +19,6 @@ trait CanInsertAndUpdateEntityWithLongKeyTests[
 }
 
 
-
-
-
 trait CanInsertAndUpdateEntityTests[
   ModelT <: CanInsertAndUpdateEntity[ModelT,  EntityT] with HasEntity[EntityT, KeyT],
   EntityT <: KeyedCaseClass[KeyT],
@@ -68,9 +65,6 @@ trait CanInsertAndUpdateEntityTests[
     updatedRestored._entity should not be (saved._entity)
   }
 }
-
-
-
 
 
 trait HasTransientServicesTests[ModelT] {

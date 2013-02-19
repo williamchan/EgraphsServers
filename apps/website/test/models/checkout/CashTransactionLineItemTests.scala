@@ -5,7 +5,6 @@ import utils._
 import services.AppConfig
 import models.enums.CheckoutCodeType
 import LineItemTestData._
-import services.cache.CacheFactory
 
 
 class CashTransactionLineItemTests extends EgraphsUnitTest
@@ -48,14 +47,7 @@ class CashTransactionLineItemTests extends EgraphsUnitTest
 
     true
   }
-
-
-
 }
-
-
-
-
 
 
 class CashTransactionLineItemTypeTests extends EgraphsUnitTest

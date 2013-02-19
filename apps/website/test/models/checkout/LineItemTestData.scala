@@ -52,7 +52,6 @@ object LineItemTestData {
   def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
   def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
 
-
   def newCheckout: FreshCheckout = {
     val buyer = Some(newSavedAccount())
     val address = newSavedAddress(buyer)

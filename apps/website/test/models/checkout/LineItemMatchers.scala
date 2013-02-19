@@ -34,9 +34,6 @@ object LineItemMatchers {
   def haveAmountOf(right: LineItem[_]) = haveAmount(right.amount)
   def haveNegatedAmountOf(right: LineItem[_]) = haveAmount(right.amount.negated)
 
-
-
-
   /** Checks is a given LineItemType resolves any LineItems from the given items and types */
   def resolveFrom(resolved: LineItems, unresolved: LineItemTypes) = Matcher { left: LineItemType[_] =>
     val result = left.lineItems(resolved, unresolved)

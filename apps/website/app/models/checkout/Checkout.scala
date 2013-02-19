@@ -84,7 +84,7 @@ abstract class Checkout
    * Needed to update things like taxes and fees, which are dependent on individual elements, when
    * adding new elements (ex: refunding taxes or including taxes on checkout edits).
    */
-  lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
+  protected lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
     // TODO(refunds): will probably want to add the refund transaction here
     // TODO(fees): will want to add any fees we charge here
 
@@ -266,7 +266,6 @@ abstract class Checkout
     resolve(ResolutionPass(unresolvedTypes = types))
   }
 
-
   //
   // helpers
   //
@@ -314,10 +313,6 @@ abstract class Checkout
     }
   }
 
-
-
-
-
   //
   // utility members
   //
@@ -332,17 +327,6 @@ abstract class Checkout
   protected def summaryTypes: LineItemTypes = Seq(SubtotalLineItemType, TotalLineItemType, BalanceLineItemType)
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 //

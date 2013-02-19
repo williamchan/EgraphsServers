@@ -31,10 +31,6 @@ trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] extends Of
 }
 
 
-
-
-
-
 object CheckoutCodeType extends Enum {
   protected type ItemEntity = LineItemEntity
   protected type TypeEntity = LineItemTypeEntity
@@ -42,7 +38,6 @@ object CheckoutCodeType extends Enum {
   sealed abstract class EnumVal(name: String) extends CheckoutCodeType(name) with Value {
     this: OfCheckoutClass[_, _] =>
   }
-
 
   //
   // Products
@@ -96,10 +91,6 @@ object CheckoutCodeType extends Enum {
     override def itemCompanion = TaxLineItem
   }
 }
-
-
-
-
 
 
 trait HasCodeType { def codeType: CheckoutCodeType }

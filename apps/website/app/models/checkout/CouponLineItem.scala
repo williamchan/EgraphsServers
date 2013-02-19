@@ -24,9 +24,8 @@ case class CouponLineItem(
   _entity: LineItemEntity,
   _type: Option[CouponLineItemType] = None,
   @transient _services: CouponLineItemServices = AppConfig.instance[CouponLineItemServices]
-)
-	extends LineItem[Coupon]
-	with HasLineItemEntity[CouponLineItem]
+) extends LineItem[Coupon]
+  with HasLineItemEntity[CouponLineItem]
   with LineItemEntityGettersAndSetters[CouponLineItem]
   with SavesAsLineItemEntityThroughServices[CouponLineItem, CouponLineItemServices]
 {
@@ -60,7 +59,7 @@ case class CouponLineItem(
   //
   // LineItemEntityLenses member
   //
-  override protected def entityLens = EntityLens( get = _._entity, set = _ copy _)
+  override protected def entityLens = EntityLens( get = _._entity, set = (coup, entity) => coup.copy(entity))
 
   //
   // Helpers

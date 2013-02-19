@@ -50,9 +50,6 @@ class CheckoutTests extends EgraphsUnitTest
     CheckoutScenario(twoGiftCertificates, Nil)
   )
 
-
-
-
   //
   // Checkout Tests
   //
@@ -91,7 +88,6 @@ class CheckoutTests extends EgraphsUnitTest
   }
 
   "Checkout#toJson" should "match the api endpoint spec" in (pending)
-
 
   //
   // Helpers

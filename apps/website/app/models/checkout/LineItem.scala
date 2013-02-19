@@ -203,9 +203,6 @@ trait SavesAsLineItemEntity[
 }
 
 
-
-
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity[T] =>

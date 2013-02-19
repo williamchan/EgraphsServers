@@ -10,7 +10,6 @@ import java.sql.Timestamp
 import services.db._
 
 
-
 //
 // Services
 //
@@ -30,7 +29,6 @@ case class GiftCertificateServices @Inject() (
     entity.copy(created = created, updated = updated)
   }
 }
-
 
 
 //
@@ -53,9 +51,6 @@ case class GiftCertificateEntity (
 
   private def idLens = MemberLens[GiftCertificateEntity, Long](this)(_,_)
 }
-
-
-
 
 
 //
@@ -101,9 +96,7 @@ case class GiftCertificate protected (
     ).getOrElse(balance)
   }
 
-
   private def maybeItemEntity = services.lineItemStore.findEntityById(itemId.get)
-
 
   //
   // Lenses
@@ -159,10 +152,6 @@ object GiftCertificate {
   // TODO(SER-471): def gifterName: String
   // TODO(SER-471: def gifterEmail: String
 }
-
-
-
-
 
 
 //
