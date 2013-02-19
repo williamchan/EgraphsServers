@@ -9,6 +9,7 @@ import org.joda.time.DateTimeConstants
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.ws._
 import play.api.libs.ws.WS._
+import play.api.libs.json.Json
 import services.inject.InjectionProvider
 import services.config.ConfigFileProxy
 
@@ -172,13 +173,13 @@ private[mail] case class MailChimpBulkMailList (apikey: String, datacenter: Stri
 
   override def removeMember(email: String) : Future[Response] = {
     WS.url(actionUrl).post(
-      Map(
-        "output" -> Seq("json"),
-        "apikey" -> Seq(apikey),
-        "method" -> Seq("listUnsubscribe"),
-        "id" -> Seq(newsletterListId),
-        "email_address" -> Seq(email),
-        "delete_member" -> Seq("true")
+      Json.obj(
+        "output" -> Json.arr("json"),
+        "apikey" -> Json.arr(apikey),
+        "method" -> Json.arr("listUnsubscribe"),
+        "id" -> Json.arr(newsletterListId),
+        "email_address" -> Json.arr(email),
+        "delete_member" -> Json.arr("true")
       )
     )
   }

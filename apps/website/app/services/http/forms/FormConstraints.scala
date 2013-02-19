@@ -22,6 +22,7 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
         case Right(_) => Valid
         case Left(PasswordTooShort(_)) => Invalid(Account.minPasswordLength + " characters minimum")
         case Left(PasswordRequired) => Invalid("Password is required")
+        case Left(unknownError) => throw new IllegalStateException(s"What is this error status? $unknownError" )
       }
     }
   }
