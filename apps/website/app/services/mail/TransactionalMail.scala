@@ -2,10 +2,11 @@ package services.mail
 
 import com.google.inject.Inject
 import play.api.Play.current
+import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
+import play.api.libs.ws._
 import play.api.libs.ws.WS.WSRequestHolder
-import play.api.libs.ws.WS
 import services.config.ConfigFileProxy
 import services.inject.InjectionProvider
 import models.frontend.email.EmailViewModel
@@ -63,10 +64,10 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
 
     val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key)
 
-    val promiseResponse = WS.url(actionUrl + methodAndOutputFormat).post(jsonIterable)
+    val futureResponse = WS.url(actionUrl + methodAndOutputFormat).post(jsonIterable)
 
-    promiseResponse.onRedeem {
-      response => play.Logger.info("Send-template response: " + response.body)
+    futureResponse.onSuccess {
+      case response => play.Logger.info("Send-template response: " + response.body)
     }
   }
 }
