@@ -3,15 +3,20 @@ package models.enums
 import egraphs.playutils.Enum
 import models.frontend.masthead.{InPageActionViewModel, SearchBoxViewModel, VideoPlayerViewModel, SimpleLinkViewModel}
 
+/**
+ * Enum for Call To Action options on the homepage.
+ *
+ * Searchbox is the site search. Text represents the place holder text
+ *
+ * SimpleLink an egraphs orange arrow button that links to the URL in the target. In page anchor locations work also.
+ *
+ * VideoPlayer brings up the video modal with the education youtube video.
+ */
 object CallToActionType extends Enum {
   sealed trait EnumVal extends Value
 
   val SimpleLink = new EnumVal{
     val name = "SimpleLink"
-  }
-
-  val InPageAction = new EnumVal {
-    val name = "InPageAction"
   }
 
   val SearchBox = new EnumVal {
@@ -25,9 +30,9 @@ object CallToActionType extends Enum {
   def toViewModel(callToActionType: CallToActionType.EnumVal, text: String, target: String) = {
     callToActionType match {
       case SimpleLink => SimpleLinkViewModel(text, target)
-      case InPageAction => InPageActionViewModel(text,target)
       case SearchBox => SearchBoxViewModel(text, target)
       case VideoPlayer => VideoPlayerViewModel(text, target)
+      case _ => VideoPlayerViewModel(text, target)
     }
   }
 }

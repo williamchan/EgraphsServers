@@ -1,4 +1,5 @@
 @(stars:Iterable[models.frontend.landing.CatalogStar],
+  mastheads: Iterable[models.frontend.landing.LandingMasthead],
   verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
   signup:Boolean = false,
   marketplaceRoute : String = "/stars"
@@ -153,10 +154,7 @@
     @tags.landing.announcement_bar()
   }
   @tags.landing.masthead_section(
-    celebrityPublicName=None,
-    mastheadMessage=None,
-    mastheadImageUrl=EgraphsAssets.at("images/landing-masthead.jpg").url,
-    getStartedUrl=Some("/stars")
+    mastheads = mastheads
   )
 
   <section id="content" role="main" class="landing">

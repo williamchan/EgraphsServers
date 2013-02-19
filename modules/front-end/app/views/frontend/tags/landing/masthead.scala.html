@@ -1,10 +1,5 @@
-@(headlineText: String =  "Egraphs Revs Up with Kevin Harvick, Rusty Wallace!",
-  subtitle: String = "", 
-  mastheadImageUrl: String, 
-  active: Boolean = false, 
-  callToActionViewModel: models.frontend.masthead.CallToActionViewModel = models.frontend.masthead.VideoPlayerViewModel(text = "View Video", target= "#video"),
-  callToActionTarget: String,
-  callToActionText: String
+@(masthead: models.frontend.landing.LandingMasthead,
+  active: Boolean = false
 )
 
 @import models.frontend.masthead._
@@ -17,17 +12,17 @@
   </p>
 }
 
-<section class="masthead-home item @if(active){active}" role="banner" style="background-image: url('@mastheadImageUrl');">
+<section class="masthead-home item @if(active){active}" role="banner" style="background-image: url('@masthead.landingPageImageUrl');">
   <div class="banner-gradient">
     <div class="container">
       <div class="row">
         <div class="span6 header-parent">
-        <h1>@headlineText</h1>
-        <h2>@subtitle</h2>
+        <h1>@masthead.headline</h1>
+        <h2>@masthead.subtitle</h2>
         @{
-          callToActionViewModel match {
-            case v: VideoPlayerViewModel => video(target = callToActionTarget, text=callToActionText)
-            case _ =>  video(target = callToActionTarget, text=callToActionText)
+          masthead.callToActionViewModel match {
+            case v: VideoPlayerViewModel => video(target = v.target, text=v.text)
+            case _ =>  video(target = "derp", text="schlerp")
           }
         }
 

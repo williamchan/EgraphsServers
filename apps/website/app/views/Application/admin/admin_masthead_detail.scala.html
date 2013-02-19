@@ -12,6 +12,7 @@
 @import views.html.frontend.base_template
 @import models.enums.CallToActionType
 @import models.enums.PublishedStatus
+@import models.frontend.landing.LandingMasthead
 
 @headJs = {
   Egraphs.page.masthead = {
@@ -23,17 +24,23 @@
   };
 }
 
+@mastheadSection = {
+  @tags.landing.masthead(
+    LandingMasthead(
+      headline = "{{masthead.headline}}",
+      subtitle = Option("{{masthead.subtitle}}"),
+      landingPageImageUrl = masthead.landingPageImage.resizedWidth(1550).getSaved(services.blobs.AccessPolicy.Public).url,
+      callToActionViewModel = CallToActionType.toViewModel(masthead.callToActionType, 
+        "{{masthead.callToActionText}}", 
+        "{{masthead.callToActionTarget}}"
+      )
+    ) 
+  )  
+}
 
 @body = {
 <section ng-controller="MastheadController" ng-cloak>
-  @tags.landing.masthead(
-    headlineText = "{{masthead.headline}}",
-    subtitle = "{{masthead.subtitle}}",
-    mastheadImageUrl = masthead.landingPageImage.resizedWidth(1550).getSaved(services.blobs.AccessPolicy.Public).url,
-    callToActionViewModel = callToActionViewModel,
-    callToActionText = "{{masthead.callToActionText}}",
-    callToActionTarget = "{{masthead.callToActionTarget}}"
-  ) 
+  @mastheadSection
   <section id="content" class="top" role="main">
     <div id="main" class="sub">
       <div class="container" id="masthead-detail">
@@ -66,7 +73,7 @@
                     <span class="help-block">
                       A CTA is a <a href="http://en.wikipedia.org/wiki/Call_to_action_(marketing)">call to action.</a> 
                     </span>        
-                  </div>>
+                  </div>
                   <label class="control-label">CTA Type</label>
                   <div class="controls">
                     @for(cta <- CallToActionType.values) {

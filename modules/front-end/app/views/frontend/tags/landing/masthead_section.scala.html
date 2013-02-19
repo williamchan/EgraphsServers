@@ -1,15 +1,7 @@
-@(celebrityPublicName: Option[String] = None,
-  mastheadMessage: Option[String] = None,
-  mastheadImageUrl: String, 
-  getStartedUrl: Option[String] = None
-)
+@(mastheads: Iterable[models.frontend.landing.LandingMasthead])
 
 @import controllers._
 @import views.html.frontend.tags
-
-@celebHeadline(name:String) = {
-  <h1>Get an egraph from @name</h1>
-}
 
 @videoModal = {
   <div id="video-modal" class="modal hide fade egraph-video-modal" data-backdrop="static">
@@ -29,36 +21,8 @@
   </div>     
 }
 
-@celebMasthead = {
-  <section class="masthead-home" role="banner" style="background-image: url('mastheadImageUrl');">
-    <div class="banner-gradient">
-      <div class="container">
-        <div class="row">
-          <div class="span6 header-parent">
-            @{
-                celebrityPublicName match {
-                  case None => {
-                    <h1>Connect With Your Stars</h1>
-                  }
-                  case Some(name) => celebHeadline(name)
-                }
-              }
-              @getStartedUrl.map{ url =>
-              @{
-                celebrityPublicName match {
-                  case None => {}
-                  case Some(name) => tags.landing.get_started(url)
-                }
-              }
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>  
-}
 
-<div id="masthead" class="carousel slide" data-interval="100">
+@** <div id="masthead" class="carousel slide" data-interval="100">
   <div id="mastheads" class="carousel-inner">
     @tags.landing.masthead(headlineText = mastheadMessage.getOrElse("Connect With Your Stars"), mastheadImageUrl = mastheadImageUrl, active = true, callToActionTarget = "video", callToActionText = "View Video")
   </div>
@@ -68,5 +32,6 @@
     <a class="carousel-control left" href="#mastheads" data-slide="next"><i class="icon-white icon-step-forward"></i></a>
   </div>
 </div>
-
+**@
+  @tags.landing.masthead(mastheads.headOption.getOrElse(models.frontend.landing.DefaultLanding.masthead))
 @videoModal

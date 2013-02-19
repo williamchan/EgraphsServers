@@ -107,7 +107,7 @@ class MastheadStore @Inject() (
     schema.mastheadCategoryValues.right(categoryValue)
   }
 
-  def getLandingMastheads : Iterable[LandingMasthead] = {
+  def getLandingMastheads: Iterable[LandingMasthead] = {
     for(masthead <- getAll) yield {
       LandingMasthead(
         id = masthead.id,
