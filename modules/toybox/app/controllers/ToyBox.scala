@@ -14,14 +14,10 @@ import org.joda.time.DateTimeConstants._
 
 import ToyBoxConfigKeys._
 
-
 /** ToyBox provides a simple way to lock down Play 2.0 applications. 
  *  See README for usage instructions.
  */
 trait ToyBox extends DefaultTBBase with DefaultTBController with DefaultTBAuthenticator
-
-
-
 
 /** Default ToyBoxBase implementation */
 trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
@@ -47,7 +43,6 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   // iPad authorization configuration
   lazy val iPadHeader: Option[String] = config.getString(iPadHeaderKey)
   lazy val iPadSecret: Option[String] = config.getString(iPadSecretKey)
-
 
   /** Paths to public assets and pages. Could also pull more paths from config or replace
    *  with Seq[RequestHeader => Boolean] to allow for more flexible exceptions.
@@ -77,7 +72,6 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
       }
     )
 
-  
   // Cookie configuration
   lazy val initialRequestCookieName = config.getString(initRequestKey).getOrElse("toybox-initial-request")
   lazy val authCookieName = config.getString(authCookieKey).getOrElse("toybox-authenticated")
@@ -93,7 +87,6 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
       "password" -> text
     )
   )
-
 
   /** Redirects unauthorized requests for private resources. 
    *  Authorized requests for private resources are handled different from 
@@ -135,7 +128,6 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   /** Method pointing to the parent's onRouteRequest method. Used to make testing easier. */
   protected def normalRouteRequestHandler: (RequestHeader => Option[Handler]) = super.onRouteRequest
 
-
   /** Handler for authorized requests to private resources. Sets a new authentication
    *  Cookie to keep it from expiring while the user is active.
    */
@@ -159,11 +151,10 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
          */
         handler
       }
-      case (_, Some(action)) => Some(authenticate(action.asInstanceOf[Action[AnyContent]]))
+      case (_, Some(action: Action[_])) => Some(authenticate(action.asInstanceOf[Action[AnyContent]]))
       case (_, other) => other
     }
   }
-
 
   /** Generates a redirect to the log-in page and sets a Cookie containing the method
    *  and path of the request received for later redirection, if none already exists.
@@ -182,10 +173,6 @@ trait DefaultTBBase extends ToyBoxBase with GlobalSettings {
   }
 }
 
-
-
-
-
 /** Default get and post endpoint controller implementation for ToyBox */
 trait DefaultTBController extends ToyBoxController { 
   this: ToyBoxBase with ToyBoxAuthenticator =>
@@ -195,7 +182,6 @@ trait DefaultTBController extends ToyBoxController {
     Ok(views.html.login(postLoginRoute, assetsRoute, loginForm))
   }
 
-
   def postLogin: Action[AnyContent] = Action { implicit request =>
     loginForm.bindFromRequest.fold(
       formErrors   => BadRequest(views.html.login(postLoginRoute, assetsRoute, formErrors)),
@@ -203,12 +189,12 @@ trait DefaultTBController extends ToyBoxController {
       loginAttempt =>
         if ( loginAttempt == (authUsername, authPassword)) 
           Redirect(
-              parseInitialRequestCookie(request)
-            ).discardingCookies(
-              initialRequestCookieName
-            ).withCookies(
-              makeAuthCookie(request)
-            )
+            parseInitialRequestCookie(request)
+          ).discardingCookies(
+            DiscardingCookie(initialRequestCookieName)
+          ).withCookies(
+            makeAuthCookie(request)
+          )
         else
           BadRequest(views.html.login(
             postLoginRoute, 
@@ -219,7 +205,6 @@ trait DefaultTBController extends ToyBoxController {
           ))
     )
   }
-
 
   /** Reads the method and path of the initial request Cookie if it's present. 
    *  Otherwise, the returned Call is a GET to the application root.
@@ -233,10 +218,6 @@ trait DefaultTBController extends ToyBoxController {
     }
   }
 }
-
-
-
-
 
 trait DefaultTBAuthenticator extends ToyBoxAuthenticator { this: ToyBoxBase =>
   /** Checks if a request is authorized to access protected resources */
@@ -274,9 +255,6 @@ trait DefaultTBAuthenticator extends ToyBoxAuthenticator { this: ToyBoxBase =>
   }
 
 }
-
-
-
 
 /** Store of keys for querying configuration */
 object ToyBoxConfigKeys {

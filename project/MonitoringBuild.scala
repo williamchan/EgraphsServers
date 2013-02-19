@@ -10,7 +10,10 @@ object ApplicationBuild extends Build {
   val baseDir = file(".") / "apps" / appName
 
   val appDependencies = Seq(
-      
+    // Playframework components
+    anorm, jdbc,
+
+    // Other third-party dependencies
     "com.amazonaws" % "aws-java-sdk" % "1.3.22",
     "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
     "redis.clients" % "jedis" % "2.0.0",

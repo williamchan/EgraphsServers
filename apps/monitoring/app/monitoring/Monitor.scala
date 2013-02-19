@@ -1,21 +1,21 @@
 package monitoring
 
-import scala.collection.immutable.List
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
+
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+
 import akka.actor.ActorRef
-import akka.actor.Props
-import akka.dispatch.Await
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.util.duration.intToDurationInt
 import collections.EgraphsMetric
-import common.CloudWatchMetricPublisher
-import play.api.Play.current
-import play.api.libs.concurrent.Akka
+import collections.MetricSource
 import common.MonitoringMessages.CheckStatus
 import common.MonitoringMessages.GetMetric
-import collections.MetricSource
 import factory.ActorFactory
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 trait Monitor {
 
