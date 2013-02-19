@@ -84,6 +84,10 @@ object WebsiteBuild extends Build {
       scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:postfixOps,implicitConversions,reflectiveCalls"),
       organization := "egraphs",
 
+      parallelExecution in Test := false,
+
+      Keys.fork in Test := false,
+
       testOptions in Test := Nil,
 
       resourceDirectory in Test := websiteBaseDir / "test" / "resources",

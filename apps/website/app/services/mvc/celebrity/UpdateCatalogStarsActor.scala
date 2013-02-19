@@ -100,7 +100,7 @@ object UpdateCatalogStarsActor extends Logging {
   // Private members
   //
   private def scheduleJob() = {
-    //run once then schedule    
+    //run once then schedule
     Await.result(this.singleton ask UpdateCatalogStars(CatalogStarsAgent.singleton), 2 minutes)
 
     val random = new Random()

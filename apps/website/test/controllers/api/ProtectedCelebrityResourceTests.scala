@@ -46,11 +46,7 @@ trait ProtectedCelebrityResourceTests { this: EgraphsUnitTest =>
   }
 
   private def executingRequestWithCredentials(account: Account, password: String): Int = {
-    val auth = BasicAuth.Credentials(account.email, password)
-
     validRequestBodyAndQueryString match {
-      // TODO: Replace this before it get deprecated.  Problem is that requests can have different content types
-      // so it cannot chose the proper writeable to hook up.  May just need a case statement to get this going.
       case Some(req) => status(routeRequest(req.withCredentials(account, password)).get)
       case None => status(route(newRouteUnderTestFakeRequest.withCredentials(account, password)).get)
     }
