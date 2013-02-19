@@ -3,7 +3,7 @@ package services.payment
 import org.joda.money.Money
 
 /**
- * "Nice" payment service implementation t    hat always says that the payment
+ * "Nice" payment service implementation that always says that the payment
  * was successful, regardless of inputs or outputs.
  */
 class YesMaamPayment extends Payment {

@@ -251,10 +251,13 @@ class Schema @Inject() (
     .via((lineItem, cashTransaction) => lineItem.id === cashTransaction.lineItemId)
   val lineItemToGiftCertificate = oneToManyRelation(lineItems, giftCertificates)
     .via((lineItem, giftCertificate) => lineItem.id === giftCertificate._lineItemId)
+  val lineItemToOrder = oneToManyRelation(lineItems, orders)
+    .via((lineItem, order) => lineItem.id === order.lineItemId)
+  val lineItemToPrintOrder = oneToManyRelation(lineItems, printOrders)
+    .via((lineItem, printOrder) => lineItem.id === printOrder.lineItemId)
 
   val lineItemTypeToCoupon = oneToManyRelation(lineItemTypes, coupons)
     .via((lineItemType, coupon) => lineItemType.id === coupon.lineItemTypeId)
-
   val lineItemTypeToLineItem = oneToManyRelation(lineItemTypes, lineItems)
     .via((lineItemType, lineItem) => lineItemType.id === lineItem._itemTypeId)
   val lineItemTypeToProduct = oneToManyRelation(lineItemTypes, products)
