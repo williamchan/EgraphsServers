@@ -78,6 +78,7 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
     val idMap = id map { (anId: Long) => Map("id" -> js(anId)) } getOrElse emptyMap
     val urlMap = imageUrl map { (url: String) => Map("imageUrl" -> js(url)) } getOrElse emptyMap
 
+
     idMap ++ urlMap ++ Map(
       "name" -> js(name),
       "description" -> js(description),
@@ -159,11 +160,15 @@ class LineItemStore @Inject() (schema: Schema) {
  *
  * It also allows the item to be included in a checkouts' LineItems as normal without worry of it being
  * transacted multiple times by the checkout and the item it depends on.
+ *
+ * (Not married to this and not convinced there isn't a more elegant solution.)
  */
 trait SubLineItem[T] extends LineItem[T] {
 
+  /** doesn't actually transact in when called directly */
   override def transact(checkout: Checkout) = this
 
+  /** to be called from the transact method of the item it belongs to */
   def transactAsSubItem(checkout: Checkout): SubLineItem[T]
 }
 

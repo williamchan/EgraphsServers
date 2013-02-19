@@ -7,8 +7,10 @@ import services.AppConfig
 import scalaz.Lens
 import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientServices}
 
-
-/** NOTE(CE-13): this checkout instance needs to be serializable */
+/**
+ * For now, requires a saved Account for the buyer to simplify some things. Want to remove this requirement
+ * eventually to make it possible for creating a cart to preview without creating an account.
+ */
 case class FreshCheckout(
   id: Long = 0L,
   _itemTypes: LineItemTypes,
@@ -19,8 +21,6 @@ case class FreshCheckout(
   zipcode: Option[String] = None,
   @transient _services: CheckoutServices = AppConfig.instance[CheckoutServices]
 ) extends Checkout {
-  require(savedIfDefined(_buyerAccount), "Buyer's account must be saved.")
-  require(savedIfDefined(recipientAccount), "Recipient account must be saved.")
 
   //
   // CE-13 Changes

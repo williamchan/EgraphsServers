@@ -1,5 +1,6 @@
 package models.checkout
 
+import checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 import models.{ProductStore, OrderStore, Order, Product}
 import org.joda.money.{CurrencyUnit, Money}
@@ -8,6 +9,9 @@ import services.db.{HasTransientServices, InsertsAndUpdates, Schema}
 import services.AppConfig
 
 
+//
+// Services
+//
 case class EgraphOrderLineItemTypeServices @Inject() (
   schema: Schema,
   orderStore: OrderStore,
@@ -26,13 +30,11 @@ case class EgraphOrderLineItemTypeServices @Inject() (
     existingEntity getOrElse createEntity
   }
 
-
   private def baseEntityByProduct(product: Product) = LineItemTypeEntity(
     "Egraph Order for product " + product.id,
     EgraphOrderLineItemType.nature,
     EgraphOrderLineItemType.codeType
   )
-
 
   def findEntityById(id: Long) = table.lookup(id)
 }
@@ -41,7 +43,9 @@ case class EgraphOrderLineItemTypeServices @Inject() (
 
 
 
-// TODO(CE-13): implement actual EgraphOrderLineItemType
+//
+// Model
+//
 case class EgraphOrderLineItemType(
   productId: Long = 0L,
   recipientName: String = "",
@@ -55,11 +59,14 @@ case class EgraphOrderLineItemType(
   with LineItemTypeEntityGetters[EgraphOrderLineItemType]
   with HasTransientServices[EgraphOrderLineItemTypeServices]
 {
-  import models.checkout.checkout.Conversions._
-  import models.enums.{LineItemNature, CheckoutCodeType}
-
+  //
+  // HasLineItemTypeEntity member
+  //
   override lazy val _entity = services.findOrCreateEntityForProduct(product)
 
+  //
+  // LineItemType members
+  //
   override def id = _entity.id
 
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some {
@@ -67,14 +74,16 @@ case class EgraphOrderLineItemType(
     print ++ Seq( EgraphOrderLineItem(this, price) )
   }
 
-  // TODO(CE-13): look into inventory batch use
+  //
+  // Helpers
+  //
   lazy val order = Order(
     productId = productId,
     recipientName = recipientName,
     messageToCelebrity = messageToCeleb,
     requestedMessage = desiredText,
 
-    // TODO(CE-13): this may be redundant, and may cause a problem if the product sells out between navigating to the product page and adding to the checkout
+    // TODO(CE-13): this may be redundant, and may cause a problem if the product sells out between navigating to the product page and adding to the checkout -- should make sure to be checking product inventory at transaction
     inventoryBatchId = inventoryBatch.id
   )
 
@@ -91,7 +100,9 @@ case class EgraphOrderLineItemType(
 
 
 
-
+//
+// Companion
+//
 object EgraphOrderLineItemType {
   def codeType = CheckoutCodeType.EgraphOrder
   def nature = LineItemNature.Product

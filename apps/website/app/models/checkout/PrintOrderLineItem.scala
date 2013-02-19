@@ -7,6 +7,7 @@ import services.AppConfig
 import scalaz.Lens
 import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
 import play.api.libs.json.Json
+import models.enums.CheckoutCodeType
 
 
 //
@@ -35,7 +36,7 @@ case class PrintOrderLineItem(
   //
   // SubLineItem members
   //
-  override def transactAsSubItem(checkout: Checkout) = {
+  override def transactAsSubItem(checkout: Checkout): PrintOrderLineItem = {
     require(domainObject.orderId > 0, "Cannot transact PrintOrder for nonexistant Order")
     if (id > 0) { this.update() }
     else {
@@ -46,7 +47,7 @@ case class PrintOrderLineItem(
 
 
   //
-  // EntityLenses members
+  // EntityLenses member
   //
   override def entityLens = Lens[PrintOrderLineItem, LineItemEntity](get = _._entity, set = _ copy _)
 
@@ -57,12 +58,12 @@ case class PrintOrderLineItem(
   /** get `PrintOrder` by LineItemId */
   private def printOrderFromDb = services.printOrderStore.findByLineItemId(id).headOption
 
-  /** get `Order` of the `PrintOrder` and create the itemType from that */
+  /** itemType must be provided or requires an order, so this method recreates it from the order of the printOrder */
   private def typeFromOrder = services.orderStore.findById(domainObject.orderId).headOption map { order =>
     PrintOrderLineItemType(order)
   }
 
-  /** save `PrintOrder` and copy into _printOrder */
+  /** saves print order */
   private def withSavedPrintOrder(checkout: Checkout) = {
     // TODO(CE-13): add name to shipping address
     val address = checkout.shippingAddress getOrElse (throw new MissingRequiredAddressException("PrintOrderLineItemType"))
@@ -96,7 +97,15 @@ object PrintOrderLineItem {
 case class PrintOrderLineItemServices @Inject() (
   schema: Schema,
   printOrderStore: PrintOrderStore,
-  orderStore: OrderStore
+  orderStore: OrderStore,
+  itemStore: LineItemStore
 ) extends SavesAsLineItemEntity[PrintOrderLineItem] {
 
+  def findByOrderId(orderId: Long) = {
+    for (
+      order <- orderStore.findById(orderId);
+      itemId <- order.lineItemId;
+      item <- itemStore.findByIdWithCodeType(itemId, CheckoutCodeType.PrintOrder)
+    ) yield item
+  }
 }

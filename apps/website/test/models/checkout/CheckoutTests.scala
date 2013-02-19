@@ -6,6 +6,7 @@ import services.AppConfig
 import services.Finance.TypeConversions._
 import utils._
 import org.scalatest.matchers.{MatchResult, Matcher}
+import play.api.libs.json.JsNull
 
 
 class CheckoutTests extends EgraphsUnitTest
@@ -84,6 +85,12 @@ class CheckoutTests extends EgraphsUnitTest
     withoutZipRestored should notHaveDuplicateSummaries
   }
 
+  it should "be previewable without a buyer Account" in {
+    val checkout = Checkout.create(twoGiftCertificates, None, None)
+    checkout.toJson should not be (JsNull)
+  }
+
+  "Checkout#toJson" should "match the api endpoint spec" in (pending)
 
 
   //

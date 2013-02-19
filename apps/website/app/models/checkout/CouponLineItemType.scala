@@ -10,7 +10,9 @@ import services.AppConfig
 import scalaz.Lens
 
 
-
+//
+// Services
+//
 case class CouponLineItemTypeServices @Inject() (
   schema: Schema,
   couponStore: CouponStore,
@@ -25,6 +27,7 @@ case class CouponLineItemTypeServices @Inject() (
       yield CouponLineItemType(convert, coupon)
   }
 
+  /** primary point of entry into a CouponLineItemType, since the actual coupon is required */
   def findByCouponCode(code: String) = couponStore.findValid(code) map { coupon =>
     lazy val couponWithExistingEntity = coupon.lineItemTypeId flatMap { id =>
       assert(findEntityById(id) isDefined, "Coupon has invalid lineItemTypeId")
@@ -44,9 +47,12 @@ case class CouponLineItemTypeServices @Inject() (
 
 
 
+//
+// Model
+//
 /**
- * For using a coupon in a checkout. Assumes code is validated before being added (would be easy to validate here, but
- * seems like it should be a concern of the endpoint where it is added to the checkout).
+ * For use of coupon in a checkout. For now it is assumed the coupon is active.
+ * TODO(CE-13): Make sure coupon use can't be gamed (without making testing annoying).
  */
 case class CouponLineItemType(
   _entity: LineItemTypeEntity,
@@ -59,6 +65,9 @@ case class CouponLineItemType(
   with SavesAsLineItemTypeEntityThroughServices[CouponLineItemType, CouponLineItemTypeServices]
 {
 
+  //
+  // LineItemType members
+  //
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
     pendingResolution(CheckoutCodeType.Subtotal) match {
       case Nil => resolvedItems(CheckoutCodeType.Subtotal).headOption map { subtotal =>
@@ -69,7 +78,9 @@ case class CouponLineItemType(
     }
   }
 
-
+  //
+  // LineItemTypeEntityLenses member
+  //
   override protected val entityLens = Lens[CouponLineItemType, LineItemTypeEntity](
     get = _._entity,
     set = _ copy _
@@ -77,11 +88,9 @@ case class CouponLineItemType(
 }
 
 
-/**
- * todo: determine how coupon type entities will be managed
- *   -type per coupon?
- *     -a multi-use coupon can have a lineItemType, but not multiple line items (uses)
- */
+//
+//
+// Companion
 object CouponLineItemType {
   def nature = LineItemNature.Discount
   def codeType = CheckoutCodeType.Coupon

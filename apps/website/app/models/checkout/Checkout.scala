@@ -10,6 +10,7 @@ import services.AppConfig
 import services.db._
 import services.payment.Charge
 import services.config.ConfigFileProxy
+import play.api.libs.json.{JsValue, JsArray, JsNull}
 
 
 //
@@ -103,7 +104,13 @@ abstract class Checkout
   /** for services to return a persisted checkout as the correct type */
   def withEntity(savedEntity: CheckoutEntity): Checkout
 
-  def toJson: String = """ {} """
+  def toJson: JsValue = lineItems.foldLeft(JsArray(Nil)) { (acc, nextItem) =>
+    nextItem.toJson match {
+      case jsArray: JsArray => jsArray ++ acc
+      case jsVal: JsValue => jsVal +: acc
+    }
+  }
+
 
   /**
    * Charges or credits buyer as needed through the information in the txnType, transacts all the
@@ -129,12 +136,9 @@ abstract class Checkout
         case _ => return Left{ CheckoutFailedCashTransactionResolutionError(this, txnType) }
       }
 
-      def refundedCharge = txnItem flatMap (_.abortTransaction())
-
       /**
-       * Transact items with a savepoint to fall back on if transacting line items fails.
-       * Note that charge must also be refunded in error cases so that no unpaid items or
-       * payments for nonexistent item exist afterwards.
+       * Transact items with a savepoint to fall back on if transacting line items fails. Note that charge must also
+       * be refunded in error cases so that no unpaid items or payments for nonexistent item exist afterwards.
        */
       tryWithSavepoint {
         val allItems = txnItem.toSeq ++ pendingItems
@@ -143,15 +147,16 @@ abstract class Checkout
         Right(services.findById(savedCheckout.id).get)
 
       } catchAndRollback {
-        case e: InsufficientInventoryException => Left { CheckoutFailedInsufficientInventory(this, txnItem, refundedCharge) }
-
-        case e: MissingRequiredAddressException => Left { CheckoutFailedShippingAddressMissing(this, e.msg) }
-
-        case e: DomainObjectNotFoundException => Left { CheckoutFailedDomainObjectNotFound(this, e.msg) }
-
-        case e: ItemTypeNotFoundException => Left { CheckoutFailedItemTypeNotFound(this, e.msg) }
-
-        case e: Exception => Left { CheckoutFailedError(this, txnItem, refundedCharge, e) }
+        case exc: Exception => {
+          val refunded = txnItem flatMap (_.abortTransaction())
+          exc match {
+            case e: MissingRequiredAddressException => Left { CheckoutFailedShippingAddressMissing(this, refunded, e.msg) }
+            case e: InsufficientInventoryException => Left { CheckoutFailedInsufficientInventory(this, txnItem, refunded) }
+            case e: DomainObjectNotFoundException => Left { CheckoutFailedDomainObjectNotFound(this, refunded, e.msg) }
+            case e: ItemTypeNotFoundException => Left { CheckoutFailedItemTypeNotFound(this, refunded, e.msg) }
+            case e: Exception => Left { CheckoutFailedError(this, txnItem, refunded, e) }
+          }
+        }
       }
     }
   }
@@ -382,16 +387,28 @@ object Checkout {
     canceledTransactionItem: Option[CashTransactionLineItem],
     charge: Option[Charge]
   ) extends CheckoutFailed(
-    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem)
+    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem, charge)
   ) with FailedCheckoutWithCharge
 
   case class CheckoutFailedCashTransactionMissing(checkout: Checkout) extends CheckoutFailed(FailedCheckoutData(checkout))
 
-  case class CheckoutFailedItemTypeNotFound(checkout: Checkout, msg: String) extends CheckoutFailed(FailedCheckoutData(checkout))
+  case class CheckoutFailedItemTypeNotFound(
+    checkout: Checkout,
+    charge: Option[Charge],
+    msg: String
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, charge = charge)) with FailedCheckoutWithCharge
 
-  case class CheckoutFailedShippingAddressMissing(checkout: Checkout, msg: String) extends CheckoutFailed(FailedCheckoutData(checkout))
+  case class CheckoutFailedShippingAddressMissing(
+    checkout: Checkout,
+    charge: Option[Charge],
+    msg: String
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, charge = charge)) with FailedCheckoutWithCharge
 
-  case class CheckoutFailedDomainObjectNotFound(checkout: Checkout, msg: String) extends CheckoutFailed(FailedCheckoutData(checkout))
+  case class CheckoutFailedDomainObjectNotFound(
+    checkout: Checkout,
+    charge: Option[Charge],
+    msg: String
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, charge = charge)) with FailedCheckoutWithCharge
 
   case class CheckoutFailedError(
     checkout: Checkout,
@@ -399,14 +416,15 @@ object Checkout {
     charge: Option[Charge],
     exception: Exception
   ) extends CheckoutFailed(
-    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem)
+    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem, charge)
   ) with FailedCheckoutWithCharge
 }
 
 case class FailedCheckoutData(
   checkout: Checkout,
-  cashTransactionLineItemTypes: Option[CashTransactionLineItemType] = None,
-  cashTransactionLineItems: Option[CashTransactionLineItem] = None
+  cashTransactionLineItemType: Option[CashTransactionLineItemType] = None,
+  cashTransactionLineItem: Option[CashTransactionLineItem] = None,
+  charge: Option[Charge] = None
 )
 
 
