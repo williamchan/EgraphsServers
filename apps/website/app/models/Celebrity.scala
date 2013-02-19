@@ -342,7 +342,8 @@ object Celebrity {
       Json.obj(
         "id" -> celebrity.id,
         "enrollmentStatus" -> celebrity.enrollmentStatus.name,
-        "publicName" -> celebrity.publicName
+        "publicName" -> celebrity.publicName,
+        "urlSlug" -> celebrity.urlSlug
       ) ++ Json.obj(celebrity.renderCreatedUpdatedForApi: _*)
     }
 

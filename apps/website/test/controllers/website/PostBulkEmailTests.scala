@@ -19,15 +19,15 @@ class PostBulkEmailTests extends EgraphsUnitTest with CsrfProtectedResourceTests
   }
 
   it should "reject invalid email addresses" in new EgraphsTestApplication {
-    val result = performRequest(email="derp@schlerp")
+    val result = performRequest(email="thisIsNotAValidEmailAddress")
     
     status(result) should be (BAD_REQUEST)
     contentAsString(result) should be ("We're gonna need a valid email address")
   }
 
   it should "accept requests with a valid e-mail address" in new EgraphsTestApplication {
-    val result = performRequest(email="customer@website.com")
-    status(result) should be (200)
+    val result = performRequest(email="very.common@example.com")
+    status(result) should be (OK)
     contentAsString(result) should be ("subscribed")
   }
   

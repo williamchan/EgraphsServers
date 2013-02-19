@@ -3,26 +3,20 @@ package utils
 import scala.concurrent._
 import scala.concurrent.duration._
 import play.api.test.FakeRequest
-import play.api.mvc.{ AnyContent, AnyContentAsEmpty, Call }
-import play.api.Play
-import play.api.test.Helpers._
 import play.api.Configuration
-import services.http.BasicAuth
-import play.api.test.FakeApplication
-import services.http.EgraphsSession
-import EgraphsSession.Conversions._
-import play.api.mvc.Call
-import play.api.mvc.AnyContentAsFormUrlEncoded
-import play.api.mvc.ChunkedResult
+import play.api.Play
+import play.api.http.HeaderNames
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.concurrent.Promise
-import play.api.mvc.Result
-import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
+import play.api.mvc._
 import play.api.test._
-import play.api.http.HeaderNames
+import play.api.test.Helpers._
 import models._
 import scenario.RepeatableScenarios
+import services.http.BasicAuth
+import services.http.EgraphsSession
+import EgraphsSession.Conversions._
 
 /**
  * Common functionality required when writing functional tests against
@@ -94,7 +88,8 @@ object FunctionalTestUtils {
         Await.result(future, 5 seconds)
 
         bytesVec
-
+      case AsyncResult(asyncResult) => 
+        chunkedContent(Await.result(asyncResult, 5 seconds))
       case _ =>
         throw new Exception("Couldn't get chunked content from result of type " + result.getClass)
     }
