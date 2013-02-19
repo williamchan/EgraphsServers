@@ -3,16 +3,13 @@ package controllers.website
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.mvc.Result
-import services.db.TransactionSerializable
-import utils.{TestConstants, TestData}
-import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
+import models.enums._
 import services.AppConfig
-import services.db.DBSession
-import utils.EgraphsUnitTest
+import services.db._
 import egraphs.playutils.Encodings.Base64
 import controllers.routes.WebsiteControllers.getEgraph
-import utils.FunctionalTestUtils
-import FunctionalTestUtils.Conversions._
+import utils.{TestConstants, TestData}
+import utils.EgraphsUnitTest
 import utils.FunctionalTestUtils._
 
 class GetEgraphEndpointTests extends EgraphsUnitTest {
