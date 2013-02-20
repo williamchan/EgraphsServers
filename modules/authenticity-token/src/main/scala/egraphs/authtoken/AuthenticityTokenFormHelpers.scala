@@ -12,7 +12,7 @@ private[authtoken] trait AuthenticityTokenFormHelpers {
   def safeForm(attributes: (Symbol, String)*)(contents: => Html)(implicit token: AuthenticityToken): Html = {
     val attributesHtml = PlayMagic.toHtmlArgs(attributes.toMap)    
     
-    Html("<form ") + attributesHtml + Html(">") + hiddenInput + contents + Html("</form>")
+    Html("<form ") += attributesHtml += Html(">") += hiddenInput += contents += Html("</form>")
   }
 
   def hiddenInput(implicit token: AuthenticityToken): Html = {
