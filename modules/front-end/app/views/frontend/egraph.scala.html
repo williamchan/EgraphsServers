@@ -19,6 +19,8 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
+@import views.html.frontend.tags
+
 @title = {@celebrityName egraph for @recipientName}
 
 @headHtml = {
@@ -84,7 +86,6 @@
         <div id="egraph-description">
           <p class="description-line">A message for <em>@recipientName</em></p>
           <p class="description-line">from <em>@celebrityName</em></p>
-          @** <p class="description-date">@signedOnDate</p> *@
         </div>
         <hr class="separator"/>
         <div id="social">
@@ -100,6 +101,12 @@
             </li>
           </ul>
         </div>
+        @if(isPromotional) {
+          <hr class="separator"/>
+          <a href="/stars">
+            @tags.arrow_button(caption="Get Your Own", classes="button egraph-promo-shop")
+          </a>
+        }
         <hr class="separator"/>
         <div id="comments">
           <div class="fb-comments" data-href="@thisPageLink" data-num-posts="2"></div>

@@ -12,7 +12,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
   //
   // Public members
   //
-  def egraph() = Action {
+  def egraph(isPromotional: Boolean = false) = Action {
     Ok(views.html.frontend.egraph(
       mp4Url = EgraphsAssets.at("videos/sample_egraph_video.mp4").url,
       videoPosterUrl = EgraphsAssets.at("images/sample_egraph_poster.jpg").url,
@@ -28,7 +28,7 @@ object Egraph extends Controller with DefaultImplicitTemplateParameters {
       iframeUrl = "#",
       shareOnPinterestLink = "http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fwww.egraphs.com&media=https%3A%2F%2Fd3kp0rxeqzwisk.cloudfront.net%2Fassets%2Fimages%2Fcrowd-fp-2054508835.jpg&description=Share%20a%20moment%20with%20your%20star",
       tweetText = "An egraph for Jordan from Sergio Romo",
-      isPromotional = false
+      isPromotional = isPromotional
     ))
   }
 
