@@ -6,15 +6,8 @@ import services.{Time, AppConfig}
 import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
-import org.apache.commons.mail.HtmlEmail
-import services.mail.{TransactionalMail, MailUtils}
-import play.api.mvc.RequestHeader
-import controllers.routes.WebsiteControllers.getVerifyAccount
-import play.api.templates.Html
-import services.ConsumerApplication
+import services.mail.TransactionalMail
 import services.config.ConfigFileProxy
-import models.enums.EmailType
-import models.frontend.email.{AccountVerificationEmailViewModel, EmailViewModel}
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -146,9 +139,11 @@ class CustomerStore @Inject() (
     findByEmail(email).getOrElse(createByEmail(email, name))
   }
 
+  def findOrCreateByEmail(email: String): Customer = findOrCreateByEmail(email, email takeWhile (_ != '@'))
+
   def createByEmail(email: String, name: String): Customer = {
     val accountOption = accountStore.findByEmail(email)
-    val account = accountOption.getOrElse(Account(email = email, services = accountServices.get))
+    val account = accountOption.getOrElse(Account(email = email, _services = accountServices.get))
     val unsavedCustomer = account.createCustomer(name)
     val unsavedUsernameHistory = account.createUsername()
     val customer = unsavedCustomer.save()
@@ -157,18 +152,12 @@ class CustomerStore @Inject() (
 
     customer
   }
-  
-  def findByEmail(email: String): Option[Customer] = {
-    // TODO: Optimize this using a single outer-join query to get Customer + Account all at once
 
-    // Get the Account and Customer face if both exist.
-    for {
-      account <- accountStore.findByEmail(email)
-      customerId <- account.customerId
-      customer <- findById(customerId)
-    } yield {
-      customer
-    }
+  def findByEmail(email: String) = {
+    join (table, schema.accounts) ( (customer, account) =>
+      where (account.email === email)
+      select (customer) on (customer.id === account.customerId)
+    ).headOption
   }
 
   def findByUsername(username: String): Option[Customer] = {

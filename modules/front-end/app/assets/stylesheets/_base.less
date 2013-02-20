@@ -84,6 +84,140 @@ ul.credit-cards {
 	}
 }
 
+// Acts like bootstrap .container, but in absolute-positioning
+.absolute-container {
+  position: absolute;
+  margin-left:40px;
+  width:940px;
+
+  @media (max-width:767px) {
+    width: 100%;
+    margin-left:0;
+  }
+
+  @media (max-width:480px) {
+    padding-left:0px;
+  }
+}
+
+//
+// Provides attractive orange field errors that are punctuated with a finger-pointing hand.
+// Decorate any div outside of your .errors div to apply the styles.
+//
+.finger-pointy-errors {
+  .errors {
+    margin-top:2px;
+    color:@orange;
+    font-size:12px;
+    font-style:italic;
+    
+    // For errors that occur on a specific field (most of them)
+    .field-error {
+      display:inline-block;
+      margin-right:5px;
+
+      // Put a funny finger icon before the error message
+      &:before {
+        position:relative;
+        background-image:url("@{iconSpritePath}");
+        content:"";
+        width:14px;
+        height:14px;
+        vertical-align:text-top;
+        display:inline-block;
+        margin-right:3px;
+        background-position: -144px -144px;
+      }
+    }
+  }
+}
+
+//
+// Styling for reminders that there are still fields left to complete
+// on ajax forms.
+//
+.field-reminder {
+  font-style:italic;
+  font-size:13px;
+
+  img {
+    width:16px;
+    vertical-align:bottom;
+  }
+
+  .fields-remaining {
+    color:lighten(@orange, 11%);
+
+    .num-remaining {
+      color:@orange;
+      font-weight:600;
+    }
+  }
+}
+
+// Use for the asterisk marker for required fields in forms
+.required-marker {
+  color:@orange;
+}
+
+//
+// Ajax input styles. An input never shows errors if it has never been tabbed-off ("attended")
+// Once it has been tabbed-off, it shows its validation and asynchronous updating state
+// using a few icons: a green check, a red X, and a spinning circle.
+//
+@checkMarkIcon: ~"@{imageBase}/glyphicons-check-circle-green.png";
+.ajaxInputIcons() {
+  &.ng-invalid:not(.ng-submitting) {
+    background-image: url("@{imageBase}/glyphicons-x-circle-orange.png");
+  }
+
+  &.ng-valid:not(.ng-submitting) {
+    background-image: url("@{checkMarkIcon}");
+  }
+  
+  &.ng-submitting {
+    background-image: url(~"@{imageBase}/ajax-loader.gif");
+  }
+}
+
+//
+// Apply the .ajax class to a form in order to have the inputs respond to the
+// stylings applied by our remote-resource angular library.
+//
+form.ajax {
+  // Undo ugly twitter bootstrap error styles.
+  input:focus:required:invalid:focus,
+  textarea:focus:required:invalid:focus,
+  select:focus:required:invalid:focus {
+    color:#666;
+    border-color: rgba(82,168,236,.8);
+    outline: 0;
+    outline: thin dotted \9; /* IE6-9 */
+    // retain a subtle shadow within the body of the input
+    .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6)");
+  }
+
+  input {
+    height:34px;
+  }
+
+  input, textarea {
+    width:100%;
+    .box-sizing(border-box);
+    padding-left:25px;
+    background-size:16px 16px;
+    background-repeat:no-repeat;
+    color: #666;
+    background-image: url("/assets/images/glyphicons-circle-gray.png");
+
+    &.ng-user-has-attended {
+      .ajaxInputIcons();
+    }
+  }
+
+  input { background-position:5px 50%; }
+  textarea { background-position: 5px 7px; }
+}
 
 // For bootstrap-style tooltips.
 .tooltip {
@@ -104,11 +238,12 @@ ul.credit-cards {
 
 // For osvaldas-style tooltips. Styles used by views/tags/tooltip.scala.html. 
 .tooltip-link {
-  cursor: help;
   text-decoration:underline;
   font-size:11px;
   font-style:italic;
 
+  a { cursor: help; }
+  
   &:hover {
   	text-decoration:underline;
   }
@@ -240,14 +375,20 @@ button  {
 		text-indent: -9999px;
 		overflow: hidden;
 	}
-	
+
 	&:hover {
 	
-		background-position: 0 100%;
+		background-position: 0 50%;
 		
-		strong, span { background-position: 0 100%; }
-	
-	}	
+		strong, span { background-position: 0 50%; }
+	}
+
+  &:disabled {
+    cursor:default;
+    background-position: 0 100%;
+    
+    strong, span { background-position: 0 100%; }
+  }
 	
 	&.facebook {
 		
@@ -471,7 +612,7 @@ section[role=banner] {
 	position: relative;
 	z-index: 1;
 	
-	#main {
+	#main, .main-like {
 
 		.box-shadow(0px 0px 8px rgba(0, 0, 0, .5));
 
@@ -508,7 +649,7 @@ section[role=banner] {
 		
 		.box-shadow(0px 0px 4px rgba(0, 0, 0, .25));
 		
-		#main {
+		#main, .main-like {
 			.box-shadow(0px 4px 8px rgba(0, 0, 0, .25));
 			top: auto;
 		}
@@ -527,7 +668,7 @@ section[role=banner] {
 		padding-bottom: 40px;
 		margin-bottom: 0;
 		
-		#main {
+		#main, .main-like {
 			max-width: @standardContentMaxWidth;
 			top: -48px;
 			padding-top: 40px;

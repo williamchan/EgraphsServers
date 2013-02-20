@@ -50,6 +50,7 @@ case class Product(
   photoKey: Option[String] = None, // todo: rename to _photoKey
   _iconKey: Option[String] = None,
   _publishedStatus: String = PublishedStatus.Unpublished.name,
+  lineItemTypeId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: ProductServices = AppConfig.instance[ProductServices]

@@ -7,9 +7,10 @@ import org.joda.money.{CurrencyUnit, Money}
 import models.enums._
 import models.SavesCreatedUpdated
 import scalaz.Lens
-import services.db.{InsertsAndUpdatesAsEntity, HasEntity, Schema}
+import services.db.{CanInsertAndUpdateEntityThroughTransientServices, InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
 import org.squeryl.Query
+import play.api.libs.json.{Json, JsValue}
 
 /**
  * Represents an actual item or data within a checkout. Has the responsibility of persisting itself,
@@ -49,23 +50,44 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
   //
   // LineItem Methods
   //
-  def toJson: String  // TODO(CE-16):
+  def toJson: JsValue  // TODO(CE-16):
   def withAmount(newAmount: Money): LineItem[T]
   def withCheckoutId(newCheckoutId: Long): LineItem[T]
 
-  /** Transforms and persists a T and potentially any objects it contains, as needed. */
+  /**
+   * Transforms and persists a T and potentially any objects it contains, as needed.
+   * TODO(CE-13): provide an abstraction for update condition check (`id > 0`)
+   */
   def transact(checkout: Checkout): LineItem[T]
 
   /** Rough approximation for equality between line items based on  */
   def equalsLineItem(that: LineItem[_]) = { that != null && this.unpacked == that.unpacked }
-  protected def unpacked = (id, amount, itemType.id, codeType, nature, domainObject)
+  protected[checkout] def unpacked = (id, amount, itemType.id, codeType, nature)
 
   /** Returns option of this if it has the desired code type, otherwise None. */
   protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
-    desiredCodeType: CodeTypeFactory[LIT, LI]
+    desiredCodeType: OfCheckoutClass[LIT, LI]
   ): Option[LI] = {
     if (codeType != desiredCodeType) None
     else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
+  }
+
+
+  /** helper for toJson method; optional values are left out of if not defined */
+  protected def jsonify(name: String, description: String, id: Option[Long] = None, imageUrl: Option[String] = None)
+  :JsValue = Json.toJson {
+    import Json.{toJson => js}
+    val emptyMap = Map.empty[String, JsValue]
+    val idMap = id map { (anId: Long) => Map("id" -> js(anId)) } getOrElse emptyMap
+    val urlMap = imageUrl map { (url: String) => Map("imageUrl" -> js(url)) } getOrElse emptyMap
+
+
+    idMap ++ urlMap ++ Map(
+      "name" -> js(name),
+      "description" -> js(description),
+      "amount" -> js(amount.getAmount.doubleValue),
+      "lineItemType" -> itemType.toJson
+    )
   }
 }
 
@@ -134,32 +156,62 @@ class LineItemStore @Inject() (schema: Schema) {
 }
 
 
+/**
+ * Products that depend on other products, like physical prints, may naturally be thought of as add-ons.
+ * This trait provides a `transactAsSubItem` method for such items that will be transacted directly by
+ * the item they depend on (e.g. for a PrintOrder, by the Order is belongs to).
+ *
+ * It also allows the item to be included in a checkouts' LineItems as normal without worry of it being
+ * transacted multiple times by the checkout and the item it depends on.
+ *
+ * In practice, the containing LineItemType will resolve to a seq of its corresponding item (as usual) and the SubItem
+ * when whatever logical condition is met that triggers the inclusion of the subitem. Then the subitem itself is
+ * transacted by the containing item because it may need data from it, rather than being transacted as normal. For
+ * example, a print order needs the order's id.
+ */
+trait SubLineItem[T] extends LineItem[T] {
+
+  /** doesn't actually transact in when called directly */
+  override def transact(checkout: Checkout) = this
+
+  /** to be called from the transact method of the item it belongs to */
+  def transactAsSubItem(checkout: Checkout): SubLineItem[T]
+}
 
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-trait HasLineItemEntity extends HasEntity[LineItemEntity, Long] { this: LineItem[_] => }
+trait HasLineItemEntity[T <: LineItem[_]] extends HasEntity[LineItemEntity, Long] { this: T =>
+  def withEntity(entity: LineItemEntity): T
+}
 
-trait SavesAsLineItemEntity[ModelT <: HasLineItemEntity]
-  extends InsertsAndUpdatesAsEntity[ModelT, LineItemEntity]
-  with SavesCreatedUpdated[LineItemEntity]
-{
+trait SavesAsLineItemEntityThroughServices[
+  T <: LineItem[_] with HasLineItemEntity[T],
+  ServicesT <: SavesAsLineItemEntity[T]
+] extends CanInsertAndUpdateEntityThroughTransientServices[T, LineItemEntity, ServicesT] {
+  this: T with Serializable =>
+}
+
+
+/** Allows LineItems' Services to insert and update LineItems */
+trait SavesAsLineItemEntity[
+  T <: LineItem[_] with HasLineItemEntity[T]
+] extends InsertsAndUpdatesAsEntity[T, LineItemEntity] with SavesCreatedUpdated[LineItemEntity] {
+
   protected def schema: Schema
   override protected val table = schema.lineItems
 
+  override protected def modelWithNewEntity(model: T, entity: LineItemEntity) = model.withEntity(entity)
   override protected def withCreatedUpdated(toUpdate: LineItemEntity, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created=created, updated=updated)
   }
 }
 
 
-
-
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
+trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity[T] =>
   import services.Finance.TypeConversions._
   import MemberLens.Conversions._
 
@@ -180,6 +232,9 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
    *
    */
   protected def entityLens: Lens[T, LineItemEntity]
+
+  protected def EntityLens(get: T => LineItemEntity, set: (T, LineItemEntity) => T) = Lens[T, LineItemEntity](get, set)
+
   def entity = entityLens.asMemberOf(this)
 
   //
@@ -207,14 +262,16 @@ trait LineItemEntityLenses[T <: LineItem[_]] { this: T with HasLineItemEntity =>
 }
 
 
-trait LineItemEntityGetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
+trait LineItemEntityGetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T] =>
+  override def id = _entity.id
   override lazy val checkoutId = checkoutIdField()
   override lazy val amount = amountField()
   lazy val itemTypeId = itemTypeIdField()
 }
 
 
-trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLenses[T] =>
+trait LineItemEntitySetters[T <: LineItem[_]] extends LineItemEntityLenses[T] { this: T with HasLineItemEntity[T] =>
+  override def withEntity(newEntity: LineItemEntity) = entity.set(newEntity)
   override def withCheckoutId(newId: Long) = checkoutIdField.set(newId)
   override def withAmount(newAmount: Money) = amountField.set(newAmount)
   lazy val withItemTypeId = itemTypeIdField.set _
@@ -223,4 +280,4 @@ trait LineItemEntitySetters[T <: LineItem[_]] { this: T with LineItemEntityLense
 trait LineItemEntityGettersAndSetters[T <: LineItem[_]]
   extends LineItemEntityLenses[T]
   with LineItemEntityGetters[T]
-  with LineItemEntitySetters[T] { this: T with HasLineItemEntity => }
+  with LineItemEntitySetters[T] { this: T with HasLineItemEntity[T] => }

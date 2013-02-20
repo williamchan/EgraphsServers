@@ -7,9 +7,8 @@ define([], function() {
       var targets = $( selector ),
         target  = false,
         tooltip = false,
-        title   = false;
-     
-      targets.bind( 'mouseenter', function()
+        title   = false,
+        openTooltip = function()
       {
         target  = $( this );
         tip   = target.attr( 'title' );
@@ -76,7 +75,9 @@ define([], function() {
      
         target.bind( 'mouseleave', remove_tooltip );
         tooltip.bind( 'click', remove_tooltip );
-      });
+      };
+     
+      targets.bind( 'mouseenter', openTooltip);
     }
   };
 });

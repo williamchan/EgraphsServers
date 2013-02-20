@@ -26,6 +26,7 @@ case class PrintOrder(id: Long = 0,
                       isFulfilled: Boolean = false,
                       amountPaidInCurrency: BigDecimal = PrintOrder.pricePerPrint,
                       pngUrl: Option[String] = None,
+                      lineItemId: Option[Long] = None,
                       created: Timestamp = Time.defaultTimestamp,
                       updated: Timestamp = Time.defaultTimestamp,
                       services: PrintOrderServices = AppConfig.instance[PrintOrderServices])
@@ -83,6 +84,8 @@ case class PrintOrder(id: Long = 0,
     }
   }
 
+  def withShippingAddress(address: Address) = { this.copy(shippingAddress = address.streetAddressString) }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -123,6 +126,10 @@ class PrintOrderStore @Inject() (schema: Schema) extends SavesWithLongKey[PrintO
         orderBy (printOrder.id asc)
         on(printOrder.orderId === order.id, order.id === egraph.orderId and (egraph._egraphState in Seq(ApprovedByAdmin.name, Published.name)))
     )
+  }
+
+  def findByLineItemId(id: Long): Query[PrintOrder] = {
+    table.where(printOrder => printOrder.lineItemId === Some(id))
   }
 
   //

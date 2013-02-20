@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
 import social.{Twitter, Facebook}
 import play.api.mvc.RequestHeader
-import play.api.templates.Html
 import db.Deletes
 import java.sql.Connection
 import services.db.CurrentTransaction
@@ -27,9 +26,6 @@ import org.apache.commons.lang3.time.DateUtils
 import java.util.Calendar
 import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
-import models.frontend.email.{RegularViewEgraphEmailViewModel, GiftViewEgraphEmailViewModel}
-import services.mail.MailUtils
-import models.frontend.email.{EmailViewModel, ViewEgraphEmailViewModel}
 
 case class OrderServices @Inject() (
   store: OrderStore,
@@ -97,6 +93,7 @@ case class Order(
   requestedMessage: Option[String] = None,
   expectedDate: Date = Order.defaultExpectedDate,
   _orderType: String = OrderType.Normal.name,
+  lineItemId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: OrderServices = AppConfig.instance[OrderServices]
@@ -517,6 +514,10 @@ class OrderStore @Inject() (
         select (order)
         orderBy (order.id asc)
     )
+  }
+
+  def findByLineItemId(itemId: Long) = {
+    schema.orders.where(_.lineItemId === Some(itemId))
   }
 
   def getOrderResults(filters: FilterOneTable[Order]*): Query[(Order, Celebrity)] = {

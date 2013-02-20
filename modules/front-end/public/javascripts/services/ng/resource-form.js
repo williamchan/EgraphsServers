@@ -20,16 +20,16 @@ function(ngApp, logging, module) {
   ngApp.directive("remoteResource", [function() {
     return {
       restrict: 'A',
-      scope: true,
       controller: ["$scope", "$http", "$timeout", "$parse", "$attrs", "$interpolate", function($scope, $http, $timeout, $parse, $attrs, $interpolate) {
         var self = this;
+
         var UrlResourceDelegate = function(url) {
           this.url = url;
 
           /** Callbacks must have onSubmitEnd, onSubmitSuccess, onSubmitFail */
           this.submit = function(callbacks) {
             var onSubmitEnd = function(data, status, headers) {
-              log("URL Resource submission returned with code " + status + ": " + $scope.url);
+              log("URL Resource submission returned with code " + status + ": " + self.url);
 
               var errors = data? data.errors: undefined;
               
@@ -42,15 +42,15 @@ function(ngApp, logging, module) {
               callbacks.onSubmitEnd(data, errors);
             };
 
-            $http.post($scope.url, $scope.resource())
+            $http.post(self.url, self.resource())
               .success(onSubmitEnd)
               .error(onSubmitEnd);
             
-            $scope.form.$submitting = true;
+            self.form.$submitting = true;
           };
 
           this.get = function(gotNewResource) {
-            $http.get($scope.url).success(function(newResource) {
+            $http.get(self.url).success(function(newResource) {
               gotNewResource(newResource);
             });
           };
@@ -58,24 +58,24 @@ function(ngApp, logging, module) {
 
         var CustomResourceDelegate = function(getResource, submitResource) {
           this.submit = function(callbacks) {
-            submitResource($scope.controls, callbacks);
+            submitResource(self.controls, callbacks);
           };
 
           this.get = function(gotNewResource) {
-            getResource($scope.controls, function(newResource) {
+            getResource(self.controls, function(newResource) {
               gotNewResource(newResource);
             });
           };
         };
 
-        $scope.controls = {};
-        $scope.submitResource = $parse($attrs.submitResource)($scope.$parent);
-        $scope.url = $interpolate($attrs.remoteResource)($scope.$parent);
-        $scope.resourceDelegate = new UrlResourceDelegate($scope.url);
+        self.controls = {};
+        self.submitResource = $parse($attrs.submitResource)($scope);
+        self.url = $interpolate($attrs.remoteResource)($scope);
+        self.resourceDelegate = new UrlResourceDelegate(self.url);
 
-        $scope.resource = function() {
+        self.resource = function() {
           var resource = {};
-          forEach($scope.controls, function(formControl, name) {
+          forEach(self.controls, function(formControl, name) {
             resource[name] = formControl.$modelValue;
           });
 
@@ -83,26 +83,32 @@ function(ngApp, logging, module) {
         };
 
         this.clearRemoteErrors = function() {
-          forEach($scope.controls, function(control) {
+          var clearControlErrors = function(control) {
             forEach(control.$error, function(isError, errorName) {
-              if (errorName.indexOf("remote_") === 0) {
+              if (errorName.indexOf("remote_") === 0 && isError) {
                 control.$setValidity(errorName, true);
               }
             });
-          });
+          };
+          
+          forEach(self.controls, clearControlErrors);
+          clearControlErrors(self.form);
         };
 
-        $scope.assignResource = function(newResource) {
-          $parse($attrs.localResource).assign($scope.$parent, newResource);
+        self.assignResource = function(newResource) {
+          self.isAssigning = true;
+          $parse($attrs.localResource).assign($scope, newResource);
+          self.isAssigning = false;
         };
 
         this.getResource = function() {
-          $scope.resourceDelegate.get(function(newResource) {
-            $scope.assignResource(newResource);
+          self.resourceDelegate.get(function(newResource) {
+            self.assignResource(newResource);
+            self.clearRemoteErrors();
             self.submit();
             forEach(newResource, function(value, name) {
-              if ($scope.controls[name]) {
-                $scope.controls[name].userAttention.setAttended(true);
+              if (self.controls[name]) {
+                self.controls[name].userAttention.setAttended(true);
               }
             });
           });
@@ -114,12 +120,17 @@ function(ngApp, logging, module) {
             submit: noop
           }, behavior);
           
-          $scope.resourceDelegate = new CustomResourceDelegate(_behavior.get, _behavior.submit);
+          self.resourceDelegate = new CustomResourceDelegate(_behavior.get, _behavior.submit);
         };
 
-        this.addControl = function(formControl) {
-          $scope.controls[formControl.$name] = formControl;
-          formControl.$setValidity("remote_validated_on_server", false);
+        this.addControl = function(inputControl) {
+          self.controls[inputControl.$name] = inputControl;
+          inputControl.$setValidity("remote_validated_on_server", false);
+        };
+
+        this.setForm = function(form) {
+          self.form = form;
+          self.form.$controls = self.controls;
         };
 
         this.submit = function(config) {
@@ -133,49 +144,48 @@ function(ngApp, logging, module) {
           var onSubmitEnd = function(data, errors) {
             var affectedFormControl;
 
-            $scope.form.$submitting = false;
+            self.form.$submitting = false;
             
-            forEach($scope.controls, function(inputControl, name) {
+            forEach(self.controls, function(inputControl, name) {
               inputControl.setSubmitting(false);
             });
 
             _config.onSubmitEnd();
 
+            self.clearRemoteErrors();
             if (errors) {
               forEach(errors, function(error) {
                 if (error.field) {
-                  affectedFormControl = $scope.controls[error.field];
-                  log("Error: " + error.field + " " + error.cause);
+                  affectedFormControl = self.controls[error.field];
+                  log("    Error: " + error.field + " " + error.cause);
                   affectedFormControl.$setValidity("remote_" + error.cause, false);
                 }
               });
             }
 
             if($attrs.submitCompleted) {
-              $parse($attrs.submitCompleted)($scope.$parent);
+              $parse($attrs.submitCompleted)($scope);
             }
 
           };
 
-          self.clearRemoteErrors();
           // Cancel any already scheduled submissions
           // TODO: when this issue (https://github.com/angular/angular.js/issues/1159)
           // gets merged into main-line, then also cancel currently active submissions.
-          if ($scope.scheduledSubmission) {
-            $timeout.cancel($scope.scheduledSubmission);
+          if (self.scheduledSubmission) {
+            $timeout.cancel(self.scheduledSubmission);
           }
 
+          self.form.$submitting = true;
           // Perform the submission after a few seconds
-          $scope.scheduledSubmission = $timeout(function() {
-            $scope.resourceDelegate.submit(
+          self.scheduledSubmission = $timeout(function() {
+            self.resourceDelegate.submit(
               {onSubmitEnd: onSubmitEnd,
                onSubmitSuccess: _config.onSubmitSuccess,
                onSubmitFail: _config.onSubmitFail}
             );
           }, _config.delay);
         };
-
-        $scope.RemoteResourceController = this;
       }],
       
       require: ['form', 'remoteResource'],
@@ -186,9 +196,9 @@ function(ngApp, logging, module) {
 
         form.resource = remoteResource;
         
-        scope.form = form;
-        scope.form.$submitting = false;
-        scope.$parent[attrs.name] = form;
+        remoteResource.setForm(form);
+        remoteResource.form.$submitting = false;
+        
         remoteResource.getResource();
       }
     };
@@ -197,7 +207,6 @@ function(ngApp, logging, module) {
   .directive("resourceProperty", [function() {
     return {
       restrict: 'A',
-      scope: true,
       require: ['^remoteResource', 'ngModel', 'monitorUserAttention'],
       controller: function(){},
       link: function(scope, element, attrs, requisites) {

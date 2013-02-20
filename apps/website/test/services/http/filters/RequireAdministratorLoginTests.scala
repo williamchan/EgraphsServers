@@ -20,7 +20,7 @@ class RequireAdministratorLoginTests extends EgraphsUnitTest {
   val badAdminId = 1309174734L
 
   val administator = Administrator(id = goodAdminId, services = null)
-  val adminAccount = Account(administratorId = Some(goodAdminId), services = null)
+  val adminAccount = Account(administratorId = Some(goodAdminId), _services = null)
 
   "filter" should "allow adminIds that have an account and administrator associated with them" in {
     val errorOrAccount = filterWithMocks.filter(goodAdminId)

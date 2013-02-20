@@ -3,6 +3,7 @@ package models.checkout
 import models.checkout.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.Money
+import play.api.libs.json.Json
 
 /**
  * Summary item for the sum of all charges and credits incurred by the customer (e.g. everything,
@@ -17,7 +18,7 @@ case class TotalLineItem (amount: Money) extends LineItem[Money] {
   override def itemType = TotalLineItemType
   override def withAmount(newAmount: Money) = this.copy(newAmount)
 
-  override def toJson = ""
+  override def toJson = jsonify("Total", "Final cost of purchase")
 
   override val id: Long = -1
   override def domainObject = amount
@@ -35,7 +36,6 @@ object TotalLineItemType extends TotalLineItemType {
   override val description = "Total"
   override val nature = LineItemNature.Summary
   override val codeType = CheckoutCodeType.Total
-  override val toJson = ""
 
 
   /**
@@ -52,13 +52,13 @@ object TotalLineItemType extends TotalLineItemType {
   override def lineItems(resolvedItems: LineItems, pendingTypes: LineItemTypes) = {
     import LineItemNature._
 
-    def pendingNeeded = pendingTypes.ofCodeType(CheckoutCodeType.Subtotal) ++ pendingTypes.ofNatures(Tax, Fee)
+    def pendingNeeded = pendingTypes.ofCodeType(CheckoutCodeType.Subtotal) ++ pendingTypes.ofNatures(Tax, Fee, Discount)
     def maybeSubtotal = resolvedItems(CheckoutCodeType.Subtotal).headOption.map(_.amount)
 
     (pendingNeeded, maybeSubtotal) match {
       case (Nil, Some(subtotal: Money)) => Some {
-        val taxesAndFees = resolvedItems.ofNatures(Tax, Fee).sumAmounts
-        Seq(TotalLineItem(taxesAndFees plus subtotal))
+        val taxesFeesDiscounts = resolvedItems.ofNatures(Tax, Fee, Discount).sumAmounts
+        Seq(TotalLineItem(taxesFeesDiscounts plus subtotal))
       }
       case _ => None
     }

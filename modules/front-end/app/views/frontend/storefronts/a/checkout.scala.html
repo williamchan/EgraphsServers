@@ -18,6 +18,8 @@
 @import models.frontend.NgField.withField
 @import models.frontend.forms.Field
 
+@requiredStar = {<span class="required-marker">*</span>}
+
 @identifyAs(name: String) = {id="@name" name="@name" ng-model="@name"}
 @headerStep(image: String, label: String, stage: String) = {
   <div class="step @stage">
@@ -92,7 +94,7 @@
 
 @headerIcon(filename: String) = {
   <div class="header-icon">
-    <img src='@EgraphsAssets.at("images/" + filename)'>
+    <img ng-src='@EgraphsAssets.at("images/" + filename)'>
   </div>
 }
 
@@ -115,10 +117,10 @@
        <a class="redeem-link" id="open-redeem" ng-click="toggleCodeRedeemerVisibility()">redeem code</a>
        <ul ng-show="codeRedeemerVisible" class="line-items">
          <li class="discount {{cart.discount.status}}">
-           <div class="image-and-description">
+           <div class="image-and-description discount-field">
              <div class="money {{cart.discount.status}}" >-${{cart.discount.amount}}</div>
              <form name="couponForm"
-                   class="form-horizontal"
+                   class="form-horizontal ajax"
                    remote-resource="{{cartApi.url}}/coupon"
                    local-resource="coupon"
                    submit-completed="refreshCart()">
@@ -135,7 +137,7 @@
                }
              </form>
               @tooltip("How do I get one?") {
-                <strong>We reward our customers.</strong> Join our mailing list after you buy to get exclusive weekly deals on egraphs.
+                <strong>We reward our customers.</strong> Join our mailing list after to get exclusive weekly deals on egraphs.
               }
               <a class="redeem-link" id="close-redeem" ng-click="toggleCodeRedeemerVisibility()">actually, forget about it</a>
            </div>
@@ -164,7 +166,7 @@
 @baseBody = {
   <div id="content" role="main">
     <div id="main" ng-cloak ng-controller="CheckoutController">
-      <div id="form" class="form-horizontal">
+      <div id="form" class="form-horizontal finger-pointy-errors">
         <section id="double-check">
           @headerIcon("glyphicons-magnifier-orange.png")
           <h2>Double-check your order</h2>
@@ -177,11 +179,12 @@
           <form remote-resource="{{cartApi.url}}/recipient"
                 local-resource="recipient"
                 name="recipientForm"
+                class="ajax"
                 novalidate>
             @withField("recipient", "email") { field =>
               <div class="control-group">
                 <label class="control-label" for="@field.id">
-                  Recipient Email:
+                  Recipient Email@requiredStar:
                   @tooltip("Why do you need this?") {
                     <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit            
                   }
@@ -200,10 +203,11 @@
           <form remote-resource="{{cartApi.url}}/buyer"
                 local-resource="buyer"
                 name="buyerForm"
+                class="ajax"
                 novalidate>
             <div class="control-group">
               @withField("buyer", "email") { field =>
-                <label class="control-label" for="@field.id">Your Email:</label>
+                <label class="control-label" for="@field.id">Your Email@requiredStar:</label>
                 <div class="controls">
                   <input @field.identityAttributes
                          type="email"
@@ -221,13 +225,13 @@
               Framed print delivery
             </h3>
             <form name="shippingForm"
-                  class="form-horizontal"
+                  class="form-horizontal ajax"
                   remote-resource="{{cartApi.url}}/shipping-address"
                   local-resource="shipping">
 
               @withField("shipping", "name") { field =>
                 <div class="control-group">
-                  <label class="control-label" for="@field.id">Name:</label>
+                  <label class="control-label" for="@field.id">Name@requiredStar:</label>
                   <div class="controls">
                     <input @field.identityAttributes
                            monitor-user-attention
@@ -240,7 +244,7 @@
 
               @withField("shipping", "addressLine1") { field =>
                 <div class="control-group">
-                  <label class="control-label" for="@field.id">Address:</label>
+                  <label class="control-label" for="@field.id">Address@requiredStar:</label>
                   <div class="controls">
                     <input @field.identityAttributes
                            monitor-user-attention
@@ -265,7 +269,7 @@
               
               <div class="control-group">
                 @withField("shipping", "city") { field =>
-                  <label class="control-label" for="@field.id">City:</label>
+                  <label class="control-label" for="@field.id">City@requiredStar:</label>
                   <div class="controls">
                     <input @field.identityAttributes
                            class="half"
@@ -290,7 +294,7 @@
 
               @withField("shipping", "postalCode") { field =>
                 <div class="control-group">
-                  <label class="control-label" for="@field.id">Postal code:</label>
+                  <label class="control-label" for="@field.id">Postal code@requiredStar:</label>
                   <div class="controls">
                     <input @field.identityAttributes monitor-user-attention resource-property class="half" required />
                     @field.standardErrorDiv
@@ -303,10 +307,10 @@
         <section id="payment-details" ng-show="cart.total > 0">
           @headerIcon("glyphicons-lock-orange.png")
           <h2>Enter payment details</h2>
-          <form id="stripeForm" stripe-resource="stripeToken" remote-resource name="stripeForm" novalidate>
+          <form id="stripeForm" class="ajax" stripe-resource="stripeToken" remote-resource name="stripeForm" novalidate>
             @withField("stripe", "cardNumber") { field =>
               <div class="control-group">
-                <label class="control-label" for="@field.id">Card Number:</label>
+                <label class="control-label" for="@field.id">Card Number@requiredStar:</label>
                 <div class="controls">
                   <input @field.identityAttributes monitor-user-attention resource-property required credit-card-number />
                   @field.errorDiv {
@@ -330,7 +334,7 @@
               </div>
             }
             <div class="control-group">
-              <label class="control-label" for="card-exp-month">Expiration:</label>
+              <label class="control-label" for="card-exp-month">Expiration@requiredStar:</label>
               <div class="controls">
                 <select @identifyAs("cardExpMonth")
                         monitor-user-attention
@@ -354,8 +358,8 @@
                 @withField("stripe", "cardExpMonth") { monthField =>
                   @withField("stripe", "cardExpYear") { yearField =>
                     <div class="errors" ng-show="(@monthField.userHasAttended && @yearField.userHasAttended) && (@monthField.invalid || @yearField.invalid)">
-                      @monthField.ifError("remote_invalid_expiry_month") {incorrect expiration date}
-                      @yearField.ifError("remote_invalid_expiry_year") {invalid expiration date}
+                      @monthField.ifError("remote_invalid_expiry_month") {incorrect expiration month}
+                      @yearField.ifError("remote_invalid_expiry_year") {invalid expiration year}
                       @monthField.ifError("required") {month required}
                       @yearField.ifError("required") {year required}
                     </div>
@@ -365,7 +369,7 @@
             </div>
             @withField("stripe", "securityCode") { field =>
               <div class="control-group">
-                <label class="control-label" for="@field.id">Security code:</label>
+                <label class="control-label" for="@field.id">Security code@requiredStar:</label>
                 <div class="controls">
                   <input @field.identityAttributes
                          monitor-user-attention
@@ -386,12 +390,13 @@
             }
           </form>
           <form name="paymentForm"
+                class="ajax"
                 remote-resource="{{cartApi.url}}/payment"
                 local-resource="payment"
                 submit-completed="refreshCart()">
             @withField("payment", "postalCode") { field => 
               <div class="control-group">
-                <label class="control-label" for="@field.id">Zip:</label>
+                <label class="control-label" for="@field.id">Zip@requiredStar:</label>
                 <div class="controls">
                   <input @field.identityAttributes class="half"  monitor-user-attention required resource-property>
                   @field.standardErrorDiv
@@ -408,7 +413,7 @@
             }
             </form>
         </section>
-        <div id="field-reminder" class="control-group">
+        <div class="field-reminder control-group">
           <div class="controls">
             <div class="fields-remaining" ng-show="fieldsRemaining().length > 0">
               <img src="@EgraphsAssets.at("images/glyphicons-uparrow-circle-orange.png")"> <span class="num-remaining">{{fieldsRemaining().length}}</span> required fields remaining
@@ -426,7 +431,8 @@
           <div class="submission">
             <button type="button"
                     class="button"
-                    ng-click="creditCardFormSubmit(onCardInfoValidated)" >
+                    ng-click="creditCardFormSubmit(onCardInfoValidated)"
+                    ng-disabled="fieldsRemaining().length > 0">
               <strong>
                 <em>Purchase now</em> 
               </strong>

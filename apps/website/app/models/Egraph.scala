@@ -212,7 +212,7 @@ case class Egraph(
         val celebrity = product.celebrity
 
         // Generate and save print-sized egraph image, and get it as a BufferedImage to be passed to LandscapeFramedPrint
-        val egraphImageAsPng = getEgraphImage(LandscapeFramedPrint.targetEgraphWidth).asPng
+        val egraphImageAsPng = getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false).asPng
         egraphImageAsPng.getSavedUrl(AccessPolicy.Public)
         val egraphImage = egraphImageAsPng.transformAndRender.graphicsSource.asInstanceOf[RasterGraphicsSource].image
 

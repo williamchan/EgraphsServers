@@ -36,7 +36,7 @@ class TotalTests extends EgraphsUnitTest
   override def resolutionBlockingTypes: Seq[LineItemTypes] = Seq(oneTaxType, subtotalWithTaxTypes)
   override def nonResolutionBlockingTypes: Seq[LineItemTypes] = {
     val otherSummaries = Seq(TotalLineItemType, BalanceLineItemType)
-    val withCashTxn = CashTransactionLineItemType(0L, None, None) +: otherSummaries
+    val withCashTxn = randomCashTransactionType +: otherSummaries
     Seq(otherSummaries, withCashTxn)
   }
 

@@ -251,12 +251,17 @@ class Schema @Inject() (
     .via((lineItem, cashTransaction) => lineItem.id === cashTransaction.lineItemId)
   val lineItemToGiftCertificate = oneToManyRelation(lineItems, giftCertificates)
     .via((lineItem, giftCertificate) => lineItem.id === giftCertificate._lineItemId)
+  val lineItemToOrder = oneToManyRelation(lineItems, orders)
+    .via((lineItem, order) => lineItem.id === order.lineItemId)
+  val lineItemToPrintOrder = oneToManyRelation(lineItems, printOrders)
+    .via((lineItem, printOrder) => lineItem.id === printOrder.lineItemId)
 
   val lineItemTypeToCoupon = oneToManyRelation(lineItemTypes, coupons)
     .via((lineItemType, coupon) => lineItemType.id === coupon.lineItemTypeId)
-
   val lineItemTypeToLineItem = oneToManyRelation(lineItemTypes, lineItems)
     .via((lineItemType, lineItem) => lineItemType.id === lineItem._itemTypeId)
+  val lineItemTypeToProduct = oneToManyRelation(lineItemTypes, products)
+    .via((lineItemType, product) => lineItemType.id === product.lineItemTypeId)
 
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
@@ -566,8 +571,8 @@ class Schema @Inject() (
 
   override def callbacks = {
     Seq(
-      factoryFor(accounts) is Account(services = injector.instance[AccountServices]),
-      factoryFor(addresses) is Address(services = injector.instance[AddressServices]),
+      factoryFor(accounts) is Account(_services = injector.instance[AccountServices]),
+      factoryFor(addresses) is Address(_services = injector.instance[AddressServices]),
       factoryFor(administrators) is Administrator(services = injector.instance[AdministratorServices]),
       factoryFor(blobKeys) is BlobKey(services = injector.instance[BlobKeyServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),

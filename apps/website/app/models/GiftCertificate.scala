@@ -10,7 +10,6 @@ import java.sql.Timestamp
 import services.db._
 
 
-
 //
 // Services
 //
@@ -30,7 +29,6 @@ case class GiftCertificateServices @Inject() (
     entity.copy(created = created, updated = updated)
   }
 }
-
 
 
 //
@@ -55,9 +53,6 @@ case class GiftCertificateEntity (
 }
 
 
-
-
-
 //
 // Model
 //
@@ -66,9 +61,11 @@ case class GiftCertificate protected (
   _coupon: Coupon,
   services: GiftCertificateServices = AppConfig.instance[GiftCertificateServices]
 ) extends HasEntity[GiftCertificateEntity, Long]
-  with CanInsertAndUpdateAsThroughServices[GiftCertificate, GiftCertificateEntity]
+  with CanInsertAndUpdateEntityThroughServices[GiftCertificate, GiftCertificateEntity]
 {
   import MemberLens.Conversions._
+
+  def id: Long = _entity.id
 
   def saveWithLineItem(item: GiftCertificateLineItem) = {
     this.typeId.set(item.itemType.id)
@@ -99,16 +96,15 @@ case class GiftCertificate protected (
     ).getOrElse(balance)
   }
 
-
   private def maybeItemEntity = services.lineItemStore.findEntityById(itemId.get)
-
 
   //
   // Lenses
   //
-  lazy val entity = MemberLens[GiftCertificate, GiftCertificateEntity](this)(_entity, copy(_))
-  lazy val coupon = MemberLens[GiftCertificate, Coupon](this)( _coupon,
-    newCoupon => this.couponId.set(newCoupon.id).copy(_coupon = newCoupon)
+  lazy val entity = MemberLens[GiftCertificate, GiftCertificateEntity](this)(getter = _entity, setter = copy(_))
+  lazy val coupon = MemberLens[GiftCertificate, Coupon](this)(
+    getter = _coupon,
+    setter = newCoupon => this.couponId.set(newCoupon.id).copy(_coupon = newCoupon)
   )
 
   /** just provide getter and setter */
@@ -158,10 +154,6 @@ object GiftCertificate {
 }
 
 
-
-
-
-
 //
 // Store
 //
@@ -185,6 +177,11 @@ class GiftCertificateStore @Inject() (
       entity <- table.where(entity => entity._lineItemId === id).headOption;
       coupon <- couponStore.findById(entity.couponId)
     ) yield GiftCertificate(entity, coupon)
+  }
+
+  def findByCoupon(coupon: Coupon) = {
+    val query = table.where(certificate => certificate.couponId.get === coupon.id)
+    query map { GiftCertificate(_, coupon) }
   }
 
   // TODO(SER-471): get by gifter, recipient?

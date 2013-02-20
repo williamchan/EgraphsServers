@@ -5,40 +5,40 @@ import models.CashTransaction
 import models.checkout.checkout.Conversions._
 import models.enums.{CashTransactionType, CheckoutCodeType, LineItemNature}
 import scalaz.{Scalaz, Lens}
-import services.db.Schema
+import services.db.{HasTransientServices, Schema}
 import services.AppConfig
+import services.payment.Payment
 
 /**
  * CashTransactionLineItemTypes are either used for making a cash transaction or represent existing
  * cash transactions. They can be payments or refunds, which just reflects the sign of the charged
  * amount.
  *
- * New/unpersisted instances need an accountId, billingPostalCode, and stripeCardTokenId if the
- * charged amount is non-zero. Restored or persisted instances only need the entity and item entity.
+ * New/unpersisted instances need a billingPostalCode, and stripeCardTokenId if the charged amount is non-zero.
+ * Restored or persisted instances only need the entity and item entity.
  *
  * The entities are singular based on their LineItemNature; for now, no need is seen for multiple
  * payment cash transaction type entities (same for refunds and forseeably for invoices).
  *
  * @param _entity new or persisted LineItemTypeEntity
- * @param accountId needed for CashTransaction, otherwise None
  * @param billingPostalCode needed for CashTransaction, otherwise None
  * @param stripeCardTokenId needed for CashTransaction, otherwise None
  * @param _maybeItemEntity None or persisted LineItemEntity
- * @param services
+ * @param _services
  */
 case class CashTransactionLineItemType protected (
   _entity: LineItemTypeEntity,
-  accountId: Option[Long],
   billingPostalCode: Option[String],
   stripeCardTokenId: Option[String],
   _maybeItemEntity: Option[LineItemEntity],
-  services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
-) extends LineItemType[CashTransaction] with HasLineItemTypeEntity
+  @transient _services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
+)
+  extends LineItemType[CashTransaction]
+  with HasLineItemTypeEntity[CashTransactionLineItemType]
   with LineItemTypeEntityLenses[CashTransactionLineItemType]
   with LineItemTypeEntityGetters[CashTransactionLineItemType]
+  with HasTransientServices[CashTransactionLineItemTypeServices]
 {
-
-  override def toJson = ""
 
   /**
    * @param resolved should have a BalanceLineItem in order to resolve
@@ -52,7 +52,9 @@ case class CashTransactionLineItemType protected (
 
       // persisted, just pass along entities
       case (Some(itemEntity: LineItemEntity), _)  =>
-        Some(Seq(CashTransactionLineItem(itemEntity, _entity)))
+        Some(Seq(
+          CashTransactionLineItem(itemEntity, _entity).withPaymentService(services.payment)
+        ))
 
 
       // new line item type, create new CashTransaction
@@ -65,7 +67,6 @@ case class CashTransactionLineItemType protected (
 
         // note: stripeChargeId set when charge is made in Checkout transaction
         val txn = CashTransaction(
-          accountId = accountId.get,          // should be defined, see apply for creating new type below
           billingPostalCode = billingPostalCode,
           stripeCardTokenId = stripeCardTokenId
         ) .withCashTransactionType(CashTransactionType.Checkout)
@@ -79,7 +80,9 @@ case class CashTransactionLineItemType protected (
           require(nature == LineItemNature.Payment)
         }
 
-        Some(Seq(CashTransactionLineItem(this, txn)))
+        Some(Seq(
+          CashTransactionLineItem(this, txn).withPaymentService(services.payment)
+        ))
 
 
       // cannot resolve yet
@@ -92,18 +95,16 @@ case class CashTransactionLineItemType protected (
     get = txnType => txnType._entity,
     set = (txnType, newEntity) => txnType.copy(newEntity)
   )
+
+  override def withEntity(newEntity: LineItemTypeEntity) = entity.set(newEntity)
 }
-
-
-
-
 
 
 object CashTransactionLineItemType {
 
   def codeType = CheckoutCodeType.CashTransaction
-  def refundEntity = entityMap(LineItemNature.Refund)
-  def paymentEntity = entityMap(LineItemNature.Payment)
+  def refundEntity(implicit services: CashTransactionLineItemTypeServices) = entityMap(LineItemNature.Refund)(services)
+  def paymentEntity(implicit services: CashTransactionLineItemTypeServices) = entityMap(LineItemNature.Payment)(services)
 
   /**
    * This memoizes db calls to get the entities for payments and refund cash transaction line item types.
@@ -114,16 +115,15 @@ object CashTransactionLineItemType {
    * number of item type entities.
    */
   private val entityMap = Scalaz.immutableHashMapMemo { nature: LineItemNature =>
-    AppConfig.instance[CashTransactionLineItemTypeServices].getEntityByNatureOrCreate(nature)
+    { services: CashTransactionLineItemTypeServices => services.getEntityByNatureOrCreate(nature) }
   }
 
-  //
-  // Create
-  //
-  def apply(accountId: Long, billingPostalCode: Option[String], stripeCardTokenId: Option[String]) = {
+
+  def create(stripeCardTokenId: Option[String], billingPostalCode: Option[String])(
+    implicit services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
+  ) = {
     new CashTransactionLineItemType(
       _entity = paymentEntity,
-      accountId = Some(accountId),
       billingPostalCode = billingPostalCode,
       stripeCardTokenId = stripeCardTokenId,
       _maybeItemEntity = None
@@ -132,13 +132,9 @@ object CashTransactionLineItemType {
 
   // todo(refunds): define a method to create refund transactions
 
-  //
-  // Restore
-  //
-  def apply(entity: LineItemTypeEntity, itemEntity: LineItemEntity) = {
+  def restore(entity: LineItemTypeEntity, itemEntity: LineItemEntity) = {
     new CashTransactionLineItemType(
       _entity = entity,
-      accountId = None,
       billingPostalCode = None,
       stripeCardTokenId = None,
       _maybeItemEntity = Some(itemEntity)
@@ -147,23 +143,12 @@ object CashTransactionLineItemType {
 }
 
 
-
-
-
-
-
-
-
 case class CashTransactionLineItemTypeServices @Inject() (
   schema: Schema,
-  lineItemStore: LineItemStore
+  lineItemStore: LineItemStore,
+  payment: Payment  // not used by CashTxnItemType, used to pass TestPayments to CashTxnLineItem
 ) extends SavesAsLineItemTypeEntity[CashTransactionLineItemType] {
   import org.squeryl.PrimitiveTypeMode._
-
-  override protected def modelWithNewEntity(
-    txn: CashTransactionLineItemType,
-    newEntity: LineItemTypeEntity
-  ): CashTransactionLineItemType = { txn.entity.set(newEntity) }
 
   def getEntityByNatureOrCreate(nature: LineItemNature) = {
     schema.lineItemTypes.where(entity =>
@@ -179,15 +164,4 @@ case class CashTransactionLineItemTypeServices @Inject() (
   private def entityFromNature(nature: LineItemNature) = LineItemTypeEntity(entityDesc(nature), nature, codeType)
   private def entityDesc(nature: LineItemNature) = "%s %s entity".format(codeType.name, nature.name)
   private def codeType = CashTransactionLineItemType.codeType
-}
-
-
-
-
-
-class CashTransactionLineItemTypeStore @Inject() (
-  schema: Schema
-) {
-
-
 }

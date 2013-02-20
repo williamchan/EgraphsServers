@@ -2,7 +2,7 @@ package models.checkout
 
 import services.Time
 import services.db.KeyedCaseClass
-import models.HasCreatedUpdated
+import models.{Customer, HasCreatedUpdated}
 import java.sql.Timestamp
 
 //
@@ -15,4 +15,6 @@ case class CheckoutEntity(
   updated: Timestamp = Time.defaultTimestamp
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
   override def unapplied = CheckoutEntity.unapply(this)
+
+  def withCustomer(customer: Customer) = this.copy(customerId = customer.id)
 }

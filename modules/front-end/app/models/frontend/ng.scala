@@ -41,13 +41,22 @@ case class NgField(form: String, name: String) {
     control + ".$invalid"
   }
 
-  def invalidAndUserHasAttended = {
-    userHasAttended + " && " + invalid
+  /** Returns the angular expression representing that the input is currently submitting in an ajax form */
+  def submitting = {
+    control + ".$submitting"
   }
 
-  /** Produces a standard error div with visibility governed by whether this form control has errors or not */
+  def invalidAndUserHasAttendedAndNotSubmitting = {
+    userHasAttended + " && " + invalid + " && !" + submitting
+  }
+
+  /**
+   * Produces a standard error div with visibility governed by whether this form control
+   * has errors or not, and is in a state where it is appropriate to show those errors
+   * to the user.
+   **/
   def errorDiv(body: => Html): Html = {
-    Html("<div class=\"errors\" ng-show=\"" + invalidAndUserHasAttended + "\">" + body + "</div>")
+    Html("<div class=\"errors\" ng-show=\"" + invalidAndUserHasAttendedAndNotSubmitting + "\">" + body + "</div>")
   }
 
   /** A standard set of errors as-per our API spec. */

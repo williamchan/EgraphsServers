@@ -1,15 +1,17 @@
 package models.checkout
 
+import _root_.exception.InsufficientInventoryException
 import com.google.inject.Inject
-import exception.InsufficientInventoryException
+import checkout.Conversions._
+import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
 import java.sql.{Connection, Timestamp}
 import models._
 import models.enums._
-import checkout.Conversions._
+import play.api.libs.json.{JsValue, JsArray, JsNull}
 import services.AppConfig
 import services.db._
 import services.payment.Charge
-
+import services.config.ConfigFileProxy
 
 
 //
@@ -22,14 +24,15 @@ case class CheckoutServices @Inject() (
   accountStore: AccountStore,
   addressStore: AddressStore,
   dbSession: DBSession,
+  config: ConfigFileProxy,
   @CurrentTransaction currentTxnConnectionFactory: () => Connection
 ) extends InsertsAndUpdatesAsEntity[Checkout, CheckoutEntity] with SavesCreatedUpdated[CheckoutEntity] {
   import org.squeryl.PrimitiveTypeMode._
 
   override protected def table = schema.checkouts
 
-  override def modelWithNewEntity(checkout: Checkout, entity: CheckoutEntity): PersistedCheckout = {
-    checkout.withSavedEntity(entity)
+  override def modelWithNewEntity(checkout: Checkout, entity: CheckoutEntity): Checkout = {
+    checkout.withEntity(entity)
   }
 
   override def withCreatedUpdated(toUpdate: CheckoutEntity, created: Timestamp, updated: Timestamp)
@@ -48,23 +51,33 @@ case class CheckoutServices @Inject() (
 //
 // Base Model
 //
-abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, CheckoutEntity]
+abstract class Checkout
+  extends CanInsertAndUpdateEntityThroughTransientServices[Checkout, CheckoutEntity, CheckoutServices]
   with HasEntity[CheckoutEntity, Long]
-{
+{ this: Serializable =>
   import Checkout._
 
   //
   // Members
   //
+  def id: Long
   def _entity: CheckoutEntity
-  def services: CheckoutServices
-  def customer: Option[Customer]
+
+  def buyerAccount: Account
+  def buyerCustomer: Customer
+
+  def recipientAccount: Option[Account]
+  def recipientCustomer: Option[Customer]
+
+  def payment: Option[CashTransactionLineItemType]
+  def shippingAddress: Option[Address]
+
+  def save(): Checkout
   def zipcode: Option[String]
   def lineItems: LineItems
   def itemTypes: LineItemTypes
   def pendingItems: LineItems
   def pendingTypes: LineItemTypes
-  protected def _persisted: Boolean
   protected def _dirty: Boolean     // simplifies transaction -- does nothing if clean
 
   /**
@@ -72,10 +85,14 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
    * Needed to update things like taxes and fees, which are dependent on individual elements, when
    * adding new elements (ex: refunding taxes or including taxes on checkout edits).
    */
-  lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
+  protected lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
     // TODO(refunds): will probably want to add the refund transaction here
     // TODO(fees): will want to add any fees we charge here
-    TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
+
+    // TODO(taxes): remove the if to enable adding taxes based on billing zipcode
+    if (services.config.applicationMode != "dev") Nil else {
+      TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
+    }
   }
 
 
@@ -86,27 +103,32 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
   def withAdditionalTypes(newTypes: LineItemTypes): Checkout
 
   /** for services to return a persisted checkout as the correct type */
-  def withSavedEntity(savedEntity: CheckoutEntity): PersistedCheckout
+  def withEntity(savedEntity: CheckoutEntity): Checkout
+
+  def toJson: JsValue = lineItems.foldLeft(JsArray(Nil)) { (acc, nextItem) =>
+    nextItem.toJson match {
+      case jsArray: JsArray => jsArray ++ acc
+      case jsVal: JsValue => jsVal +: acc
+    }
+  }
 
 
   /**
-   * Charges or credits customer as needed through the information in the txnType, transacts all the
+   * Charges or credits buyer as needed through the information in the txnType, transacts all the
    * line items which have been added since the last transaction as well as the cash transaction
-   * of the charge or credit to the customer, and returns the resulting PersistedCheckout.
+   * of the charge or credit to the buyer, and returns the resulting PersistedCheckout.
    *
-   * @param txnType used to charge or credit customer
+   * @param txnType used to charge or credit buyer
    * @return failure, this if not _dirty, or the resulting PersistedCheckout
    */
-  def transact(txnType: Option[CashTransactionLineItemType]): FailureOrCheckout = {
+  def transact(txnType: Option[CashTransactionLineItemType] = payment): FailureOrCheckout = {
     def nothingToTransact = pendingTypes.isEmpty
     def paymentMissing = !(balance.amount.isZero || txnType.isDefined)
-    def customerMissing = !customer.isDefined
 
     if (nothingToTransact) { Right(this) }
     else if (paymentMissing) { Left(CheckoutFailedCashTransactionMissing(this)) }
-    else if (customerMissing) { Left(CheckoutFailedCustomerMissing(this, txnType)) }
     else {
-      // save checkout
+      // save checkout entity
       val savedCheckout = this.save()
 
       // resolve transaction item and make charge (or return error)
@@ -115,25 +137,28 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
         case _ => return Left{ CheckoutFailedCashTransactionResolutionError(this, txnType) }
       }
 
-      def refundedCharge = txnItem flatMap (_.abortTransaction())
-
       /**
-       * Transact items with a savepoint to fall back on if transacting line items fails.
-       * Note that charge must also be refunded in error cases so that no unpaid items or
-       * payments for nonexistent item exist afterwards.
+       * Transact items with a savepoint to fall back on if transacting line items fails. Note that charge must also
+       * be refunded in error cases so that no unpaid items or payments for nonexistent item exist afterwards.
        */
       tryWithSavepoint {
         val allItems = txnItem.toSeq ++ pendingItems
-        transactItemsForCheckout(allItems)(savedCheckout)
+        savedCheckout.transactItems(allItems)
 
-        Right(PersistedCheckout(savedCheckout))
+        Right(services.findById(savedCheckout.id).get)
 
       } catchAndRollback {
-        case e: InsufficientInventoryException =>
-          Left { CheckoutFailedInsufficientInventory(this, txnItem, refundedCharge) }
-
-        case e: Exception =>
-          Left { CheckoutFailedError(this, txnItem, refundedCharge) }
+        // TODO: this could be implemented more elegantly if LineItems return some Left error case directly
+        case exc: Exception => Left {
+          val refunded = txnItem flatMap (_.abortTransaction())
+           exc match {
+            case e: MissingRequiredAddressException => CheckoutFailedShippingAddressMissing(this, refunded, e.msg)
+            case e: InsufficientInventoryException => CheckoutFailedInsufficientInventory(this, txnItem, refunded)
+            case e: DomainObjectNotFoundException => CheckoutFailedDomainObjectNotFound(this, refunded, e.msg)
+            case e: ItemTypeNotFoundException => CheckoutFailedItemTypeNotFound(this, refunded, e.msg)
+            case e: Exception => CheckoutFailedError(this, txnItem, refunded, e)
+          }
+        }
       }
     }
   }
@@ -190,7 +215,7 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
           current: LineItemType[_] = unresolvedTypes.head,
           unattempted: LineItemTypes = unresolvedTypes.tail
         ): ResolutionPass = {
-          def merge(a: LineItemTypes, b: LineItemTypes) = if (a.length < b.length) {a ++ b} else {b ++ a}
+          def merge(a: LineItemTypes, b: LineItemTypes) = if (a.size < b.size) {a ++ b} else {b ++ a}
 
           val otherTypes = merge(prevAttempted, unattempted)
           val itemsFromCurrent = current.lineItems(prevResolved, otherTypes)
@@ -243,28 +268,27 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
     resolve(ResolutionPass(unresolvedTypes = types))
   }
 
-
   //
-  // Helper methods
+  // helpers
   //
-  def save(): Checkout = if (id > 0) { this.update() } else { this.insert() }
-
   /** get the line item of the given `CashTransactionLineItemType` as applied to this checkout */
-  private def resolveCashTransaction(txnType: Option[CashTransactionLineItemType])
-  : Option[CashTransactionLineItem] = {
-    txnType.flatMap { _.lineItems( Seq(balance) ) }
-      .flatMap { _.headOption }
+  private def resolveCashTransaction(maybeTxnType: Option[CashTransactionLineItemType]): Option[CashTransactionLineItem] = {
+    for (
+      txnType <- maybeTxnType;
+      txnItems <- txnType.lineItems(Seq(balance));
+      txnItem <- txnItems.headOption
+    ) yield txnItem
   }
 
   /**
-   * Transact the given line items against the given checkout
+   * Transact the given line items
    *
    * @param items to be transacted
-   * @param checkout a saved checkout, passed to each item's `transact`
    * @return transacted line items
    */
-  private def transactItemsForCheckout(items: LineItems)(checkout: Checkout) = {
-    items map (_.transact(checkout))
+  private def transactItems(items: LineItems) = {
+    require(id > 0, "Checkout must be transacted before items.")
+    items map ( item => item.transact(this))
   }
 
   /**
@@ -291,21 +315,19 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
     }
   }
 
-
-
-
-
   //
   // utility members
   //
-  def customerId: Long = _entity.customerId
-  def accountId: Long = account map (_.id) getOrElse(0L)
-  lazy val account: Option[Account] = customer.map(_.account)
-  lazy val addresses = account.map(_.addresses).getOrElse(Nil)
-
   def fees: LineItems = lineItems(LineItemNature.Fee)
   def taxes: Seq[TaxLineItem] = lineItems(CheckoutCodeType.Tax)
+  def coupons: Seq[CouponLineItem] = lineItems(CheckoutCodeType.Coupon)
   def payments: LineItems = lineItems(LineItemNature.Payment)
+
+  /**
+   * Note that these methods are as safe as the lineItems method since the corresponding item types should be included
+   * by the implementation where appropriate. So, if these fail, it should be in lineItems, rather than from calling
+   * head on an empty seq.
+   */
   def balance: BalanceLineItem = lineItems(CheckoutCodeType.Balance).head
   def subtotal: SubtotalLineItem = lineItems(CheckoutCodeType.Subtotal).head
   def total: TotalLineItem = lineItems(CheckoutCodeType.Total).head
@@ -315,32 +337,24 @@ abstract class Checkout extends CanInsertAndUpdateAsThroughServices[Checkout, Ch
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
 //
 // Companion Object
 //
 object Checkout {
 
   // Create
-  def apply(types: LineItemTypes, maybeZipcode: Option[String], maybeCustomer: Option[Customer])
-  : FreshCheckout = {
-    val entity = CheckoutEntity(customerId = maybeCustomer.map(_.id).getOrElse(0L))
-    new FreshCheckout(entity, types, maybeCustomer, maybeZipcode)
+  def create(types: LineItemTypes, buyer: Option[Account] = None, zipcode: Option[String] = None): FreshCheckout = {
+    FreshCheckout(0L, types, buyer, zipcode = zipcode)
+  }
+
+  def create(types: LineItemTypes, buyer: Option[Account], address: Address): FreshCheckout = {
+    val zipcode = address.postalCode
+    FreshCheckout(0L, types, buyer, shippingAddress = Some(address), zipcode = Some(zipcode))
   }
 
   // Restore
-  def apply(id: Long)(services: CheckoutServices = AppConfig.instance[CheckoutServices])
-  : PersistedCheckout = { services.findById(id).get }
+  def restore(id: Long)(implicit services: CheckoutServices = AppConfig.instance[CheckoutServices])
+  : Option[PersistedCheckout] = { services.findById(id) }
 
 
   //
@@ -365,25 +379,44 @@ object Checkout {
     canceledTransactionItem: Option[CashTransactionLineItem],
     charge: Option[Charge]
   ) extends CheckoutFailed(
-    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem)
+    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem, charge)
   ) with FailedCheckoutWithCharge
 
-  case class CheckoutFailedCashTransactionMissing(checkout: Checkout)
-    extends CheckoutFailed(FailedCheckoutData(checkout))
+  case class CheckoutFailedCashTransactionMissing(checkout: Checkout) extends CheckoutFailed(FailedCheckoutData(checkout))
+
+  case class CheckoutFailedItemTypeNotFound(
+    checkout: Checkout,
+    charge: Option[Charge],
+    msg: String
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, charge = charge)) with FailedCheckoutWithCharge
+
+  case class CheckoutFailedShippingAddressMissing(
+    checkout: Checkout,
+    charge: Option[Charge],
+    msg: String
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, charge = charge)) with FailedCheckoutWithCharge
+
+  case class CheckoutFailedDomainObjectNotFound(
+    checkout: Checkout,
+    charge: Option[Charge],
+    msg: String
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, charge = charge)) with FailedCheckoutWithCharge
 
   case class CheckoutFailedError(
     checkout: Checkout,
     canceledTransactionItem: Option[CashTransactionLineItem],
-    charge: Option[Charge]
+    charge: Option[Charge],
+    exception: Exception
   ) extends CheckoutFailed(
-    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem)
+    FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem, charge)
   ) with FailedCheckoutWithCharge
 }
 
 case class FailedCheckoutData(
   checkout: Checkout,
-  cashTransactionLineItemTypes: Option[CashTransactionLineItemType] = None,
-  cashTransactionLineItems: Option[CashTransactionLineItem] = None
+  cashTransactionLineItemType: Option[CashTransactionLineItemType] = None,
+  cashTransactionLineItem: Option[CashTransactionLineItem] = None,
+  charge: Option[Charge] = None
 )
 
 

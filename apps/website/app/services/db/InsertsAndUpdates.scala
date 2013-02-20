@@ -1,6 +1,7 @@
 package services.db
 
 import org.squeryl.{Table, KeyedEntity}
+import services.AppConfig
 
 /**
  * Provides any persistence-associated class that mixes it in with means to insert
@@ -54,10 +55,52 @@ trait CanInsertAndUpdateThroughServices[T <: KeyedEntity[_]] { this: T =>
   def update(): T = services.update(this)
 }
 
-trait CanInsertAndUpdateAsThroughServices[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedCaseClass[_]]{
+
+trait CanInsertAndUpdateEntity[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedCaseClass[_]] { this: ModelT => }
+
+
+/**
+ * Mixin for Model classes with separate Entities to be able to persist their entities through services as if
+ * persisting themselves.
+ */
+trait CanInsertAndUpdateEntityThroughServices[ModelT <: HasEntity[EntityT, _], EntityT <: KeyedCaseClass[_]]
+  extends CanInsertAndUpdateEntity[ModelT, EntityT]
+{
   this: ModelT =>
 
   def services: InsertsAndUpdatesAsEntity[ModelT, EntityT]
   def insert(): ModelT = services.insert(this)
   def update(): ModelT = services.update(this)
+}
+
+
+/**
+ * Mixin for Model classes with separate Entities need to be serializable and able to persist their entities through
+ * services as if persisting themselves.
+ */
+trait CanInsertAndUpdateEntityThroughTransientServices[
+  ModelT <: HasEntity[EntityT, _],
+  EntityT <: KeyedCaseClass[_],
+  ServiceT <: InsertsAndUpdatesAsEntity[ModelT, EntityT]
+] extends CanInsertAndUpdateEntity[ModelT, EntityT] with HasTransientServices[ServiceT] {
+  this: ModelT with Serializable =>
+
+  def insert()(implicit manifest: Manifest[ServiceT]): ModelT = services.insert(this)
+  def update()(implicit manifest: Manifest[ServiceT]): ModelT = services.update(this)
+}
+
+
+/**
+ * Helper for making Types that take services as an argument serializable by marking the services as `@transient`.
+ * Transient fields are null on deserialization, so this defaults to the injected services instance when null.
+ */
+trait HasTransientServices[T] { this: Serializable =>
+  /** services parameter */
+  protected def _services: T
+
+  /** accessor, defaults to injected instance */
+  def services(implicit manifest: Manifest[T]): T = if (_services == null) _services else defaultServices
+
+  /** fallback for after deserialization */
+  protected def defaultServices(implicit manifest: Manifest[T]): T = AppConfig.instance[T]
 }

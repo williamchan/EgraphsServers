@@ -5,7 +5,7 @@ import models.GiftCertificate
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.Money
 import services.AppConfig
-import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
+import services.db.Schema
 import scalaz.Lens
 import com.google.inject.Inject
 
@@ -18,16 +18,14 @@ import com.google.inject.Inject
 case class GiftCertificateLineItemType (
   _entity: LineItemTypeEntity,
   recipient: String,
-  amount: Money,
-  services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
-) extends LineItemType[GiftCertificate] with HasLineItemTypeEntity
+  @transient amount: Money,
+  @transient _services: GiftCertificateLineItemTypeServices = AppConfig.instance[GiftCertificateLineItemTypeServices]
+)
+	extends LineItemType[GiftCertificate]
+  with HasLineItemTypeEntity[GiftCertificateLineItemType]
   with LineItemTypeEntityGettersAndSetters[GiftCertificateLineItemType]
-  with CanInsertAndUpdateAsThroughServices[GiftCertificateLineItemType, LineItemTypeEntity]
+  with SavesAsLineItemTypeEntityThroughServices[GiftCertificateLineItemType, GiftCertificateLineItemTypeServices]
 {
-
-  override def toJson: String = {
-    ""
-  }
 
   override def lineItems(
     resolvedItems: LineItems = Nil,
@@ -36,8 +34,6 @@ case class GiftCertificateLineItemType (
     val giftCertificate = GiftCertificate(recipient, amount)
     Some(Seq(GiftCertificateLineItem(this, giftCertificate)))
   }
-
-  override def id = _entity.id
 
   override protected lazy val entityLens = Lens[GiftCertificateLineItemType, LineItemTypeEntity] (
     get = cert => cert._entity,
@@ -88,11 +84,3 @@ object GiftCertificateLineItemType {
 
 case class GiftCertificateLineItemTypeServices @Inject() (schema: Schema)
   extends SavesAsLineItemTypeEntity[GiftCertificateLineItemType]
-{
-  //
-  // SavesAsLineItemTypeEntity members
-  //
-  override protected def modelWithNewEntity(certificate: GiftCertificateLineItemType, entity: LineItemTypeEntity) = {
-    certificate.copy(_entity=entity)
-  }
-}

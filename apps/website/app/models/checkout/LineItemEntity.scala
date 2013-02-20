@@ -18,6 +18,7 @@ case class LineItemEntity(
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated {
   override def unapplied = LineItemEntity.unapply(this)
   def amount = Money.of(CurrencyUnit.USD, _amountInCurrency.bigDecimal)
+  def withAmount(newAmount: Money) = this.copy(_amountInCurrency = newAmount.getAmount)
 }
 
 object LineItemEntity {
