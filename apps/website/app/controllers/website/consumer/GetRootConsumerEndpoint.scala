@@ -9,6 +9,7 @@ import models.categories.{MastheadCategoryValueStore, MastheadCategoryValue, Ver
 import services.mvc.marketplace._
 import services.http.SignupModal
 import services.mvc.landing.LandingMastheadsQuery
+import util.Random
 
 /**
  * The main landing page for the consumer website.
@@ -32,6 +33,7 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
   // Controllers
   //
 
+  val random = new Random()
   var marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
 
   def getRootConsumerEndpoint = controllerMethod.withForm() { implicit authToken =>
@@ -46,11 +48,12 @@ private[controllers] trait GetRootConsumerEndpoint extends ImplicitHeaderAndFoot
 
         val mastheadQuery = landingMastheadsQuery()
         val featuredMastheadIds = mastheadCategoryValueStore.findByCategoryValueId(featured.categoryValue.id).map(_.mastheadId).toList
-        val featuredMastheads = mastheadQuery.filter(masthead => featuredMastheadIds.contains(masthead.id))
+        val featuredMastheads = random.shuffle(mastheadQuery.filter(m => featuredMastheadIds.contains(m.id)))
+        val maybeMasthead = featuredMastheads.headOption
 
         Ok(views.html.frontend.landing(
           stars = featuredStars.toList,
-          mastheads = featuredMastheads,
+          mastheadOption = maybeMasthead,
           verticalViewModels = verticals,
           marketplaceRoute = marketplaceRoute,
           signup = displayModal))

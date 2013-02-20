@@ -74,13 +74,18 @@ trait PostMastheadAdminEndpoint {
 
             mastheadOption match {
               case Some(masthead) => {
-                val savedMasthead = masthead.copy(
+                val updatedMasthead = masthead.copy(
                   name = validForm.name,
                   headline = validForm.headline,
                   subtitle = Utils.toOption(validForm.subtitle),
                   callToActionTarget = validForm.callToActionTarget,
                   callToActionText = validForm.callToActionText
-                ).withPublishedStatus(publishedStatus).withCallToActionType(callToActionType).saveWithLandingPageImage(landingPageImageOption)
+                ).withPublishedStatus(publishedStatus).withCallToActionType(callToActionType)
+
+                val savedMasthead = landingPageImageOption match {
+                  case Some(image) => updatedMasthead.saveWithLandingPageImage(landingPageImageOption)
+                  case None => updatedMasthead.save()
+                }
 
                 Redirect(controllers.routes.WebsiteControllers.getMastheadAdmin(savedMasthead.id))
               }

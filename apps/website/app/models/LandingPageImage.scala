@@ -27,6 +27,11 @@ trait LandingPageImage[T] {
     (entity, image)
   }
 
+  /**
+   * Saves entity with image.
+   * @param landingPageImage
+   * @return
+   */
   def saveWithLandingPageImage(landingPageImage: Option[BufferedImage]): T = {
     landingPageImage match {
       case None => this.asInstanceOf[T]

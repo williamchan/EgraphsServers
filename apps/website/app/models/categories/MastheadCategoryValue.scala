@@ -14,11 +14,11 @@ import org.squeryl.Query
  * @param services
  */
 case class MastheadCategoryValue (
-                                    id: Long = 0L,
-                                    mastheadId: Long = 0L,
-                                    categoryValueId: Long = 0L,
-                                    services: CategoryServices = AppConfig.instance[CategoryServices]
-                                    ) extends KeyedCaseClass[Long]
+  id: Long = 0L,
+  mastheadId: Long = 0L,
+  categoryValueId: Long = 0L,
+  services: CategoryServices = AppConfig.instance[CategoryServices]
+) extends KeyedCaseClass[Long]
 {
   //
   // Public methods
@@ -35,9 +35,9 @@ case class MastheadCategoryValue (
 }
 
 class MastheadCategoryValueStore @Inject() (
-                                              schema: Schema,
-                                              categoryServices: Provider[CategoryServices]
-                                              ) extends SavesWithLongKey[MastheadCategoryValue] with Deletes[Long, MastheadCategoryValue]
+  schema: Schema,
+  categoryServices: Provider[CategoryServices]
+) extends SavesWithLongKey[MastheadCategoryValue] with Deletes[Long, MastheadCategoryValue]
 {
   import org.squeryl.PrimitiveTypeMode._
 

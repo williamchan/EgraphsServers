@@ -1,6 +1,6 @@
 package models
 
-import enums.HasPublishedStatusTests
+import enums.{HasCallToActionTypeTests, HasPublishedStatusTests}
 import utils._
 import services.AppConfig
 
@@ -11,6 +11,7 @@ class MastheadTests extends EgraphsUnitTest
   with DBTransactionPerTest
   with LandingPageImageTests[Masthead]
   with HasPublishedStatusTests[Masthead]
+  with HasCallToActionTypeTests[Masthead]
 {
   def store = AppConfig.instance[MastheadStore]
 
@@ -21,10 +22,29 @@ class MastheadTests extends EgraphsUnitTest
     }
     exception.getLocalizedMessage should include("Mastheads need headlines to be considered valid")
   }
+
+  it should "return associated category values" in new EgraphsTestApplication {
+    val masthead = Masthead(headline = TestData.generateUsername()).save()
+    val category1 = TestData.newSavedCategory
+    val categoryValue1 = TestData.newSavedCategoryValue(category1.id)
+
+    masthead.categoryValues.associate(categoryValue1)
+
+    masthead.categoryValues.size should be (1)
+    masthead.categoryValues.exists(cv => cv.id == categoryValue1.id) should be (true)
+  }
   //
-  //  HasPublishedStatus[Masthead] methods
+  //  HasPublishedStatusTests[Masthead] methods
   //
   override def newPublishableEntity = {
+      Masthead(name = TestData.generateFullname(), headline = TestData.generateUsername())
+  }
+
+  //
+  // HasCallToActionTypeTests[Masthead]
+  //
+
+  override def newEntityWithCallToAction = {
     Masthead(name = TestData.generateFullname(), headline = TestData.generateUsername())
   }
 

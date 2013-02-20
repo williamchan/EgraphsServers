@@ -1,6 +1,6 @@
 package models
 
-import categories.{MastheadCategoryValue, CelebrityCategoryValue, CategoryValue}
+import categories.{CategoryServices, MastheadCategoryValue, CelebrityCategoryValue, CategoryValue}
 import enums.{CallToActionType, HasCallToActionType, HasPublishedStatus, PublishedStatus}
 import frontend.landing.LandingMasthead
 import java.sql.Timestamp
@@ -18,6 +18,7 @@ import services.mvc.landing.LandingMastheadsQuery
 
 case class MastheadServices @Inject() (
   store: MastheadStore,
+  categoryServices: CategoryServices,
   imageAssetServices: Provider[ImageAssetServices]
 )
 
@@ -43,6 +44,8 @@ case class Masthead (
   with LandingPageImage[Masthead]
   with HasCallToActionType[Masthead]
 {
+
+  lazy val categoryValues = services.categoryServices.categoryValueStore.categoryValues(this)
 
   //
   // Public members
@@ -107,8 +110,15 @@ class MastheadStore @Inject() (
     schema.mastheadCategoryValues.right(categoryValue)
   }
 
+  /**
+   * Returns published mastheads suitable for landing page.
+   * @return
+   */
   def getLandingMastheads: Iterable[LandingMasthead] = {
-    for(masthead <- getAll) yield {
+    val publishedMastheads =
+      from(schema.mastheads)(m => where(m._publishedStatus === PublishedStatus.Published.name) select(m))
+
+    for(masthead <- publishedMastheads) yield {
       LandingMasthead(
         id = masthead.id,
         name=masthead.name,

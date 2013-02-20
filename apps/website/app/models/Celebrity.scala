@@ -79,10 +79,6 @@ case class Celebrity(id: Long = 0,
   with LandingPageImage[Celebrity]
 {
 
-  /**
-   * FilterValues celebrity is tagged withs
-   */
-
   lazy val categoryValues = services.categoryServices.categoryValueStore.categoryValues(this)
   
   lazy val categoryValueAndCategoryPairs : Query[(CategoryValue, Category)] = services.categoryServices.categoryValueStore.categoryValueCategoryPairs(this)

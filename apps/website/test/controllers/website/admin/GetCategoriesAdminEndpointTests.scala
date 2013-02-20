@@ -6,7 +6,7 @@ import services.AppConfig
 import services.db.DBSession
 import utils.AdminProtectedResourceTests
 
-class GetFiltersAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
+class GetCategoriesAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
   override protected def db = AppConfig.instance[DBSession]
   override protected def routeUnderTest = getCategoriesAdmin() 	
 }

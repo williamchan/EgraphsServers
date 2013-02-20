@@ -100,7 +100,7 @@
                   <div class="controls">
                     <select name="publishedStatusString">
                       @for(status <- PublishedStatus.values) {
-                      <option value="@status.name" @if(masthead._publishedStatus == status.name){selected="selected"})>@status.name</option>
+                      <option value="@status.name" @if(masthead._publishedStatus == status.name){selected="selected"}>@status.name</option>
                       }
 
                     </select>

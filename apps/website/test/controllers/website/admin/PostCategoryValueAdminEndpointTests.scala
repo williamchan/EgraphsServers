@@ -2,19 +2,15 @@ package controllers.website.admin
 
 import play.api.test._
 import play.api.test.Helpers._
-import egraphs.playutils.RichResult._
 import utils.FunctionalTestUtils.routeName
 import utils.FunctionalTestUtils.Conversions._
 import controllers.routes.WebsiteControllers.postCategoryValueAdmin
-import sjson.json.Serializer
-import utils.EgraphsUnitTest
-import utils.CsrfProtectedResourceTests
 import utils._
 import models.categories._
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
 
-class PostFilterValueAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests with AdminProtectedResourceTests{
+class PostCategoryValueAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests with AdminProtectedResourceTests{
   override protected def routeUnderTest = postCategoryValueAdmin
   override protected def db = AppConfig.instance[DBSession]
   def categoryStore = AppConfig.instance[CategoryStore]

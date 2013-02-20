@@ -1,4 +1,4 @@
-@(mastheads: Iterable[models.frontend.landing.LandingMasthead])
+@(mastheadOption: Option[models.frontend.landing.LandingMasthead])
 
 @import controllers._
 @import views.html.frontend.tags
@@ -21,17 +21,5 @@
   </div>     
 }
 
-
-@** <div id="masthead" class="carousel slide" data-interval="100">
-  <div id="mastheads" class="carousel-inner">
-    @tags.landing.masthead(headlineText = mastheadMessage.getOrElse("Connect With Your Stars"), mastheadImageUrl = mastheadImageUrl, active = true, callToActionTarget = "video", callToActionText = "View Video")
-  </div>
-  <div class="carousel-controls">
-    <a class="carousel-control left" href="#mastheads" data-slide="prev"><i class="icon-white icon-step-backward"></i></a>
-    <a class="carousel-control left" href="#mastheads" data-slide="pause"><i class="icon-white icon-pause"></i></a>
-    <a class="carousel-control left" href="#mastheads" data-slide="next"><i class="icon-white icon-step-forward"></i></a>
-  </div>
-</div>
-**@
-  @tags.landing.masthead(mastheads.headOption.getOrElse(models.frontend.landing.DefaultLanding.masthead))
+@tags.landing.masthead(mastheadOption.getOrElse(models.frontend.landing.DefaultLanding.masthead))
 @videoModal

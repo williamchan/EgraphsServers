@@ -18,7 +18,7 @@ trait HasPublishedStatusTests[T <: HasPublishedStatus[T]] {
     newPublishableEntity.withPublishedStatus(Unpublished).publishedStatus should be(Unpublished)
   }
 
-  "a publishable object" should "throw an exception if it has an invalid status string" in {
+  it should "throw an exception if it has an invalid status string" in {
 
     class HasWrongPublishableString extends HasPublishedStatus[HasWrongPublishableString] {
       val _publishedStatus = "herp"
