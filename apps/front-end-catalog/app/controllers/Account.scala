@@ -1,6 +1,5 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
 import play.api.libs.json.Json.toJson
 import models.frontend.egraphs._
@@ -8,8 +7,6 @@ import models.frontend.forms.FormError
 import models.frontend.egraphs.FulfilledEgraphViewModel
 import models.frontend.account.{AccountRecoverForm, AccountPasswordResetForm, AccountSettingsForm}
 import models.frontend.forms.Field
-import play.api.mvc.Request
-import play.data.DynamicForm
 import helpers.DefaultImplicitTemplateParameters
 
 /**
@@ -227,11 +224,6 @@ object AccountSettingsFormFactory {
       oldPassword = Field(name = "oldPassword"),
       newPassword = Field(name = "newPassword"),
       passwordConfirm = Field(name = "passwordConfirm"),
-      addressLine1 = Field(name = "address.line1", values = List("615 2nd Ave")),
-      addressLine2 = Field(name = "address.line2", values = List("Suite 300")),
-      city = Field(name = "city", values = List("Seattle")),
-      state = Field(name = "state", values = List("WA")),
-      postalCode = Field(name = "postalCode", values = List("98102")),
       galleryVisibility = Field(name = "galleryVisibility", values = List("private")),
       notice_stars = Field(name = "notice_stars", values = List("true")),
       generalErrors = List.empty[FormError]
@@ -249,11 +241,6 @@ object AccountSettingsFormFactory {
       oldPassword = basic.oldPassword.copy(error=error),
       newPassword = basic.newPassword.copy(error=error),
       passwordConfirm = basic.oldPassword.copy(error=error),
-      addressLine1 = basic.addressLine1.copy(error=error),
-      addressLine2 = basic.addressLine2.copy(error=Option(FormError("derp"))),
-      city = basic.city.copy(error=error),
-      state = Field(name = "state", values = List("WA")),
-      postalCode = basic.postalCode.copy(error=error),
       galleryVisibility = Field(name = "galleryVisibility", values = List("private")),
       notice_stars = Field(name = "notice_stars", values = List("true")),
       generalErrors = List(FormError("Derp"),FormError("Sclerp"),FormError("Lerp"))
