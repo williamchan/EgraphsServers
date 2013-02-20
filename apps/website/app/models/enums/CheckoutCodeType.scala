@@ -14,10 +14,8 @@ sealed abstract class CheckoutCodeType(val name: String) { this: OfCheckoutClass
   def itemInstance(itemEntity: LineItemEntity, typeEntity: LineItemTypeEntity): LineItem[_]
 }
 
-
 /** trait for tagging type parameters onto the enum, which didn't seem to want to work directly. */
 trait OfCheckoutClass[TypeT <: LineItemType[_], ItemT <: LineItem[_]] { this: CheckoutCodeType => }
-
 
 /** Helper for CodeTypes whose companions have an apply method that mirrors the use of itemInstance */
 trait CodeTypeFactory[TypeT <: LineItemType[_], ItemT <: LineItem[_]] extends OfCheckoutClass[TypeT, ItemT] {

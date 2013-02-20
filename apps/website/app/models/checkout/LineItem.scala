@@ -64,9 +64,9 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
 
   /** Returns option of this if it has the desired code type, otherwise None. */
   protected[checkout] def asCodeTypeOption[LIT <: LineItemType[_], LI <: LineItem[_]](
-    desiredCodeType: OfCheckoutClass[LIT, LI]
+    desiredCodeType: CheckoutCodeType with OfCheckoutClass[LIT, LI]
   ): Option[LI] = {
-    if (codeType.name != desiredCodeType.name) None
+    if (codeType != desiredCodeType) None
     else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
   }
 

@@ -5,6 +5,7 @@ import org.scalatest.matchers.{MatchResult, Matcher}
 import models.checkout.checkout.Conversions._
 import models.enums.{LineItemNature, CheckoutCodeType}
 import services.Finance.TypeConversions._
+import scala.collection.GenTraversable
 
 object LineItemMatchers {
   /**
@@ -29,7 +30,6 @@ object LineItemMatchers {
     )
   }
 
-
   /** Convenience matchers for comparing amounts of line items */
   def haveAmountOf(right: LineItem[_]) = haveAmount(right.amount)
   def haveNegatedAmountOf(right: LineItem[_]) = haveAmount(right.amount.negated)
@@ -45,10 +45,8 @@ object LineItemMatchers {
     MatchResult (result.isDefined, failMessage, successMessage)
   }
 
-
-
   /** for comparing and finding disparities between sets of items that should be equal */
-  private def unmatchedItems(leftItems: LineItems, rightItems: LineItems): (Seq[Any], Seq[Any]) = {
+  private def unmatchedItems(leftItems: LineItems, rightItems: LineItems): (GenTraversable[Any], GenTraversable[Any]) = {
     type Item = LineItem[_]
     def unpack(items: LineItems) = for (item <- items) yield item.unpacked
     def in(items: LineItems) = (item: Item) => items exists { item.equalsLineItem(_) }

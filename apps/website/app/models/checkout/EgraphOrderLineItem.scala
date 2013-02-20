@@ -84,7 +84,7 @@ case class EgraphOrderLineItem(
   /** saves the order and optionally the print order if chosen */
   private def withSavedOrder(checkout: Checkout): EgraphOrderLineItem = {
     def savedPrintOrder(forOrder: Order) = {
-      val printItem = PrintOrderLineItemType(forOrder).lineItems().flatten.headOption
+      val printItem: Option[models.checkout.PrintOrderLineItem] = PrintOrderLineItemType(forOrder).lineItems().toSeq.flatten.headOption
       printItem map { item => item.transactAsSubItem(checkout) }
     }
 

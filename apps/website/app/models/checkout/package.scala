@@ -28,11 +28,11 @@ package object checkout {
 
     implicit def lineItemSeqToMemberDSL(items: LineItems) = new HasNatureAndCodeTypeToMemberDSL(items) {
 
-      def apply[LIT <: LineItemType[_], LI <: LineItem[_]](codeType: OfCheckoutClass[LIT, LI])
+      def apply[LIT <: LineItemType[_], LI <: LineItem[_]](codeType: CheckoutCodeType with OfCheckoutClass[LIT, LI])
       : Seq[LI] = { ofCodeType(codeType) }
 
-      def ofCodeType[LIT <: LineItemType[_], LI <: LineItem[_]] (codeType: OfCheckoutClass[LIT, LI])
-      : Seq[LI] = { items.flatMap(_.asCodeTypeOption(codeType)) }
+      def ofCodeType[LIT <: LineItemType[_], LI <: LineItem[_]] (codeType: CheckoutCodeType with OfCheckoutClass[LIT, LI])
+      : Seq[LI] = { items.toSeq.seq.flatMap(_.asCodeTypeOption(codeType)) }
 
       def sumAmounts: Money = items.foldLeft(Money.zero(CurrencyUnit.USD))( _ plus _.amount )
     }
