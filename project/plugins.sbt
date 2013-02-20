@@ -12,3 +12,5 @@ addSbtPlugin("play" % "sbt-plugin" % "2.1.0")
 
 // For CloudBees deployment
 addSbtPlugin("com.cloudbees.deploy.play" % "sbt-cloudbees-play-plugin" % "0.5-SNAPSHOT")
+
+addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.2.0")
