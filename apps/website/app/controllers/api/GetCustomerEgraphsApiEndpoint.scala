@@ -34,7 +34,6 @@ case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, 
 
   def toJson: JsObject = {
     import _root_.frontend.formatting.DateFormatting.Conversions._
-    val messageToCelebrity = order.messageToCelebrity.getOrElse("")
     Json.obj(
       "orderId" -> order.id,
       "egraphId" -> egraph.id,
@@ -44,7 +43,7 @@ case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, 
       "video" -> "",
       "icon" -> product.iconUrl,
       "signedAt" -> egraph.getSignedAt.formatDayAsPlainLanguage,
-      "messageToCelebrity" -> messageToCelebrity,
+      "messageToCelebrity" -> order.messageToCelebrity.getOrElse[String](""),
       "celebrityName" -> celebrity.publicName,
       "celebritySubtitle" -> celebrity.roleDescription,
       "celebrityMasthead" -> celebrity.landingPageImage.resizedWidth(desiredWidth).getSaved(AccessPolicy.Public, Some(0.8f)).url,

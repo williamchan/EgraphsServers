@@ -65,20 +65,16 @@ case class EgraphPurchaseHandler(
   import EgraphPurchaseHandler._
 
   private def purchaseData: JsValue = {
-    val stripeTokenIdOrEmpty = stripeTokenId.getOrElse("")
-    val desiredTextOrEmpty = desiredText.getOrElse("")
-    val personalNoteOrEmpty = personalNote.getOrElse("")
-    val productPrice = totalAmountPaid.getAmount
     Json.obj(
       "recipientName" -> recipientName,
       "recipientEmail" -> recipientEmail,
       "buyerName" -> buyerName,
       "buyerEmail" -> buyerEmail,
-      "stripeTokenId" -> stripeTokenIdOrEmpty,
-      "desiredText" -> desiredTextOrEmpty,
-      "personalNote" -> personalNoteOrEmpty,
+      "stripeTokenId" -> stripeTokenId.getOrElse[String](""),
+      "desiredText" -> desiredText.getOrElse[String](""),
+      "personalNote" -> personalNote.getOrElse[String](""),
       "productId" -> product.id,
-      "productPrice" -> JsNumber(productPrice)
+      "productPrice" -> JsNumber(totalAmountPaid.getAmount)
     )
   }
   
