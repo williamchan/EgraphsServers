@@ -17,6 +17,8 @@ object ResultUtils {
    *
    * Usage:
    * {{{
+   *   import play.api.mvc._
+   * 
    *   def insertSomethingIntoTheSessionOnTheWayOut[A](action: Action[A]): Action[A] {
    *     import egraphs.playutils.ResultUtils.RichResult
 
