@@ -17,7 +17,6 @@ case class Address(
   city: String = "",
   _state: String = "",
   postalCode: String = "",
-  name: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   @transient _services: AddressServices = AppConfig.instance[AddressServices]
@@ -42,7 +41,7 @@ case class Address(
   def streetAddressString = {
     val address = (List(addressLine1) ++  addressLine2.toList) mkString (" ")
     val stateAndZip = "%s, %s %s".format(city, _state, postalCode)
-    val streetAddressAsList = name.toList ++ List(address, city, stateAndZip)
+    val streetAddressAsList = List(address, city, stateAndZip)
     streetAddressAsList.mkString("\n")
   }
 
