@@ -25,7 +25,7 @@
     <br>
     <img src='@EgraphsAssets.at("images/modal-request-star.jpg")'/>
 
-    <form ng-controller="ModalController" ng-submit="subscribe()">
+    <form ng-controller="ModalController" ng-submit="requestStar()">
       <div>
         <label>
           Requested Star:
@@ -33,7 +33,7 @@
             <strong>These requests</strong> show your star<br>how much their fans want<br>to connect with them!
           }
         </label>
-        <input class="input-xlarge" type="text" name="star-name" ng-model="star-name" value="@query"/>
+        <input class="input-xlarge" type="text" name="starName" ng-model="starName" ng-init="starName='@query'" value="@query" />
         <label>
           Your Email:
           @fieldTooltip("What for?") {
@@ -43,7 +43,7 @@
         <input class="input-xlarge" type="email" name="email" ng-model="email"/>
       </div>
       <div>
-        <button id="signup-button" type="submit" class="button">
+        <button id="request-submit-button" type="submit" class="button">
           <strong><em>Submit</em></strong>
           <span>&raquo;</span>
         </button>

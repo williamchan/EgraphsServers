@@ -6,6 +6,7 @@ define(
  "module",
  "libs/tooltip",
  "services/ng/mail-services",
+ "services/ng/request-star-services",
  "services/responsive-modal"],
 function(page, window, logging, requireModule, tooltip) {
   var menuStatus = "closed";
@@ -35,6 +36,18 @@ function(page, window, logging, requireModule, tooltip) {
         $scope.subscribe = function() {
           $subscribe($scope.email);
           $('#emailSignupForm').modal('toggle');
+        };
+      }],
+
+      /**
+       * Controller for requesting a star via a modal template.
+       */
+      ModalController: ['$scope', '$requestStar', function($scope, $requestStar) {
+        $scope.starName = "";
+        $scope.email = "";
+        $scope.requestStar = function() {
+          $requestStar($scope.starName, $scope.email);
+          $('#requestStarForm').modal('toggle');
         };
       }]
     },
@@ -84,6 +97,15 @@ function(page, window, logging, requireModule, tooltip) {
           tooltip.apply();
           e.preventDefault();
         });
+
+        $("#request-submit-button").click(function(e) {
+          document.getElementById("request-star-message").innerHTML = 'Request received. Thank you!';
+          window.setTimeout(removeMessage, 1500);
+        });
+
+        function removeMessage() {
+          document.getElementById("request-star-message").innerHTML = '';
+        }
 
         var mobileNavOut = false;
         // use the .flyout-pull-right class to specify any items outside of the

@@ -1,6 +1,5 @@
 package controllers.website.consumer
 
-import play.api.libs.json.Json.toJson
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.data._

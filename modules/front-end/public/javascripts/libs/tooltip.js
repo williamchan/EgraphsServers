@@ -75,7 +75,6 @@ define([], function() {
         };
      
         target.bind( 'mouseleave', remove_tooltip );
-        target.bind( 'click', remove_tooltip );
         tooltip.bind( 'click', remove_tooltip );
       });
     }
