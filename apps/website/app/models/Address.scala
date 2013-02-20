@@ -17,7 +17,6 @@ case class Address(
   city: String = "",
   _state: String = "",
   postalCode: String = "",
-  name: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   @transient _services: AddressServices = AppConfig.instance[AddressServices]
