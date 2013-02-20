@@ -53,20 +53,3 @@ case class FulfilledOrderBundle(egraph: Egraph, order: Order, product: Product, 
       "recipientId" -> order.recipientId)
   }
 }
-
-//object FulfilledOrderBundle {
-//  implicit object FulfilledOrderBundleFormat extends Format[FulfilledOrderBundle] {
-//    def writes(bundle: FulfilledOrderBundle): JsValue = {
-//
-//    }
-//
-//    def reads(json: JsValue): JsResult[FulfilledOrderBundle] = {
-//      JsSuccess {
-//        val egraph(
-//          (json \ "egraphId").as[Long],
-//          (json \ "audio").as[String]
-//        )
-//      }
-//    }
-//  }
-//}
