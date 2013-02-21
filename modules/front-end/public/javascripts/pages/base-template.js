@@ -93,9 +93,9 @@ function(page, window, logging, requireModule, tooltip) {
         });
 
         $("#request-star-button").click(function(e) {
-          requestStarModal.modal({});
-          tooltip.apply();
-          e.preventDefault();
+          //requestStarModal.modal({});
+          //tooltip.apply();
+          //e.preventDefault();
         });
 
         $("#request-submit-button").click(function(e) {

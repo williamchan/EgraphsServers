@@ -17,6 +17,8 @@ import celebrity.CatalogStarsQuery
 import CelebritySortingTypes._
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
+import controllers.website.consumer.PostRequestStarEndpoint
+import egraphs.playutils.FlashableForm._
 
 /**
  * Controller for serving the celebrity marketplace
@@ -161,7 +163,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           verticalViewModels = verticalViewModels,
           results = ResultSetViewModel(subtitle = Option(subtitle), verticalUrl = Option("/"), celebrities = celebrities),
           sortOptions = sortOptionViewModels(maybeSortType),
-          availableOnly = availableOnly
+          availableOnly = availableOnly,
+          requestStarForm = PostRequestStarEndpoint.form.bindWithFlashData,
+          requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url
         ))
       } else {
         // No search options so serve the landing page. If a vertical has a category value which feature stars, it is

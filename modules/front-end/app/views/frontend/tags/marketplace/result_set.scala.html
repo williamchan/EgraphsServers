@@ -1,5 +1,17 @@
 @(availableOnly: Boolean = false,
-  results: models.frontend.marketplace.ResultSetViewModel)
+  results: models.frontend.marketplace.ResultSetViewModel,
+  requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
+  requestStarActionUrl: String
+  )(
+  implicit
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@import views.html.frontend.tags.storefront_breadcrumbs_responsive
+@import views.html.frontend.tags
+@import models.frontend.forms.{Field, FormError}
+@import views.frontend.Utils.bootstrapFields
+@import egraphs.authtoken.AuthenticityToken.safeForm
 
 <div class="verticals">
   <section class="clearfix" ng-cloak ng-controller="MarketplaceCtrl">
@@ -18,15 +30,44 @@
             </ol>
         </div>
       </div>
+
       @if(results.celebrities.size == 0) {
-        <button id="request-star-button" type="button" class="button">
-          <strong><em>Request a Star</em></strong>
-          <span>&raquo;</span>
-        </button>
-        <div id="request-star-message">
-          <p></p>
+        <div id="request-star-option">
+          <button id="request-star-button" type="button" class="button">
+            <strong><em>Request a Star</em></strong>
+            <span>&raquo;</span>
+          </button>
         </div>
+
+        <section class="span4">
+
+          @safeForm(
+            'id -> "request-star-form",
+            'action -> requestStarActionUrl,
+            'method -> "post",
+            'class -> "login-option"
+          ) {
+
+            <div class="clearfix">
+              <div id="request-star-fields" >
+                <fieldset>
+                  <span id="star-name-field">
+                    @helper.inputText(requestStarForm("starName"), '_label -> "Requested Star:", '_showConstraints -> false, '_tooltipOn -> true, '_tooltipText -> "Test tooltip")
+                  </span>
+                  <span id="email-field">
+                    @helper.inputText(requestStarForm("email"), '_label -> "Email Address:", '_showConstraints -> false)
+                  </span>
+                </fieldset>
+                @tags.arrow_button(caption="Submit", classes="button create-account")
+              </div>
+            </div>
+
+          } <!-- end safe form -->
+
+        </section>
+
       }
+
       <div class="clearfix">
         <article ng-repeat="celebrity in celebrities" when-scrolled="loadCelebrities()" class="celebrity-result">
           <figure>
