@@ -19,8 +19,8 @@
 @maxNoteToStarChars = {150}
 @maxWrittenMessageChars = {60}
 
-@fieldTooltip(link: String)(body: => Html) = {
-  @tooltip(link, Seq("field-tooltip"))(body)
+@fieldTooltip(link: String, event: String="")(body: => Html) = {
+  @tooltip(link, Seq("field-tooltip"), event)(body)
 }
 
 @headerIcon(content:String, filename: String) = {
@@ -138,7 +138,7 @@
                 <div class="control-group note-to-star">
                   <label class="control-label" for="@field.id">
                     What do you want to say to @star.pronoun.obj?
-                    @fieldTooltip(s"What will ${star.pronoun.subject} do with my message?") {
+                    @fieldTooltip(s"What will ${star.pronoun.subject} do with my message?", event="What will star do with message?") {
                       <strong>This is your chance to be heard.</strong> @star.name will read this note and respond to you in a voice message, recorded from @star.pronoun.possessiveAdjective personal iPad.
                     }
                   </label>
@@ -157,7 +157,7 @@
                     </div>
                     @*<img src='@profileImageUrl' class="star-profile-image">*@
                     <div>
-                      @fieldTooltip("Not sure what to say? Here are some tips.") {
+                      @fieldTooltip("Not sure what to say? Here are some tips.", event="Not sure what to say?") {
                         <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.pronoun.obj in person. Ask a question you've always wanted to know the answer to, or request that @star.pronoun.subject say something specific.
                       }
                       <div class="explanatory-text char-remaining">{{@maxNoteToStarChars - @{field.ngModel}.length}} left</div>
@@ -169,7 +169,7 @@
                 <div class="control-group note-to-star">
                   <label class="control-label" for="@field.id">
                     What do you want @star.pronoun.obj to write in reply?
-                    @fieldTooltip("What is this?") {
+                    @fieldTooltip("What is this?", event="What is the written message?") {
                       <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.pronoun.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.pronoun.subject will hand-write whatever @star.pronoun.subject wants. Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
                     }
                   </label>
@@ -194,10 +194,10 @@
                 <div class="control-group">
                   <label class="control-label" for="@field.id">
                     Who is this egraph for?
-                    @fieldTooltip("How does gifting work?") {
+                    @fieldTooltip("How does gifting work?", event="How does gifting work?") {
                       <strong>Egraphs make a great gift for a friend or family member.</strong> Just select the <em>This is a gift</em> and enter the recipient's name (this is who @star.name will address their message to).
                     }
-                    @fieldTooltip("How will they receive it?") {
+                    @fieldTooltip("How will they receive the gift?", event="How will they receive the gift?") {
                       On the next screen you can enter an email address for the recipient. When @star.name creates the egraph, an email will be sent to both yourself and the recipient with information on how to view and hear the graph.
                     }                    
                   </label>
@@ -219,7 +219,7 @@
                       </button>
                     </div>
                     <div class="explanatory-text" ng-show="@field.ngModel == 'true'">
-                      What a great choice! An egraph makes a stellar gift.
+                      Nice choice! An egraph makes a stellar gift.
                     </div>
                   </div>
                 </div> <!-- End .control-group.recipientOption -->
@@ -229,7 +229,7 @@
                 <div class="control-group">
                   <label class="control-label" for="@field.id">
                     {{recipientPossessive()}} name<span class="required-marker">*</span>:
-                    @fieldTooltip("How is this used?") {
+                    @fieldTooltip("How is this used?", event="How is name used?") {
                       This is the name @star.name will address the egraph to in both @star.pronoun.possessiveAdjective written and audio message.
                     }
                   </label>
@@ -252,7 +252,7 @@
               <div class="control-group photo-choice">
                 <label class="control-label" for="photoChoice">
                   What photo should @star.name sign?
-                  @fieldTooltip("An egraph is both an audio and written message") {
+                  @fieldTooltip("An egraph is both an audio and written message", event="Explain photo") {
                     Using an iPad, @star.name will write a short message and signature on the photo you select. This written message and photo will be displayed with the audio message when you receive the egraph.
                   }
                 </label>
@@ -298,7 +298,7 @@
                 <div class="control-group">
                   <label class="control-label" for="@field.name">
                     In what format would you like the egraph delivered?
-                    @fieldTooltip("Can I add the framed print later?") {
+                    @fieldTooltip("Can I add the framed print later?", event="Can I add the framed print later?") {
                       <strong>Yes! You can order a framed print of your egraph any time you like</strong> For fastest processing though it is best to include it here. Just email support@@egraphs.com to place a framed print order later on.
                     }
                   </label>
@@ -327,7 +327,7 @@
                     </div>
                     <div class="explanatory-text">
                       <strong>Online Egraph -</strong> Your egraph is an online experience. When @star.name creates the egraph, {{recipientNominative()}} will get an email with a link to view, hear, and share it online. <br /><strong>Framed print -</strong> This option includes an 8x12 frame, mat, and certificate of authenticity. It features the selected photo and written message of your egraph. Shipping fees are included in the price. 
-                      @fieldTooltip("See an example framed print") {
+                      @fieldTooltip("See an example framed print", event="See an example framed print") {
                         <img src="@EgraphsAssets.at("images/physical-preview.jpg")">
                       }
                     </div>
@@ -343,7 +343,7 @@
             <h2 class="clearfix callout">
               <img src='@EgraphsAssets.at("images/glyphish-stopwatch.png")'>
               When will {{recipientNominative()}} get the egraph? @star.name will create it as soon as @star.pronoun.subject can -- on average it takes 2 weeks. It's depends on @star.pronoun.possessiveAdjective schedule, so it may be much faster, or it may be slower!
-              @fieldTooltip("Need it delivered on a specific date?") {
+              @fieldTooltip("Need it delivered on a specific date?", event="Need it delivered on a specific date?") {
                 If this is for a special occasion (like a birthday) and you'd like it sent to {{recipientNominative()}} on a specific date, email support@@egraphs.com after placing your order to let us know.
               }
             </h2>

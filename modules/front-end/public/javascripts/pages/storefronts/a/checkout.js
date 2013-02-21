@@ -27,7 +27,8 @@ function(page, tooltip, window, logging, requireModule) {
           years: page.years,
           codeRedeemerVisible: false,
           states: states,
-          cartApi: cartApi
+          cartApi: cartApi,
+          analyticsCategory: "Checkout"
         });
 
         /** Toggles visibility of the discount redeeming widget */
@@ -169,7 +170,7 @@ function(page, tooltip, window, logging, requireModule) {
         $scope.refreshCart();
 
         // Make the tooltips sing the song of their people
-        tooltip.apply();
+        tooltip.apply({analyticsCategory: "Checkout"});
       }]
     }
   };
