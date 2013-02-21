@@ -1,5 +1,7 @@
 package controllers.api
 
+import scala.language.postfixOps
+import play.api.libs.json._
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.Time.IntsToSeconds.intsToSecondDurations
@@ -8,7 +10,6 @@ import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 import services.http.filters.RequireAuthenticatedAccount
 import services.http.filters.RequireCelebrityId
-import sjson.json.Serializer
 import services.config.ConfigFileProxy
 
 private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller =>
@@ -26,9 +27,13 @@ private[controllers] trait GetCelebrityMobileAppInfoEndpoint { this: Controller 
           val iPadBuildVersion = config.ipadBuildVersion
           val s3Key = "ipad/Egraphs_" + iPadBuildVersion + ".ipa"
           val ipaUrl = blobs.getStaticResourceUrl(s3Key, 10 minutes)
-          val iPadAppInfo = Map("version" -> iPadBuildVersion, "ipaURL" -> ipaUrl)
-          val mobileAppInfo = Map("ipad" -> iPadAppInfo)
-          Ok(Serializer.SJSON.toJSON(mobileAppInfo))
+          val mobileAppInfo = Json.obj(
+            "ipad" -> Json.obj(
+              "version" -> iPadBuildVersion,
+              "ipaURL" -> ipaUrl
+            )
+          )
+          Ok(mobileAppInfo)
         }
       }
     }

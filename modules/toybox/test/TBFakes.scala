@@ -5,7 +5,6 @@ import play.api.mvc._
 import play.api.mvc.Results._
 import play.api.test._
 
-
 import controllers._
 import controllers.ToyBoxConfigKeys._
 
@@ -49,7 +48,6 @@ object TBFakes {
     def initRequestCookie(req: RequestHeader) = makeInitialRequestCookie(req)
   }
 
-
   // Fake requests
   val requestedPath    = "/foobar"
   val blankGetRequest  = FakeRequest("GET", requestedPath)
@@ -70,15 +68,13 @@ object TBFakes {
 
   val iPadRequest = FakeRequest("GET", "/").withHeaders(iPadHeader -> iPadSecret)
 
-
   // Fake cookies
   def authCookie = FakeToyBox.authCookie(blankPostRequest)
   def initCookie = FakeToyBox.initRequestCookie(blankGetRequest)
   def initCookiePath = initCookie.value.dropWhile(_ != '/') // path of initial request, not cookie.path
 
-
   // Helpers for adding fake cookies to requests
-  def authenticated(req: FakeRequest[AnyContent]) = req.withCookies(authCookie)
+  def authenticated[T <: AnyContent](req: FakeRequest[T]) = req.withCookies(authCookie)
   def withInit[T <: AnyContent](req: FakeRequest[T]): FakeRequest[T] = 
     req.withCookies(initCookie)
 
@@ -87,12 +83,12 @@ object TBFakes {
    */
   def routeRequestToSimpleResult[T <: AnyContent](req: FakeRequest[T]): PlainResult = {
     FakeToyBox.onRouteRequest(req) match {
-      case Some(action: Action[T]) => 
-        action(req) match {
+      case Some(action: Action[_]) => 
+        action.asInstanceOf[Action[T]](req) match {
           case plain: PlainResult => plain
           case _ => throw new ClassCastException("Unexpected result type for route request.")
         }
-      case None => throw new Exception("No result for route request.")
+      case other => throw new Exception(s"No result for route request = ${other}")
     }
   }
 
@@ -113,7 +109,7 @@ object TBFakes {
           val headerValue = plainRes.header.headers(play.api.http.HeaderNames.SET_COOKIE)
           headerValue.contains(cookieName)
         } catch { 
-          case _ => return false 
+          case _: Throwable => return false 
         }
       case _ => false
     }

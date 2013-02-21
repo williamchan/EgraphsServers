@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import com.typesafe.sbteclipse.core.EclipsePlugin.EclipseKeys
 import cloudbees.Plugin._
 
@@ -15,42 +15,38 @@ object WebsiteBuild extends Build {
     val appVersion      = "2.0-SNAPSHOT"
 
     val appDependencies = Seq(
-   // Application dependencies. Keep these in alphabetical order.
+      // Playframework components
+      jdbc,
+      anorm,
+
+      // Application dependencies. Keep these in alphabetical order.
       "batik" % "batik-rasterizer" % "1.6",
       "batik" % "batik-svggen" % "1.6",
       "com.googlecode.mp4parser" % "isoparser" % "1.0-RC-15", 
       "com.google.zxing" % "core" % "2.0",
       "com.google.zxing" % "javase" % "2.0",
       "com.stripe" % "stripe-java" % "1.0.1",
-      "com.typesafe" %% "play-plugins-mailer" % "2.0.4" excludeAll(
+      "com.typesafe.akka" % "akka-actor_2.10" % "2.1.0",
+      "com.typesafe.akka" % "akka-agent_2.10" % "2.1.0",
+      "com.typesafe" %% "play-plugins-mailer" % "2.1.0" excludeAll(
         ExclusionRule(organization="com.cedarsoft")
       ),
-//      "junit-addons" % "junit-addons" % "1.4",
-      "net.debasishg" %% "sjson" % "0.15" exclude("org.scala-lang", "scala-library"),  //from 0.12
-  //        exclude:
-  //            # Exclude scala because its included with play-scala
-  //            org.scala-lang % scala-library 2.8.1
+      "commons-codec" % "commons-codec" % "1.7",
+      "net.codingwell" %% "scala-guice" % "3.0.2",
       "org.antlr" % "stringtemplate" % "4.0.2",
       "org.apache.commons" % "commons-email" % "1.2",
       "org.apache.commons" % "commons-lang3" % "3.1",
       "org.apache.pdfbox" % "pdfbox" % "1.7.1",
-//      "org.jclouds.api" % "filesystem" % "1.5.1" excludeAll(
-//          ExclusionRule(organization = "org.clojure")
-//      ),
-  //        exclude:
-  //            org.clojure % *      
       "org.jclouds" % "jclouds-blobstore" % "1.4.2",
       "org.jclouds.api" % "filesystem" % "1.4.2",
       "org.jclouds.provider" % "aws-s3" % "1.4.2",
-  //        exclude:
-  //            org.clojure % *
       "org.joda" % "joda-money" % "0.6",
-      "org.specs2" %% "specs2" % "1.5" excludeAll(
+      "org.specs2" %% "specs2" % "1.13" excludeAll(
           ExclusionRule(organization = "org.mockito"),
           ExclusionRule(organization = "org.scala-lang")
       ),
       "org.twitter4j" % "twitter4j-core" % "3.0.3",
-      "org.squeryl" %% "squeryl" % "0.9.5-2" excludeAll(
+      "org.squeryl" %% "squeryl" % "0.9.5-6" excludeAll(
           // Exclude DB-specific libs
           ExclusionRule(organization = "net.sourceforge.jtds"),
           ExclusionRule(organization = "postgresql"),
@@ -61,35 +57,36 @@ object WebsiteBuild extends Build {
           ExclusionRule(organization = "junit"),
           ExclusionRule(organization = "org.scalatest")
       ),
-      "com.typesafe.akka" % "akka-agent" % "2.0.2",
       "org.scalaz" %% "scalaz-core" % "6.0.4",
       "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
       "redis.clients" % "jedis" % "2.0.0",
-      //"com.googlecode.soundlibs" % "tritonus-share" % "0.3.7-1", // from our unmanaged dependency 0.3.6
-      // "uk.me.lings" %% "scala-guice" % "3.0.1-SNAPSHOT",
       "xml-apis" % "xml-apis-ext" % "1.3.04",
       "xml-apis" % "xml-apis" % "1.3.04", // we might be getting pretty stale here
       "xuggle" % "xuggle-xuggler" % "5.4",
 
       // Test dependencies
       "com.typesafe.akka" % "akka-testkit" % "2.0.2" % "test",
-      "org.scalatest" %% "scalatest" % "1.8" % "test",
-      "org.scalamock" %% "scalamock-scalatest-support" % "2.4" % "test"
+      "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
+      "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test"
     )
     
     val websiteBaseDir = file(".") / "apps" / "website"
 
     val sep = java.io.File.separator
     val timestamp = new java.util.Date().getTime
-    val main = PlayProject(
+    val main = play.Project(
       appName,
       appVersion,
       appDependencies,
-      path = websiteBaseDir,
-      mainLang = SCALA
+      path = websiteBaseDir
     ).settings(cloudBeesSettings: _*)
     .settings(
+      scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature", "-language:postfixOps,implicitConversions,reflectiveCalls"),
       organization := "egraphs",
+
+      parallelExecution in Test := false,
+
+      Keys.fork in Test := false,
 
       testOptions in Test := Nil,
 
@@ -102,8 +99,7 @@ object WebsiteBuild extends Build {
       EclipseKeys.classpathTransformerFactories += BuildHelpers.playEclipseClasspathAdditions,
 
       resolvers ++= Seq(
-        "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java",
-        "scala-guice" at "https://jenkins-codingwell.rhcloud.com/job/Scala-Guice/lastSuccessfulBuild/artifact/repo"
+        "xugglecode" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java"
       ),
 
       CloudBees.jvmProps := "-Dlogger.resource=prod-logger.xml -Dpidfile.path=/dev/null -DdeploymentTime=" + timestamp + " -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$app_dir -XX:ErrorFile=$app_dir/java_error%p.log",

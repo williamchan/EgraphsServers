@@ -6,7 +6,7 @@ import play.api.Play
 import services.inject.ClosureProviders
 import services.http.filters.RequireAuthenticityTokenFilter
 import services.http.filters.RequireAuthenticityTokenFilterProvider
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 
 /**
  * Installs Guice application bindings that relate to our http services

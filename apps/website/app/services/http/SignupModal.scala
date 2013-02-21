@@ -11,7 +11,7 @@ import play.api.mvc.BodyParsers.parse
 import play.api.templates.Html
 import services.http.EgraphsSession.Conversions._
 import services.http.EgraphsSession.Key._
-import egraphs.playutils.RichResult.resultToRichResult
+import egraphs.playutils.ResultUtils.RichResult
 
 class SignupModal @Inject() {
 

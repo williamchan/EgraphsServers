@@ -47,7 +47,7 @@ trait QueriesAsModel[KeyT, ModelT <: KeyedEntity[KeyT]] {
   def get(id: KeyT)(implicit m: Manifest[ModelT]): ModelT = {
     findById(id).getOrElse(
       throw new RuntimeException(
-        "DB contained no instances of class " + m.erasure.getName + " with id="+id
+        "DB contained no instances of class " + m.runtimeClass.getName + " with id="+id
       )
     )
   }

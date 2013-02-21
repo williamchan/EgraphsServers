@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import checkout.Conversions._
 import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
 import java.sql.{Connection, Timestamp}
+import play.api.libs.json._
 import models._
 import models.enums._
 import play.api.libs.json.{JsValue, JsArray, JsNull}
@@ -12,7 +13,6 @@ import services.AppConfig
 import services.db._
 import services.payment.Charge
 import services.config.ConfigFileProxy
-
 
 //
 // Services
@@ -45,8 +45,6 @@ case class CheckoutServices @Inject() (
       .flatMap(entity => findById(entity.id)).toSeq
   }
 }
-
-
 
 //
 // Base Model
@@ -163,7 +161,6 @@ abstract class Checkout
     }
   }
 
-
   /**
    * Resolves the given LineItemTypes into LineItems. Optionally takes some line items as a context
    * for resolving the given types. For example:
@@ -223,7 +220,7 @@ abstract class Checkout
           val resolvedNow = itemsFromCurrent.getOrElse(Nil) ++ prevResolved
           val attemptedNow =
             if (itemsFromCurrent isDefined) prevAttempted
-            else current +: prevAttempted
+            else current +: prevAttempted.toSeq
 
           unattempted match {
             case next :: rest => iterate(prevResolved = resolvedNow)(
@@ -248,7 +245,7 @@ abstract class Checkout
         case _ => false
       }
 
-      protected def argLengths = (resolvedItems.length, unresolvedTypes.length)
+      protected def argLengths = (resolvedItems.size, unresolvedTypes.size)
     }
 
     /**
@@ -319,7 +316,7 @@ abstract class Checkout
   // utility members
   //
   def fees: LineItems = lineItems(LineItemNature.Fee)
-  def taxes: Seq[TaxLineItem] = lineItems(CheckoutCodeType.Tax)
+  def taxes: Seq[TaxLineItem] = lineItems(CheckoutCodeType.Tax).seq.toSeq
   def coupons: Seq[CouponLineItem] = lineItems(CheckoutCodeType.Coupon)
   def payments: LineItems = lineItems(LineItemNature.Payment)
 
@@ -333,9 +330,7 @@ abstract class Checkout
   def total: TotalLineItem = lineItems(CheckoutCodeType.Total).head
 
   protected def summaryTypes: LineItemTypes = Seq(SubtotalLineItemType, TotalLineItemType, BalanceLineItemType)
-
 }
-
 
 //
 // Companion Object
@@ -356,13 +351,11 @@ object Checkout {
   def restore(id: Long)(implicit services: CheckoutServices = AppConfig.instance[CheckoutServices])
   : Option[PersistedCheckout] = { services.findById(id) }
 
-
   //
   // Checkout failure cases
   //
   sealed abstract class CheckoutFailed(val failedCheckoutData: FailedCheckoutData)
   protected[checkout] trait FailedCheckoutWithCharge { def charge: Option[Charge] }
-
 
   case class CheckoutFailedCustomerMissing(
     checkout: Checkout,
@@ -418,5 +411,3 @@ case class FailedCheckoutData(
   cashTransactionLineItem: Option[CashTransactionLineItem] = None,
   charge: Option[Charge] = None
 )
-
-

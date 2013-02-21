@@ -31,7 +31,7 @@ case class EgraphActor @Inject() (
   config: ConfigFileProxy
 ) extends Actor with Logging
 {
-  protected def receive = {
+  def receive = {
     case ProcessEgraphMessage(egraphId, requestHeader) => {
       processEgraph(egraphId, requestHeader)
       sender ! "Success"

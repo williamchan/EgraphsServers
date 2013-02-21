@@ -10,7 +10,7 @@ import com.google.inject.{Module, Guice}
  *     the default application bindings
  */
 class TestAppConfig(moduleOverride: Module) {
-  import uk.me.lings.scalaguice.InjectorExtensions._
+  import net.codingwell.scalaguice.InjectorExtensions._
 
   /**
    * Get an instance of an injectable class from the injector. See [[services.AppConfig.instance]]

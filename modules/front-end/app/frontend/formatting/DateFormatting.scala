@@ -1,5 +1,6 @@
 package frontend.formatting
 
+import scala.language.implicitConversions
 import java.util
 import java.text.SimpleDateFormat
 

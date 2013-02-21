@@ -88,6 +88,8 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
 
       case RecipientChoice.Other =>
         isEmail.right.map(email => Some(email))
+
+      case other => throw new IllegalStateException("models.enums.RecipientChoice cannot have value = " + other)
     }
   }
 
@@ -136,6 +138,8 @@ class PurchaseFormChecks(toValidate: Iterable[String], check: FormChecks) {
         ) yield {
           Some(writtenMessage)
         }
+
+      case other => throw new IllegalStateException("models.enums.WrittenMessageRequest cannot have value = " + other)
     }
   }
 

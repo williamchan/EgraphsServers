@@ -27,7 +27,7 @@ class Schema @Inject() (
   config: ConfigFileProxy,
   @CurrentTransaction currentTxnConnectionFactory: () => Connection) extends org.squeryl.Schema with Logging {
 
-  import uk.me.lings.scalaguice.InjectorExtensions._
+  import net.codingwell.scalaguice.InjectorExtensions._
 
   // Putting this here because Celebrity.findByTextQuery needs it, but this feels wrong.
   def getTxnConnectionFactory = {
@@ -530,7 +530,7 @@ class Schema @Inject() (
         log("No egraphs schema was detected")
         false
 
-      case otherErrors =>
+      case otherErrors: Throwable =>
         throw otherErrors
     } finally {
       conn.rollback(savepoint)

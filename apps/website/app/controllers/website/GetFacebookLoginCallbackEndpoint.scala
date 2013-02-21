@@ -3,6 +3,10 @@ package controllers.website
 import controllers.WebsiteControllers
 import models.{Account, Customer, CustomerStore, AccountStore}
 import play.api._
+import play.api.data._
+import play.api.data.Forms._
+import play.api.libs.json.Json
+import play.api.libs.json.JsValue
 import play.api.mvc._
 import play.api.mvc.Results.Redirect
 import services.db.{TransactionSerializable, DBSession}
@@ -57,20 +61,31 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           val accessToken = Facebook.getFbAccessToken(code = fbCode, facebookAppId = facebookAppId, 
               fbAppSecret = config.fbAppsecret, fbCallbackUrl = fbCallbackUrl)
           val fbUserInfo = Facebook.getFbUserInfo(accessToken = accessToken)
-          val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
-            loginViaFacebook(registrationName = fbUserInfo(Facebook._name).toString, 
-                registrationEmail = fbUserInfo(Facebook._email).toString, user_id = fbUserInfo(Facebook._id).toString)
-          }
-          if (shouldSendWelcomeEmail) {
-            dbSession.connected(TransactionSerializable) {
-              val account = customer.account.withResetPasswordKey.save()
-              AccountCreationEmail(account = account, verificationNeeded = false).send()
+
+          val maybeRedirectSuccess = for {
+            registrationName <- (fbUserInfo \ Facebook._name).asOpt[String]
+            registrationEmail <- (fbUserInfo \ Facebook._email).asOpt[String]
+            userId <- (fbUserInfo \ Facebook._id).asOpt[String]
+          } yield {
+            val (customer, shouldSendWelcomeEmail) = dbSession.connected(TransactionSerializable) {
+              loginViaFacebook(
+                registrationName = registrationName,
+                registrationEmail = registrationEmail,
+                user_id = userId)
             }
+            if (shouldSendWelcomeEmail) {
+              dbSession.connected(TransactionSerializable) {
+                val account = customer.account.withResetPasswordKey.save()
+                AccountCreationEmail(account = account, verificationNeeded = false).send()
+              }
+            }
+
+            Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
+              session.withCustomerId(customer.id)
+            )
           }
 
-          Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
-            session.withCustomerId(customer.id)
-          )
+          maybeRedirectSuccess.getOrElse(redirectAndLogError(fbUserInfo))
         }
         case _ => {
           log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
@@ -79,7 +94,13 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           Redirect(controllers.routes.WebsiteControllers.getLogin)
         }
       }
+      Ok
     }
+  }
+
+  private def redirectAndLogError(fbUserInfo: JsValue): Result = {
+    error("Facebook did not respond with expected user info format: " + Json.stringify(fbUserInfo))
+    Redirect(controllers.routes.WebsiteControllers.getLogin)
   }
 
   /**

@@ -61,9 +61,9 @@ case class NgField(form: String, name: String) {
 
   /** A standard set of errors as-per our API spec. */
   def standardErrors: Html = {
-    ifError("required", "remote_required") {Html("required")} +
-    ifError("email") {Html("invalid e-mail")} +
-    ifError("remote_invalid_length") {Html("invalid length")} +
+    ifError("required", "remote_required") {Html("required")} +=
+    ifError("email") {Html("invalid e-mail")} +=
+    ifError("remote_invalid_length") {Html("invalid length")} +=
     ifError("remote_invalid_format", "remote_unexpected_type") {Html("invalid format")}
   }
 

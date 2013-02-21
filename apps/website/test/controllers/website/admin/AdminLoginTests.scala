@@ -2,7 +2,6 @@ package controllers.website.admin
 
 import utils.TestData
 import models.Celebrity
-
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.mvc.Result
@@ -12,10 +11,8 @@ import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
 import services.AppConfig
 import services.db.DBSession
 import utils.EgraphsUnitTest
-import utils.FunctionalTestUtils.requestWithCustomerId
+import utils.FunctionalTestUtils._
 import services.http.EgraphsSession
-import utils.FunctionalTestUtils
-import FunctionalTestUtils.Conversions._
 import controllers.routes.WebsiteControllers
 
 class AdminLoginTests extends EgraphsUnitTest {
@@ -26,10 +23,10 @@ class AdminLoginTests extends EgraphsUnitTest {
     val (admin, celebrity) = db.connected(TransactionSerializable) {
       (TestData.newSavedAdministrator(), TestData.newSavedCelebrity())
     }
-    
-    val req = FakeRequest().withAdmin(admin.id)
+
     val url = WebsiteControllers.getCelebritiesAdmin().url
-    status(routeAndCall(req.copy(method=GET, uri=url)).get) should be(OK)
+    val req = FakeRequest(GET, url).withAdmin(admin.id)
+    status(route(req).get) should be(OK)
 
 //    assertStatus(302, GET(WebsiteControllers.reverse(WebsiteControllers.getCelebritiesAdmin()).url))
 //    assertStatus(302, GET(Utils.lookupUrl("WebsiteControllers.getCelebrityEgraphsAdmin", celebrityIdMap).url))

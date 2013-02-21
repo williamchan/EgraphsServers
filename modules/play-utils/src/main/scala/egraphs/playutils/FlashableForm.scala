@@ -1,5 +1,6 @@
 package egraphs.playutils
 
+import scala.language.implicitConversions
 import play.api.data.Form
 import play.api.mvc.Request
 import play.api.libs.json.Json
@@ -41,7 +42,7 @@ case class FlashableForm[A](form: Form[A]) {
   }
 }
 
-case class SimpleResultWithFlashedForm(result: SimpleResult[_]) {
+case class SimpleResultWithFlashedForm[R](result: SimpleResult[R]) {
   import FlashableForm.CONTAINS_FLASHED_FORM
 
   /**

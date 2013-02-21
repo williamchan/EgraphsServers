@@ -2,9 +2,9 @@ package controllers.website
 
 import play.api.test._
 import play.api.test.Helpers._
-import egraphs.playutils.RichResult._
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+import egraphs.playutils.ResultUtils.RichResult
+
+import utils.FunctionalTestUtils._
 import services.db.TransactionSerializable
 import utils.TestData
 import controllers.routes.WebsiteControllers.postRecoverAccount
@@ -20,8 +20,8 @@ class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtected
   override protected def routeUnderTest = postRecoverAccount 
 
   routeName(postRecoverAccount()) should "validate email addresses" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(
-      FakeRequest().toRoute(postRecoverAccount).withFormUrlEncodedBody("email" -> "gnuggets@gangstaville.com").withAuthToken
+    val Some(result) = route(
+      FakeRequest().toCall(postRecoverAccount).withFormUrlEncodedBody("email" -> "gnuggets@gangstaville.com").withAuthToken
     )
     
     status(result) should be (NOT_FOUND)
@@ -33,9 +33,9 @@ class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtected
       customer.account
     }
 
-    val Some(result) = routeAndCall(
+    val Some(result) = route(
       FakeRequest()
-        .toRoute(postRecoverAccount)
+        .toCall(postRecoverAccount)
         .withFormUrlEncodedBody("email" -> account.email)
         .withAuthToken
     )

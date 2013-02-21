@@ -119,7 +119,7 @@ case class Account(
     val expirationTime = try {
       attempt.substring(indexOfExpirationTime).toLong
     } catch {
-      case _ => return false
+      case _: Throwable => return false
     }
 
     (resetPasswordKey.get == attempt) && (System.currentTimeMillis < expirationTime)

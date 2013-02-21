@@ -50,7 +50,8 @@ case class PersistedCheckout(
   /** LineItems that need to be transacted in next transaction */
   override lazy val pendingItems: LineItems = {
     // resolve added types against existing items, then filter out _lineItems
-    val addedItems = resolveTypes(_addedTypes, _lineItems) filter (_addedTypes contains _.itemType)
+    val addedTypes = _addedTypes.toSet
+    val addedItems = resolveTypes(_addedTypes, _lineItems) filter (addedTypes contains _.itemType)
 
     // temp summaries needed for some types to resolve...
     val derivedTypesWithTempSummaries = summaryTypes ++ _derivedTypes

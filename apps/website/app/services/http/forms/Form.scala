@@ -462,7 +462,7 @@ object Form {
       def asFormReadable: Form.Readable = {
         (key) => {
           val valueOption = getabbleAppendable.get(key)
-          valueOption.map(valueString => valueString.split(serializationDelimiter)).flatten
+          valueOption.map(valueString => valueString.split(serializationDelimiter)).toList.flatten
         }
       }
 
@@ -474,7 +474,7 @@ object Form {
 
     class FormCompatibleServerSession(serverSession: ServerSession) {
       def asFormReadable: Form.Readable = {
-        (key) => serverSession[Iterable[String]](key).flatten
+        (key) => serverSession[Iterable[String]](key).toList.flatten
       }
 
       def asFormWriteable: ServerSessionWriteable = {
@@ -563,5 +563,5 @@ abstract class ReadsForm[+FormType <: Form[_]](implicit manifest: Manifest[FormT
   // Private members
   //
   /** Name as the form as specified in the manifest */
-  private def formName = manifest.erasure.getSimpleName
+  private def formName = manifest.runtimeClass.getSimpleName
 }

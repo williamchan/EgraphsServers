@@ -1,21 +1,20 @@
 package controllers.api
 
-import play.api.test.Helpers._
-import sjson.json.Serializer
-import models._
+import play.api.libs.json._
 import play.api.mvc.Controller
 import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import services.db.DBSession
 import services.db.TransactionSerializable
 import services.AppConfig
 import services.Time
-import utils.FunctionalTestUtils.requestWithCredentials
-import utils.FunctionalTestUtils.routeName
+import utils.FunctionalTestUtils._
 import utils.ClearsCacheBefore
 import utils.EgraphsUnitTest
 import utils.TestData
+import models.Celebrity
 
 class GetCelebrityApiEndpointTests 
   extends EgraphsUnitTest 
@@ -34,23 +33,23 @@ class GetCelebrityApiEndpointTests
 
     // Execute the request
     val url = controllers.routes.ApiControllers.getCelebrity.url
-    val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
-    val Some(result) = routeAndCall(req)
+    val req = FakeRequest(GET, url).withCredentials(celebrityAccount)
+    val Some(result) = route(req)
 
     // Test expectations
     status(result) should be (OK)
 
-    val json = Serializer.SJSON.in[Map[String, AnyRef]](contentAsString(result))
+    val json = Json.parse(contentAsString(result))
+    val celebrityFromJson = json.as[Celebrity]
 
-    json("id") should be (celebrity.id)
-    json("publicName") should be (celebrity.publicName)
-    json("urlSlug") should be (celebrity.urlSlug)
-    json("enrollmentStatus") should be (celebrity.enrollmentStatus.name)
+    celebrityFromJson.id should be (celebrity.id)
+    celebrityFromJson.publicName should be (celebrity.publicName)
+    celebrityFromJson.enrollmentStatus should be (celebrity.enrollmentStatus)
+    celebrityFromJson.created should be (celebrity.created)
+    celebrityFromJson.updated should be (celebrity.updated)
 
-    // These conversions will fail if they're not Longs
-    Time.fromApiFormat(json("created").toString)
-    Time.fromApiFormat(json("updated").toString)
+    (json \ "urlSlug").as[String] should be (celebrity.urlSlug)
 
-    json.size should be (6)
+    json.as[JsObject].fields.size should be (6)
   }
 }

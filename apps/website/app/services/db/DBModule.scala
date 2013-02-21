@@ -1,6 +1,6 @@
 package services.db
 
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 import java.sql.Connection
 import play.api.db.DB
 import play.api.Play

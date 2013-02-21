@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 import play.core.PlayVersion
 
 import BuildHelpers.ModuleProject
@@ -14,19 +14,24 @@ object ToyBoxBuild extends Build {
   // From squeryl.org/getting-started.html
     
   val appDependencies = Seq(
-    "play" %% "play" % PlayVersion.current,    
-  
-    "org.scalatest" %% "scalatest" % "1.8" % "test",
+    "play" %% "play" % PlayVersion.current,
+
+    "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
     "play" %% "play-test" % PlayVersion.current % "test"
   )
 
-  val main = PlayProject(
+  val main = play.Project(
     appName, 
     appVersion, 
     appDependencies,
-    path = baseDir, 
-    mainLang = SCALA
+    path = baseDir
   ).settings(
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
+
+    parallelExecution in Test := false,
+    Keys.fork in Test := false,
+    testOptions in Test := Nil,
+
     // Copied from build helpers
     resolvers ++= Seq(
       "Typesafe Releases Repository" at "http://repo.typesafe.com/typesafe/releases/",
@@ -34,7 +39,6 @@ object ToyBoxBuild extends Build {
     ),
 
     shellPrompt := playPrompt,
-    testOptions in Test := Nil,
     commands ++= Seq(playCommand)
   ).dependsOn(PlayUtilsBuild.main)
 

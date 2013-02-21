@@ -1,9 +1,9 @@
 package models
 
+import java.sql.Timestamp
 import com.google.inject.Inject
 import services._
 import db.{Schema, SavesWithLongKey, KeyedCaseClass}
-import java.sql.Timestamp
 
 case class FailedPurchaseData(
   id: Long = 0L,
@@ -29,8 +29,6 @@ class FailedPurchaseDataStore @Inject()(schema: Schema) extends SavesWithLongKey
   // Saves methods
   //
   def table = schema.failedPurchaseData
-
-
 
   //
   // SavesCreatedUpdated methods

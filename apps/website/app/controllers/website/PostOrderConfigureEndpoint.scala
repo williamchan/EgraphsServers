@@ -9,7 +9,6 @@ import play.api.mvc._
 import play.api.data.Forms._
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
-import sjson.json.Serializer
 import play.api.mvc.Results.{BadRequest, NotFound, Forbidden}
 
 private[controllers] trait PostOrderConfigureEndpoint { this: Controller =>

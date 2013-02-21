@@ -1,22 +1,25 @@
 import sbt._
 import Keys._
 import play.core.PlayVersion
-import PlayProject._
+import play.Project._
 
 object BuildHelpers {
 
-  val currentPlayDependency = "play" % "play_2.9.1" % PlayVersion.current
+  val currentPlayDependency = "play" % "play_2.1.0" % PlayVersion.current
 
   val defaultModuleSettings = Project.defaultSettings ++ Seq(
+    scalaVersion := "2.10.0",
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
+
     resolvers ++= Seq(
       "Typesafe Releases Repository" at "http://repo.typesafe.com/typesafe/releases/",
       "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/"
     ),
     
     libraryDependencies ++= Seq(
-      "play" %% "play" % PlayVersion.current,    
+      "play" %% "play" % PlayVersion.current,
     
-      "org.scalatest" %% "scalatest" % "1.8" % "test",
+      "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
       "play" %% "play-test" % PlayVersion.current % "test"
     ),
 
@@ -55,7 +58,7 @@ object BuildHelpers {
       Project(
         id=name,
         base=file("modules") / name,
-        settings=defaultModuleSettings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings ++ settings
+        settings=defaultModuleSettings ++ org.sbtidea.SbtIdeaPlugin.settings ++ settings
       )
     }
   }

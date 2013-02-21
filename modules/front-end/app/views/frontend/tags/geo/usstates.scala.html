@@ -55,7 +55,7 @@
   }
 }
 @if(formatStr == "json") {
-  @states.map(state => "['" + state._1 + "','" + state._2 + "']").mkString("[", ",", "]")
+  @{Html(states.map(state => "['" + state._1 + "','" + state._2 + "']").mkString("[", ",", "]"))}
 }
 
 @**   Prints <option> tags for each state.

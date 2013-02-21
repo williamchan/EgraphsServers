@@ -1,17 +1,18 @@
 package services.mvc.search
 
+import scala.language.postfixOps
+import scala.concurrent.duration._
 import scala.util.Random
 
 import com.google.inject.Inject
 
-import akka.actor.Actor
-import akka.actor.Props
-import akka.util.Timeout.durationToTimeout
-import akka.util.duration.intToDurationInt
-import akka.util.Timeout
-import models.CelebrityStore
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
+
+import akka.actor.Actor
+import akka.actor.Props
+import models.CelebrityStore
 import services.db.DBSession
 import services.db.TransactionSerializable
 import services.logging.Logging
@@ -26,7 +27,7 @@ class RebuildSearchIndexActor @Inject() (
   celebrityStore: CelebrityStore) extends Actor with Logging {
   import RebuildSearchIndexActor.RebuildSearchIndex
 
-  protected def receive = {
+  def receive = {
     case RebuildSearchIndex => {
       log("Rebuilding search index starting.")
       db.connected(isolation = TransactionSerializable, readOnly = false) {
@@ -51,7 +52,7 @@ object RebuildSearchIndexActor extends Logging {
 
   private val updatePeriod = 10 minutes
 
-  private implicit val timeout: Timeout = 10 minutes
+  private implicit val timeout = 10 minutes
 
   //
   // Private members

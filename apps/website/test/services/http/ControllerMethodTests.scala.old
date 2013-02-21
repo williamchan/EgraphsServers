@@ -6,7 +6,7 @@ import play.mvc.Scope.Session
 import com.google.inject.util.Modules
 import services.AppConfig
 import com.google.inject.{Guice, AbstractModule}
-import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
+import net.codingwell.scalaguice.{InjectorExtensions, ScalaModule}
 import InjectorExtensions._
 
 class ControllerMethodTests extends EgraphsUnitTest {
