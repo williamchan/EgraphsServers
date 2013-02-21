@@ -7,7 +7,7 @@ define(
  "libs/tooltip",
  "services/ng/mail-services",
  "services/responsive-modal"],
-function(page, window, logging, requireModule, tooltip) {
+function(page, window, logging, requireModule) {
   var menuStatus = "closed";
   var log = logging.namespace(requireModule.id);
 
@@ -41,9 +41,7 @@ function(page, window, logging, requireModule, tooltip) {
 
     go: function () {
       $(document).ready(function(){
-
         var signupModal = $('#emailSignupForm');
-
         // highlight action on top menu
         $('#top .account').hover(function(){
           $(this).addClass('hover');
@@ -100,7 +98,7 @@ function(page, window, logging, requireModule, tooltip) {
           }
         });
 
-        // Set modal to visible if toggled.
+        // set modal to visible if toggled.
         if(page.modalOn === true) {
           $(window).load(function(){
             signupModal.modal({});
