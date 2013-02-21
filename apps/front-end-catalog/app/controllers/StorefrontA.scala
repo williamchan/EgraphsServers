@@ -16,7 +16,7 @@ object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
       id=1L,
       name=starName,
       products=products(starName, 3),
-      pronoun=MalePersonalPronouns
+      pronoun=FemalePersonalPronouns
     )
 
     Ok(views.html.frontend.storefronts.a.personalize(star, "/checkout", Some("default")))

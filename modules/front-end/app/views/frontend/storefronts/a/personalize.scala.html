@@ -75,11 +75,11 @@
           <div class="testimonials">
             <div class="testimonial">
               <div class="quote">
-                Best gift ever! I hardly believed it was really his voice, and couldn't stop smiling all week. Love @@Egraphs!
+                The Egraph [...] to my son was amazing! The look on his face was priceless, he couldn't believe a REAL baseball player had wished him Happy Birthday!
               </div>
               <div class="attribution">
-                - Herp Derpson. Needham, CT
-                <span class="source">via Twitter</span>
+                - Carla Hord
+                <span class="source">via Email</span>
               </div>
             </div>
           </div>
@@ -136,8 +136,8 @@
                 <div class="control-group note-to-star">
                   <label class="control-label" for="@field.id">
                     What do you want to say to @star.pronoun.obj?
-                    @fieldTooltip("What will " + star.pronoun.subject + " do with my message?") {
-                      <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit
+                    @fieldTooltip(s"What will ${star.pronoun.subject} do with my message?") {
+                      <strong>This is your chance to be heard.</strong> @star.name will read this note and respond to you in a voice message, recorded from @star.pronoun.possessiveAdjective personal iPad.
                     }
                   </label>
                   <div class="controls">
@@ -155,8 +155,8 @@
                     </div>
                     @*<img src='@profileImageUrl' class="star-profile-image">*@
                     <div>
-                      @fieldTooltip("Not sure what to say? Don't panic! Here are some great examples.") {
-                        @loremTipsum
+                      @fieldTooltip("Not sure what to say? Here are some tips.") {
+                        <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.pronoun.obj in person. Ask a question you've always wanted to know the answer to, or request that @star.pronoun.subject say something specific.
                       }
                       <div class="explanatory-text char-remaining">{{@maxTextChars - @{field.ngModel}.length}} left</div>
                     </div>
@@ -167,6 +167,9 @@
                 <div class="control-group note-to-star">
                   <label class="control-label" for="@field.id">
                     What do you want @star.pronoun.obj to reply?
+                    @fieldTooltip("What is this?") {
+                      <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.pronoun.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.pronoun.subject will write whatever @star.pronoun.subject wants. Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
+                    }
                   </label>
                   <div class="controls">
                     <div>
@@ -190,8 +193,11 @@
                   <label class="control-label" for="@field.id">
                     Who is this egraph for?
                     @fieldTooltip("How does gifting work?") {
-                      @loremTipsum
+                      <strong>Egraphs make a great gift for a friend or family member.</strong> Just select the <em>This is a gift</em> and enter the recipient's name (this is who @star.name will address their message to).
                     }
+                    @fieldTooltip("How will they receive it?") {
+                      On the next screen you can enter an email address for the recipient. When @star.name creates the egraph, an email will be sent to both yourself and the recipient with information on how to view and hear the graph.
+                    }                    
                   </label>
                   <div class="controls">
                     <div @field.identityAttributes
@@ -221,8 +227,8 @@
                 <div class="control-group">
                   <label class="control-label" for="@field.id">
                     {{recipientPossessive()}} name<span class="required-marker">*</span>:
-                    @fieldTooltip("Why do you need this?") {
-                      @loremTipsum
+                    @fieldTooltip("How is this used?") {
+                      This is the name @star.name will address the egraph to in both @star.pronoun.possessiveAdjective written and audio message.
                     }
                   </label>
                   <div class="controls">
@@ -244,13 +250,9 @@
               <div class="control-group photo-choice">
                 <label class="control-label" for="photoChoice">
                   What photo should @star.name sign?
-                  @fieldTooltip("Wait, it's not just audio?") {
-                    @loremTipsum
+                  @fieldTooltip("An egraph is both an audio and written message") {
+                    Using an iPad, @star.name will write a short message and signature on the photo you select. This written message and photo will be displayed with the audio message when you receive the egraph.
                   }
-                  @fieldTooltip("What's with the different prices?") {
-                    @loremTipsum
-                  }
-
                 </label>
                 <div class="controls">
                   <div thumbnail-selector
@@ -294,11 +296,8 @@
                 <div class="control-group">
                   <label class="control-label" for="@field.name">
                     In what format would you like the egraph delivered?
-                    @fieldTooltip("What's the difference?") {
-                      @loremTipsum
-                    }
-                    @fieldTooltip("What if I want the framed print later?") {
-                      @loremTipsum
+                    @fieldTooltip("Can I add the framed print later?") {
+                      <strong>Yes! You can wait and order a framed print of your egraph any time you like</strong> For fastest processing though it is best to include it here. Just email support@@egraphs.com to place a framed print order later on.
                     }
                   </label>
                   <div class="controls">
@@ -345,12 +344,15 @@
 
           <section id="preview-proceed" class="controls">
             <div class="field-reminder">
-              <div class="fields-remaining" ng-show="fieldsRemaining().length > 0">
+              <div class="fields-remaining" ng-show="fieldsRemaining().length > 0 && !egraphForm.$submitting">
                 <img src="@EgraphsAssets.at("images/glyphicons-uparrow-circle-orange.png")"> Oops! You still have to fill in your name...
               </div>
-              <div class="no-fields-remaining" ng-show="fieldsRemaining().length == 0">
+              <div class="no-fields-remaining" ng-show="fieldsRemaining().length == 0 && !egraphForm.$submitting">
                 <img src="@EgraphsAssets.at("images/glyphicons-check-circle-green.png")"> All required fields complete!
               </div>
+              <div class="no-fields-remaining" ng-show="egraphForm.$submitting">
+                <img src="@EgraphsAssets.at("images/ajax-loader.gif")"> Validating...
+              </div>              
             </div>          
             <button id="review-button" 
                     type="button"
