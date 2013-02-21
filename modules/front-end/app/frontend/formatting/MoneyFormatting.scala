@@ -11,7 +11,7 @@ import org.joda.money.{CurrencyUnit, Money}
  *
  * Example:
  * {{{
- *   import frontend.formatting.MoneyFormatting.TypeConversions._
+ *   import frontend.formatting.MoneyFormatting.Conversions._
  *
  *   // Make some Money objects from an amount
  *   val amount = BigDecimal(100.50)

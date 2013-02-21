@@ -11,19 +11,19 @@ import play.api.templates.Html
  */
 case class NgField(form: String, name: String) {
   /** Makes a name for the control out of the parent's form name */
-  val control = form + "Form." + name
+  def control: Html = Html(form + "Form." + name)
 
   /** Angular logic for whether this field is both altered and invalid */
-  def dirtyAndInvalid = control + ".$dirty && " + control + ".$invalid"
+  def dirtyAndInvalid: Html = control += Html(".$dirty && ") += control += Html(".$invalid")
 
   /** an id composed of the form and input name */
-  def id = form + "-" + name
+  def id: Html = Html(form) += Html("-") += Html(name)
 
   /** A default ng-model attribute for angular */
-  def ngModel = form + "." + name
+  def ngModel: Html = Html(s"$form.$name")
 
   /** Dumps in id, name, and ng-model as a series of html tag attributes */
-  def identityAttributes = "id='" + id + "' name='" + name + "' ng-model='" + ngModel + "'"
+  def identityAttributes: Html = Html("id='") += id += Html("' name='") += Html(name) += Html("' ng-model='") += ngModel += Html("'")
 
   /** Creates default error divs for different angular error cases that can happen to the NgController */
   def ifError(errors: String*)(body: => Html): Html = {
@@ -32,22 +32,22 @@ case class NgField(form: String, name: String) {
   }
 
   /** Returns the angular expression representing that the user has interacted with the input */
-  def userHasAttended = {
-    control + ".userAttention.attended"
+  def userHasAttended: Html = {
+    control += Html(".userAttention.attended")
   }
 
   /** Returns the angular expression representing that the input is in an error state */
-  def invalid = {
-    control + ".$invalid"
+  def invalid: Html = {
+    control += Html(".$invalid")
   }
 
   /** Returns the angular expression representing that the input is currently submitting in an ajax form */
-  def submitting = {
-    control + ".$submitting"
+  def submitting: Html = {
+    control += Html(".$submitting")
   }
 
-  def invalidAndUserHasAttendedAndNotSubmitting = {
-    userHasAttended + " && " + invalid + " && !" + submitting
+  def invalidAndUserHasAttendedAndNotSubmitting: Html = {
+    userHasAttended += Html(" && ") += invalid += Html(" && !") += submitting
   }
 
   /**
@@ -56,7 +56,7 @@ case class NgField(form: String, name: String) {
    * to the user.
    **/
   def errorDiv(body: => Html): Html = {
-    Html("<div class=\"errors\" ng-show=\"" + invalidAndUserHasAttendedAndNotSubmitting + "\">" + body + "</div>")
+    Html("<div class=\"errors\" ng-show=\"") += invalidAndUserHasAttendedAndNotSubmitting += Html("\">") += body += Html("</div>")
   }
 
   /** A standard set of errors as-per our API spec. */

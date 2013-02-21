@@ -32,7 +32,7 @@ object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
       PersonalizeProduct(
         id=i,
         title=star + " " + i,
-        description="The number " + i + " product of the distinguished " + star,
+        description="The number " + i + " product of the distinguished grade \"A\" " + star,
         price=Money.of(CurrencyUnit.USD, i * 10),
         selected=(i == 2),
         smallThumbUrl="https://d3kp0rxeqzwisk.cloudfront.net/product/416/20120823100121825/w340.jpg",
