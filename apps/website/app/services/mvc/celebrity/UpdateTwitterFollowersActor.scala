@@ -1,35 +1,33 @@
 package services.mvc.celebrity
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import java.util.Random
 import com.google.inject.Inject
-import akka.actor.Actor
-import akka.actor.ActorRef
-import akka.actor.Props
-import akka.agent.Agent
-import akka.dispatch.Await
+import twitter4j.TwitterException
+import akka.actor._
+import akka.agent._
 import akka.pattern.ask
-import akka.util.duration._
-import akka.util.FiniteDuration
-import akka.util.Timeout
-import models.Celebrity
-import models.CelebrityStore
+import akka.util._
 import play.api.Play.current
 import play.api.libs.concurrent._
-import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
+import models.Celebrity
+import models.CelebrityStore
 import services.AppConfig
 import services.cache.CacheFactory
 import services.db.DBSession
 import services.db.TransactionSerializable
 import services.http.twitter.TwitterProvider
 import services.logging.Logging
-import twitter4j.TwitterException
 
 import akka.routing.SmallestMailboxRouter
 
 // for single celebrity batch
 private[celebrity] class UpdateBatchTwitterFollowersActor() extends Actor with Logging {
   import UpdateTwitterFollowersActor.{ twitter, UpdateTwitterFollowers, LateUpdateTwitterFollowers, TwitterUserLookupResponse, LateTwitterUserLookupResponse }
-  protected def receive = {
+
+  def receive = {
     case UpdateTwitterFollowers(celebritiesWithTwitter) => {
       val twitterFollowers = lookupTwitterDataOrScheduleRetry(celebritiesWithTwitter).getOrElse(Map.empty[Long, Int])
       sender ! TwitterUserLookupResponse(twitterFollowers)
@@ -73,7 +71,7 @@ private[celebrity] class UpdateBatchTwitterFollowersActor() extends Actor with L
           error("Twitter exception in handling UpdateTwitterFollowers message for celebrities: " + celebrityNamesAndTwitter, e)
         }
         None
-      case e =>
+      case e: Throwable =>
         error("Exception in handling UpdateTwitterFollowers message for celebrities: " + celebrityNamesAndTwitter, e)
         None
     }
@@ -92,10 +90,9 @@ private[celebrity] class UpdateTwitterFollowersActor @Inject() (
 
   private val TWITTER_MAX_LOOKUP = 100
 
-
   def cache = cacheFactory.applicationCache
 
-  protected def receive = {
+  def receive = {
     case UpdateAllTwitterFollowers => {
       val twitterFollowerCounts = cache.cacheing(resultsCacheKey, cachingPeriod.toSeconds.toInt) {
         // Due to cache miss, this instance must update from twitter.

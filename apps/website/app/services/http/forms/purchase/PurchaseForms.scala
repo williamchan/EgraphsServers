@@ -403,6 +403,7 @@ class PurchaseForms @Inject()(
 
       case PrintingOption.DoNotPrint =>
         Right(None)
+      case other => throw new IllegalStateException("Not a valid printing option = " + other)
     }
   }
 
@@ -446,6 +447,7 @@ object PurchaseForms {
       case WrittenMessageRequest.SignatureOnly => Grammar.possessivePronoun(celebrityGender, true) + " signature only."
       case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever " + Grammar.subjectPronoun(celebrityGender) + " wants."
       case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
+      case other => throw new IllegalStateException("models.enums.WrittenMessageRequest cannot have value = " + other)
     }
   }
 

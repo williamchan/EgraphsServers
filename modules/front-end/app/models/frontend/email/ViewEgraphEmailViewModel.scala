@@ -1,33 +1,27 @@
 package models.frontend.email
 
-trait EgraphSignedEmailViewModel {
+trait ViewEgraphEmailViewModel {
   def viewEgraphUrl: String
   def celebrityPublicName: String
   def recipientName: String
-  def couponAmount: Int
-  def couponCode: String
   def buyerName: String
   def isGift: Boolean
 }
 
-case class RegularEgraphSignedEmailViewModel(
+case class RegularViewEgraphEmailViewModel(
   viewEgraphUrl: String,
   celebrityPublicName: String,
-  recipientName: String,
-  couponAmount: Int,
-  couponCode: String) extends EgraphSignedEmailViewModel {
+  recipientName: String) extends ViewEgraphEmailViewModel {
   
   val isGift = false
   val buyerName = recipientName
 }
   
-case class GiftEgraphSignedEmailViewModel(
+case class GiftViewEgraphEmailViewModel(
   viewEgraphUrl: String,
   celebrityPublicName: String,
   recipientName: String,
-  couponAmount: Int,
-  couponCode: String,  
-  buyerName: String) extends EgraphSignedEmailViewModel {
+  buyerName: String) extends ViewEgraphEmailViewModel {
   
   val isGift = true
 }

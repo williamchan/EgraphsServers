@@ -1,26 +1,13 @@
 # --- !Ups
 
-create table Masthead (
-    _landingPageImageKey varchar(128),
-    headline text not null,
-    subtitle text,
-    name varchar(128) not null,
-    keyBase varchar(128) not null,
-    id bigint primary key not null,
-    updated timestamp not null,
-    _publishedStatus varchar(128) not null,
-    created timestamp not null
-  );
-create sequence s_Masthead_id;
+-- add new columns
+ALTER TABLE Orders ADD COLUMN lineItemId bigint;
+ALTER TABLE PrintOrder ADD COLUMN lineItemId bigint;
+ALTER TABLE Product ADD COLUMN lineItemTypeId bigint;
 
+-- add new constraints
+alter table Orders add constraint OrdersFK28 foreign key (lineItemId) references LineItem(id);
+alter table PrintOrder add constraint PrintOrderFK29 foreign key (lineItemId) references LineItem(id);
+alter table Product add constraint ProductFK32 foreign key (lineItemTypeId) references LineItemType(id);
 
-create table MastheadCategoryValue (
-    mastheadId bigint not null,
-    id bigint primary key not null,
-    categoryValueId bigint not null
-  );
-
-create sequence s_MastheadCategoryValue_id;
-alter table MastheadCategoryValue add constraint MastheadCategoryValueFK7 foreign key (mastheadId) references Masthead(id) on delete cascade;
-alter table MastheadCategoryValue add constraint MastheadCategoryValueFK8 foreign key (categoryValueId) references CategoryValue(id) on delete cascade;
 # --- !Downs

@@ -1,15 +1,13 @@
 package services.mvc.celebrity
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
-import akka.actor.actorRef2Scala
-import akka.actor.Actor
-import akka.actor.ActorRef
+import akka.actor._
 import akka.agent.Agent
-import akka.util.Timeout.durationToTimeout
-import akka.util.duration.intToDurationInt
-import models.frontend.landing.CatalogStar
 import play.api.libs.concurrent.Akka
+import models.frontend.landing.CatalogStar
 import services.mvc.celebrity.UpdateCatalogStarsActor.UpdateCatalogStars
 import utils.TestHelpers.withActorUnderTest
 import utils.EgraphsUnitTest
@@ -21,7 +19,7 @@ class CatalogStarsQueryingTests extends EgraphsUnitTest {
     val mockStars = IndexedSeq(mock[CatalogStar])
 
     lazy val updateActorInstance = new Actor {
-      protected def receive = {
+      def receive = {
         case UpdateCatalogStars(_) =>
           throw new RuntimeException("I should never have been called.")
       }
@@ -41,7 +39,7 @@ class CatalogStarsQueryingTests extends EgraphsUnitTest {
     val mockStars = IndexedSeq(mock[CatalogStar])
 
     lazy val updateActorInstance = new Actor {
-      protected def receive = {
+      def receive = {
         case UpdateCatalogStars(catalogStarsAgent) =>
           catalogStarsAgent send mockStars
           catalogStarsAgent.await(10 seconds)

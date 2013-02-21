@@ -1,34 +1,33 @@
 package models
 
+import java.awt.image.BufferedImage
+import java.util.Date
+import java.sql.Timestamp
+import org.apache.commons.codec.binary.Base64
+import org.apache.commons.io.IOUtils
+import com.google.inject.{Provider, Inject}
+import org.joda.time.DateTimeConstants
+import org.squeryl.Query
+import org.squeryl.dsl.ManyToMany
+import anorm._
+import play.api.Play.current
+import play.api.libs.concurrent._
+import play.api.libs.json._
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
 import categories._
-import java.sql.Timestamp
 import services.blobs.AccessPolicy
 import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
-import com.google.inject.{Provider, Inject}
-import org.squeryl.Query
 import services._
-import java.awt.image.BufferedImage
 import services.mail.TransactionalMail
-import org.apache.commons.io.IOUtils
-import org.apache.commons.mail.HtmlEmail
-import models.Celebrity.CelebrityWithImage
-import play.api.Play.current
 import services.Dimensions
-import org.squeryl.dsl.ManyToMany
-import views.html.frontend.email.{celebrity_welcome => celebrity_welcome_html}
-import views.txt.frontend.email.{celebrity_welcome => celebrity_welcome_txt}
-import anorm._
 import services.mvc.celebrity.CelebrityViewConversions
-import play.api.libs.concurrent.Promise
-import models.frontend.marketplace.MarketplaceCelebrity
-import play.api.libs.concurrent.Akka
+import services.mail.MailUtils
 import services.db.DBSession
-import org.joda.time.DateTimeConstants
 import models.frontend.landing.CatalogStar
+import models.frontend.marketplace.MarketplaceCelebrity
+import models.Celebrity.CelebrityWithImage
+import models.enums.EmailType
 import services.mvc.celebrity.CatalogStarsQuery
-import java.util.Date
-import org.apache.commons.codec.binary.Base64
 import egraphs.playutils.{Gender, HasGender}
 
 /**
@@ -125,16 +124,6 @@ case class Celebrity(id: Long = 0,
   def doesNotHaveTwitter = {
     twitterUsername.map(name => name.toLowerCase) == Some("none")
   }
-  
-  /**
-   * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
-   * by the API (e.g. JSON)
-   */
-  def renderedForApi: Map[String, Any] = {
-    Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name,  "publicName" -> publicName,
-      "urlSlug" -> urlSlug) ++
-      renderCreatedUpdatedForApi
-  }
 
   /**
    * Saves the celebrity entity after first uploading the provided image
@@ -230,27 +219,6 @@ case class Celebrity(id: Long = 0,
     product.saveWithImageAssets(image, icon)
   }
 
-  /**
-  * Sends a welcome email to the celebrities email address with their Egraphs username and a blanked
-  * out password field.  We aren't sending the password, it is just a bunch of *****.  The email
-  * includes a link to download the latest iPad app.
-  */
-  def sendWelcomeEmail(toAddress: String, bccEmail: Option[String] = None) {
-    val email = new HtmlEmail()
-
-    email.setFrom("webserver@egraphs.com", "Egraphs")
-    email.addTo(toAddress, publicName)
-    bccEmail.map(bcc => email.addBcc(bcc))
-    email.setSubject("Welcome to Egraphs")
-    
-    val appDownloadLink = services.consumerApp.getIOSClient(redirectToItmsLink=true).url
-    services.transactionalMail.send(
-      email, 
-      text=Some(celebrity_welcome_txt(publicName, account.email, appDownloadLink).toString),
-      html=Some(celebrity_welcome_html(publicName, account.email, appDownloadLink))
-    )
-  }
-
   //
   // KeyedCaseClass[Long] methods
   //
@@ -332,6 +300,32 @@ object Celebrity {
       val savedImage = image.save(AccessPolicy.Public)
       val saved = celebrity.save()
       CelebrityWithImage(saved, savedImage)
+    }
+  }
+
+  def apply(id: Long, _enrollmentStatus: String, publicName: String): Celebrity = {
+    new Celebrity(id = id, _enrollmentStatus = _enrollmentStatus, publicName = publicName)
+  }
+
+  implicit object CelebrityFormat extends Format[Celebrity] {
+    def writes(celebrity: Celebrity): JsValue = {
+      Json.obj(
+        "id" -> celebrity.id,
+        "enrollmentStatus" -> celebrity.enrollmentStatus.name,
+        "publicName" -> celebrity.publicName,
+        "urlSlug" -> celebrity.urlSlug
+      ) ++ Json.obj(celebrity.renderCreatedUpdatedForApi: _*)
+    }
+
+    def reads(json: JsValue): JsResult[Celebrity] = {
+      JsSuccess {
+        val celebrity = Celebrity(
+          (json \ "id").as[Long],
+          (json \ "enrollmentStatus").as[String],
+          (json \ "publicName").as[String]
+        )
+        celebrity.services.store.withCreatedUpdatedFromJson(celebrity, json)
+      }
     }
   }
 }

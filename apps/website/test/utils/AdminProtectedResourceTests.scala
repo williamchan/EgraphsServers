@@ -2,10 +2,7 @@ package utils
 
 import play.api.test._
 import play.api.test.Helpers._
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
-import play.api.mvc.{MultipartFormData, Controller, Call}
-import org.scalatest.FlatSpec
+import utils.FunctionalTestUtils._
 import controllers.routes.WebsiteControllers.getLoginAdmin
 import services.db.{DBSession, TransactionSerializable}
 import models._
@@ -15,6 +12,7 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import java.util.Date
 import play.api.mvc.MultipartFormData.FilePart
+import play.api.mvc.{MultipartFormData, Call}
 
 abstract trait AdminProtectedResourceTestBase { this: EgraphsUnitTest =>
   protected def routeUnderTest: Call
@@ -27,13 +25,13 @@ abstract trait AdminProtectedResourceTestBase { this: EgraphsUnitTest =>
 
 trait AdminProtectedResourceTests extends AdminProtectedResourceTestBase { this: EgraphsUnitTest =>
   routeName(routeUnderTest) + ", as an admin authenticated resource, " should "fail due to lack of an admin id in the session" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(FakeRequest().toRoute(routeUnderTest).withAuthToken)
+    val Some(result) = route(FakeRequest().toCall(routeUnderTest).withAuthToken)
     status(result) should be (SEE_OTHER)
     headers(result)("Location") should be (getLoginAdmin.url)
   }
   
   it should "not redirect to the login page session" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(FakeRequest().toRoute(routeUnderTest).withAdmin(admin.id).withAuthToken)
+    val Some(result) = route(FakeRequest().toCall(routeUnderTest).withAdmin(admin.id).withAuthToken)
     redirectLocation(result) should not be (Some(getLoginAdmin.url))
   }
 }

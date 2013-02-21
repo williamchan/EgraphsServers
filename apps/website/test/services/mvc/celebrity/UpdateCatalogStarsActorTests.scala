@@ -1,14 +1,14 @@
 package services.mvc.celebrity
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.specs2.mock.Mockito
 import com.google.inject.Inject
 import akka.actor.ActorRef
 import akka.agent.Agent
-import akka.dispatch.Await
 import akka.pattern.ask
-import akka.util.duration._
 import akka.util.Timeout
 import models.frontend.landing.CatalogStar
 import models.CelebrityStore

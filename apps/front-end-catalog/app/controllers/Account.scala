@@ -9,7 +9,6 @@ import models.frontend.egraphs.FulfilledEgraphViewModel
 import models.frontend.account.{AccountRecoverForm, AccountPasswordResetForm, AccountSettingsForm}
 import models.frontend.forms.Field
 import play.api.mvc.Request
-import play.data.DynamicForm
 import helpers.DefaultImplicitTemplateParameters
 
 /**

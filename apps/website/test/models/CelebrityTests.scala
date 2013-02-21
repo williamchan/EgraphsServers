@@ -1,12 +1,13 @@
 package models
 
-import enums.{HasPublishedStatusTests, PublishedStatus}
+import org.joda.time.DateTimeConstants
 import javax.imageio.ImageIO
+import play.api.libs.json.Json
+import enums.{HasPublishedStatusTests, PublishedStatus}
 import services.Time
 import services.ImageUtil.Conversions._
 import services.AppConfig
 import utils._
-import org.joda.time.DateTimeConstants
 
 class CelebrityTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -22,19 +23,24 @@ class CelebrityTests extends EgraphsUnitTest
   //
   // Test cases
   //
-  "A Celebrity" should "render to API format properly" in new EgraphsTestApplication {
-    val publicName = TestData.generateFullname()
-    val celeb = Celebrity(publicName = publicName).save()
-    val apiMap = celeb.renderedForApi
-
-    apiMap("publicName") should be (publicName)
-    apiMap("urlSlug") should be (publicName.replaceAll(" ", "-"))
-    apiMap("id") should be (celeb.id)
-    apiMap("created") should be (Time.toApiFormat(celeb.created))
-    apiMap("updated") should be (Time.toApiFormat(celeb.updated))
+  "urlSlug" should "slugify the pulic name" in new EgraphsTestApplication {
+    val celeb = TestData.newSavedCelebrity()
+    celeb.urlSlug should be (celeb.publicName.replaceAll(" ", "-"))
   }
 
-  it should "start with the default profile photo" in new EgraphsTestApplication {
+  "toJson" should "render to json format properly" in new EgraphsTestApplication {
+    val celeb = TestData.newSavedCelebrity()
+    val json = Json.toJson(celeb)
+    val celebFromJson = json.as[Celebrity]
+
+    celebFromJson.id should be (celeb.id)
+    celebFromJson.publicName should be (celeb.publicName)
+    celebFromJson.urlSlug should be (celeb.urlSlug)
+    celebFromJson.created.getTime should be (celeb.created.getTime)
+    celebFromJson.updated.getTime should be (celeb.updated.getTime)
+  }
+
+  "A Celebrity" should "start with the default profile photo" in new EgraphsTestApplication {
     val celebrity = Celebrity()
     celebrity.profilePhotoUpdated should be (None)
     celebrity.profilePhoto should be (celebrity.defaultProfile)

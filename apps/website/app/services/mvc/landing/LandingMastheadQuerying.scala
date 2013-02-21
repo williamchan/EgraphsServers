@@ -2,10 +2,10 @@ package services.mvc.landing
 
 import services.logging.Logging
 import models.frontend.landing.LandingMasthead
-import akka.util.duration.intToDurationInt
 import akka.actor.ActorRef
 import akka.agent.Agent
-import akka.dispatch.Await
+import concurrent._
+import scala.concurrent.duration._
 import akka.pattern.ask
 import services.mvc.landing.UpdateLandingMastheadsActor.UpdateLandingMastheads
 import akka.util

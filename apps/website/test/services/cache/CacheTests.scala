@@ -1,7 +1,7 @@
 package services.cache
 
 import java.util
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 import com.google.inject.AbstractModule
 
 import utils.{TestData, TestAppConfig, EgraphsUnitTest}

@@ -1,34 +1,24 @@
 package controllers.website
 
-import models.AccountStore
-import utils.ClearsCacheBefore
-import utils.EgraphsUnitTest
-import services.http.forms.Form
-import services.http.forms.Form.Conversions._
-import services.http.POSTControllerMethod
-import services.db.DBSession
-import services.AppConfig
-import play.api.mvc.Action
-import services.http.forms.CustomerLoginFormFactory
-import play.api.mvc.Controller
-import play.api.mvc.Results._
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import play.api.mvc.AnyContent
-import utils.Stubs
+import play.api.mvc._
+import play.api.mvc.Results._
 import play.api.test.FakeRequest
-import utils.TestData
-import services.http.forms.CustomerLoginForm
-import services.http.forms.FormError
-import controllers.routes.WebsiteControllers.{getLogin, postLogin}
 import play.api.test.Helpers._
-import services.db.TransactionSerializable
-import egraphs.playutils.RichResult._
+import egraphs.playutils.ResultUtils.RichResult
+import models.AccountStore
+import services.http.forms._
+import services.http.forms.Form.Conversions._
 import services.http.forms.CustomerLoginForm.Fields
 import services.http.EgraphsSession.Conversions._
-import utils.CsrfProtectedResourceTests
+import services.http.POSTControllerMethod
+import services.db._
+import services.AppConfig
+import services.http.forms.CustomerLoginFormFactory
+import utils.FunctionalTestUtils._
+import utils._
+import controllers.routes.WebsiteControllers.{getLogin, postLogin}
 
 
 @RunWith(classOf[JUnitRunner])

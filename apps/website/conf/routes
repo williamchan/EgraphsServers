@@ -189,4 +189,5 @@ POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                 controllers.
 GET     /assets/*file                                               controllers.EgraphsAssets.at(path=controllers.EgraphsAssets.defaultPath, file)
 
 # Redirect any requests with trailing slashes to the slash-less version.
-GET     $resourcePath<.*>/                                          controllers.SlayTrailingSlashesController.slayTrailingSlashes(resourcePath)
+# TODO: PLAY2.1 verify this still works after it starts compiling again
+GET     /*resourcePath/                                             controllers.SlayTrailingSlashesController.slayTrailingSlashes(resourcePath)

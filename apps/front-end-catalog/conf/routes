@@ -13,7 +13,6 @@ GET     /simple_example                                           controllers.Ap
 GET     /Account/gallery                                          controllers.Account.gallery(user: String, role: String, countFulfilled: Int, countPending: Int, countFulfilledGifts: Int, countPendingGifts: Int)
 GET     /Account/errors                                           controllers.Account.errors
 POST    /orders/:orderId/:status/configure                        controllers.Account.privacy(orderId: Long, status: String)
-GET     /Account/privacy                                          controllers.Account.privacy(orderId: Long, status: String)
 GET     /Account/settings                                         controllers.Account.getSettings
 POST    /Account/settings                                         controllers.Account.postSettings
 GET     /Account/subscribe                                        controllers.Account.getSubscribe
@@ -54,9 +53,9 @@ GET     /Egraph/portrait                                          controllers.Eg
 
 GET     /Email/confirm                                            controllers.Email.confirm
 GET     /Email/mlbStatic                                          controllers.Email.mlbStatic
-GET     /Email/celebrity_welcome_email                            controllers.Email.celebrity_welcome_email
+GET     /Email/celebrityWelcome                                   controllers.Email.celebrityWelcome
 GET     /Email/orderConfirmation                                  controllers.Email.orderConfirmation
-GET     /Email/orderConfirmationText                              controllers.Email.orderConfirmationText
+GET     /Email/resetPassword                                      controllers.Email.resetPassword
 GET     /Email/verify                                             controllers.Email.verify
 GET     /Email/viewEgraph                                         controllers.Email.viewEgraph
 GET     /Email/viewGiftEgraph                                     controllers.Email.viewGiftEgraph

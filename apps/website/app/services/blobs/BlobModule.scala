@@ -1,6 +1,6 @@
 package services.blobs
 
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 import com.google.inject.{Provider, Singleton, Guice, AbstractModule}
 
 object BlobModule extends AbstractModule with ScalaModule {

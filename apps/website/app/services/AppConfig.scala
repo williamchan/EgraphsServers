@@ -15,7 +15,7 @@ import payment.PaymentModule
 import signature.SignatureBiometricsModule
 import social.SocialModule
 import voice.VoiceBiometricsModule
-import uk.me.lings.scalaguice.{InjectorExtensions, ScalaModule}
+import net.codingwell.scalaguice.{InjectorExtensions, ScalaModule}
 import com.google.inject.{Injector, Singleton, Guice, AbstractModule}
 import services.logging.Logging
 import com.google.inject.Stage
@@ -46,8 +46,8 @@ class AppConfig extends AbstractModule with ScalaModule {
 object AppConfig extends Logging {
 
   import InjectorExtensions._
-  import uk.me.lings.scalaguice.typeLiteral
-  import uk.me.lings.scalaguice.KeyExtensions._
+  import net.codingwell.scalaguice.typeLiteral
+  import net.codingwell.scalaguice.KeyExtensions._
 
   val injector: Injector = {
     // Put a try-catch on making injector and print the error because Guice
@@ -66,7 +66,7 @@ object AppConfig extends Logging {
         Guice.createInjector(stage, new AppConfig)
       }
       catch {
-        case e =>
+        case e: Throwable =>
           e.printStackTrace()
           throw e
       }

@@ -1,26 +1,22 @@
 package utils
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import play.api.test.FakeRequest
-import play.api.mvc.{ AnyContent, Call }
-import play.api.Play
-import play.api.test.Helpers._
 import play.api.Configuration
-import services.http.BasicAuth
-import play.api.test.FakeApplication
-import services.http.EgraphsSession
-import EgraphsSession.Conversions._
-import play.api.mvc.Call
-import play.api.mvc.AnyContentAsFormUrlEncoded
-import play.api.mvc.ChunkedResult
+import play.api.Play
+import play.api.http.HeaderNames
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.concurrent.Promise
-import play.api.mvc.Result
-import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
+import play.api.mvc._
 import play.api.test._
-import play.api.http.HeaderNames
+import play.api.test.Helpers._
 import models._
 import scenario.RepeatableScenarios
+import services.http.BasicAuth
+import services.http.EgraphsSession
+import EgraphsSession.Conversions._
 
 /**
  * Common functionality required when writing functional tests against
@@ -28,25 +24,38 @@ import scenario.RepeatableScenarios
  */
 object FunctionalTestUtils {
 
-  def requestWithCustomerId(id: Long): FakeRequest[AnyContent] = {
-    FakeRequest().withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
-  }
+  implicit class EgraphsFakeRequest[A](request: FakeRequest[A]) {
+    def toCall(call: Call): FakeRequest[A] = {
+      // make a new FakeRequest using the old one since the copy doesn't work exactly
+      // as we would like it to since it would return a play.api.mvc.RequestHeader
+      new FakeRequest(
+        method = call.method,
+        uri = call.url,
+        headers = request.headers,
+        body = request.body,
+        remoteAddress = request.remoteAddress,
+        version = request.version,
+        id = request.id,
+        tags = request.tags
+      )
+    }
 
-  def requestWithAdminId(id: Long): FakeRequest[AnyContent] = {
-    FakeRequest().withSession(EgraphsSession.Key.AdminId.name -> id.toString)
-  }
+    def withCustomerId(id: Long): FakeRequest[A] = {
+      request.withSession(EgraphsSession.Key.CustomerId.name -> id.toString)
+    }
 
-  /**
-   * Makes an API request verified by the credentials from provided account
-   */
-  def requestWithCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[AnyContent] = {
-    requestWithCredentials(account.email, password)
-  }
+    def withAdminId(id: Long): FakeRequest[A] = {
+      request.withSession(EgraphsSession.Key.AdminId.name -> id.toString)
+    }
 
-  def requestWithCredentials(user: String, password: String): FakeRequest[AnyContent] = {
-    val auth = BasicAuth.Credentials(user, password)
+    def withCredentials(user: String, password: String): FakeRequest[A] = {
+      val auth = BasicAuth.Credentials(user, password)
+      request.withHeaders(auth.toHeader)
+    }
 
-    FakeRequest().withHeaders(auth.toHeader)
+    def withCredentials(account: Account, password: String = TestData.defaultPassword): FakeRequest[A] = {
+      withCredentials(account.email, password)
+    }
   }
 
   /**
@@ -73,12 +82,14 @@ object FunctionalTestUtils {
         val chunkedByteResult = chunkedResult.asInstanceOf[ChunkedResult[Array[Byte]]]
         var bytesVec = Vector.empty[Byte]
         val countIteratee = Iteratee.fold[Array[Byte], Unit](0) { (_, bytes) => bytesVec = bytesVec ++ bytes }
-        val promisedIteratee = chunkedByteResult.chunks(countIteratee).asInstanceOf[Promise[Iteratee[Array[Byte], Unit]]]
+        val futureIteratee = chunkedByteResult.chunks(countIteratee).asInstanceOf[Future[Iteratee[Array[Byte], Unit]]]
 
-        promisedIteratee.await(5000).get.run.await(5000).get
+        val future = Await.result(futureIteratee, 5 seconds).run
+        Await.result(future, 5 seconds)
 
         bytesVec
-
+      case AsyncResult(asyncResult) => 
+        chunkedContent(Await.result(asyncResult, 5 seconds))
       case _ =>
         throw new Exception("Couldn't get chunked content from result of type " + result.getClass)
     }
@@ -93,9 +104,8 @@ object FunctionalTestUtils {
   }
 
   trait NonProductionEndpointTests { this: EgraphsUnitTest =>
-    import play.api.test.Helpers._
     protected def routeUnderTest: Call
-    protected def successfulRequest: FakeRequest[AnyContent] = {
+    protected def successfulRequest: FakeRequest[AnyContentAsEmpty.type] = {
       FakeRequest(routeUnderTest.method, routeUnderTest.url)
     }
 
@@ -108,7 +118,7 @@ object FunctionalTestUtils {
     }
 
     routeName(routeUnderTest) + ", as a test-only endpoint, " should "be available during test mode" in new EgraphsTestApplication {
-      val Some(result) = routeAndCall(successfulRequest)
+      val Some(result) = route(successfulRequest)
       status(result) should not be (NOT_FOUND)
     }
 
@@ -118,16 +128,12 @@ object FunctionalTestUtils {
     it should "be unavailable outside of test mode" in (pending)
   }
 
-  trait DomainRequestBase[T] {
+  trait DomainRequestBase[T, U] {
     def request: FakeRequest[T]
     def requestWithAuthTokenInBody: FakeRequest[T]
     def requestWithAdminIdInBody(adminId: Long): FakeRequest[T]
 
     val authToken = "fake-auth-token"
-
-    def toRoute(route: Call): FakeRequest[T] = {
-      request.copy(method = route.method, uri = route.url)
-    }
 
     def withCustomer(customerId: Long): FakeRequest[T] = {
       request.withSession(request.session.withCustomerId(customerId).data.toSeq: _*)
@@ -138,7 +144,7 @@ object FunctionalTestUtils {
       requestWithAdminIdInBody(adminId).withSession(newSession.data.toSeq: _*)
     }
 
-    def withAuthToken: FakeRequest[T] = {
+    def withAuthToken: FakeRequest[U] = {
       val newSession = request.session + ("authenticityToken" -> authToken)
       requestWithAuthTokenInBody.withSession(newSession.data.toSeq: _*)
     }
@@ -149,14 +155,14 @@ object FunctionalTestUtils {
    * (Overriden method requestWithAuthTokenInBody used by withAuthToken in trait DomainRequestBase:
    *   type checks for anything that can be cast as AnyContentAsFormUrlEncoded)
    */
-  class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
-    override def requestWithAuthTokenInBody: FakeRequest[T] = {
+  implicit class DomainRequest[T <: AnyContent](override val request: FakeRequest[T]) extends DomainRequestBase[T, AnyContentAsFormUrlEncoded] {
+    override def requestWithAuthTokenInBody: FakeRequest[AnyContentAsFormUrlEncoded] = {
       val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
       val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
       val newBody = existingBody + ("authenticityToken" -> Seq(authToken))
       val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
 
-      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*).asInstanceOf[FakeRequest[T]]
+      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*)
     }
 
     override def requestWithAdminIdInBody(adminId: Long): FakeRequest[T] = {
@@ -174,19 +180,20 @@ object FunctionalTestUtils {
    * (Overriden method requestWithAuthTokenInBody used by withAuthToken in trait DomainRequestBase:
    *   type checks for MultipartFormData[TemporaryFile])
    */
-  class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T] {
-    override def requestWithAuthTokenInBody: FakeRequest[T] = {
+  implicit class MultipartDomainRequest[T](override val request: FakeRequest[T]) extends DomainRequestBase[T, MultipartFormData[TemporaryFile]] {
+    override def requestWithAuthTokenInBody: FakeRequest[MultipartFormData[TemporaryFile]] = {
 
       val multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
 
       val existingDataParts = multipartEncodedRequest.body.dataParts
       val existingFiles = multipartEncodedRequest.body.files
       val existingBadParts = multipartEncodedRequest.body.badParts
-      val existingMissingFileParts = multipartEncodedRequest.body.missingFileParts
+      //TODO: verify, this seems to be removed in Play 2.1 this might be okay
+      //val existingMissingFileParts = multipartEncodedRequest.body.missingFileParts
 
       val newDataParts = existingDataParts + ("authenticityToken" -> Seq(authToken))
 
-      val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts, existingMissingFileParts)
+      val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts)
       val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)
       newRequest.asInstanceOf[FakeRequest[T]]
     }

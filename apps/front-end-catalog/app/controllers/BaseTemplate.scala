@@ -20,19 +20,19 @@ object BaseTemplate extends Controller with DefaultAuthenticityToken
 
     Ok(views.html.frontend.base_template(
       "Title",
-      headJs=new Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
-      body=new Html("<div>This is the body</div>"),
-      jsMain="pages/base-template"
+      headJs = Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
+      body = Html("<div>This is the body</div>"),
+      jsMain = "pages/base-template"
     ))
   }
 
   def loggedIn = Action {
     val loggedInStatus = HeaderLoggedIn(
-      name="Herp Derpson",
-      username="herp4life",
-      profileUrl="/users/herpderpson1",
-      accountSettingsUrl="/users/herpderpson1/settings",
-      galleryUrl="/users/herpderpson1/gallery",
+      name = "Herp Derpson",
+      username = "herp4life",
+      profileUrl = "/users/herpderpson1",
+      accountSettingsUrl = "/users/herpderpson1/settings",
+      galleryUrl = "/users/herpderpson1/gallery",
       "/logout"
     )
 
@@ -43,9 +43,9 @@ object BaseTemplate extends Controller with DefaultAuthenticityToken
 
     Ok(views.html.frontend.base_template(
       "Title",
-      headJs=new Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
-      body=new Html("<div>This is the body</div>"),
-      jsMain="pages/base-template"
+      headJs = Html("var thisShouldHaveBeenInjectedInTheHead = 1;"),
+      body = Html("<div>This is the body</div>"),
+      jsMain = "pages/base-template"
     ))
   }
 

@@ -5,9 +5,12 @@ import org.squeryl.{KeyedEntity, Table}
 
 
 trait HasEntity[T <: KeyedEntity[KeyT], KeyT] {
+  /**
+   * id is not defined as _entity.id so one may, for instance, take id as a constructor argument to a class
+   * and retrieve the _entity lazily.
+   */
+  def id: KeyT
   def _entity: T
-  def id: KeyT = _entity.id
-  def isPersisted: Boolean = _entity.isPersisted
 }
 
 

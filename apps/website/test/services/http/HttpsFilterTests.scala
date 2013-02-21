@@ -1,12 +1,15 @@
 package services.http
 
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import play.api.mvc._
 import play.api.mvc.Results._
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import utils.EgraphsUnitTest
 import services.config.ConfigFileProxy
-import play.api.test.Helpers._
 
+@RunWith(classOf[JUnitRunner])
 class HttpsFilterTests extends EgraphsUnitTest {
 
   "HttpsFilter" should "redirect insecure http requests to https when httpsOnly is true" in {

@@ -1,18 +1,20 @@
 package services.actors
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import actors.{ProcessEgraphMessage, EgraphActor}
+import akka.actor._
+import akka.actor.Actor._
+import akka.pattern._
+import akka.util.Timeout
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
 import utils.{TestHelpers, ClearsCacheBefore, EgraphsUnitTest, TestData}
 import models.enums.EgraphState
 import org.scalatest.BeforeAndAfterAll
 import utils.TestHelpers.withActorUnderTest
-import akka.pattern._
-import akka.util.Timeout
-import akka.util.duration._
 import play.api.test.FakeRequest
 import services.config.ConfigFileProxy
-import akka.dispatch.Await
 import models.EgraphQueryFilters
 import services.logging.LoggingContext
 import models.EgraphStore

@@ -15,7 +15,7 @@ class GetMarketplaceEndpointTests extends EgraphsUnitTest {
   def routeUnderTest = getMarketplaceResultPage("")
     
   "getMarketplaceResultPage" should "serve a default page" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(FakeRequest(GET, routeUnderTest.url))
+    val Some(result) = route(FakeRequest(GET, routeUnderTest.url))
     status(result) should be(OK)
   }
 

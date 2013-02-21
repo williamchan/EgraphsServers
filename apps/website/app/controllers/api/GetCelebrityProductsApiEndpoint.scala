@@ -1,10 +1,10 @@
 package controllers.api
 
+import play.api.libs.json._
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
-import sjson.json.Serializer
 
 private[controllers] trait GetCelebrityProductsApiEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
@@ -19,8 +19,7 @@ private[controllers] trait GetCelebrityProductsApiEndpoint { this: Controller =>
     httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celeb =>
         Action {
-          val productMaps = celeb.products().map(product => product.renderedForApi)
-          Ok(Serializer.SJSON.toJSON(productMaps))
+          Ok(Json.toJson(celeb.products()))
         }
       }
     }

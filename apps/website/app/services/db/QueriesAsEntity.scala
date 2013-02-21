@@ -11,6 +11,8 @@ trait QueriesAsEntity[ModelT <: HasEntity[EntityT, KeyT], EntityT <: KeyedEntity
   protected def entityToModel(convert: EntityT): Option[ModelT]
   protected def table: Table[EntityT]
 
+  def findEntityById(id: KeyT) = table.lookup(id)
+
   def findById(id: KeyT): Option[ModelT] = {
     for (entity <- table.lookup(id); model <- entityToModel(entity)) yield model
   }
@@ -18,7 +20,7 @@ trait QueriesAsEntity[ModelT <: HasEntity[EntityT, KeyT], EntityT <: KeyedEntity
   def get(id: KeyT)(implicit m: Manifest[EntityT]): ModelT = {
     findById(id).getOrElse(
       throw new RuntimeException(
-        "DB contained no instances of class " + m.erasure.getName + " with id=" + id
+        "DB contained no instances of class " + m.runtimeClass.getName + " with id=" + id
       )
     )
   }

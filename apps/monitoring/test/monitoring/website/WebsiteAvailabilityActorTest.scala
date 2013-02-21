@@ -1,14 +1,14 @@
 package monitoring.website
 
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import org.specs2.mock.Mockito
 
 import akka.actor.Props
-import akka.dispatch.Await
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.util.duration.intToDurationInt
 import collections.EgraphsMetric
 import common.CloudWatchMetricPublisher
 import common.MonitoringMessages.GetMetric

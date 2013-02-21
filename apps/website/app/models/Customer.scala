@@ -1,16 +1,19 @@
 package models
 
-import enums.OrderReviewStatus
 import java.sql.Timestamp
+import org.apache.commons.mail.HtmlEmail
+import play.api.libs.json._
+import play.api.templates.Html
+import play.api.mvc.RequestHeader
+
+import enums.OrderReviewStatus
 import services.{Time, AppConfig}
 import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
 import com.google.inject.{Provider, Inject}
 import exception.InsufficientInventoryException
 import org.apache.commons.mail.HtmlEmail
-import services.mail.TransactionalMail
-import play.api.mvc.RequestHeader
+import services.mail._
 import controllers.routes.WebsiteControllers.getVerifyAccount
-import play.api.templates.Html
 import services.ConsumerApplication
 import services.config.ConfigFileProxy
 
@@ -106,10 +109,6 @@ case class Customer(
     )
   }
 
-  def renderedForApi: Map[String, Any] = {
-    Map("id" -> id, "name" -> name)
-  }
-
   //
   // KeyedCaseClass[Long] methods
   //
@@ -119,33 +118,26 @@ case class Customer(
 }
 
 object Customer {
-  def sendNewCustomerEmail(
-      account: Account, 
-      verificationNeeded: Boolean = false, 
-      mail: TransactionalMail, 
-      consumerApp: ConsumerApplication
-  )(implicit request: RequestHeader)
-  {
-    val email = new HtmlEmail()
-    email.setFrom("webserver@egraphs.com")
-    email.addReplyTo("webserver@egraphs.com")
-    email.addTo(account.email)
-    email.setSubject("Welcome to Egraphs!")
-
-    val (textMsg: String, htmlMsg: Html) = if (verificationNeeded) {
-      val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
-      val html = views.html.frontend.email.account_verification(verifyPasswordUrl = verifyPasswordUrl)
-      val text = views.txt.frontend.email.account_verification(verifyPasswordUrl).toString()
-      (text, html)
-    } else {
-      val html = views.html.frontend.email.account_confirmation()
-      val text = views.txt.frontend.email.account_confirmation.toString()
-      (text, html)
-    }
-
-    mail.send(email, Some(textMsg), Some(htmlMsg))
+  def apply(id: Long, name: String): Customer = {
+    new Customer(id = id, name = name)
   }
 
+  implicit object CustomerFormat extends Format[Customer] {
+    def writes(customer: Customer): JsValue = {
+      Json.obj(
+        "id" -> customer.id,
+        "name" -> customer.name)
+    }
+
+    def reads(json: JsValue): JsResult[Customer] = {
+      JsSuccess {
+        Customer(
+          (json \ "id").as[Long],
+          (json \ "name").as[String]
+        )
+      }
+    }
+  }
 }
 
 class CustomerStore @Inject() (
@@ -174,9 +166,11 @@ class CustomerStore @Inject() (
     findByEmail(email).getOrElse(createByEmail(email, name))
   }
 
+  def findOrCreateByEmail(email: String): Customer = findOrCreateByEmail(email, email takeWhile (_ != '@'))
+
   def createByEmail(email: String, name: String): Customer = {
     val accountOption = accountStore.findByEmail(email)
-    val account = accountOption.getOrElse(Account(email = email, services = accountServices.get))
+    val account = accountOption.getOrElse(Account(email = email, _services = accountServices.get))
     val unsavedCustomer = account.createCustomer(name)
     val unsavedUsernameHistory = account.createUsername()
     val customer = unsavedCustomer.save()
@@ -185,18 +179,12 @@ class CustomerStore @Inject() (
 
     customer
   }
-  
-  def findByEmail(email: String): Option[Customer] = {
-    // TODO: Optimize this using a single outer-join query to get Customer + Account all at once
 
-    // Get the Account and Customer face if both exist.
-    for {
-      account <- accountStore.findByEmail(email)
-      customerId <- account.customerId
-      customer <- findById(customerId)
-    } yield {
-      customer
-    }
+  def findByEmail(email: String) = {
+    join (table, schema.accounts) ( (customer, account) =>
+      where (account.email === email)
+      select (customer) on (customer.id === account.customerId)
+    ).headOption
   }
 
   def findByUsername(username: String): Option[Customer] = {

@@ -1,8 +1,7 @@
 import cloudbees.Plugin._
 import sbt._
 import Keys._
-import PlayProject._
-import cloudbees.Plugin._
+import play.Project._
 
 object ApplicationBuild extends Build {
 
@@ -11,22 +10,24 @@ object ApplicationBuild extends Build {
   val baseDir = file(".") / "apps" / appName
 
   val appDependencies = Seq(
-      
+    // Playframework components
+    anorm, jdbc,
+
+    // Other third-party dependencies
     "com.amazonaws" % "aws-java-sdk" % "1.3.22",
     "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
     "redis.clients" % "jedis" % "2.0.0",
     
     "org.mockito" % "mockito-all" % "1.9.0" % "test",
-    "org.scalatest" %% "scalatest" % "1.8" % "test",
+    "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test",
     "com.typesafe.akka" % "akka-testkit" % "2.0.2" % "test"
   )
 
-  val main = PlayProject(
+  val main = play.Project(
     appName, 
     appVersion, 
     appDependencies, 
-    path = baseDir,
-    mainLang = SCALA
+    path = baseDir
   ).settings(
     // Add your own project settings here 
     testOptions in Test := Nil

@@ -1,10 +1,10 @@
 package controllers.api
 
+import play.api.libs.json._
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
-import sjson.json.Serializer
 
 // TODO(egraph-exploration): Work in progress. Not finalized. Used for rapid prototyping.
 private[controllers] trait GetCustomerApiEndpoint { this: Controller =>
@@ -15,7 +15,7 @@ private[controllers] trait GetCustomerApiEndpoint { this: Controller =>
     httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCustomerId.inAccount(account) { customer =>
         Action {
-          Ok(Serializer.SJSON.toJSON(customer.renderedForApi))
+          Ok(Json.toJson(customer))
         }
       }
     }

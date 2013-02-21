@@ -2,12 +2,11 @@ package services.video
 
 import java.io.File
 
-import models.Celebrity
-import models.VideoAsset
-import models.VideoAssetCelebrity
+import scala.concurrent.Future
+
 import play.api.Play.current
 import play.api.libs.Files.TemporaryFile
-import play.api.libs.concurrent.Promise
+import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.concurrent.Akka
 import play.api.libs.json.Json
 import play.api.mvc.BodyParsers.parse
@@ -18,6 +17,10 @@ import play.api.mvc.Results.Ok
 import play.api.mvc.MultipartFormData
 import play.api.mvc.Request
 import play.api.mvc.Result
+import models.Celebrity
+import models.VideoAsset
+import models.VideoAssetCelebrity
+
 import services.blobs.AccessPolicy
 import services.blobs.Blobs
 import services.db.DBSession
@@ -78,7 +81,7 @@ trait PostVideoAssetHelper {
               persist(celebrity, filename)
             }
 
-            val promiseOfMaybeFileLocation: Promise[Option[String]] = Akka.future {
+            val promiseOfMaybeFileLocation: Future[Option[String]] = Akka.future {
               resource.ref.moveTo(tempFile, true)
               putFile(blobKey, filename, tempFile)
             }

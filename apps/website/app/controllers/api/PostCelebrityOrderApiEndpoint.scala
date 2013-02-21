@@ -1,18 +1,18 @@
 package controllers.api
 
-import models.Celebrity
-import models.Order
-import models.enums.OrderReviewStatus
+import play.api.libs.json._
+import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Result
 import play.api.data._
-import Forms._
+import play.api.data.Forms._
 import play.api.data.format.Formats._
+import models.Celebrity
+import models.Order
+import models.enums.OrderReviewStatus
 import services.db.DBSession
 import services.http.{WithoutDBConnection, POSTApiControllerMethod}
 import services.http.filters.HttpFilters
-import sjson.json.Serializer
-import play.api.mvc.Action
 
 private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
   protected def dbSession: DBSession
@@ -47,12 +47,12 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
 
   // this is everything that isn't context
   private def postCelebrityOrderResult(reviewStatus: Option[String], rejectionReason: Option[String], order: Order, celebrity: Celebrity): Result = {
-    OrderReviewStatus.apply(reviewStatus.getOrElse("")) match {
+    OrderReviewStatus(reviewStatus.getOrElse("")) match {
       case Some(OrderReviewStatus.RejectedByCelebrity) => {
         val rejectedOrder = order.rejectByCelebrity(celebrity, rejectionReason = rejectionReason).save()
-        Ok(Serializer.SJSON.toJSON(rejectedOrder.renderedForApi))
+        Ok(Json.toJson(rejectedOrder))
       }
-      case _ => Ok(Serializer.SJSON.toJSON(order.renderedForApi))
+      case _ => Ok(Json.toJson(order))
     }
   }
 }

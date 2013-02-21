@@ -1,7 +1,6 @@
 package controllers.website.admin
 
 import models._
-import services.mail.TransactionalMail
 import play.api.mvc.{Action, Controller}
 import play.api.mvc.Results.{Ok, Redirect}
 import controllers.WebsiteControllers
@@ -15,6 +14,8 @@ import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
 import services.http.EgraphsSession._
+import services.email.CelebrityWelcomeEmail
+import services.ConsumerApplication
 
 trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   this: Controller =>
@@ -23,7 +24,7 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
   protected def httpFilters: HttpFilters
   protected def celebrityStore: CelebrityStore
   protected def accountStore: AccountStore
-  protected def transactionalMail: TransactionalMail
+  protected def consumerApp: ConsumerApplication
 
   def postSendCelebrityWelcomeEmailAdmin(celebrityId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
@@ -35,7 +36,13 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
                 Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId)).flashing("errors" -> formWithErrors.errors.head.message.toString())
               },
               emailAddress => {
-                celebrity.sendWelcomeEmail(emailAddress, bccEmail = Some(adminAccount.email))
+                CelebrityWelcomeEmail(
+                  toAddress = emailAddress,
+                  consumerApp = consumerApp,
+                  celebrity = celebrity,
+                  bccEmail = Some(adminAccount.email)
+                ).send()
+
                 Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId))
               })
         }

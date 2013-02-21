@@ -1,7 +1,7 @@
 package services.mail
 
 import com.google.inject.{Singleton, AbstractModule}
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 
 /**
  * Guice bindings for our email-related services.

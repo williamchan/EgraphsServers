@@ -20,10 +20,9 @@ import services.mvc.search.RebuildSearchIndexActor
 import services.mvc.celebrity.UpdateTwitterFollowersActor
 
 object Global extends controllers.ToyBox with Logging {
-  // for ToyBox; see .conf file in use for further configuration
+  // for ToyBox; see ToyBox's README.md file in use for further configuration
   val loginPath = "/toybox/login"
   val assetsRoute = controllers.routes.EgraphsAssets.at(_)
-
 
   override def onStart(app: Application) {
     SSLConfig.enableCustomTrustore()

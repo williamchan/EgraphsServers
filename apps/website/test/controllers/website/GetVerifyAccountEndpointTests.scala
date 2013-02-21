@@ -1,11 +1,10 @@
 package controllers.website
 
-
 import play.api.test._
 import play.api.test.Helpers._
-import egraphs.playutils.RichResult._
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+
+import egraphs.playutils.ResultUtils.RichResult
+import utils.FunctionalTestUtils._
 import services.db.TransactionSerializable
 import utils.TestData
 import controllers.routes.WebsiteControllers.getVerifyAccount

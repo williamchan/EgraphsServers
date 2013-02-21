@@ -1,5 +1,6 @@
 package models
 
+import play.api.libs.json.Json
 import enums._
 import utils._
 import services.{AppConfig, ConsumerApplication}
@@ -14,6 +15,8 @@ import java.util.Date
 import java.util.Calendar
 import org.joda.time.DateTimeConstants
 import org.joda.time.DateTime
+import models.frontend.email.EmailViewModel
+import services.email.ViewEgraphEmail
 
 class OrderTests extends EgraphsUnitTest
   with ClearsCacheBefore
@@ -117,34 +120,36 @@ class OrderTests extends EgraphsUnitTest
     savedPromoOrder should be ('Promotional)
     restoredPromoOrder should be ('Promotional)
   }
-  
 
-  "renderedForApi" should "serialize the correct Map for the API" in new EgraphsTestApplication {
+  "toJson" should "serialize correctly for the API" in new EgraphsTestApplication {
     val order = newEntity.copy(requestedMessage = Some("requestedMessage"), messageToCelebrity = Some("messageToCelebrity")).save()
     val buyer = order.buyer
 
-    val rendered = order.renderedForApi
-    rendered("id") should be(order.id)
-    rendered("buyerId") should be(buyer.id)
-    rendered("buyerName") should be(buyer.name)
-    rendered("recipientId") should be(buyer.id)
-    rendered("recipientName") should be(buyer.name)
-    rendered("amountPaidInCents") should be(order.amountPaid.getAmountMinor)
-    rendered("reviewStatus") should be(order.reviewStatus.name)
-    rendered("requestedMessage") should be(order.requestedMessage.get)
-    rendered("messageToCelebrity") should be(order.messageToCelebrity.get)
-    rendered("audioPrompt") should be("Recipient: " + order.recipientName)
-    rendered("orderType") should be(order.writtenMessageRequest.name)
-    rendered.contains("created") should be(true)
-    rendered.contains("updated") should be(true)
-    rendered.contains("product") should be(true)
+    val json = Json.toJson(order)
+    val orderFromJson = json.as[Order]
+
+    orderFromJson.id should be (order.id)
+    orderFromJson.buyerId should be (order.buyerId)
+    orderFromJson.recipientId should be (order.recipientId)
+    orderFromJson.recipientName should be (order.recipientName)
+    orderFromJson.amountPaidInCurrency.intValue should be (order.amountPaid.getAmountMinor.intValue)
+    orderFromJson.reviewStatus should be (order.reviewStatus)
+    orderFromJson.requestedMessage should be (order.requestedMessage)
+    orderFromJson.messageToCelebrity should be (order.messageToCelebrity)
+    orderFromJson.writtenMessageRequest should be (order.writtenMessageRequest)
+    orderFromJson.created.getTime should be (order.created.getTime)
+    orderFromJson.updated.getTime should be (order.updated.getTime)
+
+    (json \ "buyerName").as[String] should be(buyer.name)
+    (json \ "audioPrompt").as[String] should be("Recipient: " + order.recipientName)
+    (json \ "product").as[Product].id should be(order.productId)
   }
 
-  "renderedForApi" should "return requestedMessage when available, even if writtenMessageRequest is CelebrityChoosesMessage" in new EgraphsTestApplication {
-    val order = newEntity.copy(requestedMessage = Some("requestedMessage"))
+  it should "return requestedMessage when available, even if writtenMessageRequest is CelebrityChoosesMessage" in new EgraphsTestApplication {
+    val order = newEntity.copy(requestedMessage = Some("myRequestedMessage"))
       .withWrittenMessageRequest(WrittenMessageRequest.CelebrityChoosesMessage).save()
-    val rendered = order.renderedForApi
-    rendered("requestedMessage") should be("requestedMessage")
+    val json = Json.toJson(order)
+    (json \ "requestedMessage").as[String] should be("myRequestedMessage")
   }
 
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in new EgraphsTestApplication {
@@ -254,13 +259,13 @@ class OrderTests extends EgraphsUnitTest
     refundTxn.currencyCode should be(CurrencyUnit.USD.getCode)
   }
 
-  "prepareEgraphsSignedEmail" should "not use celebrity's email" in new EgraphsTestApplication {
+  "prepareViewEgraphEmail" should "not use celebrity's email" in new EgraphsTestApplication {
     val celebrity = TestData.newSavedCelebrity()
     val order = TestData.newSavedOrder(product = Some(TestData.newSavedProduct(celebrity = Some(celebrity))))
     implicit val request = FakeRequest()
-    val (email, _, _) = order.prepareEgraphSignedEmail
-    email.getFromAddress.getAddress should not be (celebrity.account.email)
-    email.getReplyToAddresses.get(0).asInstanceOf[InternetAddress].getAddress should be("webserver@egraphs.com")
+    val (emailViewModel, _, _) = ViewEgraphEmail(order).prepareViewEgraphEmail
+    emailViewModel.fromEmail should not be (celebrity.account.email)
+    emailViewModel.replyToEmail should be ("webserver@egraphs.com")
   }
 
   "isBuyerOrRecipient" should "return true if customer is either buy or recipient" in new EgraphsTestApplication {

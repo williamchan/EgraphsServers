@@ -1,7 +1,7 @@
 package models
 
 import java.sql.Timestamp
-import services.db.{KeyedCaseClass, SavesWithLongKey, Schema}
+import services.db.{HasTransientServices, KeyedCaseClass, SavesWithLongKey, Schema}
 import com.google.inject.Inject
 import java.util.UUID
 import org.apache.commons.codec.binary.Base64
@@ -23,8 +23,9 @@ case class Account(
   administratorId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  services: AccountServices = AppConfig.instance[AccountServices]
+  @transient _services: AccountServices = AppConfig.instance[AccountServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
+  with HasTransientServices[AccountServices]
 {
   def save(): Account = {
     require(!email.isEmpty, "Account: email must be specified")
@@ -118,7 +119,7 @@ case class Account(
     val expirationTime = try {
       attempt.substring(indexOfExpirationTime).toLong
     } catch {
-      case _ => return false
+      case _: Throwable => return false
     }
 
     (resetPasswordKey.get == attempt) && (System.currentTimeMillis < expirationTime)

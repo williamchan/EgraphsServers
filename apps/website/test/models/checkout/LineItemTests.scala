@@ -1,15 +1,17 @@
 package models.checkout
 
 import checkout.Conversions._
-import org.scalatest.matchers.{ShouldMatchers}
+import org.scalatest.matchers.{Matcher, MatchResult, ShouldMatchers}
 import org.scalatest.FlatSpec
 import LineItemMatchers._
-import utils.TestData._
-import utils.CanInsertAndUpdateAsThroughServicesWithLongKeyTests
-import services.db.CanInsertAndUpdateAsThroughServices
-import models.CashTransaction
-import services.payment.StripeTestPayment
+import utils.TestData
+import utils.CanInsertAndUpdateEntityWithLongKeyTests
+import services.payment.{Payment, YesMaamPayment, StripeTestPayment}
 import services.AppConfig
+import services.db.{CanInsertAndUpdateEntityThroughTransientServices, CanInsertAndUpdateEntityThroughServices}
+import models.{Coupon, CashTransaction}
+import models.enums.OfCheckoutClass
+import models.enums.CheckoutCodeType
 
 /** mixin for testing a LineItemType's lineItems method */
 trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
@@ -24,10 +26,8 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
 
   /** sets of items for which lineItems should resolve */
   def resolvableItemSets: Seq[LineItems]
-
-  /** sets of types which should prevent resolution */
+  /** sets of types which should prevent resolution, can be Nil */
   def resolutionBlockingTypes: Seq[LineItemTypes]
-
   /** sets of types that should not interfere with resolution */
   def nonResolutionBlockingTypes: Seq[LineItemTypes]
 
@@ -36,7 +36,6 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   //
   /** restores a transacted line item */
   def restoreLineItem(id: Long): Option[ItemT]
-
   /** checks that line item has roughly the expected domain object once restored */
   def hasExpectedRestoredDomainObject(lineItem: ItemT): Boolean
 
@@ -72,30 +71,46 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
     }
   }
 
-
   "A LineItem" should "have the expected domain object when restored" in {
     val restored = restoreLineItem(saveLineItem(newLineItem).id).get
 
-    hasExpectedRestoredDomainObject(restored) should be (true)
+    restored should haveExpectedRestoredDomainObject
   }
-
 
   //
   // Helpers
   //
-  def newLineItem: ItemT = newItemType.lineItems(resolvableItemSets.head, Nil)
-    .get.head.asInstanceOf[ItemT]
+  def resolve(itemType: TypeT) = itemType.lineItems(resolvableItemSets.head, Nil)
+    .get
 
-  def saveLineItem(item: ItemT): ItemT = item.transact(checkout).asInstanceOf[ItemT]
+  def newLineItem: ItemT = resolve(newItemType).ofCodeType(
+    newItemType.codeType.asInstanceOf[CheckoutCodeType with OfCheckoutClass[TypeT, ItemT]]
+  ).head
+
+  def saveLineItem(item: ItemT): ItemT = item match {
+    case subItem: SubLineItem[_] => subItem.transactAsSubItem(checkout).asInstanceOf[ItemT]
+    case lineItem: LineItem[_] => lineItem.transact(checkout).asInstanceOf[ItemT]
+  }
 
   lazy val checkout = newSavedCheckout()
+
+  lazy val lineItemStore = AppConfig.instance[LineItemStore]
+
+
+  def haveExpectedRestoredDomainObject = Matcher { left: ItemT =>
+    MatchResult(
+      hasExpectedRestoredDomainObject(left),
+      "Bad bad, wtf is this: " + left.domainObject,
+      "Good good."
+    )
+  }
 }
 
-
 /** tests simple LineItem persistence */
-trait CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[
-  ItemT <: LineItem[_] with CanInsertAndUpdateAsThroughServices[ItemT, LineItemEntity] with HasLineItemEntity
-] extends CanInsertAndUpdateAsThroughServicesWithLongKeyTests[ItemT, LineItemEntity]
+trait SavesAsLineItemEntityThroughServicesTests[
+  ItemT <: LineItem[_] with SavesAsLineItemEntityThroughServices[ItemT, ServicesT] with HasLineItemEntity[ItemT],
+  ServicesT <: SavesAsLineItemEntity[ItemT]
+] extends CanInsertAndUpdateEntityWithLongKeyTests[ItemT, LineItemEntity]
 { this: FlatSpec with ShouldMatchers with LineItemTests[_ <: LineItemType[_], ItemT] =>
 
   import LineItemTestData._
@@ -104,50 +119,5 @@ trait CanInsertAndUpdateAsThroughServicesWithLineItemEntityTests[
   override def newModel: ItemT = newLineItem
   override def transformModel(model: ItemT) = model.withAmount(model.amount.plus(1.0)).asInstanceOf[ItemT]
   override def restoreModel(id: Long): Option[ItemT] = restoreLineItem(id)
-  override def saveModel(model: ItemT): ItemT = {
-    if (model.id > 0) { model.update() } else {
-      model.transact(newSavedCheckout()).asInstanceOf[ItemT]
-    }
-  }
-
-}
-
-
-
-
-/**
- * Collection of helpers for generating line items and types of various sorts, primarily to use
- * for LineItemTests. Unless named as 'saved' whatever, these are not saved.
- */
-object LineItemTestData {
-  import services.Finance.TypeConversions._
-
-  def seqOf[T](gen: => T)(n: Int): Seq[T] = (0 to n).toSeq.map(_ => gen)
-
-  def randomGiftCertificateItem = randomGiftCertificateType.lineItems().get.head
-  def randomGiftCertificateType = GiftCertificateLineItemType(generateFullname, randomMoney)
-
-  def taxItemOn(subtotal: SubtotalLineItem): TaxLineItem = randomTaxType.lineItems(Seq(subtotal), Nil).get.head
-  def randomTaxItem: TaxLineItem = taxItemOn(randomSubtotalItem)
-  def randomTaxType: TaxLineItemType = TaxLineItemType("98888", randomTaxRate, Some("Test tax"))
-
-  def randomSubtotalItem: SubtotalLineItem = SubtotalLineItem(randomMoney)
-  def randomTotalItem = TotalLineItem(randomMoney)
-  def randomBalanceItem = BalanceLineItem(randomMoney)
-
-  def randomCashTransactionType = CashTransactionLineItemType(newSavedAccount().id, zipcode, Some(payment.testToken().id))
-  def randomCashTransactionItem = randomCashTransactionType.lineItems(Seq(randomBalanceItem)).get.head
-
-  def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
-  def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
-
-  def newCheckout = Checkout(Seq(randomGiftCertificateType), zipcode, Some(newSavedCustomer()))
-  def newSavedCheckout() = newCheckout.insert()
-  def newTransactedCheckout = newCheckout.transact(Some(randomCashTransactionType))
-
-  def payment: StripeTestPayment = {
-    val pment = AppConfig.instance[StripeTestPayment]; pment.bootstrap(); pment
-  }
-
-  protected def zipcode = Some("98888")
+  override def saveModel(model: ItemT): ItemT = saveLineItem(model)
 }

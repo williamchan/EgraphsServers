@@ -1,8 +1,5 @@
 // Styles for the checkout explorations base checkout page
 body.storefront-a-checkout {
-  // Easing function that starts out fast then slows down to stop with precision
-  @naturalEasing: cubic-bezier(0, .98, .21, .9);
-
   @mainContentWidth: 523px;
   line-height: normal;
 
@@ -387,67 +384,6 @@ body.storefront-a-checkout {
     //
     form { margin-bottom: 0px;}
 
-    // The error divs used for every single form element
-    .errors {
-      margin-top:2px;
-      color:@orange;
-      font-size:12px;
-      font-style:italic;
-      
-      // For errors that occur on a specific field (most of them)
-      .field-error {
-        display:inline-block;
-        margin-right:5px;
-
-        // Put a funny finger icon before the error message
-        &:before {
-          position:relative;
-          background-image:url("@{iconSpritePath}");
-          content:"";
-          width:14px;
-          height:14px;
-          vertical-align:text-top;
-          display:inline-block;
-          margin-right:3px;
-          background-position: -144px -144px;
-        }
-      }
-    }
-
-    // Input styles. An input never shows errors if it has never been tabbed-off ("attended")
-    // Once it has been tabbed-off, it shows its validation and asynchronous updating state
-    // using a few icons: a green check, a red X, and a spinning circle.
-    @checkMarkIcon: "/assets/images/glyphicons-check-circle-green.png";
-    .ajaxInputIcons() {
-      &.ng-invalid:not(.ng-submitting) {
-        background-image: url("/assets/images/glyphicons-x-circle-orange.png");
-        -webkit-animation-duration: .25s;
-        -webkit-animation-name: throb;
-        -webkit-animation-direction: alternate;
-        -webkit-animation-iteration-count: 4;
-      }
-
-      &.ng-valid:not(.ng-submitting) {
-        background-image: url("@{checkMarkIcon}");
-      }
-      
-      &.ng-submitting {
-        background-image: url("/assets/images/ajax-loader.gif");
-      }
-    }
-
-    input {
-      padding-left:25px;
-      background-size:16px 16px;
-      background-position: 5px 50%;
-      background-repeat:no-repeat;
-      background-image: url("/assets/images/glyphicons-circle-gray.png");
-    }
-
-    input.ng-user-has-attended, textarea.ng-user-has-attended {
-      .ajaxInputIcons();
-    }
-
     select.ng-user-has-attended {
       &.ng-invalid {
         background-color:lighten(@orange, 40%);
@@ -457,9 +393,10 @@ body.storefront-a-checkout {
 
     // Coupon code box gets the styles regardless of tab setting
     #coupon-couponCode {
-      margin-bottom:8px;
       .ajaxInputIcons();
+      width:160px;
 
+      // Gray circle icon instead of check-mark in valid state when the field is empty only
       &.ng-valid:not(.ng-submitting) {
         background-image: url("/assets/images/glyphicons-circle-gray.png");
       }
@@ -476,6 +413,10 @@ body.storefront-a-checkout {
       &.ng-dirty.ng-valid:not(.ng-submitting) {
         background-image: url("@{checkMarkIcon}");
       }
+    }
+
+    .discount-field .tooltip-link {
+      margin-top:8px;
     }
 
     .control-group {
@@ -495,19 +436,8 @@ body.storefront-a-checkout {
     .controls {
       margin-left:29%;
       margin-right:29%;
-
+      
       input, textarea, select {
-        color:#666;
-        width:92%;
-
-        &:focus {
-          border-color: rgba(82,168,236,.8);
-          outline: 0;
-          outline: thin dotted \9; /* IE6-9 */
-          // retain a subtle shadow within the body of the input
-          .box-shadow(~"inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6)");
-        }
-
         &.half {
           width:50%;
         }
@@ -532,23 +462,9 @@ body.storefront-a-checkout {
       margin-top:7px;
     }
 
-    #field-reminder {
-      font-style:italic;
-      font-size:13px;
-
+    .field-reminder {
       img {
-        width:16px;
         margin-left:6px;
-        vertical-align:bottom;
-      }
-
-      .fields-remaining {
-        color:lighten(@orange, 11%);
-
-        .num-remaining {
-          color:@orange;
-          font-weight:600;
-        }
       }
     }
 
@@ -643,7 +559,7 @@ body.storefront-a-checkout {
       display:inline;
     }
     .control-group {
-       padding-right:19px;
+       padding-right:10px;
        padding-left:10px;
     }
 

@@ -9,6 +9,6 @@ class EgraphVideoAssetTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   "encodeVideo" should "return byte array of video-fied egraph" in new EgraphsTestApplication {
     val egraph = TestData.newSavedEgraphWithRealAudio()
-    egraph.getVideoAsset.encodeVideo().length should be(52011)
+    egraph.getVideoAsset.encodeVideo().length should be(52209)
   }
 }

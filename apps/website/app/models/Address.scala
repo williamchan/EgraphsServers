@@ -3,24 +3,29 @@ package models
 import com.google.inject.Inject
 import java.sql.Timestamp
 import services.{AppConfig, Time}
-import services.db.{SavesWithLongKey, Schema, KeyedCaseClass}
+import services.db.{HasTransientServices, SavesWithLongKey, Schema, KeyedCaseClass}
 import org.squeryl.Query
 
 case class AddressServices @Inject()(store: AddressStore,
                                      accountStore: AccountStore)
 
-case class Address(id: Long = 0,
-                   accountId: Long = 0,
-                   addressLine1: String = "",
-                   addressLine2: Option[String] = None,
-                   city: String = "",
-                   _state: String = "",
-                   postalCode: String = "",
-                   created: Timestamp = Time.defaultTimestamp,
-                   updated: Timestamp = Time.defaultTimestamp,
-                   services: AddressServices = AppConfig.instance[AddressServices])
-  extends KeyedCaseClass[Long]
-  with HasCreatedUpdated {
+case class Address(
+  id: Long = 0,
+  accountId: Long = 0,
+  addressLine1: String = "",
+  addressLine2: Option[String] = None,
+  city: String = "",
+  _state: String = "",
+  postalCode: String = "",
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp,
+  @transient _services: AddressServices = AppConfig.instance[AddressServices]
+) extends KeyedCaseClass[Long]
+  with HasCreatedUpdated
+  with HasTransientServices[AddressServices]
+{
+
+
   //
   // Public methods
   //
@@ -31,6 +36,13 @@ case class Address(id: Long = 0,
 
   def account: Account = {
     services.accountStore.get(accountId)
+  }
+
+  def streetAddressString = {
+    val address = (List(addressLine1) ++  addressLine2.toList) mkString (" ")
+    val stateAndZip = "%s, %s %s".format(city, _state, postalCode)
+    val streetAddressAsList = List(address, city, stateAndZip)
+    streetAddressAsList.mkString("\n")
   }
 
   //

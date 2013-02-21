@@ -2,14 +2,11 @@ package controllers.website.admin
 
 import play.api.test._
 import play.api.test.Helpers._
-import egraphs.playutils.RichResult._
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+import egraphs.playutils.ResultUtils.RichResult
 import controllers.routes.WebsiteControllers.postCelebrityCategoryValueAdmin
-import sjson.json.Serializer
-import utils.EgraphsUnitTest
-import utils.CsrfProtectedResourceTests
 import utils._
+import utils.FunctionalTestUtils._
+import utils.CsrfProtectedResourceTests
 import models._
 import models.categories._
 import services.AppConfig

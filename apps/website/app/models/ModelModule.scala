@@ -6,7 +6,7 @@ import models.categories.CategoryServices
 import services.mvc.marketplace.MarketplaceServices
 import vbg._
 import xyzmo._
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 
 /**
  * Guice bindings for all model services.
@@ -18,12 +18,18 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[AdministratorServices].in[Singleton]    
     bind[BlobKeyServices].in[Singleton]
     bind[CashTransactionServices].in[Singleton]
+    bind[CashTransactionLineItemServices].in[Singleton]
+    bind[CashTransactionLineItemTypeServices].in[Singleton]
     bind[CategoryServices].in[Singleton]
     bind[CelebrityServices].in[Singleton]
     bind[CheckoutServices].in[Singleton]
-    bind[CouponServices].in[Singleton]    
+    bind[CouponServices].in[Singleton]
+    bind[CouponLineItemServices].in[Singleton]
+    bind[CouponLineItemTypeServices].in[Singleton]
     bind[CustomerServices].in[Singleton]
     bind[EgraphServices].in[Singleton]
+    bind[EgraphOrderLineItemServices].in[Singleton]
+    bind[EgraphOrderLineItemTypeServices].in[Singleton]
     bind[EnrollmentBatchServices].in[Singleton]
     bind[EnrollmentSampleServices].in[Singleton]
     bind[FailedPurchaseDataServices].in[Singleton]
@@ -37,9 +43,9 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[MarketplaceServices].in[Singleton]
     bind[OrderServices].in[Singleton]
     bind[PrintOrderServices].in[Singleton]
+    bind[PrintOrderLineItemServices].in[Singleton]
+    bind[PrintOrderLineItemTypeServices].in[Singleton]
     bind[ProductServices].in[Singleton]
-    bind[CashTransactionLineItemServices].in[Singleton]
-    bind[CashTransactionLineItemTypeServices].in[Singleton]
     bind[TaxLineItemServices].in[Singleton]
     bind[TaxLineItemTypeServices].in[Singleton]
     bind[VideoAssetCelebrityServices].in[Singleton]

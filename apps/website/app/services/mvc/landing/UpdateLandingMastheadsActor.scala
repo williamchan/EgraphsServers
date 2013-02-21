@@ -5,9 +5,9 @@ import services.db.{TransactionSerializable, DBSession}
 import services.cache.CacheFactory
 import models.MastheadStore
 import akka.actor.{Props, Actor}
-import akka.util.duration.intToDurationInt
 import services.logging.Logging
 import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
 import services.AppConfig
 import services.mvc.landing.UpdateLandingMastheadsActor.UpdateLandingMastheads
 import models.frontend.landing.LandingMasthead
@@ -15,8 +15,9 @@ import akka.agent.Agent
 import play.api.Play.current
 import akka.pattern.ask
 import akka.util.Timeout
-import akka.dispatch.Await
 import util.Random
+import concurrent._
+import concurrent.duration._
 
 
 private[landing] class UpdateLandingMastheadsActor @Inject()(
@@ -27,7 +28,7 @@ private[landing] class UpdateLandingMastheadsActor @Inject()(
 
   import UpdateLandingMastheadsActor.{resultsCacheKey, updatePeriod}
 
-  protected def receive = {
+  def receive = {
     case UpdateLandingMastheads(landingMastheadsAgent) => {
 
       val cache = cacheFactory.applicationCache

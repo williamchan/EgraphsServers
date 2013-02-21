@@ -174,6 +174,7 @@ trait HasCertOfAuthenticity {
     g2.drawString("www.egraphs.com/" + data.orderNumber, x, y)
 
     //draw MLB logos
-    g2.drawImage(scaledLogoImage, certWritableX + 475, logoY, null)
+    x = certWritableX + ((certWritableWidth - targetLogoWidth) / 2)
+    g2.drawImage(scaledLogoImage, x, logoY, null)
   }
 }

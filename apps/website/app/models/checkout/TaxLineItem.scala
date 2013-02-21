@@ -4,7 +4,7 @@ import checkout.Conversions._
 import com.google.inject.Inject
 import org.joda.money.Money
 import scalaz.Lens
-import services.db.{CanInsertAndUpdateAsThroughServices, Schema}
+import services.db.{CanInsertAndUpdateEntityThroughServices, Schema}
 import services.AppConfig
 
 
@@ -17,10 +17,12 @@ import services.AppConfig
 case class TaxLineItem private (
   _entity: LineItemEntity,
   _typeEntity: LineItemTypeEntity,
-  services: TaxLineItemServices = AppConfig.instance[TaxLineItemServices]
-) extends LineItem[Money] with HasLineItemEntity
+  @transient _services: TaxLineItemServices = AppConfig.instance[TaxLineItemServices]
+)
+	extends LineItem[Money]
+	with HasLineItemEntity[TaxLineItem]
   with LineItemEntityGettersAndSetters[TaxLineItem]
-  with CanInsertAndUpdateAsThroughServices[TaxLineItem, LineItemEntity]
+  with SavesAsLineItemEntityThroughServices[TaxLineItem, TaxLineItemServices]
 {
   require(amount.isPositiveOrZero)
 
@@ -28,7 +30,7 @@ case class TaxLineItem private (
   override def domainObject: Money = amount
 
 
-  override def toJson: String = ""
+  override def toJson = jsonify("Tax", itemType.description, Some(id))
 
 
   override def transact(checkout: Checkout): TaxLineItem = {
@@ -83,8 +85,4 @@ object TaxLineItem {
 //
 case class TaxLineItemServices @Inject() (
   schema: Schema
-) extends SavesAsLineItemEntity[TaxLineItem] {
-  override protected def modelWithNewEntity(tax: TaxLineItem, entity: LineItemEntity) = {
-    tax.copy(_entity=entity)
-  }
-}
+) extends SavesAsLineItemEntity[TaxLineItem]

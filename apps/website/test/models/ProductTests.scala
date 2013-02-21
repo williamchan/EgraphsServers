@@ -1,13 +1,14 @@
 package models
 
-import enums.{PublishedStatus, HasPublishedStatusTests}
 import java.util.Date
-import services.Time
-import services.AppConfig
-import utils._
 import java.awt.image.BufferedImage
 import org.joda.time.DateTimeConstants
 import play.api.Play
+import play.api.libs.json.Json
+import services.Time
+import services.AppConfig
+import utils._
+import enums.{PublishedStatus, HasPublishedStatusTests}
 
 class ProductTests extends EgraphsUnitTest
   with SavingEntityIdLongTests[Product]
@@ -55,7 +56,6 @@ class ProductTests extends EgraphsUnitTest
   //
   // Test cases
   //
-
   "Product" should "require certain fields" in new EgraphsTestApplication {
     var exception = intercept[IllegalArgumentException] {Product().save()}
     exception.getLocalizedMessage should include ("Product: name must be specified")
@@ -77,23 +77,32 @@ class ProductTests extends EgraphsUnitTest
     product.signingScaleH should be(Product.defaultPortraitSigningScale.height)
   }
 
-  "renderedForApi" should "serialize the correct Map for the API" in new EgraphsTestApplication {
+  "urlSlug" should "slugify the name" in new EgraphsTestApplication {
+    val product = TestData.newSavedProduct().copy(name = "Herp Derp").save()
+    product.urlSlug should be ("Herp-Derp")
+  }
+
+  "toJson" should "serialize the correctly for the API" in new EgraphsTestApplication {
     val product = TestData.newSavedProduct().copy(name = "Herp Derp", signingOriginX = 50, signingOriginY = 60).save()
 
-    val rendered = product.renderedForApi
+    val json = Json.toJson(product)
+    val productFromJson = json.as[Product]
+
+    productFromJson.id should be (product.id)
+    productFromJson.signingScaleW should be (product.signingScaleW)
+    productFromJson.signingScaleH should be (product.signingScaleH)
+    productFromJson.signingOriginX should be (product.signingOriginX)
+    productFromJson.signingOriginY should be (product.signingOriginY)
+    productFromJson.signingAreaW should be (product.signingAreaW)
+    productFromJson.signingAreaH should be (product.signingAreaH)
+    productFromJson.created.getTime should be (product.created.getTime)
+    productFromJson.updated.getTime should be (product.updated.getTime)
+
+    // fields not read from json to an Order, because they are derived.
     val iPadSigningPhotoUrl: String = product.photo.resizedWidth(product.signingScaleW).url
-    rendered("id") should be(product.id)
-    rendered("urlSlug") should be("Herp-Derp")
-    rendered("photoUrl") should be(iPadSigningPhotoUrl)
-    rendered("iPadSigningPhotoUrl") should be(iPadSigningPhotoUrl)
-    rendered("signingScaleW") should be(Product.defaultLandscapeSigningScale.width)
-    rendered("signingScaleH") should be(Product.defaultLandscapeSigningScale.height)
-    rendered("signingOriginX") should be(50)
-    rendered("signingOriginY") should be(60)
-    rendered("signingAreaW") should be(Product.defaultSigningAreaW)
-    rendered("signingAreaH") should be(Product.defaultSigningAreaW)
-    rendered.contains("created") should be(true)
-    rendered.contains("updated") should be(true)
+    (json \ "urlSlug").as[String] should be("Herp-Derp")
+    (json \ "photoUrl").as[String] should be(iPadSigningPhotoUrl)
+    (json \ "iPadSigningPhotoUrl").as[String] should be(iPadSigningPhotoUrl)
   }
 
   "findByCelebrityAndUrlSlug" should "return Product with matching name and celebrityId" in new EgraphsTestApplication {

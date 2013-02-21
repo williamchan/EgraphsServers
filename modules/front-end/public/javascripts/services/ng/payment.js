@@ -25,23 +25,22 @@ function(payment, validationDirective, ngApp, logging, module) {
   ngApp.directive("stripeResource", ["$parse", "$http", function($parse, $http) {
     return {
       restrict: 'A',
-      scope: true,
       require: ["remoteResource"],
       link: function(scope, element, attrs, requisites) {
         var tokenIdModel = attrs.stripeResource + ".id";
         var tokenDataModel = attrs.stripeResource + ".data";
         var remoteResourceCtrl = requisites[0];
-        var getModel = function(modelStr) { return $parse(modelStr)(scope.$parent); };
-        var setModel = function(modelStr, value) { return $parse(modelStr).assign(scope.$parent, value); };
+        var getModel = function(modelStr) { return $parse(modelStr)(scope); };
+        var setModel = function(modelStr, value) { return $parse(modelStr).assign(scope, value); };
 
         attrs.localResource = tokenIdModel;
 
         // When the stripe token ID changes due to successful form submission
         // we should also trigger a get of the remote token.
-        scope.$parent.$watch(attrs.localResource, function(tokenId) {
+        scope.$watch(attrs.localResource, function(tokenId) {
           if(tokenId) {
             payment.getToken(tokenId, function(status, token) {
-              scope.$parent.$apply(function() {
+              scope.$apply(function() {
                 if (status === 200) {
                   token.card.typeClass = function() {
                     return this.type === "Visa"? "visa":
@@ -91,7 +90,7 @@ function(payment, validationDirective, ngApp, logging, module) {
             };
 
             payment.createToken(form, function(status, response) {
-              scope.$parent.$apply(function() {
+              scope.$apply(function() {
                 var errors;
                 var data;
                 if (status === 200) {

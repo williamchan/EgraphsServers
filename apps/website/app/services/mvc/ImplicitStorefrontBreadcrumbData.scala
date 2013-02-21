@@ -1,5 +1,6 @@
 package services.mvc
 
+import scala.language.existentials
 import models.frontend.storefront.{StorefrontBreadcrumb, StorefrontBreadcrumbs}
 import services.http.forms.purchase.{PersonalizeForm, PurchaseForms, FormReaders, PurchaseFormFactory}
 import play.api.mvc.Request
