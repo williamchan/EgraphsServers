@@ -19,12 +19,12 @@ class GetMastheadAdminEndpointTests extends EgraphsUnitTest with AdminProtectedR
   routeName(getCreateMastheadAdmin) should "serve a page to create a masthead when logged in" in new EgraphsTestApplication {
     val admin = db.connected(TransactionSerializable) {TestData.newSavedAdministrator()}
 
-    val Some(result) = routeAndCall(FakeRequest().withAdmin(admin.id).toRoute(getCreateMastheadAdmin))
+    val Some(result) = route(FakeRequest(GET, getCreateMastheadAdmin.url).withAdmin(admin.id))
     status(result) should be (OK)
   }
 
   routeName(getCreateMastheadAdmin) should "not serve a page to create a masthead when not logged in" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(FakeRequest().toRoute(getCreateMastheadAdmin))
+    val Some(result) = route(FakeRequest(GET, getCreateMastheadAdmin.url))
     status(result) should be (SEE_OTHER)
   }
 }
