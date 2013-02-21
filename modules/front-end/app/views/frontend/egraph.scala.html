@@ -27,6 +27,7 @@
   <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
   <script src="https://vjs.zencdn.net/c/video.js"></script>
 
+  @** Open Graph property to specify what image from this page should be shown in Facebook likes *@
   <meta property="og:image" content="@videoPosterUrl"/>
 
   @** Twitter card for embedded player - https://dev.twitter.com/docs/cards *@
@@ -41,11 +42,6 @@
   <meta name="twitter:player:height" content="274">
   <meta name="twitter:player:stream" content="@mp4Url">
   <meta name="twitter:player:stream:content_type" content="video/mp4">
-}
-
-@headJs = {
-  Egraphs.page.celebrityName = "@celebrityName";
-  Egraphs.page.isPromotional = @isPromotional;
 }
 
 @baseBody = {
@@ -128,6 +124,6 @@
   title=title.toString,
   headHtml=headHtml,
   body=baseBody,
-  headJs=headJs,
+  jsMain="pages/egraph",
   bodyClasses=Seq("egraph-page")
 )
