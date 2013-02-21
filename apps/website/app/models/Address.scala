@@ -40,9 +40,8 @@ case class Address(
 
   def streetAddressString = {
     val address = (List(addressLine1) ++  addressLine2.toList) mkString (" ")
-    val stateAndZip = "%s, %s %s".format(city, _state, postalCode)
-    val streetAddressAsList = List(address, city, stateAndZip)
-    streetAddressAsList.mkString("\n")
+    val cityStateAndZip = "%s, %s %s".format(city, _state, postalCode)
+    List(address, cityStateAndZip).mkString("\n")
   }
 
   //

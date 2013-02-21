@@ -16,10 +16,11 @@ object LineItemTestData {
   def seqOf[T](gen: => T)(n: Int): Seq[T] = (0 to n).toSeq.map(_ => gen)
 
 
-  def randomEgraphOrderType(withPrint: Boolean = false, product: Option[Product] = None) = EgraphOrderLineItemType(
+  def randomEgraphOrderType(withPrint: Boolean = false, product: Option[Product] = None, isGift: Boolean = false) = EgraphOrderLineItemType(
     productId = (product getOrElse newSavedProduct()).id,
     recipientName = generateFullname(),
-    framedPrint = withPrint
+    framedPrint = withPrint,
+    isGift = isGift
   )
   def randomEgraphOrderItem(withPrint: Boolean = false) = randomEgraphOrderType(withPrint).lineItems(Nil, Nil).get.head
 
