@@ -1,0 +1,19 @@
+@(title: String, message: String)
+
+@import views.html.frontend.base_template
+
+@body = {
+<section id="content" role="main">
+  <div id="main" style="top:0px">
+    <div class="container">
+      <p>@message</p>
+    </div>
+  </div>
+</section>
+}
+
+@base_template(title=title, body=body, jsMain="")(
+  headerData = models.frontend.header.HeaderData(),
+  footerData = models.frontend.footer.FooterData(),
+  authToken = new egraphs.authtoken.AuthenticityToken("")
+)
