@@ -3,6 +3,7 @@
 define([
   "page",
   "libs/tooltip",
+  "window",
   "services/logging",
   "module",
   "services/ng/payment",
@@ -10,7 +11,7 @@ define([
   "services/responsive-modal",
   "bootstrap/bootstrap-button"
 ],
-function(page, tooltip, logging, requireModule) {
+function(page, tooltip, window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
   var forEach = angular.forEach;
   var celebId = page.celebId;
@@ -68,6 +69,19 @@ function(page, tooltip, logging, requireModule) {
             }
 
             $scope.cart = cartData;
+          });
+        };
+
+        $scope.transactCheckout = function() {
+          cartApi.transact().success(function(response) {
+            var order = response.order;
+            log("Successfully purchased. Order is: ");
+            log(order);
+            window.location.href = order.confirmationUrl;
+          })
+          .error(function(errors) {
+            log("Oh snap I got some errors trying to buy this order");
+            log(errors);
           });
         };
 
@@ -142,8 +156,6 @@ function(page, tooltip, logging, requireModule) {
           } else {
             return "enteringData";
           }
-
-
         };
 
         $scope.orderCompleteIcon = function() {

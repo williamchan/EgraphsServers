@@ -86,7 +86,14 @@ function(mockBackend, logging, module, ngApp) {
 
   var checkoutApiShouldReturn = function(checkout) {
     mockBackend.setBehavior(function($httpBackend) {
-      $httpBackend.whenGET(/checkouts\/[0-9]+$/).respond(checkout);
+      var checkoutRegex = /checkouts\/[0-9]+$/;
+      $httpBackend.whenGET(checkoutRegex).respond(checkout);
+      $httpBackend.whenPOST(checkoutRegex).respond({
+        "order": {
+          "id": 1,
+          "confirmationUrl": "/orders/1/confirm"
+        }
+      });
     });
   };
 
