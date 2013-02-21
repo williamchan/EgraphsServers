@@ -121,6 +121,7 @@ object FunctionalTestUtils {
   trait DomainRequestBase[T] {
     def request: FakeRequest[T]
     def requestWithAuthTokenInBody: FakeRequest[T]
+    def requestWithAdminIdInBody(adminId: Long): FakeRequest[T]
 
     val authToken = "fake-auth-token"
 
@@ -133,7 +134,8 @@ object FunctionalTestUtils {
     }
 
     def withAdmin(adminId: Long): FakeRequest[T] = {
-      request.withSession(request.session.withAdminId(adminId).data.toSeq: _*)
+      val newSession = request.session + (EgraphsSession.Key.AdminId.name -> adminId.toString)
+      requestWithAdminIdInBody(adminId).withSession(newSession.data.toSeq: _*)
     }
 
     def withAuthToken: FakeRequest[T] = {
@@ -156,6 +158,15 @@ object FunctionalTestUtils {
 
       request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*).asInstanceOf[FakeRequest[T]]
     }
+
+    override def requestWithAdminIdInBody(adminId: Long): FakeRequest[T] = {
+      val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
+      val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
+      val newBody = existingBody + (EgraphsSession.Key.AdminId.name -> Seq(adminId.toString))
+      val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
+
+      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*).asInstanceOf[FakeRequest[T]]
+    }
   }
 
   /**
@@ -174,6 +185,21 @@ object FunctionalTestUtils {
       val existingMissingFileParts = multipartEncodedRequest.body.missingFileParts
 
       val newDataParts = existingDataParts + ("authenticityToken" -> Seq(authToken))
+
+      val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts, existingMissingFileParts)
+      val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)
+      newRequest.asInstanceOf[FakeRequest[T]]
+    }
+
+    override def requestWithAdminIdInBody(adminId: Long) : FakeRequest[T] = {
+      val multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
+
+      val existingDataParts = multipartEncodedRequest.body.dataParts
+      val existingFiles = multipartEncodedRequest.body.files
+      val existingBadParts = multipartEncodedRequest.body.badParts
+      val existingMissingFileParts = multipartEncodedRequest.body.missingFileParts
+
+      val newDataParts = existingDataParts + (EgraphsSession.Key.AdminId.name -> Seq(adminId.toString))
 
       val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts, existingMissingFileParts)
       val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)

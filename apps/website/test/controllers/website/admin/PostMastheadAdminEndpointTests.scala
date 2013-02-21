@@ -4,57 +4,88 @@ import play.api.test._
 import play.api.test.Helpers._
 import utils.FunctionalTestUtils.routeName
 import utils.FunctionalTestUtils.Conversions._
-import utils.{TestData, CsrfProtectedResourceTests, EgraphsUnitTest}
+import utils._
 import services.db.{TransactionSerializable, DBSession}
 import services.AppConfig
 import controllers.routes.WebsiteControllers.postMastheadAdmin
+import controllers.routes.WebsiteControllers.getMastheadAdmin
 import models.{Administrator, Masthead, MastheadStore}
-import play.api.mvc.MultipartFormData
+import play.api.mvc.{AnyContent, MultipartFormData}
 import play.api.libs.Files.TemporaryFile
 import java.io.File
 import org.apache.commons.io.FileUtils
 import java.util.Date
 import play.api.mvc.MultipartFormData.FilePart
 import play.mvc.Http.HeaderNames
+import models.enums.{PublishedStatus, CallToActionType}
+import play.api.test.FakeHeaders
+import play.api.mvc.MultipartFormData.FilePart
+import scala.Some
+import models.Masthead
 
 
-class PostMastheadAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
+class PostMastheadAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests with AdminProtectedMultipartFormResourceTests {
   protected def routeUnderTest = postMastheadAdmin
   protected def db = AppConfig.instance[DBSession]
 
   def mastheadStore = AppConfig.instance[MastheadStore]
 
   routeName(postMastheadAdmin) should "reject empty headlines" in new EgraphsTestApplication {
-
+    val mastheadId = newMastheadId
     db.connected(TransactionSerializable) {
-      val adminId = createAdmin.id
-      val Some(result) = performRequest(mastheadId = newMastheadId.toString, headline = "", adminId)
+      val Some(result) = performRequest(mastheadId = mastheadId.toString, headline = "", adminId = admin.id)
       status(result) should be(SEE_OTHER)
+      redirectLocation(result) should be(Some(getMastheadAdmin(mastheadId).url))
     }
   }
 
-  private def performRequest(mastheadId: String,  headline: String, adminId: Long): Option[play.api.mvc.Result] = {
-    val tempFile = File.createTempFile("landingPageImage", "jpg")
+  it should "accept a complete request" in new EgraphsTestApplication {
+    val mastheadId = newMastheadId
+    db.connected(TransactionSerializable) {
+      val Some(result) = performRequest(mastheadId = mastheadId.toString, adminId = admin.id)
+
+      status(result) should be(SEE_OTHER)
+      redirectLocation(result) should be (Some(getMastheadAdmin(mastheadId).url))
+
+      val newMasthead = mastheadStore.get(mastheadId)
+
+      newMasthead.headline should be("a headline")
+    }
+  }
+
+  private def performRequest(mastheadId: String,
+                             headline: String = "a headline",
+                             callToActionTypeString: String = CallToActionType.SearchBox.name,
+                             publishedStatusString: String  = PublishedStatus.Published.name,
+                             adminId: Long): Option[play.api.mvc.Result] = {
+
+    val tempFile = File.createTempFile("afakefile", "txt")
     FileUtils.writeStringToFile(tempFile, (new Date()).toString)
-    val filename = "test.jpg"
-    val fakeImageFile = Seq(FilePart("landingPageImage", filename, Some("image/jpeg"),
+    val filename = "test.txt"
+    val fakeImageFile = Seq(FilePart("testFile", filename, Some("text/plain"),
       play.api.libs.Files.TemporaryFile(tempFile)))
 
-    val postBody = MultipartFormData[TemporaryFile](
-      Map("mastheadId" -> Seq(mastheadId), "headline" -> Seq(headline)),
+    val body = MultipartFormData[TemporaryFile](
+      Map("mastheadId" -> Seq(mastheadId),
+        "name" -> Seq("name"),
+        "headline" -> Seq(headline),
+        "subtitle" -> Seq("subtitle"),
+        "publishedStatusString" -> Seq(publishedStatusString),
+        "callToActionTypeString" -> Seq(callToActionTypeString),
+        "callToActionTarget" -> Seq("target"),
+        "callToActionText" -> Seq("text")
+      ),
       fakeImageFile,
       badParts = Seq(),
-      missingFileParts = Seq()
-    )
-    val request = FakeRequest()
+      missingFileParts = Seq())
 
     routeAndCall(
-      request.copy(POST,
-        controllers.routes.WebsiteControllers.postMastheadAdmin().url,
+      FakeRequest().copy(
+        POST,
+        postMastheadAdmin().url,
         FakeHeaders(Map(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))),
-        postBody
-      ).withAuthToken.withAdmin(adminId)
-    )
+        body = body
+      ).withAuthToken.withAdmin(adminId))
   }
 
   private def newMastheadId : Long = {
@@ -63,5 +94,4 @@ class PostMastheadAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedR
     }
   }
 
-  private def createAdmin : Administrator = {TestData.newSavedAdministrator()}
 }
