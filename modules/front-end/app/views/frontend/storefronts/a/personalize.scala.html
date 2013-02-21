@@ -16,7 +16,9 @@
 @import play.api.libs.json._
 @import models.frontend.forms.Field
 
-@maxTextChars = {130}
+@maxNoteToStarChars = {150}
+@maxWrittenMessageChars = {60}
+
 @fieldTooltip(link: String)(body: => Html) = {
   @tooltip(link, Seq("field-tooltip"))(body)
 }
@@ -148,7 +150,7 @@
                       <textarea @field.identityAttributes
                                 cols="1"
                                 resource-property
-                                maxlength="@maxTextChars"
+                                maxlength="@maxNoteToStarChars"
                                 monitor-user-attention
                                 placeholder="Type your note to @star.name..."></textarea>
                       @field.standardErrorDiv
@@ -158,7 +160,7 @@
                       @fieldTooltip("Not sure what to say? Here are some tips.") {
                         <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.pronoun.obj in person. Ask a question you've always wanted to know the answer to, or request that @star.pronoun.subject say something specific.
                       }
-                      <div class="explanatory-text char-remaining">{{@maxTextChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxNoteToStarChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->
@@ -166,9 +168,9 @@
               @withField("egraph", "desiredText") { field =>
                 <div class="control-group note-to-star">
                   <label class="control-label" for="@field.id">
-                    What do you want @star.pronoun.obj to reply?
+                    What do you want @star.pronoun.obj to write in reply?
                     @fieldTooltip("What is this?") {
-                      <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.pronoun.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.pronoun.subject will write whatever @star.pronoun.subject wants. Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
+                      <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.pronoun.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.pronoun.subject will hand-write whatever @star.pronoun.subject wants. Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
                     }
                   </label>
                   <div class="controls">
@@ -176,13 +178,13 @@
                       <textarea @field.identityAttributes
                                 cols="1"
                                 resource-property
-                                maxlength="@maxTextChars"
+                                maxlength="@maxWrittenMessageChars"
                                 monitor-user-attention
-                                placeholder="Anything you really want to hear @star.pronoun.obj say? Leave it blank and @star.pronoun.subject'll say whatever @star.pronoun.subject wants..."></textarea>
+                                placeholder="Leave it blank and @star.name will write whatever @star.pronoun.subject wants. Or give @star.pronoun.obj a short message like &quot;Happy 16th Birthday Bobby!&quot; and @star.pronoun.subject'll write that."></textarea>
                     </div>
                     @field.standardErrorDiv
                     <div>
-                      <div class="explanatory-text char-remaining">{{@maxTextChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxWrittenMessageChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->
@@ -297,7 +299,7 @@
                   <label class="control-label" for="@field.name">
                     In what format would you like the egraph delivered?
                     @fieldTooltip("Can I add the framed print later?") {
-                      <strong>Yes! You can wait and order a framed print of your egraph any time you like</strong> For fastest processing though it is best to include it here. Just email support@@egraphs.com to place a framed print order later on.
+                      <strong>Yes! You can order a framed print of your egraph any time you like</strong> For fastest processing though it is best to include it here. Just email support@@egraphs.com to place a framed print order later on.
                     }
                   </label>
                   <div class="controls">
@@ -324,7 +326,10 @@
                       </div>
                     </div>
                     <div class="explanatory-text">
-                      This is the option that you've chosen. There are many other options, but this one is yours. Your option is your best friend. It is your life. You must master it as you must master your life.
+                      <strong>Online Egraph -</strong> Your egraph is an online experience. When @star.name creates the egraph, {{recipientNominative()}} will get an email with a link to view, hear, and share it online. <br /><strong>Framed print -</strong> This option includes an 8x12 frame, mat, and certificate of authenticity. It features the selected photo and written message of your egraph. Shipping fees are included in the price. 
+                      @fieldTooltip("See an example framed print") {
+                        <img src="@EgraphsAssets.at("images/physical-preview.jpg")">
+                      }
                     </div>
                   </div>
                 </div> <!-- End .control-group.photoChoice -->
@@ -337,7 +342,10 @@
           <section id="egraph-arrival">
             <h2 class="clearfix callout">
               <img src='@EgraphsAssets.at("images/glyphish-stopwatch.png")'>
-              When will {{recipientNominative()}} get the egraph? @star.name will create it as soon as @star.pronoun.subject can -- on average it takes 2 weeks. It may be much faster, or it may be slower!
+              When will {{recipientNominative()}} get the egraph? @star.name will create it as soon as @star.pronoun.subject can -- on average it takes 2 weeks. It's depends on @star.pronoun.possessiveAdjective schedule, so it may be much faster, or it may be slower!
+              @fieldTooltip("Need it delivered on a specific date?") {
+                If this is for a special occasion (like a birthday) and you'd like it sent to {{recipientNominative()}} on a specific date, email support@@egraphs.com after placing your order to let us know.
+              }
             </h2>
           </section>
           <div class="separator"></div>
