@@ -60,6 +60,11 @@ GET     /Email/verify                                             controllers.Em
 GET     /Email/viewEgraph                                         controllers.Email.viewEgraph
 GET     /Email/viewGiftEgraph                                     controllers.Email.viewGiftEgraph
 
+GET     /Error/badRequest                                         controllers.Error.badRequest
+GET     /Error/error                                              controllers.Error.error
+GET     /Error/forbidden                                          controllers.Error.forbidden
+GET     /Error/notFound                                           controllers.Error.notFound
+
 GET     /Failed/creditcard_error                                  controllers.Failed.creditcard_error
 GET     /Failed/no_inventory                                      controllers.Failed.no_inventory
 GET     /Failed/purchase_error                                    controllers.Failed.purchase_error
