@@ -1,5 +1,5 @@
 /*global angular console mixpanel*/
-define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min"],
+define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min", "libs/jquery-ui"],
 function (Egraphs, marketplace, ngApp, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
 
@@ -221,6 +221,14 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
         $(".clear-all").click(function(e) {
           marketplace.clearCategoryByKey("c" + $(this).attr("data-category"));
           marketplace.reloadPage();
+        });
+
+        $("#request-star-button").click(function(e) {
+          $('.request-star-option').hide("slide", {direction: "left"}, 200, function() {
+            $('.request-star-fields').show("slide", {direction: "right"}, 200, function() {
+              $("#star-name-field input").focus();
+            });
+          });
         });
 
       });

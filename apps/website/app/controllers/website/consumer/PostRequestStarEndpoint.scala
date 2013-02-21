@@ -29,40 +29,30 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
    * Store requested star and associated email for later notification.
    */
   def postRequestStar = postController(dbSettings = WithDBConnection(readOnly = true)) {
-    //httpFilters.requireCustomerLogin.inSession() { case (customer, account) => // do we want to require customer login?!
-      Action { implicit request =>
-        
-        Ok("you're in the controller!")
-      
-//      val requestForm = Form(
-//        mapping(
-//          "starName" -> text.verifying(nonEmpty),
-//          "email" -> email.verifying(nonEmpty)
-//        )(PostRequestStarForm.apply)(PostRequestStarForm.unapply)
-//      )
-//      
-//      requestForm.bindFromRequest.fold(
-//        formWithErrors => {
-//          BadRequest("We're gonna need a valid email address")
-//        },
-//        validForm => {
-//          //bulkMailList.subscribeNewAsync(validForm)
-//          val starName = validForm.starName
-//          
-//          val maybeCelebrity = celebrityStore.findByPublicName(starName)
-//          
-//          maybeCelebrity match {
-//            case None => play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
-//            case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
-//          }
-//          
-//          play.Logger.info("email is " + validForm.email + ", starName is " + validForm.starName)
-//          Ok("star requested").withSession(request.session.withHasSignedUp)
-//        }
-//      )
+    Action { implicit request =>
+
+      val form = PostRequestStarEndpoint.form
+
+      form.bindFromRequest.fold(
+        formWithErrors => {
+          BadRequest("Something's gone wrong with request a star form submit")
+        },
+        validForm => {
+
+          val starName = validForm.starName
+          val maybeCelebrity = celebrityStore.findByPublicName(starName)
+
+          maybeCelebrity match {
+            case None => play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
+            case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
+          }
+
+          play.Logger.info("email is " + validForm.email + ", starName is " + validForm.starName)
+          Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
+        }
+      )
     }
   }
-  //}
 }
 
 object PostRequestStarEndpoint {

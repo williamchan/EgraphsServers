@@ -32,7 +32,7 @@
       </div>
 
       @if(results.celebrities.size == 0) {
-        <div id="request-star-option">
+        <div class="request-star-option">
           <button id="request-star-button" type="button" class="button">
             <strong><em>Request a Star</em></strong>
             <span>&raquo;</span>
@@ -49,7 +49,7 @@
           ) {
 
             <div class="clearfix">
-              <div id="request-star-fields" >
+              <div class="request-star-fields" style="display: none">
                 <fieldset>
                   <span id="star-name-field">
                     @helper.inputText(requestStarForm("starName"), '_label -> "Requested Star:", '_showConstraints -> false, '_tooltipOn -> true, '_tooltipText -> "Test tooltip")
