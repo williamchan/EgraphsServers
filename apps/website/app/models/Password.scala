@@ -19,7 +19,7 @@ case class Password(hash: String, salt: String) {
 }
 
 object Password {
-  trait PasswordError {
+  sealed trait PasswordError {
     def message: String
   }
   

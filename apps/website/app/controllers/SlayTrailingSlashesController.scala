@@ -11,6 +11,6 @@ import services.logging.Logging
 object SlayTrailingSlashesController extends Controller with Logging {
   def slayTrailingSlashes(resourcePath: String) = Action { request =>
     log("Redirecting: " + request.path + " -> " + resourcePath)
-    Redirect(resourcePath, request.queryString)
+    Redirect("/" + resourcePath, request.queryString)
   }
 }

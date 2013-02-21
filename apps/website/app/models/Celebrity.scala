@@ -1,34 +1,34 @@
 package models
 
-import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
-import categories._
-import java.sql.Timestamp
-import services.blobs.AccessPolicy
-import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
-import com.google.inject.{Provider, Inject}
-import org.squeryl.Query
-import services._
 import java.awt.image.BufferedImage
-import services.mail.TransactionalMail
+import java.util.Date
+import java.sql.Timestamp
+import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.IOUtils
-import models.Celebrity.CelebrityWithImage
-import play.api.Play.current
-import services.Dimensions
+import com.google.inject.{Provider, Inject}
+import org.joda.time.DateTimeConstants
+import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
 import anorm._
+import play.api.Play.current
+import play.api.libs.concurrent._
+import play.api.libs.json._
+import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
+import categories._
+import services.blobs.AccessPolicy
+import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
+import services._
+import services.mail.TransactionalMail
+import services.Dimensions
 import services.mvc.celebrity.CelebrityViewConversions
 import services.mail.MailUtils
-import play.api.libs.concurrent.Promise
-import models.frontend.marketplace.MarketplaceCelebrity
-import play.api.libs.concurrent.Akka
 import services.db.DBSession
-import org.joda.time.DateTimeConstants
 import models.frontend.landing.CatalogStar
-import services.mvc.celebrity.CatalogStarsQuery
-import java.util.Date
-import org.apache.commons.codec.binary.Base64
-import egraphs.playutils.{Gender, HasGender}
+import models.frontend.marketplace.MarketplaceCelebrity
+import models.Celebrity.CelebrityWithImage
 import models.enums.EmailType
+import services.mvc.celebrity.CatalogStarsQuery
+import egraphs.playutils.{Gender, HasGender}
 
 /**
  * Services used by each celebrity instance
@@ -126,16 +126,6 @@ case class Celebrity(id: Long = 0,
    */
   def doesNotHaveTwitter = {
     twitterUsername.map(name => name.toLowerCase) == Some("none")
-  }
-  
-  /**
-   * Renders the Celebrity as a Map, which will itself be rendered into whichever data format
-   * by the API (e.g. JSON)
-   */
-  def renderedForApi: Map[String, Any] = {
-    Map("id" -> id, "enrollmentStatus" -> enrollmentStatus.name,  "publicName" -> publicName,
-      "urlSlug" -> urlSlug) ++
-      renderCreatedUpdatedForApi
   }
 
   /**
@@ -340,6 +330,32 @@ object Celebrity {
       val savedImage = image.save(AccessPolicy.Public)
       val saved = celebrity.save()
       CelebrityWithImage(saved, savedImage)
+    }
+  }
+
+  def apply(id: Long, _enrollmentStatus: String, publicName: String): Celebrity = {
+    new Celebrity(id = id, _enrollmentStatus = _enrollmentStatus, publicName = publicName)
+  }
+
+  implicit object CelebrityFormat extends Format[Celebrity] {
+    def writes(celebrity: Celebrity): JsValue = {
+      Json.obj(
+        "id" -> celebrity.id,
+        "enrollmentStatus" -> celebrity.enrollmentStatus.name,
+        "publicName" -> celebrity.publicName,
+        "urlSlug" -> celebrity.urlSlug
+      ) ++ Json.obj(celebrity.renderCreatedUpdatedForApi: _*)
+    }
+
+    def reads(json: JsValue): JsResult[Celebrity] = {
+      JsSuccess {
+        val celebrity = Celebrity(
+          (json \ "id").as[Long],
+          (json \ "enrollmentStatus").as[String],
+          (json \ "publicName").as[String]
+        )
+        celebrity.services.store.withCreatedUpdatedFromJson(celebrity, json)
+      }
     }
   }
 }

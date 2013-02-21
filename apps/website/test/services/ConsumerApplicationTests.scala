@@ -25,7 +25,7 @@ class ConsumerApplicationTests extends EgraphsUnitTest {
   "getIOSClient" should "correctly forward the boolean value for redirectToItmsLink" in {
     val (app, _) = newConsumerApp()
     
-    app.getIOSClient(redirectToItmsLink=true).url should include ("redirectToItmsLink=1")
+    app.getIOSClient(redirectToItmsLink=true).url should include ("redirectToItmsLink=true")
     app.getIOSClient(redirectToItmsLink=false).url should not include ("redirectToItmsLink")
   }
   

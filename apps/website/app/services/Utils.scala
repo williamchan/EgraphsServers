@@ -141,13 +141,10 @@ class Utils @Inject() {
    * sparseMap == Map("one" -> Some(1)) // True
    * }}}
    */
-  def makeOptionalFieldMap(optionalFields: List[(String, Option[Any])]): Map[String, Any] = {
-    optionalFields.foldLeft(Map.empty[String, Any])((growingMap, nextField) =>
-      nextField._2 match {
-        case None => growingMap
-        case Some(value) => growingMap + (nextField._1 -> value)
-      }
-    )
+  def makeOptionalFieldMap[T](optionalFields: List[(String, Option[T])]): Map[String, T] = {
+    val definedOptionalFields = optionalFields.filter{case (key, value) => value.isDefined}
+    val definedFields = definedOptionalFields.map{case (key, value) => (key -> value.get)}
+    definedFields.toMap
   }
 
   implicit def properties(pairs: (AnyRef, AnyRef)*): util.Properties = {

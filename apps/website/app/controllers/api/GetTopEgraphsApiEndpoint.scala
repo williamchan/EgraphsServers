@@ -1,11 +1,11 @@
 package controllers.api
 
-import models._
+import play.api.libs.json._
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import models._
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
-import sjson.json.Serializer
 
 // TODO(egraph-exploration): Work in progress. Not finalized. Used for rapid prototyping.
 private[controllers] trait GetTopEgraphsApiEndpoint { this: Controller =>
@@ -16,7 +16,7 @@ private[controllers] trait GetTopEgraphsApiEndpoint { this: Controller =>
   def getTopEgraphs = controllerMethod() {
     Action {
       Ok(jsonStr)
-//      Ok(Serializer.SJSON.toJSON(orderStore.findTenSpecificFulfilled(List(400,493,794,1403,2703,2708,1886,1621,3329,2552,981)).map(_.renderedForApi)))
+//      Ok(Json.arr(orderStore.findTenSpecificFulfilled(List(400,493,794,1403,2703,2708,1886,1621,3329,2552,981)).map(_.renderedForApi)))
     }
   }
 

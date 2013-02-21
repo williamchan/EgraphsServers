@@ -1,14 +1,21 @@
 package models.checkout
 
-import LineItemTestData._
-import models.checkout.checkout.Conversions._
+import org.joda.money.Money
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.matchers.{MatchResult, Matcher}
+import org.junit.runner.RunWith
+import play.api.libs.json.JsNull
+import utils._
+import utils.TestData._
 import services.AppConfig
 import services.Finance.TypeConversions._
-import utils._
-import org.scalatest.matchers.{MatchResult, Matcher}
-import play.api.libs.json.JsNull
+import models.checkout.LineItemMatchers._
+import models.checkout.checkout.Conversions._
+import models.checkout.Checkout._
+import models.enums.LineItemNature._
+import LineItemTestData._
 
-
+@RunWith(classOf[JUnitRunner])
 class CheckoutTests extends EgraphsUnitTest
   with CheckoutTestCases
   with DateShouldMatchers
@@ -92,11 +99,10 @@ class CheckoutTests extends EgraphsUnitTest
 
   def checkoutServices: CheckoutServices = AppConfig.instance[CheckoutServices]
 
-
   //
   // Checkout Matchers
   //
-  def notHaveDuplicateSummaries: Matcher[Checkout] = Matcher { checkout: Checkout =>
+  def notHaveDuplicateSummaries = Matcher { checkout: Checkout =>
     val numSubtotals = checkout.itemTypes.filter(SubtotalLineItemType eq _).size
     val numTotals = checkout.itemTypes.filter(TotalLineItemType eq _).size
 

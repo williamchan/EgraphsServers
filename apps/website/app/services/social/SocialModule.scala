@@ -1,6 +1,6 @@
 package services.social
 
-import uk.me.lings.scalaguice.ScalaModule
+import net.codingwell.scalaguice.ScalaModule
 import com.google.inject.{Singleton, AbstractModule}
 
 /**

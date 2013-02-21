@@ -1,5 +1,6 @@
 package services.pdf
 
+import scala.language.postfixOps
 import org.apache.pdfbox.pdmodel.edit.PDPageContentStream
 import org.apache.pdfbox.pdmodel.font.PDFont
 import org.apache.pdfbox.pdmodel.PDPage

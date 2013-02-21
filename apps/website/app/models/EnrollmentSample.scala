@@ -85,8 +85,6 @@ class EnrollmentSampleStore @Inject()(schema: Schema) extends SavesWithLongKey[E
   //
   override val table = schema.enrollmentSamples
 
-
-
   //
   // SavesCreatedUpdated[EnrollmentSample] methods
   //

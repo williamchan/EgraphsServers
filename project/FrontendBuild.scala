@@ -1,6 +1,6 @@
 import sbt._
 import Keys._
-import PlayProject._
+import play.Project._
 
 /**
  * Builds the front-end Play 2.0 module. Provides the 'frontend' project to Play / SBT.
@@ -14,7 +14,7 @@ object FrontendBuild extends Build {
     "org.joda" % "joda-money" % "0.6",
 
     // Test dependencies
-    "org.scalatest" %% "scalatest" % "1.8" % "test"
+    "org.scalatest" % "scalatest_2.10" % "1.9.1" % "test"
   )
 
   // Only compile the bootstrap bootstrap.less file and any other *.less file in the stylesheets directory
@@ -26,16 +26,16 @@ object FrontendBuild extends Build {
     (base / "bootstrap" / "less" / "bootstrap" * "bootstrap.less") //twitter bootstrap
   )
 
-  val main = PlayProject(
+  val main = play.Project(
     appName,
     appVersion,
     appDependencies,
-    path = file(".") / "modules" / "front-end",
-    mainLang = SCALA
+    path = file(".") / "modules" / "front-end"
   ).settings(
-    //resolvers += "Crionics Github Repository" at "http://orefalo.github.com/m2repo/releases/",
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-feature"),
     organization := "egraphs",
 
+    libraryDependencies += "com.google.guava" % "guava" % "13.0.1",
     testOptions in Test := Nil,    
 
     lessEntryPoints <<= baseDirectory(customLessEntryPoints),

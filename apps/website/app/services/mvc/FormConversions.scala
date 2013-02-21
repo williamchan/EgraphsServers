@@ -98,6 +98,7 @@ object FormConversions {
         case SpecificMessage => PersonalizeMessageOption.SpecificMessage
         case SignatureOnly => PersonalizeMessageOption.SignatureOnly
         case CelebrityChoosesMessage => PersonalizeMessageOption.CelebrityChoosesMessage
+        case other => throw new IllegalStateException("models.enums.WrittenMessageRequest cannot have value = " + other)
       }
     }
   }

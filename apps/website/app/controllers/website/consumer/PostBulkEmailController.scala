@@ -1,5 +1,6 @@
 package controllers.website.consumer
 
+import play.api.Logger
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.data._
@@ -21,6 +22,7 @@ private[controllers] trait PostBulkEmailController extends ImplicitHeaderAndFoot
   def postSubscribeEmail = postController(dbSettings = WithoutDBConnection) {
     Action { implicit request =>
       Form("email" -> email).bindFromRequest.fold(formWithErrors => {
+        Logger.info("Cannot subscribe invalid email = " + email)
         BadRequest("We're gonna need a valid email address")
       }, validForm => {
         // TODO: We aren't doing anything if this fails, maybe we should do something 

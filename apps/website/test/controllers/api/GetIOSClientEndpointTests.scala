@@ -4,7 +4,6 @@ import play.api.mvc.Request
 import play.api.mvc.Controller
 import play.api.test.Helpers._
 import services.Time
-import sjson.json.Serializer
 import utils.FunctionalTestUtils.routeName
 import models._
 import enums.EnrollmentStatus
@@ -21,7 +20,7 @@ class GetIOSClientEndpointTests extends EgraphsUnitTest {
 
   routeName(getIOSClient(redirectToItmsLink=true)) should "return a redirect to an itms-services link if queried with ?redirectToItmsLink=true" in new EgraphsTestApplication {
     // Execute the request
-    val Some(result) = routeAndCall(FakeRequest(GET, getIOSClient(redirectToItmsLink=true).url))
+    val Some(result) = route(FakeRequest(GET, getIOSClient(redirectToItmsLink=true).url))
 
     // Test expectations
     status(result) should be (SEE_OTHER)
@@ -30,7 +29,7 @@ class GetIOSClientEndpointTests extends EgraphsUnitTest {
   }
   
   routeName(getIOSClient(redirectToItmsLink=false)) should "return the application plist if not queried with ?redirectToItmsLink=true" in new EgraphsTestApplication {
-    val Some(result) = routeAndCall(FakeRequest(GET, getIOSClient(redirectToItmsLink=false).url))
+    val Some(result) = route(FakeRequest(GET, getIOSClient(redirectToItmsLink=false).url))
     
     status(result) should be (OK)
     contentType(result) should be (Some("application/octet-stream"))

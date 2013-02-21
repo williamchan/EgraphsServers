@@ -5,7 +5,7 @@ import play.api.mvc.Action
 import play.api.mvc.WrappedRequest
 import play.api.http.Status
 import services.http.EgraphsSession.Conversions._
-import egraphs.playutils.RichResult.resultToRichResult
+import egraphs.playutils.ResultUtils.RichResult
 
 class AnalyticsActions @Inject() {
 

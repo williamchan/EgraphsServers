@@ -80,7 +80,7 @@ class CacheAvailabilityActor(cacheName: String, friendlyName: String,
       pool.destroy()
       Some(info)
     } catch {
-      case _ => None
+      case _: Throwable => None
     }
   }
 }

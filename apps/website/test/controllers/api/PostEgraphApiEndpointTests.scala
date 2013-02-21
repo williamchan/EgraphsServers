@@ -1,12 +1,7 @@
 package controllers.api
 
-import sjson.json.Serializer
-import utils.FunctionalTestUtils.{
-  requestWithCredentials, 
-  routeName, 
-  runCustomerBuysProductsScenerio
-}
 import play.api.mvc.{AnyContent, AnyContentAsFormUrlEncoded}
+import play.api.libs.json._
 import utils.TestConstants
 import models.EnrollmentBatch
 import play.api.test.Helpers._
@@ -22,6 +17,8 @@ import models.EgraphStore
 import utils.TestData
 import models.Account
 import models.Celebrity
+import utils.FunctionalTestUtils._
+import play.api.mvc.AnyContentAsFormUrlEncoded
 
 class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrityResourceTests {
   private def blobs = AppConfig.instance[Blobs]
@@ -36,7 +33,7 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
   protected override def validRequestBodyAndQueryString = {
     // TODO: Once we're on Play 2.1 then get rid of this necessary indirection to satisfy
     //   invariance of FakeRequest[A], which should be FakeRequest[+A]    
-    val formRequest = FakeRequest().withFormUrlEncodedBody(
+    val formRequest = newRouteUnderTestFakeRequest.withFormUrlEncodedBody(
       "signature" -> TestConstants.shortWritingStr,
       "audio" -> TestConstants.voiceStr_8khz(),
       "latitude" -> latitude.toString,
@@ -44,9 +41,13 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
       "signedAt" -> signedAt
     )
 
-    val anyContentRequest = formRequest.copy(body = (formRequest.body: AnyContent))
+    val anyContentRequest = formRequest.withBody(formRequest.body)
 
     Some(anyContentRequest)
+  }
+
+  protected override def routeRequest(request: FakeRequest[_]): Option[Result] = {
+    route(request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]])
   }
 
   "postEgraph" should "accept a well-formed egraph as its first submission" in new EgraphsTestApplication {
@@ -171,8 +172,10 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
     }
 
     for ((order, i) <- orders.zipWithIndex) {
-      getCelebrityOrders(celebrityAccount).length should be (orders.size - i)
-      
+      val json = getCelebrityOrders(celebrityAccount)
+      val jsonOrders = json.as[JsArray].value
+      jsonOrders.size should be (orders.size - i)
+
       val (code, Some(egraphId)) = performEgraphPost(celebrityAccount, order.id)(
         "signature" -> TestConstants.shortWritingStr,
         "audio" -> TestConstants.voiceStr_8khz(),
@@ -181,30 +184,30 @@ class PostEgraphApiEndpointTests extends EgraphsUnitTest with ProtectedCelebrity
       code should be (OK)
     }
 
-    getCelebrityOrders(celebrityAccount).length should be (0)
+    getCelebrityOrders(celebrityAccount).as[JsArray].value.size should be (0)
   }
 
   /** Gets the list of orders needed to be completed by the celebrity and returns their json map */
-  private def getCelebrityOrders(celebrityAccount: Account):List[Map[String, Any]] = {
+  private def getCelebrityOrders(celebrityAccount: Account): JsValue = {
     val url = controllers.routes.ApiControllers.getCelebrityOrders(Some(true)).url
-    val Some(ordersResult) = routeAndCall(
-      requestWithCredentials(celebrityAccount).copy(GET, url)
+    val Some(ordersResult) = route(
+      FakeRequest(GET, url).withCredentials(celebrityAccount)
     )
     status(ordersResult) should be (OK)
-    Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(ordersResult))
+    Json.parse(contentAsString(ordersResult))
   }
 
   /** Posts the egraph and returns the result status on the left and egraphId on the right */
   private def performEgraphPost(celebrityAccount: Account, orderId: Long)(body: (String, String)*): (Int, Option[Long]) = {
     val url = controllers.routes.ApiControllers.postEgraph(orderId).url
-    val Some(result) = routeAndCall(
-      requestWithCredentials(celebrityAccount).copy(POST, url).withFormUrlEncodedBody(body:_*)
+    val Some(result) = route(
+      FakeRequest(POST, url).withCredentials(celebrityAccount).withFormUrlEncodedBody(body:_*)
     )
 
     val code = status(result)
     val maybeEgraphId = if (code == OK) {
-      val json = Serializer.SJSON.in[Map[String, Any]](contentAsString(result))
-      Some(json("id").toString.toLong)
+      val json = Json.parse(contentAsString(result))
+      Some((json \ "id").as[Long])
     } else {
       None
     }

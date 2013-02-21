@@ -49,7 +49,7 @@ class InternalTests extends EgraphsUnitTest {
         try {
           categoryStore.delete(category)
         } catch {
-          case _ => //do nothing, we accept that we may not be able to remove Internal
+          case _: Throwable => //do nothing, we accept that we may not be able to remove Internal
           // and that other tests may break if running at the same time if we do this.
         }
       case None => // it's not there no need to delete

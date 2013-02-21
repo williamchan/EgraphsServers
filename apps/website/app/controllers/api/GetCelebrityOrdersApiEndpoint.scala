@@ -1,12 +1,12 @@
 package controllers.api
 
-import models.OrderQueryFilters
-import models.OrderStore
+import play.api.libs.json._
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import models.OrderQueryFilters
+import models.OrderStore
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
-import sjson.json.Serializer
 
 private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
@@ -32,9 +32,8 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
   
             case _ => {
               val orders = orderStore.findByCelebrity(celeb.id, orderQueryFilters.actionableOnly: _*)
-              val ordersAsMaps = orders.map(order => order.renderedForApi)
   
-              Ok(Serializer.SJSON.toJSON(ordersAsMaps))
+              Ok(Json.toJson(orders))
             }
           }
         }

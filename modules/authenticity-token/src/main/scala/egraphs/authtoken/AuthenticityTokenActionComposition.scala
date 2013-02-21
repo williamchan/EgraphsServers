@@ -1,6 +1,6 @@
 package egraphs.authtoken
 
-import egraphs.playutils.RichResult._
+import egraphs.playutils.ResultUtils.RichResult
 import play.api.mvc.BodyParser
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.Results.{Forbidden}

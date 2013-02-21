@@ -1,19 +1,20 @@
 package services.mvc.celebrity
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import java.util.Random
 import com.google.inject.Inject
+import play.api.Play.current
+import play.api.libs.concurrent._
+import play.api.libs.concurrent.Execution.Implicits._
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 import akka.agent.Agent
-import akka.dispatch.Await
-import akka.util.duration._
-import akka.util.Timeout
 import akka.pattern.ask
+import akka.util._
 import models.CelebrityStore
 import models.frontend.landing.CatalogStar
-import play.api.Play.current
-import play.api.libs.concurrent.Akka
 import services.cache.CacheFactory
 import services.db.DBSession
 import services.db.TransactionSerializable
@@ -43,7 +44,7 @@ private[celebrity] class UpdateCatalogStarsActor @Inject()(
   import viewConverting._
   import UpdateCatalogStarsActor.{UpdateCatalogStars, updatePeriod, resultsCacheKey}
 
-  protected def receive = {
+  def receive = {
     case UpdateCatalogStars(catalogStarsAgent) => {
       // Get the stars from the cache preferentially. This reduces round-trips to the database in multi-instance
       // deployments because one instance can share the results from another.
@@ -99,7 +100,7 @@ object UpdateCatalogStarsActor extends Logging {
   // Private members
   //
   private def scheduleJob() = {
-    //run once then schedule    
+    //run once then schedule
     Await.result(this.singleton ask UpdateCatalogStars(CatalogStarsAgent.singleton), 2 minutes)
 
     val random = new Random()

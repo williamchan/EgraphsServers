@@ -2,13 +2,12 @@ package services.http.filters
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
+import play.api.test.Helpers._
 import models.InventoryBatch
 import models.InventoryBatchStore
 import services.http.filters.FilterTestUtil.EitherErrorOrSuccess2RichErrorOrSuccess
-import play.api.test.Helpers.NOT_FOUND
-import play.api.test.Helpers.status
-import utils.EgraphsUnitTest
 import services.AppConfig
+import utils.EgraphsUnitTest
 import utils.TestData
 import utils.DBTransactionPerTest
 

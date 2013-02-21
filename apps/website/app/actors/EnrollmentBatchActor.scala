@@ -26,7 +26,7 @@ case class EnrollmentBatchActor @Inject()(
   logging: LoggingContext,
   config: ConfigFileProxy
 ) extends Actor with Logging {
-  protected def receive = {
+  def receive = {
     case ProcessEnrollmentBatchMessage(id: Long) =>
       processEnrollmentBatch(enrollmentBatchId = id)
     case _ =>

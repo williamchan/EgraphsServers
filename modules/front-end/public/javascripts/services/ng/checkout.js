@@ -25,42 +25,14 @@ function(page, ngApp, logging, module) {
         var baseUrl = apiRoot + "/sessions/" + sessionId + "/checkouts/" + celebId;
 
         return {
+          url: baseUrl,
+
           get: function() {
             return $http.get(baseUrl);
           },
 
-          url: baseUrl,
-
-          egraph: function(form) {
-            return $http.post(baseUrl + "/egraph", form);
-          },
-
-          discount: function(config) {
-            if (config) {
-              return $http.post(baseUrl + "/coupon", {"couponCode": config.code});
-            } else {
-              return $http.get(baseUrl + "/coupon");
-            }
-          },
-
-          shippingAddress: function(form) {
-            return $http.post(baseUrl + "/shipping-address", form);
-          },
-
-          buyer: function(form) {
-            return $http.post(baseUrl + "/buyer", form);
-          },
-
-          recipient: function(postData) {
-            if (postData) {
-              return $http.post(baseUrl + "/recipient", postData.email);
-            } else {
-              return $http.get(baseUrl + "/recipient");
-            }
-          },
-
-          payment: function(form) {
-            return $http.post(baseUrl + "/payment", form);
+          transact: function() {
+            return $http.post(baseUrl);
           }
         };
       }
