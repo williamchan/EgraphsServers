@@ -279,6 +279,7 @@ trait PostCelebrityAdminEndpoint {
     val landingPageImageFile = body.file("landingPageImage").map(_.ref.file)
     val logoImageFile = body.file("logoImage").map(_.ref.file)
     val profileImageOption = if (profileImageFile.isDefined) ImageUtil.parseImage(profileImageFile.get) else None
+    println(s"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n$landingPageImageFile")
     val landingPageImageOption = if (landingPageImageFile.isDefined) ImageUtil.parseImage(landingPageImageFile.get) else None
     val logoImageOption = if (logoImageFile.isDefined) ImageUtil.parseImage(logoImageFile.get) else None
     (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption)
