@@ -13,6 +13,7 @@ import models.enums.OrderReviewStatus
 import services.db.DBSession
 import services.http.{WithoutDBConnection, POSTApiControllerMethod}
 import services.http.filters.HttpFilters
+import models.JsOrder
 
 private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
   protected def dbSession: DBSession
@@ -50,9 +51,9 @@ private[controllers] trait PostCelebrityOrderApiEndpoint { this: Controller =>
     OrderReviewStatus(reviewStatus.getOrElse("")) match {
       case Some(OrderReviewStatus.RejectedByCelebrity) => {
         val rejectedOrder = order.rejectByCelebrity(celebrity, rejectionReason = rejectionReason).save()
-        Ok(Json.toJson(rejectedOrder))
+        Ok(Json.toJson(JsOrder.from(rejectedOrder)))
       }
-      case _ => Ok(Json.toJson(order))
+      case _ => Ok(Json.toJson(JsOrder.from(order)))
     }
   }
 }

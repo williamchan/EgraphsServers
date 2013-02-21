@@ -3,6 +3,7 @@ package models
 import java.sql.Timestamp
 import org.apache.commons.mail.HtmlEmail
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import play.api.templates.Html
 import play.api.mvc.RequestHeader
 
@@ -117,26 +118,13 @@ case class Customer(
   }
 }
 
-object Customer {
-  def apply(id: Long, name: String): Customer = {
-    new Customer(id = id, name = name)
-  }
+case class JsCustomer(id: Long, name: String)
 
-  implicit object CustomerFormat extends Format[Customer] {
-    def writes(customer: Customer): JsValue = {
-      Json.obj(
-        "id" -> customer.id,
-        "name" -> customer.name)
-    }
+object JsCustomer {
+  implicit val customerWrites = Json.writes[JsCustomer]
 
-    def reads(json: JsValue): JsResult[Customer] = {
-      JsSuccess {
-        Customer(
-          (json \ "id").as[Long],
-          (json \ "name").as[String]
-        )
-      }
-    }
+  def from(customer: Customer): JsCustomer = {
+    JsCustomer(id = customer.id, name = customer.name)
   }
 }
 

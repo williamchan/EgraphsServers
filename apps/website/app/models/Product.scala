@@ -1,23 +1,25 @@
 package models
 
+import java.util.Date
 import java.sql.Timestamp
+import java.awt.image.BufferedImage
 import org.apache.commons.io.IOUtils
 import org.joda.money.Money
+import org.squeryl.Query
+import org.squeryl.dsl.ManyToMany
+import com.google.inject.{Provider, Inject}
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
+import play.api.Play.current
+
 import enums.PublishedStatus.EnumVal
 import enums.{PublishedStatus, HasPublishedStatus}
+import services._
 import services.db.{FilterOneTable, Schema, SavesWithLongKey, KeyedCaseClass}
 import services.Finance.TypeConversions._
-import models.Product.ProductWithPhoto
-import java.awt.image.BufferedImage
 import services.blobs.AccessPolicy
-import com.google.inject.{Provider, Inject}
-import services._
-import org.squeryl.Query
-import play.api.Play.current
+import models.Product.ProductWithPhoto
 import graphics.GraphicsSource
-import org.squeryl.dsl.ManyToMany
-import java.util.Date
 import ImageUtil.Conversions._
 
 case class ProductServices @Inject() (
@@ -260,8 +262,44 @@ case class Product(
   ).getSaved(AccessPolicy.Public)
 }
 
-object Product {
+case class JsProduct(
+  id: Long,
+  urlSlug: String,
+  photoUrl: String,
+  iPadSigningPhotoUrl: String,
+  signingScaleW: Int,
+  signingScaleH: Int,
+  signingOriginX: Int,
+  signingOriginY: Int,
+  signingAreaW: Int,
+  signingAreaH: Int,
+  created: Date,
+  updated: Date
+)
 
+// TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
+object JsProduct extends Function12[Long, String, String, String, Int, Int, Int, Int, Int, Int, Date, Date, JsProduct] {
+  implicit val productFormats = Json.format[JsProduct]
+  
+  def from(product: Product): JsProduct = {
+    JsProduct(
+      id = product.id,
+      urlSlug = product.urlSlug,
+      photoUrl = product.signingScalePhoto.url,
+      iPadSigningPhotoUrl = product.signingScalePhoto.url,
+      signingScaleW = product.signingScaleW,
+      signingScaleH = product.signingScaleH,
+      signingOriginX = product.signingOriginX,
+      signingOriginY = product.signingOriginY,
+      signingAreaW = product.signingAreaW,
+      signingAreaH = product.signingAreaH,
+      created = product.created,
+      updated = product.updated
+    )
+  }
+}
+
+object Product {
   val defaultPrice = BigDecimal(50)
   val defaultSigningAreaW = 1024 // This is the width of an iPad2 screen. Default signing area is 1024x1024.
   val defaultLandscapeSigningScale = Dimensions(width = 1615, height = 1024)
@@ -283,50 +321,6 @@ object Product {
       val savedProduct = product.save()
 
       ProductWithPhoto(savedProduct, savedPhoto)
-    }
-  }
-
-  def apply(id: Long, signingScaleW: Int, signingScaleH: Int, signingOriginX: Int, signingOriginY: Int, signingAreaW: Int, signingAreaH: Int): Product = {
-    new Product(
-      id = id,
-      signingScaleW = signingScaleW,
-      signingScaleH = signingScaleH,
-      signingOriginX = signingOriginX,
-      signingOriginY = signingOriginY,
-      signingAreaW = signingAreaW,
-      signingAreaH = signingAreaH
-    )
-  }
-
-  implicit object ProductFormat extends Format[Product] {
-    def writes(product: Product): JsValue = {
-      Json.obj(
-        "id" -> product.id,
-        "urlSlug" -> product.urlSlug,
-        "photoUrl" -> product.signingScalePhoto.url,
-        "iPadSigningPhotoUrl" -> product.signingScalePhoto.url,
-        "signingScaleW" -> product.signingScaleW,
-        "signingScaleH" -> product.signingScaleH,
-        "signingOriginX" -> product.signingOriginX,
-        "signingOriginY" -> product.signingOriginY,
-        "signingAreaW" -> product.signingAreaW,
-        "signingAreaH" -> product.signingAreaH
-      ) ++ Json.obj(product.renderCreatedUpdatedForApi: _*)
-    }
-
-    def reads(json: JsValue): JsResult[Product] = {
-      JsSuccess {
-        val product = Product(
-          (json \ "id").as[Long],
-          (json \ "signingScaleW").as[Int],
-          (json \ "signingScaleH").as[Int],
-          (json \ "signingOriginX").as[Int],
-          (json \ "signingOriginY").as[Int],
-          (json \ "signingAreaW").as[Int],
-          (json \ "signingAreaH").as[Int]
-        )
-        product.services.store.withCreatedUpdatedFromJson(product, json)
-      }
     }
   }
 }
