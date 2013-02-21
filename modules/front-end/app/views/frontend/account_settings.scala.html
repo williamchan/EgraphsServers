@@ -13,14 +13,6 @@
     fullname : "@form.fullname.value",
     username : "@form.username.value",
     email : "@form.email.value",
-    address : {
-      title : "Default",
-      line1 : "@form.addressLine1.value",
-      line2 : "@form.addressLine2.value",
-      city : "@form.city.value",
-      state : "@form.state.value",
-      postalCode : "@form.postalCode.value"
-    },
     gallery : {visibility : "@form.galleryVisibility.value"},
     notices : [
       {
@@ -50,11 +42,6 @@
             confirmField=form.passwordConfirm)
           @tags.ng.form_select(model = "user.gallery.visibility", name={form.galleryVisibility.name}, label = "Gallery Visibility",
           options = Map("public" -> "Public","private" -> "Private"), initValue={form.galleryVisibility.value.getOrElse("public")})
-        </section>
-        <section class="settings-group" id="shipping-address">
-          <h2>Shipping Address</h2>
-          @tags.ng.form_address(model = "user.address", name="address", form=form)
-          <!--<a href="#" class="add-link"><p>+ Add Another Shipping Address</p></a>-->
         </section>
         <section class="settings-group" id="additional-settings">
           <h2>Additional Settings</h2>

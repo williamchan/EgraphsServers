@@ -185,7 +185,8 @@
     </ol>
     <h2>Egraph Page</h2>
     <ol>
-      @catalogEntry(routes.Egraph.egraph().url, "Egraph - videofied")
+      @catalogEntry(routes.Egraph.egraph().url, "Egraph page")
+      @catalogEntry(routes.Egraph.egraph(true).url, "Egraph page - promotional")
       @catalogEntry(routes.Egraph.classicPortrait(isPromotional = false).url, "Classic - portrait")
       @catalogEntry(routes.Egraph.classicLandscape(isPromotional = false).url, "Classic - landscape")
       @catalogEntry(routes.Egraph.classicPortrait(isPromotional = true).url, "Classic - promotional portrait")
@@ -210,6 +211,13 @@
     <ol>
       @catalogEntry("Storefront-A/personalize", "Storefront reset personalize, default")
       @catalogEntry("Storefront-A/checkout?testcase=default", "Storefront reset checkout, default")
+    </ol>
+    <h2>Error Pages</h2>
+    <ol>
+      @catalogEntry("Error/error", "500 error")
+      @catalogEntry("Error/badRequest", "400 bad request")
+      @catalogEntry("Error/forbidden", "403 forbidden")
+      @catalogEntry("Error/notFound", "404 not found")
     </ol>
   </body>
 </html>
