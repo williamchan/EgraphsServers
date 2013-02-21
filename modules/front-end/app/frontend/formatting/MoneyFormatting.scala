@@ -5,19 +5,19 @@ import java.math.RoundingMode
 import org.joda.money.{CurrencyUnit, Money}
 
 /**
- * Utilities for formatting [[org.joda.cash.Money]].
+ * Utilities for formatting [[org.joda.money.Money]].
  *
  * Most of the utilities are best used implicitly by importing Finance.TypeConversions._
  *
  * Example:
  * {{{
- *   import frontend.formatting.MoneyFormatting.TypeConversions._
+ *   import frontend.formatting.MoneyFormatting.Conversions._
  *
  *   // Make some Money objects from an amount
  *   val amount = BigDecimal(100.50)
  *
  *   val dollars = amount.toMoney()
- *   val euros = amount.toMoney(org.joda.cash.CurrencyUnit.EUR)
+ *   val euros = amount.toMoney(org.joda.money.CurrencyUnit.EUR)
  *
  *   // Format the cash
  *   val forDisplay = dollars.formatSimply // -> $100.50
