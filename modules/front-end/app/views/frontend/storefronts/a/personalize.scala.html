@@ -13,6 +13,7 @@
 @import views.html.frontend._
 @import tags.tooltip
 @import models.frontend.NgField.withField
+@import play.api.libs.json._
 @import models.frontend.forms.Field
 
 @maxTextChars = {130}
@@ -36,7 +37,7 @@
   angular.extend(Egraphs.page, {
     config: {},
     celebId: @star.id,
-    products: @star.products.map(_.toJson).mkString("[", ",", "]"),
+    products: @Html(Json.stringify(JsArray(star.products.map(_.toJson)))),
     checkoutUrl: "@checkoutUrl"
   });
 
@@ -168,7 +169,7 @@
                     What do you want @star.pronoun.obj to reply?
                   </label>
                   <div class="controls">
-                    <div class="triangle-border right">
+                    <div>
                       <textarea @field.identityAttributes
                                 cols="1"
                                 resource-property

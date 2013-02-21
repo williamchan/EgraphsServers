@@ -141,7 +141,7 @@ function(ngApp, logging, module) {
             delay: 1000
           }, config);
 
-          var onSubmitEnd = function(data, errors) {
+          var onSubmitEnd = function(data, fieldsAndErrors) {
             var affectedFormControl;
 
             self.form.$submitting = false;
@@ -152,21 +152,25 @@ function(ngApp, logging, module) {
 
             _config.onSubmitEnd();
 
+            // Handle errors
             self.clearRemoteErrors();
-            if (errors) {
-              forEach(errors, function(error) {
-                if (error.field) {
-                  affectedFormControl = self.controls[error.field];
-                  log("    Error: " + error.field + " " + error.cause);
-                  affectedFormControl.$setValidity("remote_" + error.cause, false);
-                }
+            if (fieldsAndErrors) {
+              log("Errors in submission:");
+              forEach(fieldsAndErrors, function(errors, fieldName) {
+                log("    \"" + fieldName + "\": " + errors);
+                affectedFormControl = self.controls[fieldName];
+                forEach(errors, function(error) {
+                  if (affectedFormControl) {
+                    affectedFormControl.$setValidity("remote_" + error, false);
+                  }
+                });
               });
             }
 
+            // Any submit complete callback
             if($attrs.submitCompleted) {
               $parse($attrs.submitCompleted)($scope);
             }
-
           };
 
           // Cancel any already scheduled submissions
