@@ -50,6 +50,7 @@ class CouponLineItemTests extends EgraphsUnitTest
       case Unlimited => coupon.isActive
       case Prepaid => coupon.discountAmount < newItemType.coupon.discountAmount
       case OneUse => !coupon.isActive
+      case unknown => throw new IllegalStateException(s"What is a $unknown")
     }
   }
 

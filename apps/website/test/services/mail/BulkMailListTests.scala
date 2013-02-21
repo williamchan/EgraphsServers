@@ -1,13 +1,17 @@
 package services.mail
 
+import scala.concurrent._
+import scala.concurrent.duration._
 import collection.JavaConversions._
-import utils.EgraphsUnitTest
-import services.{Utils, AppConfig}
-import play.api.libs.ws.WS
+import java.util.concurrent.TimeUnit
+
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
+import play.api.libs.ws.WS
+
+import utils.EgraphsUnitTest
+import services.{Utils, AppConfig}
 import services.config.ConfigFileProxy
-import java.util.concurrent.TimeUnit
 
 @RunWith(classOf[JUnitRunner])
 class BulkMailListTests extends EgraphsUnitTest {
@@ -36,7 +40,7 @@ class BulkMailListTests extends EgraphsUnitTest {
     val mailList = mailchimpProvider
     val email = "test@derp.com"
     val future = mailList.subscribeNewAsync(email)
-    future.await(10, TimeUnit.SECONDS)
+    Await.result(future, 10 seconds)
 
     val response = mailList.members
 

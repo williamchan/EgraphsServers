@@ -1,16 +1,16 @@
 package monitoring.database
 
+import java.util.Date
 import akka.actor._
+import anorm._
 import play.api.libs.ws._
 import play.api.libs.concurrent.Promise
-import java.util.Date
-import common.CloudWatchMetricPublisher
+import play.api.db.DB
+import play.api.Play.current
 import collections.LimitedQueue
 import collections.EgraphsMetric
 import monitoring.ActorUtilities
-import play.api.db.DB
-import play.api.Play.current
-import anorm._
+import common.CloudWatchMetricPublisher
 import common.MonitoringMessages.CheckStatus
 import common.MonitoringMessages.GetMetric
 
@@ -21,14 +21,12 @@ class DBAvailabilityActor(database: String, friendlyName: String,
   private val history = new LimitedQueue[Int](60)
 
   def receive() = {
-
     case CheckStatus => checkStatus
     case GetMetric => sender ! EgraphsMetric(friendlyName, database, history.toIndexedSeq)
     case _ => println("Cannot handle this message")
   }
 
   def checkStatus = {
-
     val dbConnections = sendDBQuery
     awsActions("DBAvailability." + database, dbConnections)
   }
@@ -39,9 +37,7 @@ class DBAvailabilityActor(database: String, friendlyName: String,
    * "no data" and if the number of connections drops below a certain threshold.
    */
   def sendDBQuery: Int = {
-
     try {
-
       DB.withConnection(database) { implicit conn =>
         conn.setReadOnly(true)
 
@@ -52,9 +48,9 @@ class DBAvailabilityActor(database: String, friendlyName: String,
         count.toInt
       }
     } catch {
-      case _ => {
+      case t: Throwable => {
         history.enqueue(0)
-        play.Logger.info("Database " + database + " failed to connect")
+        play.Logger.info("Database " + database + " failed to connect", t)
         return 0
       }
     }

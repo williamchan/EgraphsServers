@@ -6,11 +6,12 @@ import org.scalatest.FlatSpec
 import LineItemMatchers._
 import utils.TestData
 import utils.CanInsertAndUpdateEntityWithLongKeyTests
-import services.db.{CanInsertAndUpdateEntityThroughTransientServices, CanInsertAndUpdateEntityThroughServices}
-import models.{Coupon, CashTransaction}
 import services.payment.{Payment, YesMaamPayment, StripeTestPayment}
 import services.AppConfig
+import services.db.{CanInsertAndUpdateEntityThroughTransientServices, CanInsertAndUpdateEntityThroughServices}
+import models.{Coupon, CashTransaction}
 import models.enums.OfCheckoutClass
+import models.enums.CheckoutCodeType
 
 /** mixin for testing a LineItemType's lineItems method */
 trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
@@ -70,13 +71,11 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
     }
   }
 
-
   "A LineItem" should "have the expected domain object when restored" in {
     val restored = restoreLineItem(saveLineItem(newLineItem).id).get
 
     restored should haveExpectedRestoredDomainObject
   }
-
 
   //
   // Helpers
@@ -85,7 +84,7 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
     .get
 
   def newLineItem: ItemT = resolve(newItemType).ofCodeType(
-    newItemType.codeType.asInstanceOf[OfCheckoutClass[TypeT, ItemT]]
+    newItemType.codeType.asInstanceOf[CheckoutCodeType with OfCheckoutClass[TypeT, ItemT]]
   ).head
 
   def saveLineItem(item: ItemT): ItemT = item match {
@@ -107,9 +106,6 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   }
 }
 
-
-
-
 /** tests simple LineItem persistence */
 trait SavesAsLineItemEntityThroughServicesTests[
   ItemT <: LineItem[_] with SavesAsLineItemEntityThroughServices[ItemT, ServicesT] with HasLineItemEntity[ItemT],
@@ -124,27 +120,4 @@ trait SavesAsLineItemEntityThroughServicesTests[
   override def transformModel(model: ItemT) = model.withAmount(model.amount.plus(1.0)).asInstanceOf[ItemT]
   override def restoreModel(id: Long): Option[ItemT] = restoreLineItem(id)
   override def saveModel(model: ItemT): ItemT = saveLineItem(model)
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

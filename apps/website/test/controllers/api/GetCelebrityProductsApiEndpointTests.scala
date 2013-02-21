@@ -1,13 +1,15 @@
 package controllers.api
 
-import sjson.json.Serializer
+import play.api.libs.json._
+import play.api.test.Helpers._
+import play.api.test.FakeRequest
 import utils.{ClearsCacheBefore, EgraphsUnitTest}
-import utils.FunctionalTestUtils.{requestWithCredentials, routeName}
+import utils.FunctionalTestUtils._
 import controllers.routes.ApiControllers.getCelebrityProducts
 import utils.TestData
 import services.AppConfig
-import play.api.test.Helpers._
 import services.db.TransactionSerializable
+import models.Product
 
 class GetCelebrityProductsApiEndpointTests 
   extends EgraphsUnitTest 
@@ -28,15 +30,15 @@ class GetCelebrityProductsApiEndpointTests
     }
 
     // Issue request
-    val request = requestWithCredentials(account.email, TestData.defaultPassword)
-      .copy(method=GET, uri=routeUnderTest.url)
+    val request = FakeRequest(GET, routeUnderTest.url).withCredentials(account)
 
-    val Some(result) = routeAndCall(request)
+    val Some(result) = route(request)
 
     // Check result
     status(result) should be (OK)
 
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-    json(0)("id") should be (product.id)
+    val json = Json.parse(contentAsString(result))
+    val jsonProducts = json.asInstanceOf[JsArray].value
+    (jsonProducts.head.as[Product]).id should be (product.id)
   }
 }

@@ -2,8 +2,7 @@ package controllers.website
 
 import play.api.test._
 import play.api.test.Helpers._
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 import controllers.routes.WebsiteControllers.{postOrderPrivacy, getLogin}
 import scala.collection.JavaConversions._
 import services.AppConfig
@@ -19,7 +18,6 @@ import play.api.mvc.Result
 import play.api.mvc.AnyContent
 import utils.CsrfProtectedResourceTests
 
-
 class PostOrderConfigureEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
   private def orderStore = AppConfig.instance[OrderStore]
   private def db = AppConfig.instance[DBSession]
@@ -33,8 +31,8 @@ class PostOrderConfigureEndpointTests extends EgraphsUnitTest with CsrfProtected
       (order, order.recipient, TestData.newSavedCustomer())
     }
 
-    private def perform(
-      request: FakeRequest[AnyContent], 
+    private def perform[A](
+      request: FakeRequest[A], 
       newPrivacy: String=PrivacyStatus.Public.name
     ): Result = 
     {

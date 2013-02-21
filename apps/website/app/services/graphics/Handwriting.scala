@@ -96,7 +96,7 @@ object Handwriting extends Logging {
    */
   def apply(jsonText: String): Handwriting = {
     JSON.parseFull(jsonText) match {
-      case Some(strokeListsTypeErased: Map[_, _]) =>
+      case Some(strokeListsTypeErased) =>
         val strokeLists = strokeListsTypeErased.asInstanceOf[Map[String, List[List[Double]]]]
         val strokePointLists = List(
           strokeLists("x"),

@@ -1,14 +1,12 @@
 package controllers.api
 
-import sjson.json.Serializer
-import scenario.Scenarios
-import utils.FunctionalTestUtils.{
-  routeName,
-  requestWithCredentials,
-  runCustomerBuysProductsScenerio
-}
-import utils.TestConstants
+import play.api.mvc.Result
+import play.api.libs.json._
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import scenario.Scenarios
+import utils.FunctionalTestUtils._
+import utils.TestConstants
 import utils.EgraphsUnitTest
 import services.Utils
 import services.AppConfig
@@ -18,7 +16,7 @@ import models._
 import enums.EgraphState
 import utils.TestData
 import services.db.TransactionSerializable
-import play.api.mvc.Result
+
 
 class GetCelebrityOrdersApiEndpointTests
   extends EgraphsUnitTest
@@ -35,16 +33,15 @@ class GetCelebrityOrdersApiEndpointTests
     }
 
     // Execute the request
-    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
+    val result = routeGetCelebrityOrders(celebrityAccount)
 
     status(result) should be(OK)
 
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-    val orderIdsInResponse = json.map(aJson => aJson("id"))
+    val ordersInResponse = getOrdersFromResult(result)
 
     // Just check the ids -- the rest is covered by unit tests
     for (order <- orders) {
-      orderIdsInResponse.contains(BigDecimal(order.id)) should be(true)
+      ordersInResponse.exists(inResponse => inResponse.id  == order.id) should be(true)
     }
   }
 
@@ -54,7 +51,7 @@ class GetCelebrityOrdersApiEndpointTests
       celebrity.account
     }
 
-    val result = routeAndCallGetCelebrityOrders(celebrityAccount, signerActionable = None)
+    val result = routeGetCelebrityOrders(celebrityAccount, signerActionable = None)
 
     status(result) should be(BAD_REQUEST)
   }
@@ -69,11 +66,11 @@ class GetCelebrityOrdersApiEndpointTests
       (celebrity.account, orders)
     }
 
-    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
+    val result = routeGetCelebrityOrders(celebrityAccount)
     status(result) should be(OK)
 
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-    json.length should be(3) // 4 - 1 (the one we made awaiting verification)
+    val ordersInResponse = getOrdersFromResult(result)
+    ordersInResponse.size should be(3) // 4 - 1 (the one we made awaiting verification)
   }
 
   it should "filter out orders with Egraphs that have already been published" in {
@@ -86,11 +83,11 @@ class GetCelebrityOrdersApiEndpointTests
       (celebrity.account, orders)
     }
 
-    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
+    val result = routeGetCelebrityOrders(celebrityAccount)
     status(result) should be(OK)
 
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-    json.length should be(3) // 4 - 1 (the one we made published)
+    val ordersInResponse = getOrdersFromResult(result)
+    ordersInResponse.size should be(3) // 4 - 1 (the one we made published)
   }
 
   it should "include orders with with egraphs that were rejected" in {
@@ -103,20 +100,25 @@ class GetCelebrityOrdersApiEndpointTests
       (celebrity.account, orders)
     }
 
-    val result = routeAndCallGetCelebrityOrders(celebrityAccount)
+    val result = routeGetCelebrityOrders(celebrityAccount)
     status(result) should be(OK)
 
-    val json = Serializer.SJSON.in[List[Map[String, Any]]](contentAsString(result))
-    json.length should be(4)
+    val ordersInResponse = getOrdersFromResult(result)
+    ordersInResponse.size should be(4)
+  }
+
+  private def getOrdersFromResult(result: Result): Seq[Order] = {
+    val jsonOrders = Json.parse(contentAsString(result)).asInstanceOf[JsArray].value
+    jsonOrders.map(_.as[Order])
   }
 
   /**
    * Assemble the request and get the result.
    */
-  private def routeAndCallGetCelebrityOrders(celebrityAccount: Account, signerActionable: Option[Boolean] = Some(true)): Result = {
+  private def routeGetCelebrityOrders(celebrityAccount: Account, signerActionable: Option[Boolean] = Some(true)): Result = {
     val url = controllers.routes.ApiControllers.getCelebrityOrders(signerActionable = signerActionable).url
-    val req = requestWithCredentials(celebrityAccount).copy(method = GET, uri = url)
-    val Some(result) = routeAndCall(req)
+    val req = FakeRequest(GET, url).withCredentials(celebrityAccount)
+    val Some(result) = route(req)
     result
   }
 }

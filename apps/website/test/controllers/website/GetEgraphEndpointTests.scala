@@ -3,16 +3,14 @@ package controllers.website
 import play.api.test.Helpers._
 import play.api.test._
 import play.api.mvc.Result
-import services.db.TransactionSerializable
-import utils.{TestConstants, TestData}
-import models.enums.{EgraphState, OrderReviewStatus, PrivacyStatus}
+import models.enums._
 import services.AppConfig
-import services.db.DBSession
-import utils.EgraphsUnitTest
+import services.db._
 import egraphs.playutils.Encodings.Base64
 import controllers.routes.WebsiteControllers.getEgraph
-import utils.FunctionalTestUtils
-import FunctionalTestUtils.Conversions._
+import utils.{TestConstants, TestData}
+import utils.EgraphsUnitTest
+import utils.FunctionalTestUtils._
 
 class GetEgraphEndpointTests extends EgraphsUnitTest {
   
@@ -43,7 +41,7 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
     status(requestAsCustomer(Some(recipient.id))) should be (OK)
     
     val adminReq = FakeRequest(GET, getEgraph(orderId).url).withAdmin(admin.id)
-    status(routeAndCall(adminReq).get) should be (OK)
+    status(route(adminReq).get) should be (OK)
   }
   
   "A public egraph" should "be viewable by all" in new EgraphsTestApplication {
@@ -55,17 +53,16 @@ class GetEgraphEndpointTests extends EgraphsUnitTest {
         .withAssets(TestConstants.shortWritingStr, Some(TestConstants.shortWritingStr), Base64.decode(TestConstants.voiceStr())).save()
       order.id
     }
-   
-    val Some(result) = routeAndCall(FakeRequest(GET, getEgraph(orderId).url))
-    
+
+    val Some(result) = route(FakeRequest(GET, getEgraph(orderId).url))
+
     status(result) should be (OK)
   }
   
   private def egraphRequestAsCustomer(orderId: Long, customerId: Option[Long]): Result = {
-    val req = customerId.map(id => FakeRequest().withCustomer(id)).getOrElse(FakeRequest())
-    
-    routeAndCall(req.copy(method=GET, uri=getEgraph(orderId).url)).get
-  }
+    val requestBase = FakeRequest(GET, getEgraph(orderId).url)
+    val req = customerId.map(id => requestBase.withCustomer(id)).getOrElse(requestBase)
 
-  
+    route(req).get
+  }  
 }

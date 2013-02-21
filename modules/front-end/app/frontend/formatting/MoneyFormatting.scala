@@ -1,7 +1,8 @@
 package frontend.formatting
 
-import org.joda.money.{CurrencyUnit, Money}
+import scala.language.implicitConversions
 import java.math.RoundingMode
+import org.joda.money.{CurrencyUnit, Money}
 
 /**
  * Utilities for formatting [[org.joda.cash.Money]].

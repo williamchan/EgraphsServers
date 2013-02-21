@@ -5,8 +5,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import services.db.TransactionSerializable
 import utils.TestData
-import utils.FunctionalTestUtils.routeName
-import utils.FunctionalTestUtils.Conversions._
+import utils.FunctionalTestUtils._
 import controllers.routes.WebsiteControllers.{getCustomerGalleryByUsername, getCustomerGalleryById}
 import utils.EgraphsUnitTest
 import services.AppConfig
@@ -20,7 +19,7 @@ class GetCustomerGalleryEndpointTests extends EgraphsUnitTest {
     val userId = db.connected(TransactionSerializable) {
       TestData.newSavedCustomer().id
     }
-    val Some(result) = routeAndCall(FakeRequest().toRoute(getCustomerGalleryById(userId)))
+    val Some(result) = route(FakeRequest().toCall(getCustomerGalleryById(userId)))
     status(result) should be (OK)
   }
   
@@ -28,7 +27,7 @@ class GetCustomerGalleryEndpointTests extends EgraphsUnitTest {
     val username = db.connected(TransactionSerializable) {
       TestData.newSavedCustomer().username
     }
-    val Some(result) = routeAndCall(FakeRequest().toRoute(getCustomerGalleryByUsername(username)))
+    val Some(result) = route(FakeRequest().toCall(getCustomerGalleryByUsername(username)))
     status(result) should be (OK)
   }
 }

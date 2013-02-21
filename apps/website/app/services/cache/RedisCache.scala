@@ -24,14 +24,14 @@ private[cache] class RedisCache @Inject()(pool: JedisFactory, config: ConfigFile
   // Cache members
   //
   override def set[T](key: String, value: T, expirationSeconds: Int) {
-    require(manifest.erasure.isInstanceOf[Serializable])
+    require(manifest.runtimeClass.isInstanceOf[Serializable])
     val keyBytes = key.getBytes
     
     pool.connected(jedis => jedis.setex(keyBytes, expirationSeconds, toByteArray(value)))
   }
 
   override def get[T: Manifest](key: String): Option[T] = {
-    require(manifest.erasure.isInstanceOf[Serializable])
+    require(manifest.runtimeClass.isInstanceOf[Serializable])
     val bytes = pool.connected(jedis => jedis.get(key.getBytes))
 
     if (bytes == null) {
@@ -63,7 +63,7 @@ private[cache] class RedisCache @Inject()(pool: JedisFactory, config: ConfigFile
       }
     } catch {
       case e: Exception =>
-        error("The following bytes failed to deserialize into a " + manifest.erasure.getName)
+        error("The following bytes failed to deserialize into a " + manifest.runtimeClass.getName)
         error(new String(bytes, "UTF-8"))
         Utils.logException(e)
         e match {

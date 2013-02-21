@@ -1,10 +1,6 @@
 package controllers.api
 
-import sjson.json.Serializer
-import utils.FunctionalTestUtils.{
-  requestWithCredentials,
-  routeName
-}
+import play.api.libs.json.Json
 import play.api.mvc.{ AnyContent, AnyContentAsFormUrlEncoded }
 import utils.TestConstants
 import models.EnrollmentBatch
@@ -22,6 +18,7 @@ import models._
 import controllers.WebsiteControllers
 import controllers.ApiControllers
 import utils.TestData
+import utils.FunctionalTestUtils._
 
 class PostEnrollmentSampleApiEndpointTests
   extends EgraphsUnitTest
@@ -34,13 +31,17 @@ class PostEnrollmentSampleApiEndpointTests
   protected override def validRequestBodyAndQueryString = {
     // TODO: Once we're on Play 2.1 then get rid of this necessary indirection to satisfy
     //   invariance of FakeRequest[A], which should be FakeRequest[+A]    
-    val formRequest = FakeRequest().withFormUrlEncodedBody(
+    val formRequest = newRouteUnderTestFakeRequest.withFormUrlEncodedBody(
       "signature" -> TestConstants.shortWritingStr,
       "audio" -> TestConstants.voiceStr_8khz())
 
-    val anyContentRequest = formRequest.copy(body = (formRequest.body: AnyContent))
+    val anyContentRequest = formRequest.withBody(formRequest.body)
 
     Some(anyContentRequest)
+  }
+
+  protected override def routeRequest(request: FakeRequest[_]): Option[Result] = {
+    route(request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]])
   }
 
   routeName(routeUnderTest) should "accept a well-formed enrollment sample" in new EgraphsTestApplication {
@@ -49,7 +50,8 @@ class PostEnrollmentSampleApiEndpointTests
       (celebrity, celebrity.account)
     }
 
-    val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+    val result = routePostEnrollmentSample(celebrityAccount)
+    status(result) should be(OK)
 
     val enrollmentBatch = db.connected(TransactionSerializable) {
       enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
@@ -68,7 +70,8 @@ class PostEnrollmentSampleApiEndpointTests
       (celebrity, celebrity.account)
     }
 
-    val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+    val result = routePostEnrollmentSample(celebrityAccount)
+    status(result) should be(OK)
 
     val enrollmentBatch = db.connected(TransactionSerializable) {
       enrollmentBatchStore.getOpenEnrollmentBatch(celebrity).get // should be one after we post a sample
@@ -82,14 +85,14 @@ class PostEnrollmentSampleApiEndpointTests
       enrollmentBatch.id)
 
     for (i <- 1 until EnrollmentBatch.batchSize - 1) {
-      val result = routeAndCallPostEnrollmentSample(celebrityAccount)
+      val result = routePostEnrollmentSample(celebrityAccount)
       assertPostEnrollmentSample(
         result,
         isBatchComplete = false,
         numEnrollmentSamplesInBatch = i + 1,
         enrollmentBatch.id)
     }
-    val lastSampleResult = routeAndCallPostEnrollmentSample(celebrityAccount)
+    val lastSampleResult = routePostEnrollmentSample(celebrityAccount)
     assertPostEnrollmentSample(
       lastSampleResult,
       isBatchComplete = true,
@@ -103,27 +106,27 @@ class PostEnrollmentSampleApiEndpointTests
     enrollmentBatchId: Long) {
 
     status(result) should be(OK)
-    val json = Serializer.SJSON.in[Map[String, Any]](contentAsString(result))
-    json("id") == null should not be (true)
-    json("batch_complete").toString.toBoolean should be(isBatchComplete)
+    val json = Json.parse(contentAsString(result))
+    (json \ "id").as[Long] should be > 0L
+    (json \ "batch_complete").as[Boolean] should be(isBatchComplete)
 
-    json("numEnrollmentSamplesInBatch").asInstanceOf[BigDecimal].intValue() should be(numEnrollmentSamplesInBatch)
-    json("enrollmentBatchSize").asInstanceOf[BigDecimal].intValue() should be(EnrollmentBatch.batchSize)
-    json("enrollmentBatchId").asInstanceOf[BigDecimal].longValue() should be(enrollmentBatchId)
+    (json \ "numEnrollmentSamplesInBatch").as[BigDecimal].intValue should be(numEnrollmentSamplesInBatch)
+    (json \ "enrollmentBatchSize").as[BigDecimal].intValue should be(EnrollmentBatch.batchSize)
+    (json \ "enrollmentBatchId").as[BigDecimal].longValue should be(enrollmentBatchId)
   }
 
   /**
    * Assemble the request and get the result.
    */
-  private def routeAndCallPostEnrollmentSample(celebrityAccount: Account,
+  private def routePostEnrollmentSample(celebrityAccount: Account,
     signatureStr: String = TestConstants.shortWritingStr,
     voiceStr: String = TestConstants.voiceStr_8khz): Result = {
 
     val url = controllers.routes.ApiControllers.postEnrollmentSample.url
-    val req = requestWithCredentials(celebrityAccount).copy(method = POST, uri = url).withFormUrlEncodedBody(
+    val req = FakeRequest(POST, url).withCredentials(celebrityAccount).withFormUrlEncodedBody(
       "signature" -> signatureStr,
       "audio" -> voiceStr)
-    val Some(result) = routeAndCall(req)
+    val Some(result) = route(req)
     result
   }
 }

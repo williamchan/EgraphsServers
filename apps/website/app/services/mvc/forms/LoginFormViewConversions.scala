@@ -1,5 +1,6 @@
 package services.mvc.forms
 
+import scala.language.implicitConversions
 import services.http.forms.CustomerLoginForm
 import models.frontend.login_page.LoginFormViewModel
 import models.frontend.forms.Field

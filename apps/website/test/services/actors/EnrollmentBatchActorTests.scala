@@ -1,24 +1,22 @@
 package services.actors
 
-import akka.actor.Actor
-import Actor._
+import scala.concurrent._
+import scala.concurrent.duration._
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import akka.actor._
+import akka.actor.Actor._
+import akka.pattern._
+import akka.util.Timeout
+import play.api.Application
+import play.api.libs.concurrent.Akka
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
 import utils.{TestData, ClearsCacheBefore, EgraphsUnitTest}
 import actors.{ProcessEnrollmentBatchMessage, EnrollmentBatchActor}
 import models._
 import enums.EnrollmentStatus
-import play.api.Application
-import play.api.libs.concurrent.Akka
-import akka.actor.Props
-import akka.actor.ActorRef
-import akka.pattern._
-import akka.util.Timeout
-import akka.util.duration._
 import utils.TestHelpers.withActorUnderTest
-import akka.dispatch.Await
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class EnrollmentBatchActorTests extends EgraphsUnitTest

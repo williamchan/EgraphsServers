@@ -1,5 +1,6 @@
 package services.report
 
+import scala.language.postfixOps
 import com.google.inject.Inject
 import services.db.Schema
 import java.io.File
