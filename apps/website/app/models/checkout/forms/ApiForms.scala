@@ -36,7 +36,7 @@ object ApiForms {
     (product, availableInventory) match {
       case (Some(_), Some(_)) => Valid
       case (Some(_), None) => Invalid(ApiError.NoInventory.name)
-      case (None, None) => Invalid(ApiError.InvalidProduct.name)
+      case (None, _) => Invalid(ApiError.InvalidProduct.name)
     }
   }
 
@@ -71,7 +71,7 @@ object ApiForms {
     def bind(key: String, data: Map[String, String]) = {
       def bindString = apiStringFormat.bind(key, data)
       def invalidTypeError = Left { Seq( FormError(key, ApiError.InvalidType.name) ) }
-      def errorOrConverted(input: String) = try Right(convert(input)) catch { case _ => invalidTypeError }
+      def errorOrConverted(input: String) = try Right(convert(input)) catch { case _: Throwable => invalidTypeError }
 
       bindString.right flatMap { (input: String) => errorOrConverted(input) }
     }
