@@ -274,12 +274,12 @@ trait PostCelebrityAdminEndpoint {
   private def getUploadedImages(body: MultipartFormData[play.api.libs.Files.TemporaryFile])
   : (Option[File], Option[File], Option[File], Option[BufferedImage], Option[BufferedImage], Option[BufferedImage]) = 
   {
-    val profileImageFile = body.file("profileImage").map(_.ref.file)
-    val landingPageImageFile = body.file("landingPageImage").map(_.ref.file)
-    val logoImageFile = body.file("logoImage").map(_.ref.file)
-    val profileImageOption = if (profileImageFile.isDefined) ImageUtil.parseImage(profileImageFile.get) else None
-    val landingPageImageOption = if (landingPageImageFile.isDefined) ImageUtil.parseImage(landingPageImageFile.get) else None
-    val logoImageOption = if (logoImageFile.isDefined) ImageUtil.parseImage(logoImageFile.get) else None
+    val profileImageFile = body.file("profileImage").map(_.ref.file).filterNot(_.length == 0)
+    val landingPageImageFile = body.file("landingPageImage").map(_.ref.file).filterNot(_.length == 0)
+    val logoImageFile = body.file("logoImage").map(_.ref.file).filterNot(_.length == 0)
+    val profileImageOption = profileImageFile.map(ImageUtil.parseImage(_)).flatten
+    val landingPageImageOption = landingPageImageFile.map(ImageUtil.parseImage(_)).flatten
+    val logoImageOption = logoImageFile.map(ImageUtil.parseImage(_)).flatten
     (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption)
   }
 

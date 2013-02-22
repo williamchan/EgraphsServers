@@ -2,7 +2,10 @@ package models.frontend.storefront_a
 
 import models.frontend.PersonalPronouns
 import org.joda.money.Money
-import play.api.templates.Html
+import play.api.templates.{HtmlFormat, Html}
+import play.api.libs.json._
+import HtmlFormat.escape
+import frontend.formatting.MoneyFormatting.Conversions._
 
 case class PersonalizeStar (
   id: Long,
@@ -20,20 +23,18 @@ case class PersonalizeProduct (
   smallThumbUrl: String,
   largeThumbUrl: String
 ) {
-  def toJson: Html = {
-    Html(
-      "{id:" + id + "," +
-      " title:'" + title + "'," +
-      " description:'" + description + "'," +
-      " price:" + price.getAmount + "," +
-      " currencySymbol:'" + price.getCurrencyUnit.getSymbol + "'," +
-      " selected:" + selected + "," +
-      " thumbnails: {" +
-      "   small:'" + smallThumbUrl + "'," +
-      "   large:'" + largeThumbUrl + "'" +
-      " }" +
-      "} "
+  def toJson: JsValue = {
+    Json.obj(
+      "id" -> id,
+      "title" -> title,
+      "description" -> description,
+      "price" -> price.getAmount.doubleValue(),
+      "currencySymbol" -> price.getCurrencyUnit.getSymbol,
+      "selected" -> selected,
+      "thumbnails" -> Json.obj(
+        "small" -> smallThumbUrl,
+        "large" -> largeThumbUrl
+      )
     )
   }
 }
-

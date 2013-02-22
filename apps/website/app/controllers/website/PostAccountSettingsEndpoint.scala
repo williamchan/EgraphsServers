@@ -1,9 +1,7 @@
 package controllers.website
 
 import play.api.mvc.Controller
-import play.api.mvc.Results.Redirect
 import play.api.mvc.Action
-import play.api.mvc.Results.{Ok, Redirect}
 import controllers.routes.WebsiteControllers.getAccountSettings
 import models._
 import services.http.filters.HttpFilters
@@ -43,9 +41,8 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
   }
 
   private def persist(validForm: AccountSettingsForm.Validated, customer: Customer, account: Account) {
-    val (fullname, username, email, newPassword, isGalleryVisible, addressLine1, addressLine2, city, state, postalCode, notice_stars) =
+    val (fullname, username, email, newPassword, isGalleryVisible, notice_stars) =
       (validForm.fullname, validForm.username, validForm.email, validForm.newPassword, validForm.galleryVisibility,
-        validForm.addressLine1, validForm.addressLine2, validForm.city, validForm.state, validForm.postalCode,
         validForm.noticeStars)
 
     // Persist Account changes
@@ -53,13 +50,6 @@ private[controllers] trait PostAccountSettingsEndpoint { this: Controller =>
     if (!newPassword.isEmpty) {
       account.withPassword(newPassword).right.get.save()
     }
-
-    // Persist Address changes
-    val address = account.addresses.headOption match {
-      case None => Address(accountId = account.id)
-      case Some(a) => a
-    }
-    address.copy(addressLine1 = addressLine1, addressLine2 = addressLine2, city = city, _state = state, postalCode = postalCode).save()
 
     // Subscribe or unsubscribe from the mailing list
     if (!customer.notice_stars && notice_stars == "on") {

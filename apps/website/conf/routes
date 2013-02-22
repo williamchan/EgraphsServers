@@ -8,8 +8,6 @@
 GET     /test/scenarios                          controllers.website.nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                    controllers.website.nonproduction.ScenarioController.clear
 GET     /test/scenarios/:urlSlug                 controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
-GET     /test/log-stuff-then-die                 controllers.website.nonproduction.TestControllers.logStuffThenThrowException
-GET     /test/throwError                         controllers.website.nonproduction.TestControllers.throwError(error: String)
 GET     /test/storefront-a/checkout              controllers.WebsiteControllers.storefrontACheckout
 
 ###
@@ -140,7 +138,6 @@ GET     /affiliates                                                 controllers.
 #GET     /careers                                                    controllers.WebsiteControllers.getCareers
 GET     /egraph/$orderId<[0-9]+>                                    controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
 GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraph(orderId: Long)
-# temporary until Twitter Card application is concluded b/c we applied with https://www.egraphs.com/66/new
 GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
 GET     /$orderId<[0-9]+>/embed                                     controllers.WebsiteControllers.getEgraphPlayerEmbed(orderId: Long)
 GET     /facebooklogin/callback                                     controllers.WebsiteControllers.getFacebookLoginCallback

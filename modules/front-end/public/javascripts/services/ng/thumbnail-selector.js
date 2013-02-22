@@ -6,10 +6,12 @@
 define(
 [
   "ngApp",
+  "services/analytics",
+  "window",
   "services/logging",
   "module"
 ],
-function(ngApp, logging, module) {
+function(ngApp, analytics, window, logging, module) {
   var log = logging.namespace(module.id);
   var extend = angular.extend;
   var forEach = angular.forEach;
@@ -22,6 +24,7 @@ function(ngApp, logging, module) {
     return {
       controller: ["$scope", "$parse", "$attrs", function($scope, $parse, $attrs) {
         var self = this;
+        var events = analytics.eventCategory($scope.analyticsCategory || window.location.pathname);
         self.collection = $parse($attrs.collection)($scope);
         var thumbsById = {};
 
@@ -35,6 +38,7 @@ function(ngApp, logging, module) {
           thumbsById[thumbController.id] = thumbController;
           // view -> model
           thumbController.element.bind('click', function() {
+            events.track(["Thumbnail selected", thumbController.id]);
             $scope.$apply(function() {
               self.ngModel.$setViewValue(thumbController.id);
             });

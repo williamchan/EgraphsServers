@@ -167,10 +167,10 @@ trait PostProductAdminEndpoint extends Logging {
   private def getUploadedImages(body: MultipartFormData[play.api.libs.Files.TemporaryFile])
   : (Option[File], Option[File], Option[BufferedImage], Option[BufferedImage]) = 
   {
-    val productImageFile = body.file("productImage").map(_.ref.file)
-    val productIconFile = body.file("productIcon").map(_.ref.file)
-    val productImageOption = if (productImageFile.isDefined) ImageUtil.parseImage(productImageFile.get) else None
-    val productIconOption = if (productIconFile.isDefined) ImageUtil.parseImage(productIconFile.get) else None
+    val productImageFile = body.file("productImage").map(_.ref.file).filterNot(_.length == 0)
+    val productIconFile = body.file("productIcon").map(_.ref.file).filterNot(_.length == 0)
+    val productImageOption = productImageFile.map(ImageUtil.parseImage(_)).flatten
+    val productIconOption = productIconFile.map(ImageUtil.parseImage(_)).flatten
     (productImageFile, productIconFile, productImageOption, productIconOption)
   }
 

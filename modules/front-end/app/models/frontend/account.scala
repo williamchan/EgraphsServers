@@ -13,11 +13,6 @@ case class AccountSettingsForm(
   oldPassword: Field[String],
   newPassword: Field[String],
   passwordConfirm: Field[String],
-  addressLine1: Field[String],
-  addressLine2: Field[String],
-  city: Field[String],
-  state: Field[String],
-  postalCode: Field[String],
   notice_stars: Field[String],
   generalErrors: Iterable[FormError]
 )

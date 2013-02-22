@@ -41,12 +41,15 @@
       }
 
       .egraph-player-container {
-        // .box-shadow(0 0 1px 2px #666);
         position:relative;
         margin-top: 25px;
         .box-shadow(0px 0px 0px 2px #888);
         margin-left: auto;
         margin-right: auto;
+      }
+
+      .egraph-promo-shop {
+        margin: 10px auto 10px auto;
       }
 
       /**
@@ -62,6 +65,13 @@
         .egraph-player-container {
           height: 380px;
         }
+        button {
+          display: block;
+          width: 57%;
+          > strong {
+            width: 75%;
+          }
+        }
       }
       @media (max-width: 640px) and (min-width: 480px) {
         .egraph-container {
@@ -70,6 +80,9 @@
         .egraph-player-container {
           height: 252px;
         }
+        button>strong {
+          width: 332px;
+        }
       }
       @media (max-width: 479px) {
         .egraph-container {
@@ -77,6 +90,9 @@
         }
         .egraph-player-container {
           height: 177px;
+        }
+        button>strong {
+          width: 212px;
         }
       }
 
