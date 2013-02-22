@@ -1,6 +1,7 @@
 package models.frontend.marketplace
 
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 /**
  *  Classes for results page
@@ -37,6 +38,11 @@ case class MarketplaceCelebrity(
   def hasInventoryRemaining: Boolean = !soldout
 }
 
+// TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
+object MarketplaceCelebrity extends Function8[Long, String, String, String, Int, Int, Int, String, MarketplaceCelebrity]{
+  implicit val marketplaceCelebrityFormats = Json.format[MarketplaceCelebrity]
+}
+
 /**
  * Represents a collection of results from a query. 
  * Subtitle is usually something like "Showing 10 results for 'derp'"
@@ -47,44 +53,9 @@ case class ResultSetViewModel(
     celebrities: Iterable[MarketplaceCelebrity] = List()
 )
 
-object MarketplaceConversions {
-  implicit object MarketplaceCelebrityFormat extends Format[MarketplaceCelebrity] {
-    def reads(json: JsValue): JsResult[MarketplaceCelebrity] = JsSuccess(MarketplaceCelebrity (
-      (json \ "id").as[Long],
-      (json \ "publicName").as[String],
-      (json \ "photoUrl").as[String],
-      (json \ "storefrontUrl").as[String],
-      (json \ "inventoryRemaining").as[Int],
-      (json \ "minPrice").as[Int],
-      (json \ "maxPrice").as[Int],
-      (json \ "secondaryText").as[String]
-    ))
-
-    def writes(c: MarketplaceCelebrity): JsValue = JsObject(List(
-      "id" -> JsNumber(c.id),
-      "publicName" -> JsString(c.publicName),
-      "photoUrl" -> JsString(c.photoUrl),
-      "storefrontUrl" -> JsString(c.storefrontUrl),
-      "inventoryRemaining" -> JsNumber(c.inventoryRemaining),
-      "soldout" -> JsBoolean(c.soldout),
-      "minPrice" -> JsNumber(c.minPrice),
-      "maxPrice" -> JsNumber(c.maxPrice),
-      "secondaryText" -> JsString(c.secondaryText)
-    ))
-  }
-
-  implicit object ResultSetViewModelFormat extends Format[ResultSetViewModel] {
-    def reads(json: JsValue) : JsResult[ResultSetViewModel] = JsSuccess(ResultSetViewModel(
-      (json \ "subtitle").asOpt[String],
-      (json \ "verticalUrl").as[Option[String]],  
-      (json \ "celebrities").as[List[MarketplaceCelebrity]]
-    ))
-
-    def writes(r: ResultSetViewModel) : JsValue =  JsObject(List(
-      "subtitle" -> JsString(r.subtitle.getOrElse("")),
-      "celebrities" -> JsArray(r.celebrities.map (c => Json.toJson(c)).toSeq)
-    ))
-  }
+// TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
+object ResultSetViewModel extends Function3[Option[String], Option[String], Iterable[MarketplaceCelebrity], ResultSetViewModel] {
+  implicit val resultSetViewModelFormats = Json.format[ResultSetViewModel]
 }
 
 /**
