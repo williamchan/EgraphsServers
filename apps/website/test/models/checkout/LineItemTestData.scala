@@ -44,7 +44,7 @@ object LineItemTestData {
   def randomTotalItem = TotalLineItem(randomMoney)
   def randomBalanceItem = BalanceLineItem(randomMoney)
 
-  def randomCashTransactionType = CashTransactionLineItemType.create(Some(stripePayment.testToken().id), zipcode)
+  def randomCashTransactionType = CashTransactionLineItemType.createOptional(Some(stripePayment.testToken().id), zipcode)
   def randomCashTransactionItem = {
     val services = AppConfig.instance[CashTransactionLineItemServices].copy(payment = yesMaamPayment)
     randomCashTransactionType.lineItems(Seq(randomBalanceItem)).get.head.copy(_services = services)

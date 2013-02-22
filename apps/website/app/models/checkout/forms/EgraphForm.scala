@@ -22,6 +22,7 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
     import ApiForms._
     import FormKeys._
 
+    // TODO use dependency injector to apply services instead of static call
     mapping(
       productId -> longNumber.verifying(validProductId),
       recipientName -> text(3, 30),

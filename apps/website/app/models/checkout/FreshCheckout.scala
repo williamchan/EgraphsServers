@@ -49,7 +49,7 @@ case class FreshCheckout(
     services.customerStore.findOrCreateByEmail(account.email)
   }
 
-  override def payment = stripeToken map (token => CashTransactionLineItemType.create(Some(token), zipcode))
+  override def payment = stripeToken map (token => CashTransactionLineItemType.createOptional(Some(token), zipcode))
 
   override protected def _dirty: Boolean = !_itemTypes.isEmpty
 

@@ -10,7 +10,7 @@ class RequireSessionUrlSlug @Inject() () {
     val producedAction = actionFactory(sessionSlug)
     Action[T](producedAction.parser) { implicit request =>
       request.session.id match {
-        case Some(sessionSlug) => producedAction(request)
+        case Some(sessionId) if sessionId == sessionSlug => producedAction(request)
         case _ => Results.Forbidden
       }
     }

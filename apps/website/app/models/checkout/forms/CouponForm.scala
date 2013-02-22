@@ -19,7 +19,7 @@ object CouponForm extends CheckoutForm[CouponLineItemType]{
     import FormKeys._
 
     Forms.mapping(
-      couponCode -> (text(_codeLength, _codeLength) verifying validCouponCode)
+      couponCode -> (text verifying validCouponCode)
     )(applyToForm)(unapplyToForm)
   }
 

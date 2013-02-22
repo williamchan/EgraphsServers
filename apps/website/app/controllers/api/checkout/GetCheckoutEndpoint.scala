@@ -5,7 +5,6 @@ import services.http.ControllerMethod
 import services.http.filters.HttpFilters
 
 
-
 /** GET /sessions/[SessionID]/checkouts/[CelebID] */
 trait GetCheckoutEndpoint { this: Controller =>
 
@@ -14,8 +13,6 @@ trait GetCheckoutEndpoint { this: Controller =>
   //
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
-
-
 
   //
   // Controllers
