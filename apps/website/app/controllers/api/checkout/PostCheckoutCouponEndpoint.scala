@@ -1,14 +1,14 @@
 package controllers.api.checkout
 
-import play.api.mvc.{Controller, AnyContent, Action}
+import play.api.mvc.{Result, Controller, AnyContent, Action}
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
-import models.checkout.forms.CouponForm
-import models.checkout.CheckoutAdapterServices
+import models.checkout.forms.{CheckoutForm, CouponForm}
+import models.checkout.{CouponLineItemType, EgraphCheckoutAdapter, CheckoutAdapterServices}
 
 
 /** POST /sessions/[SessionID]/checkouts/[CelebID]/coupon */
-trait PostCheckoutCouponEndpoint { this: Controller =>
+trait PostCheckoutCouponEndpoint extends CheckoutResourceEndpoint[CouponLineItemType] { this: Controller =>
 
   //
   // Services
@@ -18,26 +18,23 @@ trait PostCheckoutCouponEndpoint { this: Controller =>
   protected def checkoutAdapters: CheckoutAdapterServices
 
   //
-  // Controllers
+  // CheckoutResourceEndpoint members
   //
+  override protected def resourceForm = CouponForm
+
+  override protected def setResource(
+    resource: Option[CouponLineItemType],
+    checkout: EgraphCheckoutAdapter
+  ) = {
+    checkout.withCoupon(resource)
+  }
+
   /** Returns Ok if the coupon code is valid and the corresponding coupon is successfully added to the checkout */
-  def postCheckoutCoupon(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = postController() {
-    httpFilters.requireSessionAndCelebrityUrlSlugs(sessionIdSlug, checkoutIdSlug) { (sessionId, celeb) =>
-      Action { implicit request =>
-        val checkout = checkoutAdapters.decacheOrCreate(celeb.id)
+  def postCheckoutCoupon(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = {
+    postCheckoutResource(sessionIdSlug, checkoutIdSlug)
+  }
 
-        CouponForm.bindFromRequestAndCache(checkout).fold(
-          formWithErrors => {
-            checkout.withCoupon(None).cache()
-            BadRequest(formWithErrors.errorsAsJson)
-          },
-
-          couponType => {
-            checkout.withCoupon(Some(couponType)).cache()
-            Ok
-          }
-        )
-      }
-    }
+  def getCheckoutCoupon(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = {
+    getCheckoutResource(sessionIdSlug, checkoutIdSlug)
   }
 }

@@ -29,9 +29,10 @@ trait CheckoutForm[T] {
     checkout.cart.setting(this.getClass.getSimpleName -> formToCache).save()
   }
 
-  def decache(checkout: EgraphCheckoutAdapter)(implicit request: Request[_], mani: Manifest[T])
-  : Option[T] =
+  def decache[FormT <: Form[T]](checkout: EgraphCheckoutAdapter)
+    (implicit request: Request[_], mani: Manifest[FormT])
+  : Option[Form[T]] =
   {
-    checkout.cart.get[T](this.getClass.getSimpleName)
+    checkout.cart.get[FormT](this.getClass.getSimpleName)
   }
 }
