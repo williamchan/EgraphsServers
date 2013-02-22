@@ -7,11 +7,12 @@ import play.api.test.Helpers._
 import play.api.mvc.Result
 import services.db.{TransactionSerializable, DBSession}
 import services.AppConfig
-import models.Celebrity
+import models.{Coupon, Celebrity}
 import play.api.libs.json._
+import controllers.routes.ApiControllers.{postCheckoutCoupon, getCheckoutCoupon}
 
 class CheckoutCouponEndpointTests extends EgraphsUnitTest with ClearsCacheBefore {
-  import controllers.routes.ApiControllers.{postCheckoutCoupon, getCheckoutCoupon}
+  import CheckoutCouponEndpointHelper._
   def db = AppConfig.instance[DBSession]
 
   "Getting a coupon when none had previously been posted" should "404" in new EgraphsTestApplication {
@@ -51,6 +52,15 @@ class CheckoutCouponEndpointTests extends EgraphsUnitTest with ClearsCacheBefore
     status(getCoupon(sessionId, celeb2.id)) should be (NOT_FOUND)
   }
 
+
+
+  private def makeCeleb(): Celebrity = {
+    db.connected(TransactionSerializable)(TestData.newSavedCelebrity())
+  }
+}
+
+object CheckoutCouponEndpointHelper {
+
   def postCoupon(couponCode: String, sessionId: String, celebId: Long) = {
     val req = FakeRequest(POST, postCheckoutCoupon(sessionId, celebId).url)
       .withFormUrlEncodedBody("couponCode" -> couponCode)
@@ -61,9 +71,5 @@ class CheckoutCouponEndpointTests extends EgraphsUnitTest with ClearsCacheBefore
   def getCoupon(sessionId: String, celebId: Long): Result = {
     val req = FakeRequest(GET, getCheckoutCoupon(sessionId, celebId).url).withSessionId(sessionId)
     route(req).get
-  }
-
-  private def makeCeleb(): Celebrity = {
-    db.connected(TransactionSerializable)(TestData.newSavedCelebrity())
   }
 }

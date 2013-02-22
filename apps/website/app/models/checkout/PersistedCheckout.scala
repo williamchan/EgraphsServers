@@ -30,7 +30,7 @@ case class PersistedCheckout(
   /** cash transaction to be made if changes are transacted */
   override def payment: Option[CashTransactionLineItemType] = {
     for ( token <- stripeToken; zip <- zipcode) yield
-      CashTransactionLineItemType.createOptional(Some(token), Some(zip))
+      CashTransactionLineItemType.create(token, zip)
   }
 
   override lazy val shippingAddress = buyerAccount.addresses.headOption

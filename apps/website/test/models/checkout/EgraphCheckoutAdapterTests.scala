@@ -128,7 +128,7 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
 
     adapter should be ('validated)
 
-    val transacted = adapter.transact()
+    val transacted = adapter.transact().get
 
     transacted should be ('right)
 

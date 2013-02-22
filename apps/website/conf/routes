@@ -47,6 +47,9 @@ POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs controllers.ApiC
 POST    /api/1.0/celebrities/me/videoasset                      controllers.ApiControllers.postVideoAsset
 
 # Checkout API
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+> controllers.ApiControllers.getCheckout(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+> controllers.ApiControllers.postCheckout(sessionId: String, checkoutId: Long)
+
 GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/buyer controllers.ApiControllers.getCheckoutBuyer(sessionId: String, checkoutId: Long)
 POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/buyer controllers.ApiControllers.postCheckoutBuyer(sessionId: String, checkoutId: Long)
 

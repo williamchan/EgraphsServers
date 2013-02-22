@@ -16,9 +16,11 @@ case class CheckoutAdapterServices @Inject() (
   cartFactory: CartFactory
 ) {
   def decacheOrCreate(celebId: Long)(implicit request: RequestHeader): EgraphCheckoutAdapter = {
-    cartFactory(celebId).get[EgraphCheckoutAdapter]("checkout").getOrElse {
-      EgraphCheckoutAdapter(celebId)
-    }
+    decache(celebId) getOrElse EgraphCheckoutAdapter(celebId).cache() // TODO(CE-13): cache asynchronously, perhaps?
+  }
+
+  def decache(celebId: Long)(implicit request: RequestHeader): Option[EgraphCheckoutAdapter] = {
+    cartFactory(celebId).get[EgraphCheckoutAdapter]("checkout")
   }
 }
 
@@ -61,6 +63,7 @@ case class EgraphCheckoutAdapter (
 
   def cache()(implicit request: RequestHeader) = {
     cart.setting("checkout" -> this).save()
+    this
   }
 
   //
@@ -68,15 +71,7 @@ case class EgraphCheckoutAdapter (
   //
   def summary = previewCheckout.toJson
 
-  /** if true, the actual checkout should be ready to transact */
-  def validated = { order.isDefined &&
-    buyerEmail.isDefined &&
-    (recipientEmail.isDefined || !isGift) &&
-    (shippingAddress.isDefined || !hasPrint) &&
-    (payment.isDefined || previewCheckout.total.amount.isZero)
-  }
-
-  def transact() = makeActualCheckout().transact(payment)
+  def transact() = if (validated) Some(makeActualCheckout().transact(payment)) else None
 
 
   //
@@ -96,6 +91,14 @@ case class EgraphCheckoutAdapter (
   protected def isGift = order map (_.isGift) getOrElse (false)
 
   protected def hasPrint = order map (_.framedPrint) getOrElse (false)
+
+  /** if true, the actual checkout should be ready to transact */
+  protected def validated = { order.isDefined &&
+    buyerEmail.isDefined &&
+    (recipientEmail.isDefined || !isGift) &&
+    (shippingAddress.isDefined || !hasPrint) &&
+    (payment.isDefined || previewCheckout.total.amount.isZero)
+  }
 
   /** generate a Checkout without saving any Customers or Accounts */
   protected def previewCheckout = {

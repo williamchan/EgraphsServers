@@ -103,10 +103,18 @@ abstract class Checkout
   /** for services to return a persisted checkout as the correct type */
   def withEntity(savedEntity: CheckoutEntity): Checkout
 
-  def toJson: JsValue = lineItems.foldLeft(JsArray(Nil)) { (acc, nextItem) =>
-    nextItem.toJson match {
-      case jsArray: JsArray => jsArray ++ acc
-      case jsVal: JsValue => jsVal +: acc
+  def toJson: JsValue = {
+    def itemsToJson(items: LineItems) = items.foldLeft(JsArray(Nil)) { (acc, nextItem) =>
+      nextItem.toJson match {
+        case jsArray: JsArray => jsArray ++ acc
+        case jsVal: JsValue => jsVal +: acc
+      }
+    }
+
+    Json.toJson {
+      LineItemNature.values map { nature =>
+        (nature.name, itemsToJson(lineItems(nature)))
+      } toMap
     }
   }
 
