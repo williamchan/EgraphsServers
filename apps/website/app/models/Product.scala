@@ -273,12 +273,13 @@ case class JsProduct(
   signingOriginY: Int,
   signingAreaW: Int,
   signingAreaH: Int,
-  created: Date,
-  updated: Date
+  created: Timestamp,
+  updated: Timestamp
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsProduct extends Function12[Long, String, String, String, Int, Int, Int, Int, Int, Int, Date, Date, JsProduct] {
+object JsProduct extends Function12[Long, String, String, String, Int, Int, Int, Int, Int, Int, Timestamp, Timestamp, JsProduct] {
+  import services.Time._
   implicit val productFormats = Json.format[JsProduct]
   
   def from(product: Product): JsProduct = {
