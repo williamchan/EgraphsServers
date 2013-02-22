@@ -10,6 +10,7 @@ package models.frontend.marketplace
  */
 case class RequestStarViewModel(
   starName: String,
-  requesterName: String,
-  email: String
+  customerId: Long
+//  requesterName: String,
+//  email: String
 )

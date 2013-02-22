@@ -2,7 +2,9 @@
   results: models.frontend.marketplace.ResultSetViewModel,
   query: String,
   requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
-  requestStarActionUrl: String
+  requestStarActionUrl: String,
+  isLoggedIn: Boolean,
+  maybeCustomerId: Option[Long]
   )(
   implicit
   authToken: egraphs.authtoken.AuthenticityToken
@@ -63,47 +65,58 @@
   @if(results.celebrities.size == 0) {
     <section class="span4">
 
-      @safeForm(
-        'id -> "request-star-form",
-        'action -> requestStarActionUrl,
-        'method -> "post",
-        'class -> "login-option"
-      ) {
+      @if(isLoggedIn) {
+
+        @safeForm(
+          'id -> "request-star-form",
+          'action -> requestStarActionUrl,
+          'method -> "post",
+          'class -> "login-option"
+        ) {
+
+          <div class="clearfix">
+            <div class="request-star-logged-in-option">
+              <button id="request-star-logged-in-button" type="button" class="button">
+                <strong><em>Request a Star</em></strong>
+                <span>&raquo;</span>
+              </button>
+            </div>
+
+            <div class="request-star-logged-in-fields" style="display: none">
+              <fieldset>
+                <span id="star-name-field">
+                  @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
+                    <input type="text" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
+                  }
+                </span>
+                <span>
+                  @helper.input(requestStarForm("customerId")) { (id, name, value, args) =>
+                    <input type="hidden" name="@name" value="@maybeCustomerId.get" id="@id" @toHtmlArgs(args)>
+                  }
+                </span>
+              </fieldset>
+              @tags.arrow_button(caption="Submit", classes="button create-account")
+            </div>
+          </div>
+
+        } <!-- end safe form -->
+
+      } else {
 
         <div class="clearfix">
-          <div class="request-star-option">
-            <button id="request-star-button" type="button" class="button">
+          <div class="request-star-not-logged-in-option">
+            <button id="request-star-not-logged-in-button" type="button" class="button">
               <strong><em>Request a Star</em></strong>
               <span>&raquo;</span>
             </button>
           </div>
 
-          <div class="request-star-logged-in-fields" style="display: none">
-            <fieldset>
-              <span id="star-name-field">
-                @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
-                  <input type="text" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
-                }
-              </span>
-            </fieldset>
-            @tags.arrow_button(caption="Submit", classes="button create-account")
-          </div>
-
-          <div class="login-prompt-fields" style="display: none">
-            <fieldset>
-              <h4>Please sign in to Request a Star:</h4>
-              <span id="email-field">
-                @helper.inputText(requestStarForm("email"), '_label -> "Email:", '_showConstraints -> false)
-              </span>
-              <span id="password-field">
-                @helper.inputText(requestStarForm("password"), '_label -> "Password:", '_showConstraints -> false)
-              </span>
-            <fieldset>
-            @tags.arrow_button(caption="Submit", classes="button create-account")
+          <div class="login-reminder" style="display: none">
+            <p> It looks like you're not logged in! </p>
+            <a href="/login">Login here.</a>
           </div>
         </div>
-
-      } <!-- end safe form -->
+      }
     </section>
   }
 }

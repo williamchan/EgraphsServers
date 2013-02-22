@@ -20,11 +20,11 @@ import services.mvc.ImplicitHeaderAndFooterData
 
 private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
-    
+
   protected def celebrityStore: CelebrityStore
   protected def httpFilters: HttpFilters
   protected def postController: POSTControllerMethod
-  
+
   /**
    * Store requested star and associated email for later notification.
    */
@@ -47,7 +47,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
             case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
           }
 
-          play.Logger.info("starName is " + validForm.starName + ", requesterName is " + validForm.requesterName + ", email is " + validForm.email)
+          play.Logger.info("starName is " + validForm.starName + ", customerId is " + validForm.customerId)
           Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
         }
       )
@@ -61,8 +61,8 @@ object PostRequestStarEndpoint {
   def form: Form[RequestStarViewModel] = Form(
     mapping(
       "starName" -> text.verifying(nonEmpty),
-      "requesterName" -> text.verifying(nonEmpty),
-      "email" -> email.verifying(nonEmpty)
-    )(RequestStarViewModel.apply)(RequestStarViewModel.unapply)
-  )
+      "customerId" -> longNumber
+      //      "requesterName" -> text.verifying(nonEmpty),
+      //      "email" -> email.verifying(nonEmpty)
+      )(RequestStarViewModel.apply)(RequestStarViewModel.unapply))
 }

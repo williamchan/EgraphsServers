@@ -158,6 +158,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
         val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
+        val (formBasedOnLoginStatus, isLoggedIn, maybeCustomerId) = getFormBasedOnLoginStatus
+
         Ok(views.html.frontend.marketplace_results(
           query = queryOption.getOrElse(""),
           viewAsList = viewAsList,
@@ -166,8 +168,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           results = ResultSetViewModel(subtitle = Option(subtitle), verticalUrl = Option("/"), celebrities = celebrities),
           sortOptions = sortOptionViewModels(maybeSortType),
           availableOnly = availableOnly,
-          requestStarForm = getFormBasedOnLoginStatus,
-          requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url
+          requestStarForm = formBasedOnLoginStatus,
+          requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url,
+          isLoggedIn = isLoggedIn,
+          maybeCustomerId = maybeCustomerId
         ))
       } else {
         // No search options so serve the landing page. If a vertical has a category value which feature stars, it is
@@ -191,7 +195,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
     }
   }
 
-  private def getFormBasedOnLoginStatus(implicit request: Request[AnyContent]) = {
+  private def getFormBasedOnLoginStatus(implicit request: Request[AnyContent]): (Form[RequestStarViewModel], Boolean, Option[Long]) = {
     val eitherIsLoggedIn = httpFilters.requireCustomerLogin.filterInSession()
     val (isLoggedIn, maybeCustomerId) = eitherIsLoggedIn match {
       case Right(loggedInCustomerAndAccount) => {
@@ -200,10 +204,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         (true, Some(customerId))
       }
       case Left(notLoggedIn) => {
-        play.Logger.info("notLoggedIn is " + notLoggedIn)
         (false, None)
       }
     }
-    PostRequestStarEndpoint.form.bindWithFlashData
+    (PostRequestStarEndpoint.form.bindWithFlashData, isLoggedIn, maybeCustomerId)
   }
 }
