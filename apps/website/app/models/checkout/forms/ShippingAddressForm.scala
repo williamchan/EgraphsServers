@@ -15,13 +15,10 @@ case class ShippingAddress(
 ) {
   def stringify = listified mkString "\n"
 
-
   //
   // Helpers
   //
-
-  // TODO(CE-13): get rid of this and use of Address
-  def address = Address(
+  def address = Address( // TODO: get rid of Address
     addressLine1 = addressLine1,
     addressLine2 = addressLine2,
     city = city,
@@ -32,6 +29,7 @@ case class ShippingAddress(
   private def cityStateAndZip = "%s, %s %s".format(city, state, postalCode)
   private def listified = List(name, addressLine1) ++ addressLine2.toList ++ List(cityStateAndZip)
 }
+
 
 object ShippingAddressForm extends CheckoutForm[ShippingAddress] {
 
@@ -49,8 +47,8 @@ object ShippingAddressForm extends CheckoutForm[ShippingAddress] {
     import ApiForms._
     import FormKeys._
 
-    mapping (
-      nameKey -> nonEmpty(text),        // TODO(CE-13): set length on these if necessary
+    mapping ( // TODO(CE-13): set length on these if necessary
+      nameKey -> nonEmpty(text),
       addressLine1Key -> nonEmpty(text),
       addressLine2Key -> optional(text),
       cityKey -> nonEmpty(text),

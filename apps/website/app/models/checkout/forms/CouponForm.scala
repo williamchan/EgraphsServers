@@ -23,7 +23,12 @@ object CouponForm extends CheckoutForm[CouponLineItemType]{
     )(applyToForm)(unapplyToForm)
   }
 
+
+  //
+  // helpers
+  //
   def unapplyToForm(couponItemType: CouponLineItemType) = Some(couponItemType.coupon.code)
+
   def applyToForm(code: String)(implicit services: CouponLineItemTypeServices = defaultServices) = {
     services.findByCouponCode(code).get
   }

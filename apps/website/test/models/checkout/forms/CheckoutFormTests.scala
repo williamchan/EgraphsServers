@@ -1,5 +1,6 @@
 package models.checkout.forms
 
+import enums.ApiError
 import utils.{TestData, DBTransactionPerTest, DateShouldMatchers, EgraphsUnitTest}
 import play.api.test.FakeRequest
 import models.checkout.{LineItemTestData, CouponLineItemType, EgraphOrderLineItemType}

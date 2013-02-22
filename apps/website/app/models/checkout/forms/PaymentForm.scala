@@ -21,6 +21,7 @@ object PaymentForm extends CheckoutForm[CashTransactionLineItemType] {
     )(CashTransactionLineItemType.create)(unapplyToForm)
   }
 
+  /** since `CashTransactionLineItemType` has other arguments, its default unapply doesn't work for the form */
   protected def unapplyToForm(txnType: CashTransactionLineItemType) = {
     Some(txnType.stripeCardTokenId, txnType.billingPostalCode)
   }

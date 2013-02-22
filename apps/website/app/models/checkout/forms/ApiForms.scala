@@ -1,24 +1,33 @@
 package models.checkout.forms
 
+import enums.ApiError
 import play.api.data.{Mapping, FormError, Forms}
 import play.api.data.format.{Formats, Formatter}
 import models.{CouponStore, ProductStore}
 import services.AppConfig.instance
 
+/**
+ * Use similar to play.api.data.Forms -- provides Mappings and Constraints for checkout forms that conform to the
+ * Checkout API's error spec.
+ */
 object ApiForms {
   import play.api.data.validation._
 
+  //
+  // Mappings
+  //
   def text(min: Int = 0, max: Int = Int.MaxValue): Mapping[String] = text verifying lengthRequirement(min, max)
   def text: Mapping[String] = Forms.of[String](apiStringFormat)
+  def email = text verifying formatRequirement(playEmailPattern)
   def longNumber = Forms.of[Long](apiLongFormat)
   def boolean = Forms.of[Boolean](apiBooleanFormat)
-  def email = text verifying formatRequirement(playEmailPattern)
 
   /** like text(min = 1) except gives ApiError.Required instead of ApiError.InvalidLength if violated */
   def nonEmpty(mapping: Mapping[String]) = mapping verifying isNonEmpty
 
+
   //
-  // Validators -- API length and format errors
+  // Constraints -- API length and format errors
   //
   def lengthRequirement(min: Int = 0, max: Int = Int.MaxValue) = Constraint[String] { (input: String) =>
     if (min to max contains input.size) Valid
@@ -47,7 +56,7 @@ object ApiForms {
     }
   }
 
-  /** Like a more vague lengthRequirement, returns ApiError.Required if violated */
+  /** Like a more vague `lengthRequirement(min = 1)`, returns ApiError.Required if violated */
   def isNonEmpty = Constraint[String] { (input: String) =>
     if (input.isEmpty) Invalid(ApiError.Required.name)
     else Valid
@@ -55,7 +64,7 @@ object ApiForms {
 
 
   //
-  // Formats -- for API type error
+  // Formatters -- for API type error
   //
   private val apiLongFormat = apiFormatter[Long]( input => input.toLong )
   private val apiBooleanFormat = apiFormatter[Boolean]( input => input.toBoolean )
@@ -76,6 +85,7 @@ object ApiForms {
       bindString.right flatMap { (input: String) => errorOrConverted(input) }
     }
   }
+
 
   //
   // Helpers

@@ -5,7 +5,22 @@ import services.AppConfig
 import services.db.HasTransientServices
 import models.{Customer, Account}
 
-
+/**
+ * Basically, a cacheable form of the Checkout that makes it easy to add, replace, and remove specific components of
+ * the checkout.
+ *
+ * The actual checkout is not serializable currently and manipulating its contents is more verbose due to its
+ * generalized nature. This class may be extended to cover other purchase scenarios or just ditched if Checkouts are
+ *
+ *
+ * @param order - to be transacted, required
+ * @param coupon - to be applied to checkout
+ * @param payment - to be charged if balance is nonZero
+ * @param buyerEmail - email of buyer, required
+ * @param recipientEmail - email of giftee, required if order is a gift
+ * @param shippingAddress - shipping address for print, required if order is physical
+ * @param _services
+ */
 case class EgraphCheckoutAdapter (
   // named after the api endpoints they correspong to
   order: Option[EgraphOrderLineItemType] = None,
@@ -20,15 +35,8 @@ case class EgraphCheckoutAdapter (
   //
   // Members
   //
-  def isGift = order map (_.isGift) getOrElse (false)
-
-  def isPhysical = order map (_.framedPrint) getOrElse (false)
-
-  def buyer = new CheckoutCustomer(buyerEmail, isGiftee = false)
-
-  def recipient = recipientEmail map { email =>
-    new CheckoutCustomer(Some(email), isGiftee = true)
-  }
+  def buyer = CheckoutBuyer(buyerEmail)
+  def recipient = recipientEmail map { email => CheckoutRecipient(Some(email)) }
 
 
   //
@@ -36,30 +44,15 @@ case class EgraphCheckoutAdapter (
   //
   def summary = previewCheckout.toJson
 
-  def previewCheckout = {
-    val types: Seq[LineItemType[_]] = Seq(order, coupon).flatten
-    val zipcode = payment.flatMap(_.billingPostalCode)
-    val address = shippingAddress.map(_.address)
-    val recipientAccount = recipient map (_.account)
-
-    Checkout.create( types, Some(buyer.account), zipcode)
-      .withRecipient( recipientAccount )
-      .withShippingAddress( address )
+  /** if true, the actual checkout should be ready to transact */
+  def validated = { order.isDefined &&
+    buyerEmail.isDefined &&
+    (recipientEmail.isDefined || !isGift) &&
+    (shippingAddress.isDefined || !hasPrint) &&
+    (payment.isDefined || previewCheckout.total.amount.isZero)
   }
 
-  def validated = {
-    order.isDefined &&
-      buyerEmail.isDefined &&
-      (recipientEmail.isDefined || !isGift) &&
-      (shippingAddress.isDefined || !isPhysical) &&
-      (payment.isDefined || previewCheckout.total.amount.isZero)
-  }
-
-  def checkout(): FreshCheckout = previewCheckout
-    .withRecipient { recipient map (_.account.save()) }
-    .withBuyer { buyer.account.save() }
-
-  def transact() = checkout.transact(payment)
+  def transact() = makeActualCheckout().transact(payment)
 
 
   //
@@ -74,10 +67,39 @@ case class EgraphCheckoutAdapter (
 
 
   //
-  // privates
+  // helpers
   //
-  /** Helper class for dealing with Account and Customer related business for buyer and recipient */
-  protected class CheckoutCustomer(val email: Option[String], isGiftee: Boolean) {
+  protected def isGift = order map (_.isGift) getOrElse (false)
+
+  protected def hasPrint = order map (_.framedPrint) getOrElse (false)
+
+  /** generate a Checkout without saving any Customers or Accounts */
+  protected def previewCheckout = {
+    val types: Seq[LineItemType[_]] = Seq(order, coupon).flatten
+    val zipcode = payment.flatMap(_.billingPostalCode)
+    val address = shippingAddress.map(_.address)
+    val recipientAccount = recipient map (_.account)
+
+    Checkout.create( types, Some(buyer.account), zipcode)
+      .withRecipient( recipientAccount )
+      .withShippingAddress( address )
+  }
+
+  /** try to generate a Checkout ready to transact -- should be able to transact if `validated` is true */
+  protected def makeActualCheckout(): FreshCheckout = previewCheckout
+    .withRecipient { recipient map (_.account.save()) }
+    .withBuyer { buyer.account.save() }
+
+
+  /** Helper classes for dealing with Account and Customer related business for buyer and recipient */
+  protected case class CheckoutBuyer(email: Option[String]) extends CheckoutCustomer(isGiftee = false)
+
+
+  protected case class CheckoutRecipient(email: Option[String]) extends CheckoutCustomer(isGiftee = true)
+
+
+  protected abstract class CheckoutCustomer(isGiftee: Boolean) {
+    def email: Option[String]
 
     def customer: Customer = getOrCreate(
       existing = email flatMap {services.customerStore.findByEmail(_)} )(
