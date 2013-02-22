@@ -15,9 +15,7 @@ trait CheckoutForm[T] {
   {
     val form = bindFromRequest()
 
-    future {
-      this.cache(checkout, Some(form))
-    }
+    this.cache(checkout, Some(form))
 
     form
   }

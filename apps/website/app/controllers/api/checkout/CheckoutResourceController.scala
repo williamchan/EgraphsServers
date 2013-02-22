@@ -67,11 +67,11 @@ class CheckoutResourceController[T] (
         val checkout = checkoutAdapters.decacheOrCreate(celeb.id)
         resourceForm.decache[FormT](checkout).map { cachedForm =>
           val formJson = Json.toJson(cachedForm.data)
-          log(s"OK: Found simple form for ${resourceForm.getClass.getSimpleName}")
+          log(s"OK: Found previously submitted form for ${resourceForm.getClass.getSimpleName}")
           log(Json.stringify(formJson))
           Ok(formJson)
         }.getOrElse {
-          log(s"NOT_FOUND:: No cached form found for ${resourceForm.getClass.getSimpleName}")
+          log(s"NOT_FOUND: No cached form found for ${resourceForm.getClass.getSimpleName}")
           NotFound
         }
       }

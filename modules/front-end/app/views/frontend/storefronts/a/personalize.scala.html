@@ -157,7 +157,7 @@
                       @fieldTooltip("Not sure what to say? Here are some tips.", event="Not sure what to say?") {
                         <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.pronoun.obj in person. Ask a question you've always wanted to know the answer to, or request that @star.pronoun.subject say something specific.
                       }
-                      <div class="explanatory-text char-remaining">{{@maxDesiredTextChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxMessageToCelebChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->
@@ -181,7 +181,7 @@
                     </div>
                     @field.standardErrorDiv
                     <div>
-                      <div class="explanatory-text char-remaining">{{@maxMessageToCelebChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxDesiredTextChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->
@@ -214,9 +214,6 @@
                               class="btn btn-primary btn-custom-radio">
                         This is a gift
                       </button>
-                    </div>
-                    <div class="explanatory-text" ng-show="@field.ngModel == 'true'">
-                      Nice choice! An egraph makes a stellar gift.
                     </div>
                   </div>
                 </div> <!-- End .control-group.recipientOption -->

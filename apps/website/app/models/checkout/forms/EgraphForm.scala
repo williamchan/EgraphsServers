@@ -16,7 +16,6 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
     val framedPrint = "framedPrint"
   }
 
-
   override val form = Form[EgraphOrderLineItemType] {
     import play.api.data.Forms.{ignored, mapping, optional}
     import ApiForms._
@@ -35,6 +34,6 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
 
   }
 
-  val maxMessageToCelebChars = 180
-  val maxDesiredTextChars = 60
+  def maxMessageToCelebChars = 180
+  def maxDesiredTextChars = 60
 }
