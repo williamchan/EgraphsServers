@@ -144,6 +144,11 @@ object FunctionalTestUtils {
       requestWithAdminIdInBody(adminId).withSession(newSession.data.toSeq: _*)
     }
 
+    def withSessionId(sessionId: String): FakeRequest[T] = {
+      val newSession = request.session + (EgraphsSession.SESSION_ID_KEY -> sessionId)
+      request.withSession(newSession.data.toSeq: _*)
+    }
+
     def withAuthToken: FakeRequest[U] = {
       val newSession = request.session + ("authenticityToken" -> authToken)
       requestWithAuthTokenInBody.withSession(newSession.data.toSeq: _*)

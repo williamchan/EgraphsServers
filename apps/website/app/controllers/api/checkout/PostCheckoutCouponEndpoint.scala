@@ -30,11 +30,12 @@ trait PostCheckoutCouponEndpoint extends CheckoutResourceEndpoint[CouponLineItem
   }
 
   /** Returns Ok if the coupon code is valid and the corresponding coupon is successfully added to the checkout */
-  def postCheckoutCoupon(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = {
-    postCheckoutResource(sessionIdSlug, checkoutIdSlug)
+  def postCheckoutCoupon(sessionId: UrlSlug, checkoutId: Long): Action[AnyContent] = {
+    postCheckoutResource(sessionId, checkoutId)
   }
 
-  def getCheckoutCoupon(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = {
-    getCheckoutResource(sessionIdSlug, checkoutIdSlug)
+  def getCheckoutCoupon(sessionIdSlug: UrlSlug, checkoutId: Long): Action[AnyContent] = {
+    getCheckoutResource(sessionIdSlug, checkoutId)
   }
 }
+

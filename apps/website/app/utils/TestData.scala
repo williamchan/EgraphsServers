@@ -42,6 +42,10 @@ object TestData {
     RandomStringUtils.randomAlphabetic(10) + " " + RandomStringUtils.randomAlphabetic(10)
   }
 
+  def generateSessionId(): String = {
+    RandomStringUtils.randomAlphabetic(10)
+  }
+
   def makeTestCacheKey: String = {
     "this_is_a_test_case_key_" + new java.util.Date().getTime
   }

@@ -7,22 +7,22 @@ import models.Celebrity
 
 
 class RequireSessionAndCelebrityUrlSlugs @Inject() (
-  requireCelebrityUrlSlug: RequireCelebrityUrlSlug,
+  requireCelebrityId: RequireCelebrityId,
   requireCelebrityPublishedAccess: RequireCelebrityPublishedAccess,
   requireSessionUrlSlug: RequireSessionUrlSlug,
   requireAdministratorLogin: RequireAdministratorLogin
 ) {
 
   def apply[T](
-    sessionUrlSlug: String,
-    celebrityUrlSlug: String,
+    sessionId: String,
+    celebrityId: Long,
     accessKey: String = "",
     parser: BodyParser[T] = parse.anyContent
   )(actionFactory: (String, Celebrity) => Action[T]): Action[T] = {
-    requireCelebrityUrlSlug(celebrityUrlSlug, parser) { celebFromId =>
+    requireCelebrityId(celebrityId, parser) { celebFromId =>
       def celebrityPublishedFilter = requireCelebrityPublishedAccess.filter((celebFromId, accessKey))
       requireAdministratorLogin.inSessionOrUseOtherFilter(celebFromId, parser)(otherFilter = celebrityPublishedFilter) { celebrity =>
-        requireSessionUrlSlug(sessionUrlSlug) { sessionId =>
+        requireSessionUrlSlug(sessionId) { sessionId =>
           Action[T](parser) { request =>
             actionFactory(sessionId, celebrity).apply(request)
           }
