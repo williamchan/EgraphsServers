@@ -5,8 +5,8 @@ import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
 
 
-/** POST /sessions/[SessionID]/checkouts/[CelebID]/recipient */
-trait PostCheckoutRecipientEndpoint { this: Controller =>
+/** POST /sessions/[SessionID]/checkouts/[CelebID]/buyer */
+trait CheckoutBuyerEndpoints { this: Controller =>
 
   //
   // Services
@@ -19,13 +19,13 @@ trait PostCheckoutRecipientEndpoint { this: Controller =>
   //
   // Controllers
   //
-  /** Returns Ok if the recipient info binds and is successfully added to the checkout */
-  def postCheckoutRecipient(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = postController() {
+  /** Returns Ok if the buyer info binds and is successfully added to the checkout */
+  def postCheckoutBuyer(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = postController() {
 //  httpFilter.requireCelebrityIdAndSessionIdUrlSlugs { (celebId, sessionId) =>
       Action { implicit request =>
 
       /**
-       * TODO(CE-13): Bind request to customer form, add as the checkout's recipient, recache, and return Ok.
+       * TODO(CE-13): Bind request to customer form, add as the checkout's buyer, recache, and return Ok.
        * Return BadRequest if form binding fails.
        */
 
@@ -35,6 +35,5 @@ trait PostCheckoutRecipientEndpoint { this: Controller =>
   }
 
 }
-
 
 

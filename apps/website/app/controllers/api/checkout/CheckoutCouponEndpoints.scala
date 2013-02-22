@@ -6,17 +6,8 @@ import services.http.filters.HttpFilters
 import models.checkout.forms.{CheckoutForm, CouponForm}
 import models.checkout.{CouponLineItemType, EgraphCheckoutAdapter, CheckoutAdapterServices}
 
-
 /** POST /sessions/[SessionID]/checkouts/[CelebID]/coupon */
-trait PostCheckoutCouponEndpoint extends CheckoutResourceEndpoint[CouponLineItemType] { this: Controller =>
-
-  //
-  // Services
-  //
-  protected def postController: POSTControllerMethod
-  protected def httpFilters: HttpFilters
-  protected def checkoutAdapters: CheckoutAdapterServices
-
+trait CheckoutCouponEndpoints extends CheckoutResourceEndpoint[CouponLineItemType] { this: Controller =>
   //
   // CheckoutResourceEndpoint members
   //

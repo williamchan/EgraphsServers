@@ -10,7 +10,7 @@ import services.AppConfig
 import models.Celebrity
 import play.api.libs.json._
 
-class PostCheckoutCouponEndpointTests extends EgraphsUnitTest with ClearsCacheBefore {
+class CheckoutCouponEndpointTests extends EgraphsUnitTest with ClearsCacheBefore {
   import controllers.routes.ApiControllers.{postCheckoutCoupon, getCheckoutCoupon}
   def db = AppConfig.instance[DBSession]
 

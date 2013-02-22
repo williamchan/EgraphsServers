@@ -6,7 +6,7 @@ import services.http.filters.HttpFilters
 
 
 /** POST /sessions/[SessionID]/checkouts/[CelebID]/egraph */
-trait PostCheckoutEgraphEndpoint { this: Controller =>
+trait CheckoutEgraphEndpoints { this: Controller =>
 
   //
   // Services

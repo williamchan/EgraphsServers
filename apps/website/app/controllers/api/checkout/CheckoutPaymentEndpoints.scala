@@ -6,7 +6,7 @@ import services.http.filters.HttpFilters
 
 
 /** POST /sessions/[SessionID]/checkouts/[CelebID]/payment */
-trait PostCheckoutPaymentEndpoint { this: Controller =>
+trait CheckoutPaymentEndpoints { this: Controller =>
 
   //
   // Services

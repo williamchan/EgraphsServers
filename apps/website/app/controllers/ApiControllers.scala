@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.api._
-import checkout.PostCheckoutCouponEndpoint
+import checkout.CheckoutCouponEndpoints
 import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, ControllerMethod, POSTApiControllerMethod}
 import services.db.DBSession
@@ -26,7 +26,7 @@ object ApiControllers extends Controller
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint
   with PostVideoAssetApiEndpoint
-  with PostCheckoutCouponEndpoint
+  with CheckoutCouponEndpoints
 {
   import services.AppConfig.instance
 

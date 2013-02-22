@@ -6,7 +6,7 @@ import services.http.filters.HttpFilters
 
 
 /** POST /sessions/[SessionID]/checkouts/[CelebID]/shipping-address */
-trait PostCheckoutShippingAddressEndpoint { this: Controller =>
+trait CheckoutShippingAddressEndpoints { this: Controller =>
 
   //
   // Services
