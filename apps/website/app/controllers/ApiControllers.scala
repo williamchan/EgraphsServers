@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.api._
-import checkout.CheckoutCouponEndpoints
+import checkout.{CheckoutResourceControllerFactory, CheckoutResourceEndpoints}
 import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, ControllerMethod, POSTApiControllerMethod}
 import services.db.DBSession
@@ -26,7 +26,7 @@ object ApiControllers extends Controller
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint
   with PostVideoAssetApiEndpoint
-  with CheckoutCouponEndpoints
+  with CheckoutResourceEndpoints
 {
   import services.AppConfig.instance
 
@@ -43,5 +43,5 @@ object ApiControllers extends Controller
   override protected def orderQueryFilters = instance[OrderQueryFilters]
   override protected def enrollmentBatchServices = instance[EnrollmentBatchServices]
   override protected def httpFilters = instance[HttpFilters]
-  override protected def checkoutAdapters: CheckoutAdapterServices = instance[CheckoutAdapterServices]
+  override protected def checkoutControllers = instance[CheckoutResourceControllerFactory]
 }
