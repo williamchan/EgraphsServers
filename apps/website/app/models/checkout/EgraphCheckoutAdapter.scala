@@ -3,7 +3,30 @@ package models.checkout
 import forms.{ShippingAddress}
 import services.AppConfig
 import services.db.HasTransientServices
-import models.{Customer, Account}
+import models.{AccountStore, CustomerStore, Customer, Account}
+import com.google.inject.Inject
+import services.http.{ServerSession, ServerSessionFactory}
+import play.api.mvc.{RequestHeader}
+
+
+class CartFactory @Inject() (sessionFactory: ServerSessionFactory) {
+  def apply(celebId: Long)(implicit request: RequestHeader): ServerSession = {
+    sessionFactory(request.session).namespaced("checkouts").namespaced(celebId.toString)
+  }
+}
+
+
+case class CheckoutAdapterServices @Inject() (
+  accountStore: AccountStore,
+  customerStore: CustomerStore,
+  cartFactory: CartFactory
+) {
+  def decacheOrCreate(celebId: Long)(implicit request: RequestHeader): EgraphCheckoutAdapter = {
+    cartFactory(celebId).get[EgraphCheckoutAdapter]("checkout").getOrElse {
+      EgraphCheckoutAdapter(celebId)
+    }
+  }
+}
 
 /**
  * Basically, a cacheable form of the Checkout that makes it easy to add, replace, and remove specific components of
@@ -22,6 +45,7 @@ import models.{Customer, Account}
  * @param _services
  */
 case class EgraphCheckoutAdapter (
+  celebId: Long,
   // named after the api endpoints they correspong to
   order: Option[EgraphOrderLineItemType] = None,
   coupon: Option[CouponLineItemType] = None,
@@ -29,15 +53,21 @@ case class EgraphCheckoutAdapter (
   buyerEmail: Option[String] = None,
   recipientEmail: Option[String] = None,
   shippingAddress: Option[ShippingAddress] = None,
-  @transient _services: CheckoutServices = AppConfig.instance[CheckoutServices]
-) extends HasTransientServices[CheckoutServices] {
+  @transient _services: CheckoutAdapterServices = AppConfig.instance[CheckoutAdapterServices]
+) extends HasTransientServices[CheckoutAdapterServices] {
 
   //
   // Members
   //
   def buyer = CheckoutBuyer(buyerEmail)
+
   def recipient = recipientEmail map { email => CheckoutRecipient(Some(email)) }
 
+  def cart(implicit request: RequestHeader): ServerSession = services.cartFactory(celebId)
+
+  def cache()(implicit request: RequestHeader) = {
+    cart.setting("checkout" -> this).save()
+  }
 
   //
   // Checkout methods

@@ -20,6 +20,7 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
   override def newModel = {
     import LineItemTestData._
     EgraphCheckoutAdapter(
+      0L,
       order = Some(randomEgraphOrderType()),
       coupon = Some(randomCouponType()),
       payment = Some(randomCashTransactionType),

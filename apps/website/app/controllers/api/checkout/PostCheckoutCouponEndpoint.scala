@@ -3,6 +3,8 @@ package controllers.api.checkout
 import play.api.mvc.{Controller, AnyContent, Action}
 import services.http.POSTControllerMethod
 import services.http.filters.HttpFilters
+import models.checkout.forms.CouponForm
+import models.checkout.CheckoutAdapterServices
 
 
 /** POST /sessions/[SessionID]/checkouts/[CelebID]/coupon */
@@ -13,25 +15,29 @@ trait PostCheckoutCouponEndpoint { this: Controller =>
   //
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
-
-
+  protected def checkoutAdapters: CheckoutAdapterServices
 
   //
   // Controllers
   //
   /** Returns Ok if the coupon code is valid and the corresponding coupon is successfully added to the checkout */
   def postCheckoutCoupon(sessionIdSlug: UrlSlug, checkoutIdSlug: UrlSlug): Action[AnyContent] = postController() {
-//  httpFilter.requireCelebrityIdAndSessionIdUrlSlugs { (celebId, sessionId) =>
+    httpFilters.requireSessionAndCelebrityUrlSlugs(sessionIdSlug, checkoutIdSlug) { (sessionId, celeb) =>
       Action { implicit request =>
+        val checkout = checkoutAdapters.decacheOrCreate(celeb.id)
 
-      /**
-       * TODO(CE-13): Bind request to coupon form, add the LIT to the checkout, recache, and return Ok.
-       * Return BadRequest if form binding fails or the coupon code is invalid.
-       */
+        CouponForm.bindFromRequestAndCache(checkout).fold(
+          formWithErrors => {
+            checkout.withCoupon(None).cache()
+            BadRequest(formWithErrors.errorsAsJson)
+          },
 
-        Ok
+          couponType => {
+            checkout.withCoupon(Some(couponType)).cache()
+            Ok
+          }
+        )
       }
-//  }
+    }
   }
-
 }
