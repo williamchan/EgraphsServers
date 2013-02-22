@@ -6,6 +6,7 @@ import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFacto
 import services.mail.{BulkMailList, TransactionalMail}
 import services.payment.Payment
 import models._
+import checkout.CheckoutAdapterServices
 import models.categories._
 import services.db.DBSession
 import play.api.mvc.Controller
@@ -86,4 +87,5 @@ case class TestWebsiteControllers @Inject()(
   override def orderQueryFilters = instance[OrderQueryFilters]
   override def printOrderQueryFilters = instance[PrintOrderQueryFilters]
   override def consumerApp = instance[ConsumerApplication]
+  override def checkouts = instance[CheckoutAdapterServices]
 }

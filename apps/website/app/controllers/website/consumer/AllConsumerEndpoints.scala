@@ -32,4 +32,5 @@ trait AllConsumerEndpoints
   with StorefrontCheckoutConsumerEndpoints
   with StorefrontFinalizeConsumerEndpoints
   with StorefrontFailedConsumerEndpoints
+  with PurchaseFlowPersonalizationEndpoints
 { this: Controller => }

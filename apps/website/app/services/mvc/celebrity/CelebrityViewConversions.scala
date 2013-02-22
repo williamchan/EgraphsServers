@@ -11,6 +11,9 @@ import services.mvc.celebrity._
 import services.AppConfig
 import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
 import com.google.inject.{Provider, Inject}
+import models.frontend.storefront_a.{PersonalizeProduct, PersonalizeStar}
+import egraphs.playutils.Gender
+import models.frontend.{FemalePersonalPronouns, MalePersonalPronouns}
 
 /**
  * Converts Celebrities into various view models defined in the front-end module
@@ -46,6 +49,23 @@ class CelebrityViewConversions(celeb: Celebrity) {
       roleDescription = celeb.roleDescription,
       bio = celeb.bio,
       twitterUsername = celeb.twitterUsername
+    )
+  }
+
+  def asPersonalizeStar(products: Seq[PersonalizeProduct]): PersonalizeStar = {
+    PersonalizeStar(
+      id=celeb.id,
+      name=celeb.publicName,
+      mastheadUrl=celeb
+        .landingPageImage
+        .withImageType(ImageAsset.Jpeg)
+        .getSaved(AccessPolicy.Public)
+        .url,
+      products=products,
+      pronoun= celeb.gender match {
+        case Gender.Male | Gender.Neutral => MalePersonalPronouns
+        case _ => FemalePersonalPronouns
+      }
     )
   }
   

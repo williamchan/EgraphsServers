@@ -11,6 +11,7 @@ import models.checkout.CheckoutAdapterServices
 import models.checkout.EgraphCheckoutAdapter
 import scala.Some
 import com.google.inject.Inject
+import services.logging.Logging
 
 class CheckoutResourceControllerFactory @Inject() (services: CheckoutResourceControllerServices) {
   def apply[T](
@@ -35,6 +36,7 @@ class CheckoutResourceController[T] (
 ) extends Results
 {
   import services._
+  import CheckoutResourceController._
 
   def post(sessionIdSlug: UrlSlug, checkoutIdSlug: Long): Action[AnyContent] = {
     postApiController() {
@@ -64,11 +66,17 @@ class CheckoutResourceController[T] (
       Action { implicit request =>
         val checkout = checkoutAdapters.decacheOrCreate(celeb.id)
         resourceForm.decache[FormT](checkout).map { cachedForm =>
-          Ok(Json.toJson(cachedForm.data))
+          val formJson = Json.toJson(cachedForm.data)
+          log(s"OK: Found simple form for ${resourceForm.getClass.getSimpleName}")
+          log(Json.stringify(formJson))
+          Ok(formJson)
         }.getOrElse {
+          log(s"NOT_FOUND:: No cached form found for ${resourceForm.getClass.getSimpleName}")
           NotFound
         }
       }
     }
   }
 }
+
+object CheckoutResourceController extends Logging

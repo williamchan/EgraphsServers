@@ -194,6 +194,9 @@ GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error          controllers.
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/no-inventory      controllers.WebsiteControllers.getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug:String)
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.WebsiteControllers.getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug:String)
 
+GET     /:celebrityUrlSlug/connect                                  controllers.WebsiteControllers.getPersonalize(celebrityUrlSlug: String, accesskey: String ?= "")
+GET     /:celebrityUrlSlug/checkout                                 controllers.WebsiteControllers.getCheckout(celebrityUrlSlug: String, accesskey: String ?= "")
+
 ##
 ## Admin Restricted Functionality - We want to keep certain admin functionality off customer-facing servers.
 ##

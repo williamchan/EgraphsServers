@@ -1,4 +1,9 @@
-@(star: models.frontend.storefront_a.PersonalizeStar, checkoutUrl: String, testcase: Option[String])(
+@(star: models.frontend.storefront_a.PersonalizeStar, 
+  checkoutUrl: String,
+  maxDesiredTextChars: Int,
+  maxMessageToCelebChars: Int,
+  testcase: Option[String]=None
+)(
   implicit
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
@@ -15,9 +20,6 @@
 @import models.frontend.NgField.withField
 @import play.api.libs.json._
 @import models.frontend.forms.Field
-
-@maxNoteToStarChars = {150}
-@maxWrittenMessageChars = {60}
 
 @fieldTooltip(link: String, event: String="")(body: => Html) = {
   @tooltip(link, Seq("field-tooltip"), event)(body)
@@ -57,10 +59,6 @@
   <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit
 }
 
-@mastheadImageUrl = {https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg}
-
-@profileImageUrl = {https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png}
-
 @baseBody = {
   <div id="content" role="main" ng-controller="PersonalizeController" ng-cloak>
     <div id="main">
@@ -70,7 +68,7 @@
           @* <img class="video-preview" src='@EgraphsAssets.at("images/egraph-video-preview.png")'> *@
         </div>
         <hr class="masthead-highlight" />
-        <img src="@mastheadImageUrl"></img>
+        <img src="@star.mastheadUrl"></img>
       </section> <!-- end #masthead-home -->        
       <div class="container">
         <section id="testimonials">
@@ -150,17 +148,16 @@
                       <textarea @field.identityAttributes
                                 cols="1"
                                 resource-property
-                                maxlength="@maxNoteToStarChars"
+                                maxlength="@maxMessageToCelebChars"
                                 monitor-user-attention
                                 placeholder="Type your note to @star.name..."></textarea>
                       @field.standardErrorDiv
                     </div>
-                    @*<img src='@profileImageUrl' class="star-profile-image">*@
                     <div>
                       @fieldTooltip("Not sure what to say? Here are some tips.", event="Not sure what to say?") {
                         <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.pronoun.obj in person. Ask a question you've always wanted to know the answer to, or request that @star.pronoun.subject say something specific.
                       }
-                      <div class="explanatory-text char-remaining">{{@maxNoteToStarChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxDesiredTextChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->
@@ -178,13 +175,13 @@
                       <textarea @field.identityAttributes
                                 cols="1"
                                 resource-property
-                                maxlength="@maxWrittenMessageChars"
+                                maxlength="@maxDesiredTextChars"
                                 monitor-user-attention
                                 placeholder="Leave it blank and @star.name will write whatever @star.pronoun.subject wants. Or give @star.pronoun.obj a short message like &quot;Happy 16th Birthday Bobby!&quot; and @star.pronoun.subject'll write that."></textarea>
                     </div>
                     @field.standardErrorDiv
                     <div>
-                      <div class="explanatory-text char-remaining">{{@maxWrittenMessageChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxMessageToCelebChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->

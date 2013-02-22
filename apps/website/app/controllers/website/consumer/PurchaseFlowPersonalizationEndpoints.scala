@@ -2,39 +2,69 @@ package controllers.website.consumer
 
 import play.api.mvc.{Action, AnyContent, Controller}
 import services.http.filters.HttpFilters
-import services.http.{ControllerMethod, POSTControllerMethod}
+import services.http.ControllerMethod
+import services.mvc.ProductViewConversions._
+import services.mvc.celebrity.CelebrityViewConversions._
+import services.mvc.ImplicitHeaderAndFooterData
+import models.checkout.forms.EgraphForm
+import models.checkout.CheckoutAdapterServices
+import services.payment.Payment
 
-trait PurchaseFlowPersonalizationEndpoints
-// extends ???
-{ this: Controller =>
-
+trait PurchaseFlowPersonalizationEndpoints extends ImplicitHeaderAndFooterData { this: Controller =>
 
   //
   // Services
   //
   protected def controllerMethod: ControllerMethod
   protected def httpFilters: HttpFilters
-  /* declare additional needed services */
-
-
+  protected def checkouts: CheckoutAdapterServices
+  protected def payment: Payment
 
   //
   // Controllers
   //
-  /**
-   * TODO(CE-13): Serve personalize page.
-   * Similar to `StorefrontPersonalizeConsumerEndpoints#getStorefrontPersonalize`, but doesn't need product url slug.
-   */
-  def getPersonalize(celebrityUrlSlug: String, productUrlSlug: String): Action[AnyContent] =
+  def getPersonalize(celebrityUrlSlug: String, accesskey: String = ""): Action[AnyContent] =
   controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedCelebrity =>
+      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedCelebrity)(
+        otherFilter = httpFilters.requireCelebrityPublishedAccess.filter((maybeUnpublishedCelebrity, accesskey))
+      ) { celeb =>
+        Action { implicit request =>
+          val products = celeb.productsInActiveInventoryBatches()
+          val maybeMostExpensive = products.sortBy(_.price.getAmount).headOption
+
+          val productViews = for (
+            product <- products;
+            mostExpensive <- maybeMostExpensive.toSeq
+          ) yield {
+            product.asPersonalizeThumbView.copy(selected=product == mostExpensive)
+          }
+          val starView = celeb.asPersonalizeStar(productViews)
+
+          Ok(views.html.frontend.storefronts.a.personalize(
+            starView,
+            controllers.routes.WebsiteControllers.getCheckout(celebrityUrlSlug, accesskey).url,
+            maxDesiredTextChars=EgraphForm.maxDesiredTextChars,
+            maxMessageToCelebChars=EgraphForm.maxMessageToCelebChars
+          ))
+        }
+      }
+    }
+  }
+
+  def getCheckout(celebrityUrlSlug: String, accesskey: String = ""): Action[AnyContent] = controllerMethod.withForm() { implicit authenticityToken =>
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celeb =>
       Action { implicit request =>
-
-        /**
-         * return view with form, or redirect somewhere to sensible on error
-         */
-
-        Ok
+        // Only serve the page if there's a valid Egraph order in the checkout
+        checkouts.decacheOrCreate(celeb.id).order.map { form =>
+          Ok(views.html.frontend.storefronts.a.checkout(
+            celebId=celeb.id,
+            paymentJsModule=payment.browserModule,
+            paymentPublicKey=payment.publishableKey
+          ))
+        }.getOrElse {
+          Redirect(controllers.routes.WebsiteControllers.getPersonalize(celebrityUrlSlug))
+        }
       }
     }
   }

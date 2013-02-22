@@ -5,6 +5,7 @@ import models.frontend.storefront._
 import models.ImageAsset.Jpeg
 import controllers.routes.WebsiteControllers.{getStorefrontChoosePhotoCarousel, postStorefrontChoosePhoto}
 import models._
+import frontend.storefront_a.{PersonalizeProduct, PersonalizeStar}
 import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct
@@ -39,6 +40,18 @@ class ProductViewConversions(product: Product) {
       targetUrl=CelebrityAccesskey.urlWithAccesskey(carouselViewLinkBase, accesskey),
       quantityRemaining=quantityRemaining,
       orientation=orientationOfFrame(product.frame)
+    )
+  }
+
+  def asPersonalizeThumbView = {
+    PersonalizeProduct(
+      id=product.id,
+      title=product.name,
+      description=product.description,
+      price=product.price,
+      selected=false,
+      smallThumbUrl=getProductThumbnailUrl(width=340),
+      largeThumbUrl=getProductThumbnailUrl(width=575)
     )
   }
 

@@ -10,6 +10,7 @@ import play.api.mvc.RequestHeader
 import controllers.WebsiteControllers
 import services.mail.BulkMailList
 import services.config.ConfigFileProxy
+import services.http.EgraphsSession.Conversions._
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -26,6 +27,7 @@ trait ImplicitHeaderAndFooterData {
       loggedInStatus = getHeaderLoggedInStatus(request.session),
       deploymentInformation = Option(DeploymentInformation(System.getProperty("deploymentTime"))),
       enableLogging=config.enableFrontendLogging,
+      sessionId=request.session.id.getOrElse(""),
       //TODO: move into it's own implicit object
       updateMixpanelAlias = shouldUpdateMixpanelAlias(request.session)
     )

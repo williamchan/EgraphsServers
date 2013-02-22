@@ -27,11 +27,14 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
       productId -> longNumber.verifying(validProductId),
       recipientName -> text(3, 30),
       isGift -> boolean,
-      desiredText -> optional(text(max = 80)),
-      messageToCeleb -> optional(text(max = 180)),
+      desiredText -> optional(text(max = maxDesiredTextChars)),
+      messageToCeleb -> optional(text(max = maxMessageToCelebChars)),
       framedPrint -> boolean,
       "_services" -> ignored(instance[EgraphOrderLineItemTypeServices])
     )(EgraphOrderLineItemType.apply)(EgraphOrderLineItemType.unapply)
 
   }
+
+  val maxMessageToCelebChars = 180
+  val maxDesiredTextChars = 60
 }

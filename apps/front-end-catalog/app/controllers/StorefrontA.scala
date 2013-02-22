@@ -16,10 +16,17 @@ object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
       id=1L,
       name=starName,
       products=products(starName, 3),
-      pronoun=FemalePersonalPronouns
+      pronoun=FemalePersonalPronouns,
+      mastheadUrl = "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg"
     )
 
-    Ok(views.html.frontend.storefronts.a.personalize(star, "/checkout", Some("default")))
+    Ok(views.html.frontend.storefronts.a.personalize(
+      star,
+      "/checkout",
+      maxDesiredTextChars="60",
+      maxMessageToCelebChars="100",
+      testcase=Some("default")
+    ))
   }
 
   def checkout(testcase: Option[String]) = Action { request =>
