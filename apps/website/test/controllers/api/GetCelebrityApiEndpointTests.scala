@@ -14,7 +14,8 @@ import utils.FunctionalTestUtils._
 import utils.ClearsCacheBefore
 import utils.EgraphsUnitTest
 import utils.TestData
-import models.Celebrity
+import models.JsCelebrity
+import models.JsCelebrity._
 
 class GetCelebrityApiEndpointTests 
   extends EgraphsUnitTest 
@@ -40,16 +41,8 @@ class GetCelebrityApiEndpointTests
     status(result) should be (OK)
 
     val json = Json.parse(contentAsString(result))
-    val celebrityFromJson = json.as[Celebrity]
+    val celebrityFromJson = json.as[JsCelebrity]
 
-    celebrityFromJson.id should be (celebrity.id)
-    celebrityFromJson.publicName should be (celebrity.publicName)
-    celebrityFromJson.enrollmentStatus should be (celebrity.enrollmentStatus)
-    celebrityFromJson.created should be (celebrity.created)
-    celebrityFromJson.updated should be (celebrity.updated)
-
-    (json \ "urlSlug").as[String] should be (celebrity.urlSlug)
-
-    json.as[JsObject].fields.size should be (6)
+    celebrityFromJson should be (JsCelebrity.from(celebrity))
   }
 }

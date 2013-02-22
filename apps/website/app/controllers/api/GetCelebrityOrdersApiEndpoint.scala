@@ -7,6 +7,7 @@ import models.OrderQueryFilters
 import models.OrderStore
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
+import models.JsOrder
 
 private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
@@ -33,7 +34,7 @@ private[controllers] trait GetCelebrityOrdersApiEndpoint { this: Controller =>
             case _ => {
               val orders = orderStore.findByCelebrity(celeb.id, orderQueryFilters.actionableOnly: _*)
   
-              Ok(Json.toJson(orders))
+              Ok(Json.toJson(orders.map(JsOrder.from(_))))
             }
           }
         }

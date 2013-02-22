@@ -123,33 +123,18 @@ class OrderTests extends EgraphsUnitTest
 
   "toJson" should "serialize correctly for the API" in new EgraphsTestApplication {
     val order = newEntity.copy(requestedMessage = Some("requestedMessage"), messageToCelebrity = Some("messageToCelebrity")).save()
-    val buyer = order.buyer
 
-    val json = Json.toJson(order)
-    val orderFromJson = json.as[Order]
+    val json = Json.toJson(JsOrder.from(order))
+    val orderFromJson = json.as[JsOrder]
 
-    orderFromJson.id should be (order.id)
-    orderFromJson.buyerId should be (order.buyerId)
-    orderFromJson.recipientId should be (order.recipientId)
-    orderFromJson.recipientName should be (order.recipientName)
-    orderFromJson.amountPaidInCurrency.intValue should be (order.amountPaid.getAmountMinor.intValue)
-    orderFromJson.reviewStatus should be (order.reviewStatus)
-    orderFromJson.requestedMessage should be (order.requestedMessage)
-    orderFromJson.messageToCelebrity should be (order.messageToCelebrity)
-    orderFromJson.writtenMessageRequest should be (order.writtenMessageRequest)
-    orderFromJson.created.getTime should be (order.created.getTime)
-    orderFromJson.updated.getTime should be (order.updated.getTime)
-
-    (json \ "buyerName").as[String] should be(buyer.name)
-    (json \ "audioPrompt").as[String] should be("Recipient: " + order.recipientName)
-    (json \ "product").as[Product].id should be(order.productId)
+    orderFromJson should be (JsOrder.from(order))
   }
 
   it should "return requestedMessage when available, even if writtenMessageRequest is CelebrityChoosesMessage" in new EgraphsTestApplication {
     val order = newEntity.copy(requestedMessage = Some("myRequestedMessage"))
       .withWrittenMessageRequest(WrittenMessageRequest.CelebrityChoosesMessage).save()
-    val json = Json.toJson(order)
-    (json \ "requestedMessage").as[String] should be("myRequestedMessage")
+    val jsonOrder = JsOrder.from(order)
+    jsonOrder.requestedMessage should be (Some("myRequestedMessage"))
   }
 
   "approveByAdmin" should "change reviewStatus to ApprovedByAdmin" in new EgraphsTestApplication {

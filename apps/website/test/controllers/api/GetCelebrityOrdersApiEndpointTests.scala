@@ -17,7 +17,6 @@ import enums.EgraphState
 import utils.TestData
 import services.db.TransactionSerializable
 
-
 class GetCelebrityOrdersApiEndpointTests
   extends EgraphsUnitTest
   with ProtectedCelebrityResourceTests
@@ -27,9 +26,9 @@ class GetCelebrityOrdersApiEndpointTests
   private def db = AppConfig.instance[DBSession]
 
   routeName(routeUnderTest) should "get the list of celebrity orders" in new EgraphsTestApplication {
-    val (celebrityAccount, orders) = db.connected(TransactionSerializable) {
+    val (celebrityAccount, orders, expectedJsonValues) = db.connected(TransactionSerializable) {
       val (_, celebrity, _, orders) = runCustomerBuysProductsScenerio()
-      (celebrity.account, orders)
+      (celebrity.account, orders, orders.map(JsOrder.from(_)).toSet)
     }
 
     // Execute the request
@@ -41,7 +40,7 @@ class GetCelebrityOrdersApiEndpointTests
 
     // Just check the ids -- the rest is covered by unit tests
     for (order <- orders) {
-      ordersInResponse.exists(inResponse => inResponse.id  == order.id) should be(true)
+      ordersInResponse.exists(inResponse => expectedJsonValues.contains(inResponse)) should be(true)
     }
   }
 
@@ -107,9 +106,9 @@ class GetCelebrityOrdersApiEndpointTests
     ordersInResponse.size should be(4)
   }
 
-  private def getOrdersFromResult(result: Result): Seq[Order] = {
+  private def getOrdersFromResult(result: Result): Seq[JsOrder] = {
     val jsonOrders = Json.parse(contentAsString(result)).asInstanceOf[JsArray].value
-    jsonOrders.map(_.as[Order])
+    jsonOrders.map(_.as[JsOrder])
   }
 
   /**
