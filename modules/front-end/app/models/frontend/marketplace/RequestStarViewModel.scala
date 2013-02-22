@@ -10,6 +10,6 @@ package models.frontend.marketplace
  */
 case class RequestStarViewModel(
   starName: String,
-  //requesterName: String,
+  requesterName: String,
   email: String
 )

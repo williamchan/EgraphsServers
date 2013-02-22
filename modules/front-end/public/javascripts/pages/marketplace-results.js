@@ -225,8 +225,9 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
 
         $("#request-star-button").click(function(e) {
           $('.request-star-option').hide("slide", {direction: "left"}, 200, function() {
-            $('.request-star-fields').show("slide", {direction: "right"}, 200, function() {
-              $("#star-name-field input").focus();
+            $('.login-prompt-fields').show("slide", {direction: "right"}, 200, function() {
+            //$('.request-star-logged-in-fields').show("slide", {direction: "right"}, 200, function() {
+              //$("#requester-name-field input").focus();
             });
           });
         });

@@ -9,6 +9,7 @@ import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 import services.mvc.marketplace.MarketplaceServices
 import services.http.ControllerMethod
+import services.http.filters.HttpFilters
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
 import services.db.TransactionSerializable
@@ -30,6 +31,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def catalogStarsQuery: CatalogStarsQuery
   protected def dbSession: DBSession
   protected def featured: Featured
+  protected def httpFilters: HttpFilters
   protected def verticalStore: VerticalStore
   protected def marketplaceServices: MarketplaceServices
 
@@ -164,7 +166,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           results = ResultSetViewModel(subtitle = Option(subtitle), verticalUrl = Option("/"), celebrities = celebrities),
           sortOptions = sortOptionViewModels(maybeSortType),
           availableOnly = availableOnly,
-          requestStarForm = PostRequestStarEndpoint.form.bindWithFlashData,
+          requestStarForm = getFormBasedOnLoginStatus,
           requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url
         ))
       } else {
@@ -187,5 +189,21 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         ))
       }
     }
+  }
+
+  private def getFormBasedOnLoginStatus(implicit request: Request[AnyContent]) = {
+    val eitherIsLoggedIn = httpFilters.requireCustomerLogin.filterInSession()
+    val (isLoggedIn, maybeCustomerId) = eitherIsLoggedIn match {
+      case Right(loggedInCustomerAndAccount) => {
+        val customerId = loggedInCustomerAndAccount._1.id
+        play.Logger.info("I have a customer ID and it is " + customerId)
+        (true, Some(customerId))
+      }
+      case Left(notLoggedIn) => {
+        play.Logger.info("notLoggedIn is " + notLoggedIn)
+        (false, None)
+      }
+    }
+    PostRequestStarEndpoint.form.bindWithFlashData
   }
 }

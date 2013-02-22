@@ -47,7 +47,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
             case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
           }
 
-          play.Logger.info("email is " + validForm.email + ", starName is " + validForm.starName)
+          play.Logger.info("starName is " + validForm.starName + ", requesterName is " + validForm.requesterName + ", email is " + validForm.email)
           Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
         }
       )
@@ -61,7 +61,7 @@ object PostRequestStarEndpoint {
   def form: Form[RequestStarViewModel] = Form(
     mapping(
       "starName" -> text.verifying(nonEmpty),
-      //"requesterName" -> text.verifying(nonEmpty),
+      "requesterName" -> text.verifying(nonEmpty),
       "email" -> email.verifying(nonEmpty)
     )(RequestStarViewModel.apply)(RequestStarViewModel.unapply)
   )

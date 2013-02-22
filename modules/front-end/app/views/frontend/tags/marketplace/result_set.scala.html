@@ -1,5 +1,6 @@
 @(availableOnly: Boolean = false,
   results: models.frontend.marketplace.ResultSetViewModel,
+  query: String,
   requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
   requestStarActionUrl: String
   )(
@@ -77,15 +78,27 @@
             </button>
           </div>
 
-          <div class="request-star-fields" style="display: none">
+          <div class="request-star-logged-in-fields" style="display: none">
             <fieldset>
               <span id="star-name-field">
-                @helper.inputText(requestStarForm("starName"), '_label -> "Requested Star:", '_showConstraints -> false, '_tooltipOn -> true, '_tooltipText -> "Test tooltip")
-              </span>
-              <span id="email-field">
-                @helper.inputText(requestStarForm("email"), '_label -> "Email Address:", '_showConstraints -> false)
+                @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
+                  <input type="text" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
+                }
               </span>
             </fieldset>
+            @tags.arrow_button(caption="Submit", classes="button create-account")
+          </div>
+
+          <div class="login-prompt-fields" style="display: none">
+            <fieldset>
+              <h4>Please sign in to Request a Star:</h4>
+              <span id="email-field">
+                @helper.inputText(requestStarForm("email"), '_label -> "Email:", '_showConstraints -> false)
+              </span>
+              <span id="password-field">
+                @helper.inputText(requestStarForm("password"), '_label -> "Password:", '_showConstraints -> false)
+              </span>
+            <fieldset>
             @tags.arrow_button(caption="Submit", classes="button create-account")
           </div>
         </div>
