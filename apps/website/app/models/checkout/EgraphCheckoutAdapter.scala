@@ -7,13 +7,7 @@ import models.{AccountStore, CustomerStore, Customer, Account}
 import com.google.inject.Inject
 import services.http.{ServerSession, ServerSessionFactory}
 import play.api.mvc.{RequestHeader}
-
-
-class CartFactory @Inject() (sessionFactory: ServerSessionFactory) {
-  def apply(celebId: Long)(implicit request: RequestHeader): ServerSession = {
-    sessionFactory(request.session).namespaced("checkouts").namespaced(celebId.toString)
-  }
-}
+import services.ecommerce.CartFactory
 
 
 case class CheckoutAdapterServices @Inject() (
