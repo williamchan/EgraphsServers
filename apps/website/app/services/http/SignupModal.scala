@@ -3,10 +3,7 @@ package services.http
 import java.util.Date
 import com.google.inject.Inject
 import org.joda.time.DateTimeConstants
-import play.api.mvc.Action
-import play.api.mvc.Request
-import play.api.mvc.Result
-import play.api.mvc.BodyParser
+import play.api.mvc._
 import play.api.mvc.BodyParsers.parse
 import play.api.templates.Html
 import services.http.EgraphsSession.Conversions._
@@ -17,24 +14,20 @@ class SignupModal @Inject() {
 
   private val displayFrequencyInMillis = 2 * DateTimeConstants.MILLIS_PER_WEEK
 
-  private def notDisplayedRecently(date: Date): Boolean = {
-    val thresholdDate = new Date(System.currentTimeMillis - displayFrequencyInMillis)
-    date.before(thresholdDate)
+  private def notDisplayedRecently(session: Session): Boolean = {
+    val maybeLastSignupModalDisplay = session.lastSignupModalDisplay
+    maybeLastSignupModalDisplay.map { lastDisplayed => 
+      val thresholdDate = new Date(System.currentTimeMillis - displayFrequencyInMillis)
+      lastDisplayed.before(thresholdDate)
+    }.getOrElse(true)
   }
 
   def shouldDisplay[A](implicit request: Request[A]): Boolean = {
-    if (request.session.hasSignedUp) {
-      false
-    } else {
-      val maybeLastSignupModalDisplay = request.session.lastSignupModalDisplay
-      def loggedIn = request.session.customerId.isDefined
+    def loggedIn = request.session.customerId.isDefined
+    def signedUp = request.session.hasSignedUp
 
-      val maybeNotDisplayedRecently = maybeLastSignupModalDisplay.map { date =>
-        notDisplayedRecently(date)
-      }
-
-      maybeNotDisplayedRecently.getOrElse(!loggedIn)
-    }
+    println(s"!hasSignedUp = ${!request.session.hasSignedUp}, !loggedIn = ${!loggedIn}, notDisplayedRecently = ${notDisplayedRecently(request.session)}")
+    !loggedIn && !signedUp && notDisplayedRecently(request.session)
   }
 
   def apply[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Boolean => Action[A]): Action[A] = {
