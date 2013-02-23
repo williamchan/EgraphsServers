@@ -8,7 +8,6 @@
 GET     /test/scenarios                          controllers.website.nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                    controllers.website.nonproduction.ScenarioController.clear
 GET     /test/scenarios/:urlSlug                 controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
-GET     /test/storefront-a/checkout              controllers.WebsiteControllers.storefrontACheckout
 
 ###
 ### Production routes

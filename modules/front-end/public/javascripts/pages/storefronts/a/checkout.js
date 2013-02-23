@@ -4,6 +4,7 @@ define([
   "page",
   "libs/tooltip",
   "window",
+  "services/analytics",
   "services/logging",
   "module",
   "services/ng/payment",
@@ -11,11 +12,12 @@ define([
   "services/responsive-modal",
   "bootstrap/bootstrap-button"
 ],
-function(page, tooltip, window, logging, requireModule) {
+function(page, tooltip, window, analytics, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
   var forEach = angular.forEach;
   var celebId = page.celebId;
   var states = page.states;
+  var events = analytics.eventCategory("Checkout");
 
   return {
     ngControllers: {
@@ -38,6 +40,9 @@ function(page, tooltip, window, logging, requireModule) {
             // Toss away any entered codes since we are closing down the code-redeeming widget
             $scope.coupon.couponCode = "";
             $scope.couponForm.resource.submit();
+            events.track(["Code Redeemer - Close"]);
+          } else {
+            events.track(["Code Redeemer - Open"]);
           }
         };
 

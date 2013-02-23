@@ -13,9 +13,9 @@ function(mockBackend, logging, module, ngApp) {
   var BAD_REQUEST = 400;
   var newCheckout = function() {
     return {
-      products: [],
-      discounts: [],
-      fees: [],
+      product: [],
+      discount: [],
+      fee: [],
       summary: [{
         id: idSequence++,
         name: "Total",
@@ -26,18 +26,18 @@ function(mockBackend, logging, module, ngApp) {
       }],
 
       _addProduct: function(product) {
-        this.products.push(product);
+        this.product.push(product);
         this.summary[0].amount += product.amount;
       },
 
       _setDiscount: function(amount) {
-        if (this.discounts.length > 0) {
-          this.summary[0].amount += this.discounts[0].amount;
-          this.discounts = [];
+        if (this.discount.length > 0) {
+          this.summary[0].amount += this.discount[0].amount;
+          this.discount = [];
         }
         if (amount) {
           this.summary[0].amount -= amount;
-          this.discounts.push({
+          this.discount.push({
             id: idSequence++,
             name: amount + " off",
             description: amount + " off",

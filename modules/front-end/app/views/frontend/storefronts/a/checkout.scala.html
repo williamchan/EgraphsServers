@@ -1,4 +1,5 @@
 @(celebId: Long = 1L,
+  personalizeUrl: String,
   testcase: Option[String] = None,
   paymentJsModule: String = "stripe-payment",
   paymentPublicKey: String = "pk_qIGUDirehUxj2GTFwgeRBkOfHIWdX"
@@ -21,12 +22,16 @@
 @requiredStar = {<span class="required-marker">*</span>}
 
 @identifyAs(name: String) = {id="@name" name="@name" ng-model="@name"}
-@headerStep(image: String, label: String, stage: String) = {
+@linked(link: String)(body: Html) = {
+  @if(!link.isEmpty){<a href="@link">}@body@if(!link.isEmpty){</a>}
+}
+
+@headerStep(image: String, label: String, stage: String, link: String="") = {
   <div class="step @stage">
     <div class="image-container ">
-      <img src="@EgraphsAssets.at(image)">
+      @linked(link){<img src="@EgraphsAssets.at(image)">}
     </div>
-    <label>@label</label>
+    <label>@linked(link){@label}</label>
 
   </div>
   @if(stage != "final") {
@@ -42,7 +47,7 @@
       </a>
     </div>
     <div class="steps">
-      @headerStep("images/glyphicons-links-orange.png", "connect", stage="previous")
+      @headerStep("images/glyphicons-links-orange.png", "connect", stage="previous", link=personalizeUrl)
       @headerStep("images/glyphicons-pencil-box-orange.png", "enter details", stage="current")
       @headerStep("images/glyphicons-check-circle.png", "done", stage="final")
     </div>
@@ -437,7 +442,7 @@
                 <em>Purchase now</em> 
               </strong>
               <span>&raquo;</span>
-            </button>
+            </button><img style="position:relative;left:5px" src="@EgraphsAssets.at("images/ajax-loader.gif")" ng-show="transacting" />
             <div id="this-will-charge" ng-show="fieldsRemaining().length == 0">
               <span class="money">${{cart.total}}</span> will be charged
               <span ng-show="cart.total > 0">to your {{stripeToken.data.card.type}}********{{stripeToken.data.card.last4}}</span>

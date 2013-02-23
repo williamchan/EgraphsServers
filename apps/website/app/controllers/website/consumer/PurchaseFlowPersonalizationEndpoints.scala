@@ -11,7 +11,7 @@ import models.checkout.CheckoutAdapterServices
 import services.payment.Payment
 
 trait PurchaseFlowPersonalizationEndpoints extends ImplicitHeaderAndFooterData { this: Controller =>
-
+  import controllers.routes.WebsiteControllers
   //
   // Services
   //
@@ -43,7 +43,7 @@ trait PurchaseFlowPersonalizationEndpoints extends ImplicitHeaderAndFooterData {
 
           Ok(views.html.frontend.storefronts.a.personalize(
             starView,
-            controllers.routes.WebsiteControllers.getCheckout(celebrityUrlSlug, accesskey).url,
+            WebsiteControllers.getCheckout(celebrityUrlSlug, accesskey).url,
             maxDesiredTextChars=EgraphForm.maxDesiredTextChars,
             maxMessageToCelebChars=EgraphForm.maxMessageToCelebChars
           ))
@@ -59,6 +59,7 @@ trait PurchaseFlowPersonalizationEndpoints extends ImplicitHeaderAndFooterData {
         checkouts.decacheOrCreate(celeb.id).order.map { form =>
           Ok(views.html.frontend.storefronts.a.checkout(
             celebId=celeb.id,
+            personalizeUrl=WebsiteControllers.getPersonalize(celebrityUrlSlug, accesskey).url,
             paymentJsModule=payment.browserModule,
             paymentPublicKey=payment.publishableKey
           ))

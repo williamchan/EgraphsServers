@@ -34,6 +34,6 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
 
   }
 
-  def maxMessageToCelebChars = 180
+  def maxMessageToCelebChars = 140
   def maxDesiredTextChars = 60
 }

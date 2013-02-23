@@ -23,15 +23,15 @@ object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.storefronts.a.personalize(
       star,
       "/checkout",
-      maxDesiredTextChars="60",
-      maxMessageToCelebChars="100",
+      maxDesiredTextChars=60,
+      maxMessageToCelebChars=100,
       testcase=Some("default")
     ))
   }
 
   def checkout(testcase: Option[String]) = Action { request =>
     val request = Form
-    Ok(views.html.frontend.storefronts.a.checkout(testcase=testcase))
+    Ok(views.html.frontend.storefronts.a.checkout(personalizeUrl="/personalize", testcase=testcase))
   }
 
   def products(star: String, n: Int=3): Seq[PersonalizeProduct] = {
