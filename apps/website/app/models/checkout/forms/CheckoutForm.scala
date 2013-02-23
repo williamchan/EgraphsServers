@@ -24,13 +24,16 @@ trait CheckoutForm[T] {
 
   def cache(checkout: EgraphCheckoutAdapter, form: Option[Form[T]] = None)(implicit request: Request[_]) {
     val formToCache = form.getOrElse(this.bindFromRequest())
-    checkout.cart.setting(this.getClass.getSimpleName -> formToCache).save()
+
+    checkout.cart.setting(this.getClass.getSimpleName -> formToCache.data).save()
   }
 
   def decache[FormT <: Form[T]](checkout: EgraphCheckoutAdapter)
     (implicit request: Request[_], mani: Manifest[FormT])
   : Option[Form[T]] =
   {
-    checkout.cart.get[FormT](this.getClass.getSimpleName)
+    checkout.cart.get[Map[String, String]](this.getClass.getSimpleName).map { formData =>
+      form.bind(formData)
+    }
   }
 }
