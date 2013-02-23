@@ -7,19 +7,20 @@ import models.checkout._
 import scala.Some
 
 
-object CouponForm extends CheckoutForm[CouponLineItemType]{
+object CouponForm extends CheckoutForm[Option[CouponLineItemType]]{
 
   object FormKeys {
     val _codeLength = Coupon.defaultCodeLength
     val couponCode = "couponCode"
   }
 
-  override val form = Form[CouponLineItemType] {
+  override val form = Form[Option[CouponLineItemType]] {
     import ApiForms._
     import FormKeys._
+    import play.api.data.Forms.optional
 
     Forms.mapping(
-      couponCode -> (text verifying validCouponCode)
+      couponCode -> optional(text verifying validCouponCode)
     )(applyToForm)(unapplyToForm)
   }
 
@@ -27,10 +28,15 @@ object CouponForm extends CheckoutForm[CouponLineItemType]{
   //
   // helpers
   //
-  def unapplyToForm(couponItemType: CouponLineItemType) = Some(couponItemType.coupon.code)
+  def unapplyToForm(couponItemType: Option[CouponLineItemType]) = couponItemType.map(lit => Some(lit.coupon.code))
 
-  def applyToForm(code: String)(implicit services: CouponLineItemTypeServices = defaultServices) = {
-    services.findByCouponCode(code).get
+  def applyToForm(maybeCode: Option[String])(implicit services: CouponLineItemTypeServices = defaultServices) = {
+    for (
+      code <- maybeCode;
+      coupon <- services.findByCouponCode(code)
+    ) yield {
+      coupon
+    }
   }
 
   private def defaultServices = AppConfig.instance[CouponLineItemTypeServices]

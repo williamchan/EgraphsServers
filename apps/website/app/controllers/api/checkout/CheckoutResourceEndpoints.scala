@@ -39,9 +39,9 @@ trait CheckoutResourceEndpoints { this: Controller =>
 
   private lazy val recipient = emailResource((resource, checkout) => checkout.withRecipientEmail(resource))
 
-  private lazy val coupon = checkoutControllers[CouponLineItemType](
+  private lazy val coupon = checkoutControllers[Option[CouponLineItemType]](
     CouponForm,
-    (resource, checkout) => checkout.withCoupon(resource)
+    (resource, checkout) => checkout.withCoupon(resource.flatten)
   )
 
   private lazy val egraph = checkoutControllers[EgraphOrderLineItemType](
