@@ -104,7 +104,7 @@
   <div class="summary">
     <h2 id="items-header">Items</h2>
     <ul class="line-items">
-      <li ng-repeat="product in cart.products" class="{{product.type.codeType}}">
+      <li ng-repeat="product in cart.products" class="{{product.lineItemType.codeType}}">
         <div class="image-and-description">
           <img ng-src="{{product.imageUrl}}"></img>
           <h3><div class="money">${{product.amount}}</div>{{product.name}}</h3>
@@ -116,9 +116,9 @@
       <h2>Discounts</h2>
        <a class="redeem-link" id="open-redeem" ng-click="toggleCodeRedeemerVisibility()">redeem code</a>
        <ul ng-show="codeRedeemerVisible" class="line-items">
-         <li class="discount {{cart.discount.status}}">
+         <li class="discount {{cart.currentDiscount.status}}">
            <div class="image-and-description discount-field">
-             <div class="money {{cart.discount.status}}" >-${{cart.discount.amount}}</div>
+             <div class="money {{cart.currentDiscount.status}}" >${{cart.currentDiscount.amount}}</div>
              <form name="couponForm"
                    class="form-horizontal ajax"
                    remote-resource="{{cartApi.url}}/coupon"
@@ -154,8 +154,8 @@
       </li>                
     </ul>              
     <ul class="line-items">
-      <li ng-repeat="line in cart.summary" class="{{line.type.codeType}} summary-line">
-        <h3><div class="money">${{line.amount}}</div>{{line.name}}</h3>
+      <li class="TotalLineItem summary-line">
+        <h3><div class="money">${{cart.total}}</div>Total</h3>
       </li>
     </ul>
   </div>

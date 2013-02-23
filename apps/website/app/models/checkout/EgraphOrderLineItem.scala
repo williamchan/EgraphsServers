@@ -8,6 +8,7 @@ import com.google.inject.Inject
 import scalaz.Lens
 import models.enums.PaymentStatus
 import play.api.libs.json.{JsValue, Json}
+import services.blobs.AccessPolicy
 
 
 //
@@ -41,7 +42,8 @@ case class EgraphOrderLineItem(
   /** includes print order item's json if it exists */
   override def toJson = {
     val product = domainObject.product
-    val thisJson = jsonify(product.name, product.description, Some(id), Some(product.defaultIcon.url))
+    val imageUrl = product.celebrity.profilePhoto.getSaved(AccessPolicy.Public).url
+    val thisJson = jsonify(product.name, product.description, Some(id), Some(imageUrl))
     val printOrderJson = printOrderItem map (_.toJson)
     Json.toJson(printOrderJson.toSeq ++ Seq(thisJson))
   }

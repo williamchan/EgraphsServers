@@ -46,26 +46,26 @@ function(page, tooltip, window, logging, requireModule) {
         /** Refreshes $scope.cart, which tracks all of the order's line items. */
         $scope.refreshCart = function() {
           cartApi.get().success(function(cartData) {
-            cartData.discount = {amount: null, status: "notApplied"};
-
+            cartData.currentDiscount = {amount: null, status: "notApplied"};
+            cartData.products = cartData.product;
             cartData.requiresShipping = false;
             forEach(cartData.products, function(product) {
-              if (product.type.codeType === "PrintOrderLineItemType" ) {
+              if (product.lineItemType.codeType === "PrintOrderLineItem" ) {
                 cartData.requiresShipping = true;
               }
             });
 
-            forEach(cartData.discounts, function(discount) {
-              cartData.discount = {amount: discount.amount, status:"applied"};
+            forEach(cartData.discount, function(discount) {
+              cartData.currentDiscount = {amount: discount.amount, status:"applied"};
             });
 
             forEach(cartData.summary, function(lineItem) {
-              if (lineItem.type.codeType === "TotalLineItemType") {
+              if (lineItem.lineItemType.codeType === "TotalLineItem") {
                 cartData.total = lineItem.amount;
               }
             });
 
-            if (cartData.discount.amount) {
+            if (cartData.currentDiscount.amount) {
               $scope.codeRedeemerVisible = true;
             }
 

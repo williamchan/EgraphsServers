@@ -1,11 +1,13 @@
 package controllers.api.checkout
 
-import play.api.mvc.{Controller, AnyContent, Action}
-import services.http.{POSTApiControllerMethod, ControllerMethod}
+import play.api.mvc.{RequestHeader, Controller, AnyContent, Action}
+import services.http.{WithDBConnection, POSTApiControllerMethod, ControllerMethod}
 import services.http.filters.HttpFilters
 import models.checkout.{Checkout, CheckoutAdapterServices}
 import models.enums.CheckoutCodeType
-
+import services.db.TransactionSerializable
+import services.logging.Logging
+import play.api.libs.json._
 
 /**
  * Should this be CheckoutAdapterEndpoints, maybe?
@@ -13,7 +15,7 @@ import models.enums.CheckoutCodeType
  * path: /sessions/[SessionID]/checkouts/[CelebID]
  */
 trait CheckoutEndpoints { this: Controller =>
-
+  import CheckoutEndpoints._
   //
   // Services
   //
@@ -26,12 +28,15 @@ trait CheckoutEndpoints { this: Controller =>
   // Controllers
   //
   /** Returns JSON representation of the checkout */
-  def getCheckout(sessionIdSlug: UrlSlug, checkoutIdSlug: Long): Action[AnyContent] = controllerMethod()
-  {
-    httpFilters.requireSessionAndCelebrityUrlSlugs(sessionIdSlug, checkoutIdSlug) { (sessionId, celebrity) =>
-      Action { implicit request =>
-        val maybeCheckout = checkoutAdapters.decache(celebrity.id)
-        maybeCheckout map { checkout => Ok(checkout.summary) } getOrElse NotFound
+  def getCheckout(sessionIdSlug: UrlSlug, checkoutIdSlug: Long): Action[AnyContent] = {
+    // Make read-only because sometimes EgraphOrderLineItemType doesn't exist for every Product.
+    // We should generate them for each product and then deprecate readOnly here.
+    controllerMethod(WithDBConnection(TransactionSerializable, readOnly=false)) {
+      httpFilters.requireSessionAndCelebrityUrlSlugs(sessionIdSlug, checkoutIdSlug) { (sessionId, celebrity) =>
+        Action { implicit request =>
+          val maybeCheckout = checkoutAdapters.decache(celebrity.id)
+          maybeCheckout map { checkout => Ok(checkout.summary) } getOrElse NotFound
+        }
       }
     }
   }
@@ -43,7 +48,7 @@ trait CheckoutEndpoints { this: Controller =>
       Action { implicit request =>
         checkoutAdapters.decache(celebrity.id) map { checkout =>
           checkout.transact() match {
-            case Some(Right(transacted)) => Ok(confirmationUrlFor(transacted))
+            case Some(Right(transacted)) => confirmationUrlFor(transacted)
             case Some(Left(failure)) => BadRequest("derp")
             case None => BadRequest("herp")
           }
@@ -58,12 +63,18 @@ trait CheckoutEndpoints { this: Controller =>
   //
   // Helpers
   //
-  private def confirmationUrlFor(checkout: Checkout) = {
+  private def confirmationUrlFor(checkout: Checkout)(implicit request: RequestHeader) = {
     import models.checkout.checkout.Conversions._
     import controllers.routes.WebsiteControllers.getOrderConfirmation
     val order = checkout.lineItems(CheckoutCodeType.EgraphOrder).head
-
-    getOrderConfirmation(order.id).url
+    val jsonResponse = Json.obj(
+      "order" -> Json.obj(
+        "id" -> order.id,
+        "confirmationUrl" -> getOrderConfirmation(order.id).url
+      )
+    )
+    Ok(jsonResponse).flashing(request.flash + ("orderId" -> order.id.toString))
   }
-
 }
+
+object CheckoutEndpoints extends Logging

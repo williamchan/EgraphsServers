@@ -331,7 +331,7 @@ body.storefront-a-checkout {
           }
 
           // All non-total .moneys get de-emphasized
-          &:not(.TotalLineItemType) .money {
+          &:not(.TotalLineItem) .money {
             color:@orange;
             background-color:inherit;
           }
@@ -355,20 +355,22 @@ body.storefront-a-checkout {
           // (see https://egraphs.atlassian.net/wiki/display/DEV/API+Endpoints for list of
           //      code types)
           //
-          &.EgraphOrderLineItemType {
+          &.EgraphOrderLineItem {
             img {
               border:1px solid #ddd;
               background-color:white;
+              width:60px;
+              height:60px;
             }
           }
 
-          &.PrintOrderLineItemType {
+          &.PrintOrderLineItem {
             img {
               background-color:white;
             }
           }
 
-          &.TotalLineItemType {
+          &.TotalLineItem {
             text-transform:uppercase;
             background-color:transparent;
 

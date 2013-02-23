@@ -20,8 +20,8 @@ function(mockBackend, logging, module, ngApp) {
         id: idSequence++,
         name: "Total",
         amount: 0,
-        type: {
-          codeType: "TotalLineItemType"
+        lineItemType: {
+          codeType: "TotalLineItem"
         }
       }],
 
@@ -42,8 +42,8 @@ function(mockBackend, logging, module, ngApp) {
             name: amount + " off",
             description: amount + " off",
             amount: amount,
-            type: {
-              codeType: "DiscountLineItemType"
+            lineItemType: {
+              codeType: "DiscountLineItem"
             }
           });
         }
@@ -65,8 +65,8 @@ function(mockBackend, logging, module, ngApp) {
       description: "For Herp Derpson with note I'm your biggest fan!. He will sign the photo Heart of a Warrior.",
       amount: 50,
       imageUrl: "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png",
-      type: {
-        codeType: "EgraphOrderLineItemType"
+      lineItemType: {
+        codeType: "EgraphOrderLineItem"
       }
     };
   };
@@ -78,8 +78,8 @@ function(mockBackend, logging, module, ngApp) {
       description: "A framed print of your digital egraph.",
       amount: 45,
       imageUrl: "/assets/images/framed-print.png",
-      type: {
-        codeType: "PrintOrderLineItemType"
+      lineItemType: {
+        codeType: "PrintOrderLineItem"
       }
     };
   };

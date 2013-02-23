@@ -67,13 +67,20 @@ case class CouponLineItemType(
   // LineItemType members
   //
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = {
-    pendingResolution(CheckoutCodeType.Subtotal) match {
+    println("Resolved -- " + resolvedItems.map(_.codeType))
+    println("Pending -- " + pendingResolution.map(_.codeType))
+
+    val resolution = pendingResolution(CheckoutCodeType.Subtotal) match {
       case Nil => resolvedItems(CheckoutCodeType.Subtotal).headOption map { subtotal =>
         val discountAmount = coupon.calculateDiscount(subtotal.amount)
-        Seq{ CouponLineItem(this, discountAmount) }
+        Seq{ CouponLineItem(this, discountAmount.negated) }
       }
       case _ => None
     }
+
+    println("Resolved coupon as resolution: " + resolution)
+
+    resolution
   }
 
   //

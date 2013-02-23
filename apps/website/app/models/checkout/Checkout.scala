@@ -111,9 +111,10 @@ abstract class Checkout
       }
     }
 
+    println("Before json, items are -- " + lineItems.map(_.codeType))
     Json.toJson {
       LineItemNature.values map { nature =>
-        (nature.name, itemsToJson(lineItems(nature)))
+        (nature.name.toLowerCase, itemsToJson(lineItems(nature)))
       } toMap
     }
   }
@@ -238,7 +239,7 @@ abstract class Checkout
             )
             case Nil => ResolutionPass(
               resolvedItems = resolvedNow,
-              unresolvedTypes = prevAttempted
+              unresolvedTypes = attemptedNow
             )
           }
         }
