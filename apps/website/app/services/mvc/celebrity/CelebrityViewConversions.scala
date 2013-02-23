@@ -78,7 +78,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       id = celeb.id,
       publicName = celeb.publicName,
       photoUrl = photoUrl,
-      storefrontUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url,
+      storefrontUrl = controllers.routes.WebsiteControllers.getPersonalize(celeb.urlSlug).url,
       inventoryRemaining = inventoryRemaining,
       minPrice = minPrice,
       maxPrice = maxPrice,
@@ -103,7 +103,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .resizedWidth(660)
       .getSaved(AccessPolicy.Public).url // expensive call
 
-    val choosePhotoUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url
+    val connectUrl = controllers.routes.WebsiteControllers.getPersonalize(celeb.urlSlug).url
 
     CatalogStar(
       id = celeb.id,
@@ -112,7 +112,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       organization = celeb.organization,
       imageUrl = mastheadImageUrl,
       marketplaceImageUrl = marketplaceImageUrl,
-      storefrontUrl = choosePhotoUrl,
+      storefrontUrl = connectUrl,
       inventoryRemaining = inventoryRemaining,
       minPrice = minPrice,
       maxPrice = maxPrice
