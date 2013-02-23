@@ -9,8 +9,8 @@ package models.frontend.marketplace
  * @param email the email address as submitted
  */
 case class RequestStarViewModel(
-  starName: String,
-  customerId: Long
+  starName: String
+//  customerId: Long
 //  requesterName: String,
 //  email: String
 )

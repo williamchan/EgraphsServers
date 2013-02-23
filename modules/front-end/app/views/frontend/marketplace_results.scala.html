@@ -6,9 +6,7 @@
   sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel],
   availableOnly: Boolean = false,
   requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
-  requestStarActionUrl: String,
-  isLoggedIn: Boolean,
-  maybeCustomerId: Option[Long]
+  requestStarActionUrl: String
   )(
   implicit
   headerData: models.frontend.header.HeaderData,
@@ -91,7 +89,7 @@
           @if(viewAsList) {
             @tags.marketplace.result_set_list(results)
           } else {
-            @tags.marketplace.result_set(availableOnly, results, query, requestStarForm, requestStarActionUrl, isLoggedIn, maybeCustomerId)
+            @tags.marketplace.result_set(availableOnly, results, query, requestStarForm, requestStarActionUrl)
           }
         </div>
       </div>

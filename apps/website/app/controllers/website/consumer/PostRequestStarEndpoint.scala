@@ -11,6 +11,7 @@ import play.api.data.validation.Valid
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.AppConfig
+import services.http.EgraphsSession._
 import services.http.EgraphsSession.Conversions._
 import services.http.filters._
 import services.http.forms.FormConstraints
@@ -31,26 +32,36 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
   def postRequestStar = postController(dbSettings = WithDBConnection(readOnly = true)) {
     Action { implicit request =>
 
-      val form = PostRequestStarEndpoint.form
-
-      form.bindFromRequest.fold(
-        formWithErrors => {
-          BadRequest("Something's gone wrong with request a star form submit")
-        },
-        validForm => {
-
-          val starName = validForm.starName
-          val maybeCelebrity = celebrityStore.findByPublicName(starName)
-
-          maybeCelebrity match {
-            case None => play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
-            case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
-          }
-
-          play.Logger.info("starName is " + validForm.starName + ", customerId is " + validForm.customerId)
-          Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
+      val eitherCustomerAndAccountOrResult = httpFilters.requireCustomerLogin.filterInSession()
+      eitherCustomerAndAccountOrResult match {
+        case Right(customerAndAccount) => {
+          Ok("Yay! We're logged in and the customer ID is " + customerAndAccount._1.id)
         }
-      )
+        case Left(result) => {
+          Redirect("/login")
+        }
+      }
+
+//      val form = PostRequestStarEndpoint.form
+//
+//      form.bindFromRequest.fold(
+//        formWithErrors => {
+//          BadRequest("Something's gone wrong with request a star form submit")
+//        },
+//        validForm => {
+//
+//          val starName = validForm.starName
+//          val maybeCelebrity = celebrityStore.findByPublicName(starName)
+//
+//          maybeCelebrity match {
+//            case None => play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
+//            case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
+//          }
+//
+//          play.Logger.info("starName is " + validForm.starName + ", customerId is " + validForm.customerId)
+//          Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
+//        }
+//      )
     }
   }
 }
@@ -60,8 +71,8 @@ object PostRequestStarEndpoint {
 
   def form: Form[RequestStarViewModel] = Form(
     mapping(
-      "starName" -> text.verifying(nonEmpty),
-      "customerId" -> longNumber
+      "starName" -> text.verifying(nonEmpty)
+      //      "customerId" -> longNumber
       //      "requesterName" -> text.verifying(nonEmpty),
       //      "email" -> email.verifying(nonEmpty)
       )(RequestStarViewModel.apply)(RequestStarViewModel.unapply))

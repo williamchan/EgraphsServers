@@ -223,20 +223,6 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
           marketplace.reloadPage();
         });
 
-        $("#request-star-logged-in-button").click(function(e) {
-          $('.request-star-logged-in-option').hide("slide", {direction: "left"}, 200, function() {
-            $('.request-star-logged-in-fields').show("slide", {direction: "right"}, 200, function() {
-              $("#requester-name-field input").focus();
-            });
-          });
-        });
-
-        $("#request-star-not-logged-in-button").click(function(e) {
-          $('.request-star-not-logged-in-option').hide("slide", {direction: "left"}, 200, function() {
-            $('.login-reminder').show("slide", {direction: "right"}, 200)
-          });
-        });
-
       });
     }
   };

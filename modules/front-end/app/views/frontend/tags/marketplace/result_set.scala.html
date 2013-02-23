@@ -2,9 +2,7 @@
   results: models.frontend.marketplace.ResultSetViewModel,
   query: String,
   requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
-  requestStarActionUrl: String,
-  isLoggedIn: Boolean,
-  maybeCustomerId: Option[Long]
+  requestStarActionUrl: String
   )(
   implicit
   authToken: egraphs.authtoken.AuthenticityToken
@@ -65,8 +63,6 @@
   @if(results.celebrities.size == 0) {
     <section class="span4">
 
-      @if(isLoggedIn) {
-
         @safeForm(
           'id -> "request-star-form",
           'action -> requestStarActionUrl,
@@ -75,48 +71,16 @@
         ) {
 
           <div class="clearfix">
-            <div class="request-star-logged-in-option">
-              <button id="request-star-logged-in-button" type="button" class="button">
-                <strong><em>Request a Star</em></strong>
+            <div class="request-star-button">
+              <button id="request-star-logged-in-button" type="submit" class="button">
+                <strong><em>Request @query</em></strong>
                 <span>&raquo;</span>
               </button>
-            </div>
-
-            <div class="request-star-logged-in-fields" style="display: none">
-              <fieldset>
-                <span id="star-name-field">
-                  @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
-                    <input type="text" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
-                  }
-                </span>
-                <span>
-                  @helper.input(requestStarForm("customerId")) { (id, name, value, args) =>
-                    <input type="hidden" name="@name" value="@maybeCustomerId.get" id="@id" @toHtmlArgs(args)>
-                  }
-                </span>
-              </fieldset>
-              @tags.arrow_button(caption="Submit", classes="button create-account")
             </div>
           </div>
 
         } <!-- end safe form -->
 
-      } else {
-
-        <div class="clearfix">
-          <div class="request-star-not-logged-in-option">
-            <button id="request-star-not-logged-in-button" type="button" class="button">
-              <strong><em>Request a Star</em></strong>
-              <span>&raquo;</span>
-            </button>
-          </div>
-
-          <div class="login-reminder" style="display: none">
-            <p> It looks like you're not logged in! </p>
-            <a href="/login">Login here.</a>
-          </div>
-        </div>
-      }
     </section>
   }
 }
