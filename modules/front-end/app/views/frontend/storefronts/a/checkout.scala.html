@@ -282,7 +282,7 @@
                   <select @field.identityAttributes
                           monitor-user-attention
                           resource-property
-                          ng-options="state[1] for state in states"
+                          ng-options="state[0] as state[0] for state in states"
                           class="half" 
                           required />
                     <option value>State</option>
