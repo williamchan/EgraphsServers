@@ -4,7 +4,7 @@ import play.api.data.{Form, Forms}
 
 
 /** used for posting buyer and recipient emails from checkout page */
-object EmailForm extends CheckoutForm[String] {
+trait EmailForm extends CheckoutForm[String] {
 
   object FormKeys {
     val emailKey = "email"
@@ -16,3 +16,7 @@ object EmailForm extends CheckoutForm[String] {
     )
   }
 }
+
+object BuyerForm extends EmailForm
+
+object RecipientForm extends EmailForm

@@ -432,7 +432,7 @@
             <button type="button"
                     class="button"
                     ng-click="transactCheckout()"
-                    ng-disabled="fieldsRemaining().length > 0">
+                    ng-disabled="fieldsRemaining().length > 0 || transacting">
               <strong>
                 <em>Purchase now</em> 
               </strong>

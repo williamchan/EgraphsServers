@@ -66,7 +66,9 @@ trait CheckoutEndpoints { this: Controller =>
   private def confirmationUrlFor(checkout: Checkout)(implicit request: RequestHeader) = {
     import models.checkout.checkout.Conversions._
     import controllers.routes.WebsiteControllers.getOrderConfirmation
-    val order = checkout.lineItems(CheckoutCodeType.EgraphOrder).head
+    val orderLineItem = checkout.lineItems(CheckoutCodeType.EgraphOrder).head
+    val order = orderLineItem.domainObject
+
     val jsonResponse = Json.obj(
       "order" -> Json.obj(
         "id" -> order.id,

@@ -1,5 +1,6 @@
 package models.checkout
 
+import forms.ShippingAddress
 import forms.{ShippingAddress}
 import services.AppConfig
 import services.db.HasTransientServices
@@ -8,6 +9,11 @@ import com.google.inject.Inject
 import services.http.{ServerSession, ServerSessionFactory}
 import play.api.mvc.{RequestHeader}
 import services.ecommerce.CartFactory
+import controllers.api.checkout.CheckoutEndpoints._
+import models.checkout.CheckoutAdapterServices
+import models.checkout.EgraphCheckoutAdapter
+import models.checkout.FreshCheckout
+import scala.Some
 
 
 case class CheckoutAdapterServices @Inject() (
@@ -93,11 +99,30 @@ case class EgraphCheckoutAdapter (
   protected def hasPrint = order map (_.framedPrint) getOrElse (false)
 
   /** if true, the actual checkout should be ready to transact */
-  protected def validated = { order.isDefined &&
+  protected def validated = {
+    val checkout = previewCheckout
+
+    printValidationStatus(checkout)
+
+    order.isDefined &&
     buyerEmail.isDefined &&
     (recipientEmail.isDefined || !isGift) &&
     (shippingAddress.isDefined || !hasPrint) &&
     (payment.isDefined || previewCheckout.total.amount.isZero)
+  }
+  
+  protected def printValidationStatus(checkout: Checkout) {
+    log(s"""" +
+       Validating order before purchase:
+         has order? ${order.isDefined}
+         has buyerEmail? ${buyerEmail.isDefined}
+         has recipientEmail? ${recipientEmail.isDefined}
+           isGift? ${isGift}
+         has shippingAddress? ${shippingAddress.isDefined}
+           hasPrint? ${hasPrint}
+         has payment? ${payment.isDefined}
+           total: ${checkout.total.amount}
+     """)
   }
 
   /** generate a Checkout without saving any Customers or Accounts */

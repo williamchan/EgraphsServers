@@ -74,6 +74,7 @@ function(page, tooltip, window, logging, requireModule) {
         };
 
         $scope.transactCheckout = function() {
+          $scope.transacting = true;
           cartApi.transact().success(function(response) {
             var order = response.order;
             log("Successfully purchased. Order is: ");
@@ -81,6 +82,7 @@ function(page, tooltip, window, logging, requireModule) {
             window.location.href = order.confirmationUrl;
           })
           .error(function(errors) {
+            $scope.transacting = false;
             log("Oh snap I got some errors trying to buy this order");
             log(errors);
           });
@@ -166,6 +168,11 @@ function(page, tooltip, window, logging, requireModule) {
             return "glyphicons-check-circle-dense-green.png";
           }
         };
+
+        // Submit the payment form whenever the stripe model changes
+        $scope.$watch("stripeToken.id", function(newValue, oldValue) {
+          $scope.paymentForm.resource.submit();
+        });
 
         $scope.refreshCart();
 

@@ -35,9 +35,15 @@ trait CheckoutResourceEndpoints { this: Controller =>
   //
   // Private Members
   //
-  private lazy val buyer = emailResource((resource, checkout) => checkout.withBuyerEmail(resource))
+  private lazy val buyer = checkoutControllers[String](
+    BuyerForm,
+    (resource, checkout) => checkout.withBuyerEmail(resource)
+  )
 
-  private lazy val recipient = emailResource((resource, checkout) => checkout.withRecipientEmail(resource))
+  private lazy val recipient = checkoutControllers[String](
+    RecipientForm,
+    (resource, checkout) => checkout.withRecipientEmail(resource)
+  )
 
   private lazy val coupon = checkoutControllers[Option[CouponLineItemType]](
     CouponForm,
@@ -58,12 +64,6 @@ trait CheckoutResourceEndpoints { this: Controller =>
     PaymentForm,
     (resource, checkout) => checkout.withPayment(resource)
   )
-
-  private def emailResource(setter: (Option[String], EgraphCheckoutAdapter) => EgraphCheckoutAdapter)
-  : CheckoutResourceController[String] =
-  {
-    checkoutControllers[String](EmailForm, setter)
-  }
 }
 
 

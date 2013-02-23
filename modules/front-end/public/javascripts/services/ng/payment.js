@@ -37,7 +37,7 @@ function(payment, validationDirective, ngApp, logging, module) {
 
         // When the stripe token ID changes due to successful form submission
         // we should also trigger a get of the remote token.
-        scope.$watch(attrs.localResource, function(tokenId) {
+        scope.$watch(tokenIdModel, function(tokenId) {
           if(tokenId) {
             payment.getToken(tokenId, function(status, token) {
               scope.$apply(function() {
