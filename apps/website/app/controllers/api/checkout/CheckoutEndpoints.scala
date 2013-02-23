@@ -48,7 +48,9 @@ trait CheckoutEndpoints { this: Controller =>
       Action { implicit request =>
         checkoutAdapters.decache(celebrity.id) map { checkout =>
           checkout.transact() match {
-            case Some(Right(transacted)) => confirmationUrlFor(transacted)
+            case Some(Right(transacted)) =>
+              checkout.cart.emptied.save()
+              confirmationUrlFor(transacted)
             case Some(Left(failure)) => BadRequest("derp")
             case None => BadRequest("herp")
           }

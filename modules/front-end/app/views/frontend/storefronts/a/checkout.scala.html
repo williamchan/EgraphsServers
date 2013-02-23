@@ -278,7 +278,6 @@
                   <label class="control-label" for="@field.id">City@requiredStar:</label>
                   <div class="controls">
                     <input @field.identityAttributes
-                           class="half"
                            monitor-user-attention
                            resource-property
                            required />
@@ -288,8 +287,7 @@
                   <select @field.identityAttributes
                           monitor-user-attention
                           resource-property
-                          ng-options="state[1] as state[1] for state in states"
-                          class="half" 
+                          ng-options="state[0] as state[1] for state in states"
                           required />
                     <option value>State</option>
                   </select>
