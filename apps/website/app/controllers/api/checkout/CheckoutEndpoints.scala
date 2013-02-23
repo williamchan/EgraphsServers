@@ -50,9 +50,21 @@ trait CheckoutEndpoints { this: Controller =>
           checkout.transact() match {
             case Some(Right(transacted)) =>
               checkout.cart.emptied.save()
-              confirmationUrlFor(transacted)
-            case Some(Left(failure)) => BadRequest("derp")
-            case None => BadRequest("herp")
+              confirmationResultFor(transacted)
+
+            case Some(Left(failure)) =>
+              error(s"Failed to transact checkout due to $failure: session=$sessionIdSlug, celeb=$checkoutIdSlug}")
+              log(Json.stringify(checkout.formState))
+              log(Json.stringify(checkout.summary))
+
+              BadRequest
+
+            case None =>
+              error(s"Failed to transact checkout due to invalid state: session=$sessionIdSlug, celeb=$checkoutIdSlug}")
+              log(Json.stringify(checkout.formState))
+              log(Json.stringify(checkout.summary))
+
+              BadRequest
           }
         } getOrElse {
           NotFound
@@ -65,7 +77,7 @@ trait CheckoutEndpoints { this: Controller =>
   //
   // Helpers
   //
-  private def confirmationUrlFor(checkout: Checkout)(implicit request: RequestHeader) = {
+  private def confirmationResultFor(checkout: Checkout)(implicit request: RequestHeader) = {
     import models.checkout.checkout.Conversions._
     import controllers.routes.WebsiteControllers.getOrderConfirmation
     val orderLineItem = checkout.lineItems(CheckoutCodeType.EgraphOrder).head

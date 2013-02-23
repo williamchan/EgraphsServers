@@ -10,7 +10,7 @@ import models.checkout.forms.EgraphForm
 import models.checkout.CheckoutAdapterServices
 import services.payment.Payment
 
-trait PurchaseFlowPersonalizationEndpoints extends ImplicitHeaderAndFooterData { this: Controller =>
+trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controller =>
   import controllers.routes.WebsiteControllers
   //
   // Services

@@ -5,15 +5,22 @@ import play.api.mvc.Request
 import models.checkout.EgraphCheckoutAdapter
 import scala.concurrent.future
 import play.api.libs.concurrent.Execution.Implicits._
+import services.logging.Logging
+import play.api.libs.json._
 
 /** Convenience trait for wrapping Play forms */
 trait CheckoutForm[T] {
+  import CheckoutForm._
+
   def bindFromRequest()(implicit request: Request[_]) = form.bindFromRequest()(request)
 
   def bindFromRequestAndCache(checkout: EgraphCheckoutAdapter)(implicit request: Request[_])
   : Form[T] =
   {
     val form = bindFromRequest()
+    log(s"Cacheing submitted resource ${this.getClass.getSimpleName}")
+    log(s"  data: ${Json.toJson(form.data)}")
+    log(s"  errors: ${form.errorsAsJson}")
 
     this.cache(checkout, Some(form))
 
@@ -37,3 +44,5 @@ trait CheckoutForm[T] {
     }
   }
 }
+
+object CheckoutForm extends Logging

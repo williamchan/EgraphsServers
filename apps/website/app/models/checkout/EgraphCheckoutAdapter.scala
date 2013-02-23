@@ -1,16 +1,15 @@
 package models.checkout
 
+import forms._
 import forms.ShippingAddress
 import services.AppConfig
 import services.db.HasTransientServices
 import models.{AccountStore, CustomerStore, Customer, Account}
 import com.google.inject.Inject
 import services.http.ServerSession
-import play.api.mvc.{RequestHeader}
+import play.api.mvc.{Request, RequestHeader}
 import services.ecommerce.CartFactory
 import controllers.api.checkout.CheckoutEndpoints._
-import scala.Some
-
 
 case class CheckoutAdapterServices @Inject() (
   accountStore: AccountStore,
@@ -66,6 +65,22 @@ case class EgraphCheckoutAdapter (
   def cache()(implicit request: RequestHeader) = {
     cart.setting("checkout" -> this).save()
     this
+  }
+
+  def formState(implicit request: Request[_]) = {
+    import play.api.libs.json._
+
+    def formJson(checkoutForm: CheckoutForm[_]) = {
+      checkoutForm.decache(this).map(form => Json.toJson(form.data))
+    }
+    Json.obj(
+      "egraph" -> formJson(EgraphForm),
+      "recipient" -> formJson(RecipientForm),
+      "buyer" -> formJson(BuyerForm),
+      "shippingAddress" -> formJson(ShippingAddressForm),
+      "payment" -> formJson(PaymentForm),
+      "coupon" -> formJson(CouponForm)
+    )
   }
 
   //
