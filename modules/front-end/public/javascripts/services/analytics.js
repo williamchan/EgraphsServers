@@ -10,7 +10,7 @@ function(window, logging, requireModule) {
 
   var googleEvent = function(args) {
     var gaqArguments = ["_trackEvent"].concat(args);
-    // log("Google Event: " + args);
+    log("Google Event: " + args);
     google.push(gaqArguments);
   };
 

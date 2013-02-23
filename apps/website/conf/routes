@@ -62,8 +62,8 @@ POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/coupon controlle
 GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/egraph controllers.ApiControllers.getCheckoutEgraph(sessionId: String, checkoutId: Long)
 POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/egraph controllers.ApiControllers.postCheckoutEgraph(sessionId: String, checkoutId: Long)
 
-GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/shippingAddress controllers.ApiControllers.getCheckoutShippingAddress(sessionId: String, checkoutId: Long)
-POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/shippingAddress controllers.ApiControllers.postCheckoutShippingAddress(sessionId: String, checkoutId: Long)
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/shipping-address controllers.ApiControllers.getCheckoutShippingAddress(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/shipping-address controllers.ApiControllers.postCheckoutShippingAddress(sessionId: String, checkoutId: Long)
 
 GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/payment controllers.ApiControllers.getCheckoutPayment(sessionId: String, checkoutId: Long)
 POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/payment controllers.ApiControllers.postCheckoutPayment(sessionId: String, checkoutId: Long)

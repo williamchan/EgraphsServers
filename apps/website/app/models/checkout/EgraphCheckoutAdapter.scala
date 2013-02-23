@@ -1,18 +1,14 @@
 package models.checkout
 
 import forms.ShippingAddress
-import forms.{ShippingAddress}
 import services.AppConfig
 import services.db.HasTransientServices
 import models.{AccountStore, CustomerStore, Customer, Account}
 import com.google.inject.Inject
-import services.http.{ServerSession, ServerSessionFactory}
+import services.http.ServerSession
 import play.api.mvc.{RequestHeader}
 import services.ecommerce.CartFactory
 import controllers.api.checkout.CheckoutEndpoints._
-import models.checkout.CheckoutAdapterServices
-import models.checkout.EgraphCheckoutAdapter
-import models.checkout.FreshCheckout
 import scala.Some
 
 
