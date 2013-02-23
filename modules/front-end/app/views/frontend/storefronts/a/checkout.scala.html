@@ -185,13 +185,14 @@
                 local-resource="recipient"
                 name="recipientForm"
                 class="ajax"
-                novalidate>
+                novalidate
+                ng-show="isGift">
             @withField("recipient", "email") { field =>
               <div class="control-group">
                 <label class="control-label" for="@field.id">
                   Recipient Email@requiredStar:
                   @tooltip("Why do you need this?") {
-                    <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit            
+                    When the egraph is made, an email will be sent to yourself and the gift recipient with information on how to view and hear it.
                   }
                 </label>
                 <div class="controls">
@@ -287,7 +288,7 @@
                   <select @field.identityAttributes
                           monitor-user-attention
                           resource-property
-                          ng-options="state[0] as state[0] for state in states"
+                          ng-options="state[1] as state[1] for state in states"
                           class="half" 
                           required />
                     <option value>State</option>
@@ -401,7 +402,7 @@
                 submit-completed="refreshCart()">
             @withField("payment", "postalCode") { field => 
               <div class="control-group">
-                <label class="control-label" for="@field.id">Zip@requiredStar:</label>
+                <label class="control-label" for="@field.id">Postal code@requiredStar:</label>
                 <div class="controls">
                   <input @field.identityAttributes class="half"  monitor-user-attention required resource-property>
                   @field.standardErrorDiv

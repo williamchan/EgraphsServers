@@ -56,8 +56,12 @@ function(mockBackend, logging, module, ngApp) {
     coupon: {},
     recipient: {},
     shippingAddress: {},
-    payment: {}
+    payment: {},
+    egraph: {
+      isGift: "false"
+    }
   };
+
   var digitalEgraphLineItem = function() {
     return {
       id: idSequence++,
@@ -182,6 +186,7 @@ function(mockBackend, logging, module, ngApp) {
   var configureDefaultCheckoutApi = function() {
     checkoutApiShouldReturn(checkout);
     stubApi(/coupon/, 'coupon');
+    stubApi(/egraph/, 'egraph');
     stubApi(/recipient/, 'recipient');
     stubApi(/buyer/, 'buyer');
     stubApi(/shipping-address/, 'shippingAddress');
@@ -257,6 +262,18 @@ function(mockBackend, logging, module, ngApp) {
         checkout._addProduct(framedPrintLineItem());
 
         populateForms();
+        configureDefaultCheckoutApi();
+      }
+    },
+
+    "gift-recipient": {
+      bootstrap: function() {
+        checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
+
+        mockApi.egraph = {
+          isGift: "true"
+        };
         configureDefaultCheckoutApi();
       }
     },

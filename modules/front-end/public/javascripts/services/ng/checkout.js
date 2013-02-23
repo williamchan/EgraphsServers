@@ -31,6 +31,10 @@ function(page, ngApp, logging, module) {
             return $http.get(baseUrl);
           },
 
+          egraph: function() {
+            return $http.get(baseUrl + "/egraph");
+          },
+
           transact: function() {
             return $http.post(baseUrl);
           }

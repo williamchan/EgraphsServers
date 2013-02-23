@@ -33,6 +33,10 @@ function(page, tooltip, window, analytics, logging, requireModule) {
           analyticsCategory: "Checkout"
         });
 
+        cartApi.egraph().success(function(egraph) {
+          $scope.isGift = egraph.isGift === "true";
+        });
+
         /** Toggles visibility of the discount redeeming widget */
         $scope.toggleCodeRedeemerVisibility = function() {
           $scope.codeRedeemerVisible = !$scope.codeRedeemerVisible;
@@ -96,9 +100,12 @@ function(page, tooltip, window, analytics, logging, requireModule) {
         /** Returns all forms that are relevant to the user given current cart state */
         $scope.forms = function() {
           var forms = [
-            $scope.recipientForm,
             $scope.buyerForm
           ];
+
+          if ($scope.isGift) {
+            forms.push($scope.recipientForm);
+          }
 
           if ($scope.codeRedeemerVisible) {
             forms.push($scope.couponForm);
