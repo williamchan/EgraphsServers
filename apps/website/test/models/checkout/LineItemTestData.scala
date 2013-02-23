@@ -38,13 +38,13 @@ object LineItemTestData {
 
   def taxItemOn(subtotal: SubtotalLineItem): TaxLineItem = randomTaxType.lineItems(Seq(subtotal), Nil).get.head
   def randomTaxItem: TaxLineItem = taxItemOn(randomSubtotalItem)
-  def randomTaxType: TaxLineItemType = TaxLineItemType("98888", randomTaxRate, Some("Test tax"))
+  def randomTaxType: TaxLineItemType = TaxLineItemType(zipcode, randomTaxRate, Some("Test tax"))
 
   def randomSubtotalItem: SubtotalLineItem = SubtotalLineItem(randomMoney)
   def randomTotalItem = TotalLineItem(randomMoney)
   def randomBalanceItem = BalanceLineItem(randomMoney)
 
-  def randomCashTransactionType = CashTransactionLineItemType.createOptional(Some(stripePayment.testToken().id), zipcode)
+  def randomCashTransactionType = CashTransactionLineItemType.create(stripePayment.testToken().id, zipcode)
   def randomCashTransactionItem = {
     val services = AppConfig.instance[CashTransactionLineItemServices].copy(payment = yesMaamPayment)
     randomCashTransactionType.lineItems(Seq(randomBalanceItem)).get.head.copy(_services = services)
@@ -67,5 +67,5 @@ object LineItemTestData {
     val pment = AppConfig.instance[T]; pment.bootstrap(); pment
   }
 
-  protected def zipcode = Some("98888")
+  protected def zipcode = "98888"
 }

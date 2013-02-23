@@ -139,7 +139,6 @@ case class EgraphCheckoutAdapter (
   /** generate a Checkout without saving any Customers or Accounts */
   protected def previewCheckout = {
     val types: Seq[LineItemType[_]] = Seq(order, coupon).flatten
-    println("Types are -- " + types.map(_.codeType))
     val zipcode = payment.flatMap(_.billingPostalCode)
     val address = shippingAddress.map(_.address)
     val recipientAccount = recipient map (_.account)

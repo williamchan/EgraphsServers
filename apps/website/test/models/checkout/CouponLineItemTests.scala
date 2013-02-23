@@ -50,7 +50,7 @@ class CouponLineItemTests extends EgraphsUnitTest
       case Unlimited => coupon.isActive
       case Prepaid => coupon.discountAmount < newItemType.coupon.discountAmount
       case OneUse => !coupon.isActive
-      case unknown => throw new IllegalStateException(s"What is a $unknown")
+      case unknown => throw new IllegalStateException(s"What is a ${unknown}?")
     }
   }
 
@@ -62,14 +62,11 @@ class CouponLineItemTests extends EgraphsUnitTest
   //
   override lazy val scenarios = Seq(
     orderAndCouponScenario,
-    orderThenCouponScenario
+    orderAndCouponThenGiftCertScenario
   )
 
   def orderAndCouponScenario = CheckoutScenario(orderAndCouponSeq)
-  def orderThenCouponScenario = {
-    val (order, coupon) = orderAndCoupon
-    CheckoutScenario(Seq(order), Seq(coupon))
-  }
+  def orderAndCouponThenGiftCertScenario = CheckoutScenario(orderAndCouponSeq, Seq(randomGiftCertificateType))
 
   def orderAndCoupon = {
     val product = newSavedProduct()

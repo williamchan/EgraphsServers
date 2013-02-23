@@ -41,7 +41,7 @@ class CheckoutFormTests extends EgraphsUnitTest with DateShouldMatchers with DBT
     val boundForm = bindToForm(CouponForm)(CouponForm.FormKeys.couponCode -> coupon.code)
 
     boundForm should not have errors
-    boundForm.value match {
+    boundForm.value.flatten match {
       case Some(CouponLineItemType(_, coupon, _)) =>
       case _ => fail(boundForm.value + "did not have coupon: " + coupon)
     }

@@ -86,7 +86,7 @@ case class EgraphOrderLineItem(
   /** saves the order and optionally the print order if chosen */
   private def withSavedOrder(checkout: Checkout): EgraphOrderLineItem = {
     def savedPrintOrder(forOrder: Order) = {
-      val printItem: Option[models.checkout.PrintOrderLineItem] = PrintOrderLineItemType(forOrder).lineItems().toSeq.flatten.headOption
+      val printItem: Option[PrintOrderLineItem] = PrintOrderLineItemType(forOrder).lineItems().toSeq.flatten.headOption
       printItem map { item => item.transactAsSubItem(checkout) }
     }
 
@@ -96,7 +96,8 @@ case class EgraphOrderLineItem(
     val savedOrder = domainObject.copy(
       lineItemId = Some(id),
       buyerId = buyerId,
-      recipientId = recipientId
+      recipientId = recipientId,
+      amountPaidInCurrency = this.amount.getAmount
     ).withPaymentStatus(PaymentStatus.Charged).save()
 
     /**

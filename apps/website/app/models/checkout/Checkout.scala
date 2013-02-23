@@ -111,7 +111,6 @@ abstract class Checkout
       }
     }
 
-    println("Before json, items are -- " + lineItems.map(_.codeType))
     Json.toJson {
       LineItemNature.values map { nature =>
         (nature.name.toLowerCase, itemsToJson(lineItems(nature)))
@@ -226,10 +225,11 @@ abstract class Checkout
           val otherTypes = merge(prevAttempted, unattempted)
           val itemsFromCurrent = current.lineItems(prevResolved, otherTypes)
 
-          val resolvedNow = itemsFromCurrent.getOrElse(Nil) ++ prevResolved
-          val attemptedNow =
-            if (itemsFromCurrent isDefined) prevAttempted
-            else current +: prevAttempted.toSeq
+          val resolvedNow = itemsFromCurrent.toSeq.flatten ++ prevResolved
+          val attemptedNow = itemsFromCurrent match {
+            case Some(_) => prevAttempted
+            case None => current +: prevAttempted.toSeq
+          }
 
           unattempted match {
             case next :: rest => iterate(prevResolved = resolvedNow)(

@@ -51,6 +51,8 @@ case class PersistedCheckout(
   override lazy val pendingItems: LineItems = {
     // resolve added types against existing items, then filter out _lineItems
     val addedTypes = _addedTypes.toSet
+
+    // TODO: coupons currently don't work on `PersistedCheckout`s because they need a subtotal to be applied against
     val addedItems = resolveTypes(_addedTypes, _lineItems) filter (addedTypes contains _.itemType)
 
     // temp summaries needed for some types to resolve...
