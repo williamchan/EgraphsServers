@@ -1,8 +1,10 @@
 package services.mvc
 
 import models._
+import checkout.Checkout
 import com.google.inject.Inject
 import controllers.routes.WebsiteControllers.getFAQ
+import enums.CheckoutCodeType
 import frontend.storefront.OrderCompleteViewModel
 import org.joda.money.{CurrencyUnit, Money}
 import services.config.ConfigFileProxy
@@ -35,6 +37,29 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       cashTransaction,
       maybePrintOrder
     )
+  }
+
+  def fromEgraphPurchaseCheckout(checkout: Checkout): Option[OrderCompleteViewModel] = {
+    import models.checkout.checkout.Conversions._
+    import CheckoutCodeType._
+
+    for ( orderItem <- checkout.lineItems(EgraphOrder).headOption) yield {
+      val order = orderItem.domainObject
+      val product = order.product
+      val buyer = checkout.buyerCustomer
+
+      this.fromModels(
+        celebrity = product.celebrity,
+        product = product,
+        buyer = buyer,
+        buyerAccount = buyer.account,
+        recipientAccount = order.recipient.account,
+        order = order,
+        inventoryBatch = order.inventoryBatch,
+        cashTransaction = checkout.lineItems(CashTransaction).headOption map (_.domainObject),
+        maybePrintOrder = checkout.lineItems(PrintOrder).headOption map (_.domainObject)
+      )
+    }
   }
 
   //
