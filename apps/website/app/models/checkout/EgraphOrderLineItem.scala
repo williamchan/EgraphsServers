@@ -44,8 +44,8 @@ case class EgraphOrderLineItem(
     val product = domainObject.product
     val imageUrl = product.celebrity.profilePhoto.getSaved(AccessPolicy.Public).url
     val thisJson = jsonify(product.name, product.description, Some(id), Some(imageUrl))
-    val printOrderJson = printOrderItem map (_.toJson)
-    Json.toJson(printOrderJson.toSeq ++ Seq(thisJson))
+    val printOrderJson = printOrderItem map (_.toJsonAsSubItem)
+    Json.toJson(Seq(thisJson) ++ printOrderJson.toSeq)
   }
 
   override def domainObject: Order = (orderFromType orElse orderFromDb) getOrElse (throw new IllegalArgumentException("Order required."))
@@ -116,9 +116,9 @@ case class EgraphOrderLineItem(
 // Companion
 //
 object EgraphOrderLineItem {
-  def apply(itemType: EgraphOrderLineItemType, amount: Money) = {
+  def create(itemType: EgraphOrderLineItemType, amount: Money, printItem: Option[PrintOrderLineItem] = None) = {
     val entity = LineItemEntity(_itemTypeId = itemType.id).withAmount(amount)
-    new EgraphOrderLineItem( entity, Some(itemType) )
+    new EgraphOrderLineItem( entity, Some(itemType), printItem )
   }
 
   def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = new EgraphOrderLineItem(entity)

@@ -12,9 +12,9 @@ import scala.Some
 
 class CheckoutFormTests extends EgraphsUnitTest with DateShouldMatchers with DBTransactionPerTest {
 
-  "EmailForm" should "bind to an AccountEmail" in {
+  "EmailForms" should "bind to email strings" in {
     val email = "jj420@heyhey.biz"
-    val boundForm = bindToForm(EmailForm)(EmailForm.FormKeys.emailKey -> email)
+    val boundForm = bindToForm(BuyerForm)(BuyerForm.FormKeys.emailKey -> email)
 
     boundForm should not have errors
     boundForm should haveValue(email)

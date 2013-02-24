@@ -30,12 +30,6 @@ case class PrintOrderLineItem(
   //
   override def itemType = (_type orElse typeFromOrder) getOrElse (throw new ItemTypeNotFoundException("PrintOrderLineItemType"))
   override def domainObject = (_printOrder orElse printOrderFromDb) getOrElse (throw new DomainObjectNotFoundException("PrintOrder"))
-  override def toJson = jsonify(
-    name = "High quality print",
-    description = "Framed print of digital egraph",
-    id = Some(id),
-    imageUrl = Some("/assets/images/framed-print.png")
-  )
 
 
   //
@@ -49,6 +43,13 @@ case class PrintOrderLineItem(
       savedItem.withSavedPrintOrder(checkout)
     }
   }
+
+  override def toJsonAsSubItem = jsonify(
+    name = "High quality print",
+    description = "Framed print of digital egraph",
+    id = Some(id),
+    imageUrl = Some("/assets/images/framed-print.png")
+  )
 
 
   //

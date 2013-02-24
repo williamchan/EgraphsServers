@@ -67,8 +67,8 @@ case class EgraphOrderLineItemType(
   override def id = _entity.id
 
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some {
-    val print: LineItems = if (!framedPrint) Nil else PrintOrderLineItemType(order).lineItems().getOrElse(Nil)
-    Seq( EgraphOrderLineItem(this, price) ) ++ print
+    val print = if (!framedPrint) None else PrintOrderLineItemType(order).lineItems().flatMap(_.headOption)
+    Seq( EgraphOrderLineItem.create(this, price, print) ) ++ print.toSeq
   }
 
   //
