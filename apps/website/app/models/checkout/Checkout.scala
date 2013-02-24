@@ -138,9 +138,9 @@ abstract class Checkout
       val savedCheckout = this.save()
 
       // resolve transaction item and make charge (or return error)
-      val txnItem = resolveCashTransaction(txnType) match {
-        case Some(item) => Some( item.makeCharge(savedCheckout) )
-        case _ => return Left{ CheckoutFailedCashTransactionResolutionError(this, txnType) }
+      val txnItem = savedCheckout.resolveCashTransactionAndCharge(txnType) match {
+        case Right(txnItem) => txnItem
+        case Left(failure) => return Left(failure)
       }
 
       /**
@@ -277,13 +277,21 @@ abstract class Checkout
   //
   // helpers
   //
-  /** get the line item of the given `CashTransactionLineItemType` as applied to this checkout */
-  private def resolveCashTransaction(maybeTxnType: Option[CashTransactionLineItemType]): Option[CashTransactionLineItem] = {
-    for (
+  /** get the line item of the given `CashTransactionLineItemType` as applied to this checkout and charge it */
+  private def resolveCashTransactionAndCharge(maybeTxnType: Option[CashTransactionLineItemType])
+  : Either[CheckoutFailed, Option[CashTransactionLineItem]] =
+  {
+    val txnItem = for (
       txnType <- maybeTxnType;
       txnItems <- txnType.lineItems(Seq(balance));
       txnItem <- txnItems.headOption
     ) yield txnItem
+
+    (txnItem, balance.amount.isZero) match {
+      case (Some(item), false) => Right { Some(item.makeCharge(this)) }
+      case (None, false) => Left{ CheckoutFailedCashTransactionResolutionError(this, maybeTxnType) }
+      case (_, true)  => Right(None)
+    }
   }
 
   /**
