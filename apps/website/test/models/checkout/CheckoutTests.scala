@@ -49,19 +49,7 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Checkout Tests
   //
-  "A checkout" should "add taxes for taxed zipcodes" in eachScenario { implicit scenario =>
-    val untaxedCheckout = initialCheckout.withZipcode(untaxedZip)
-    val taxedCheckout = initialCheckout.withZipcode(taxedZip)
-    val untaxedRestored = untaxedCheckout.restored
-    val taxedRestored = taxedCheckout.restored
-
-    untaxedCheckout.taxes should be (Nil)
-    untaxedRestored.taxes should be (Nil)
-    taxedCheckout.taxes should not be (Nil)
-    taxedRestored.taxes should not be (Nil)
-  }
-
-  it should "not have duplicate summaries" in eachScenario { implicit scenario =>
+  "A checkout" should "not have duplicate summaries" in eachScenario { implicit scenario =>
     val taxedCheckout = initialCheckout.withZipcode(taxedZip)
     val taxedRestored = taxedCheckout.restored
     val untaxedCheckout = initialCheckout.withZipcode(untaxedZip)
@@ -76,6 +64,18 @@ class CheckoutTests extends EgraphsUnitTest
     untaxedRestored should notHaveDuplicateSummaries
     checkoutWithoutZip should notHaveDuplicateSummaries
     withoutZipRestored should notHaveDuplicateSummaries
+  }
+
+  ignore should "add taxes for taxed zipcodes" in eachScenario { implicit scenario =>
+    val untaxedCheckout = initialCheckout.withZipcode(untaxedZip)
+    val taxedCheckout = initialCheckout.withZipcode(taxedZip)
+    val untaxedRestored = untaxedCheckout.restored
+    val taxedRestored = taxedCheckout.restored
+
+    untaxedCheckout.taxes should be (Nil)
+    untaxedRestored.taxes should be (Nil)
+    taxedCheckout.taxes should not be (Nil)
+    taxedRestored.taxes should not be (Nil)
   }
 
   it should "be previewable without a buyer Account" in {

@@ -83,15 +83,14 @@ abstract class Checkout
    * Needed to update things like taxes and fees, which are dependent on individual elements, when
    * adding new elements (ex: refunding taxes or including taxes on checkout edits).
    */
-  protected lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
-    // TODO(refunds): will probably want to add the refund transaction here
-    // TODO(fees): will want to add any fees we charge here
-
-    // TODO(taxes): remove the if to enable adding taxes based on billing zipcode
-    if (services.config.applicationMode != "dev") Nil else {
-      TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
-    }
-  }
+  protected lazy val _derivedTypes: LineItemTypes = Nil
+//  if (!_dirty) { Nil } else {
+//    // TODO(refunds): will probably want to add the refund transaction here
+//    // TODO(fees): will want to add any fees we charge here
+//
+//    // TODO(taxes): remove the if to enable adding taxes based on billing zipcode
+//    TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
+//  }
 
 
   //
