@@ -55,16 +55,16 @@ trait ImplicitHeaderAndFooterData {
       val url = getCustomerGalleryByUsername(customer.username).url
 
       HeaderLoggedIn(
-        name=customer.name,
-        username=customer.username,
-        profileUrl="",
-        accountSettingsUrl=getAccountSettings.url,
-        galleryUrl=url,
-        logoutUrl="/logout"  //TODO: this should be reverse routed
+        name = customer.name,
+        username = customer.username,
+        profileUrl = "",
+        accountSettingsUrl = getAccountSettings.url,
+        galleryUrl = url,
+        logoutUrl = controllers.routes.WebsiteControllers.getLogout.url
       )
     }
 
-    headerLoggedInOption.toRight(HeaderNotLoggedIn("/login"))
+    headerLoggedInOption.toRight(HeaderNotLoggedIn(controllers.routes.WebsiteControllers.getLogin(None).url))
   }
 
   private def getCustomerOption(session: Session): Option[Customer] = {

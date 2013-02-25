@@ -72,7 +72,12 @@
 
           <div class="clearfix">
             <div class="request-star-button">
-              <button id="request-star-logged-in-button" type="submit" class="button">
+              <span>
+                @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
+                  <input type="hidden" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
+                }
+              </span>
+              <button id="request-star-button" type="submit" class="button">
                 <strong><em>Request @query</em></strong>
                 <span>&raquo;</span>
               </button>

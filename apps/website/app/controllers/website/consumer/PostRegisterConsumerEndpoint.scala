@@ -83,7 +83,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
 
       form.bindFromRequest.fold(
         formWithErrors => {
-          Left(Redirect(controllers.routes.WebsiteControllers.getLogin).flashingFormData(formWithErrors))
+          Left(Redirect(controllers.routes.WebsiteControllers.getLogin(None)).flashingFormData(formWithErrors))
         }
         , validForm => {
           // The form validation already told us we can add this fella to the DB

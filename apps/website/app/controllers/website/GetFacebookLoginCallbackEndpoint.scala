@@ -91,7 +91,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
             ", error_reason = " + error_reason.getOrElse("") +
             ", error_description = " + error_description.getOrElse(""))
-          Redirect(controllers.routes.WebsiteControllers.getLogin)
+          Redirect(controllers.routes.WebsiteControllers.getLogin(None))
         }
       }
       Ok
@@ -100,7 +100,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 
   private def redirectAndLogError(fbUserInfo: JsValue): Result = {
     error("Facebook did not respond with expected user info format: " + Json.stringify(fbUserInfo))
-    Redirect(controllers.routes.WebsiteControllers.getLogin)
+    Redirect(controllers.routes.WebsiteControllers.getLogin(None))
   }
 
   /**

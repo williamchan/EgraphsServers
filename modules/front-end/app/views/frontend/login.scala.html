@@ -1,7 +1,8 @@
 @(loginForm: models.frontend.login_page.LoginFormViewModel,
   registrationForm: Form[models.frontend.login_page.RegisterConsumerViewModel],
   registrationActionUrl: String,
-  fbAuthUrl: String
+  fbAuthUrl: String,
+  maybeBannerMessage: Option[String]
 )(implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
@@ -25,6 +26,13 @@
 @headJs = {
   Egraphs.page.login = {
     registrationErrors: @registrationForm.hasErrors
+  }
+}
+
+@bannerMessage = @{
+  maybeBannerMessage match {
+    case Some(bannerMessage) => bannerMessage
+    case None => ""
   }
 }
 
@@ -89,5 +97,6 @@
   newOwnerTargetUrl=registrationActionUrl,
   fbHeader=fbHeader,
   fbContent=fbContent,
-  fbAuthUrl=fbAuthUrl
+  fbAuthUrl=fbAuthUrl,
+  bannerMessage = bannerMessage
 )

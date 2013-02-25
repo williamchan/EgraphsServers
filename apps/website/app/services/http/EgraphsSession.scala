@@ -3,6 +3,7 @@ package services.http
 import com.google.inject.Inject
 import services.Utils
 import play.api.mvc.Session
+import play.api.mvc.Call
 import egraphs.playutils.Enum
 import java.util.Date
 
@@ -50,6 +51,18 @@ case class EgraphsSession(session: Session) {
     session - Key.CustomerId.name
   }
 
+  def requestedStar: Option[String] = {
+    session.get(Key.RequestedStar.name)
+  }
+
+  def withRequestedStar(requestedStar: String): Session = {
+    session + (Key.RequestedStar.name -> requestedStar)
+  }
+
+  def removeRequestedStar: Session = {
+    session - Key.RequestedStar.name
+  }
+
   def withUsernameChanged: Session = {
     session + (Key.UsernameChanged.name -> true.toString)
   }
@@ -95,6 +108,7 @@ object EgraphsSession {
     val UsernameChanged = new EnumVal("username_changed") {}
     val HasSignedUp = new EnumVal("has_signed_up") {}
     val LastSignupModalDisplay = new EnumVal("last_signup_modal_display") {}
+    val RequestedStar = new EnumVal("requested_star") {}
   }
 
   object Conversions {

@@ -141,7 +141,7 @@ GET     /$orderId<[0-9]+>/embed                                     controllers.
 GET     /facebooklogin/callback                                     controllers.WebsiteControllers.getFacebookLoginCallback
 GET     /faq                                                        controllers.WebsiteControllers.getFAQ
 GET     /inside-an-egraph                                           controllers.WebsiteControllers.getInsideEgraph
-GET     /login                                                      controllers.WebsiteControllers.getLogin
+GET     /login                                                      controllers.WebsiteControllers.getLogin(maybeBannerMessage: Option[String])
 POST    /login                                                      controllers.WebsiteControllers.postLogin
 GET     /logout                                                     controllers.WebsiteControllers.getLogout
 POST    /logout                                                     controllers.WebsiteControllers.postLogout
