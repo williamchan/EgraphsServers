@@ -3,17 +3,13 @@ package utils
 import play.api.test._
 import play.api.test.Helpers._
 import utils.FunctionalTestUtils._
-import utils.FunctionalTestUtils.writeable
 import controllers.routes.WebsiteControllers.getLoginAdmin
 import services.db.{DBSession, TransactionSerializable}
 import models._
 import play.api.libs.Files.TemporaryFile
-import play.mvc.Http.HeaderNames
-import java.io.File
-import org.apache.commons.io.FileUtils
-import java.util.Date
-import play.api.mvc.MultipartFormData.FilePart
 import play.api.mvc.{MultipartFormData, Call}
+import play.api.mvc.Action
+import services.mvc.MultipartFormTestHelper
 
 abstract trait AdminProtectedResourceTestBase { this: EgraphsUnitTest =>
   protected def routeUnderTest: Call
@@ -37,38 +33,22 @@ trait AdminProtectedResourceTests extends AdminProtectedResourceTestBase { this:
   }
 }
 
-trait AdminProtectedMultipartFormResourceTests extends AdminProtectedResourceTestBase { this: EgraphsUnitTest =>
-  // TODO fix these tests when we figure out how to test mutlipart in play2.1
-  ignore should "fail due to lack of an admin id in the session" in new EgraphsTestApplication {
-    val Some(result) = route(request.withAuthToken)
+/**
+ * This trait works similarly to AdminProtectedResourceTests, except is designed to test multipart form submissions
+ */
+trait AdminProtectedMultipartFormResourceTests extends AdminProtectedResourceTestBase with MultipartFormTestHelper { this: EgraphsUnitTest =>
+
+  it should "fail due to lack of an admin id in the session" in new EgraphsTestApplication {
+    val result = controllerMethod(request.withAuthToken)
 
     status(result) should be (SEE_OTHER)
     headers(result)("Location") should be (getLoginAdmin.url)
   }
 
-  ignore should "not redirect to the login page session" in new EgraphsTestApplication {
-    val Some(result) = route(request.withAdmin(admin.id).withAuthToken)
+  it should "not redirect to the login page session" in new EgraphsTestApplication {
+    val result = controllerMethod(request.withAdmin(admin.id).withAuthToken)
     redirectLocation(result) should not be (Some(getLoginAdmin.url))
   }
 
-  private def request = {
-    val tempFile = File.createTempFile("afakefile", "txt")
-    FileUtils.writeStringToFile(tempFile, (new Date()).toString)
-    val filename = "test.txt"
-    val fakeImageFile = Seq(FilePart("testFile", filename, Some("text/plain"),
-      play.api.libs.Files.TemporaryFile(tempFile)))
-    val body = MultipartFormData[TemporaryFile](
-      Map("example" -> Seq("example")),
-      fakeImageFile,
-      badParts = Seq()
-    )
-    
-    FakeRequest(
-      POST,
-      routeUnderTest.url,
-      FakeHeaders(Seq(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))),
-      body
-    )
-  }
 }
 

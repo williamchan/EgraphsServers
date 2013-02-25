@@ -1,7 +1,7 @@
 package models.enums
 
 import egraphs.playutils.Enum
-import models.frontend.masthead.{InPageActionViewModel, SearchBoxViewModel, VideoPlayerViewModel, SimpleLinkViewModel}
+import models.frontend.masthead.{SearchBoxViewModel, VideoPlayerViewModel, SimpleLinkViewModel}
 
 /**
  * Enum for Call To Action options on the homepage.

@@ -22,16 +22,16 @@ import play.api.test.FakeHeaders
 import play.api.mvc.MultipartFormData.FilePart
 import scala.Some
 import models.Masthead
-import utils.FunctionalTestUtils.writeable
 
 
-class PostMastheadAdminEndpointTests extends EgraphsUnitTest with AdminProtectedMultipartFormResourceTests {
+class PostMastheadAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedMultipartFormResourceTests with AdminProtectedMultipartFormResourceTests {
   protected def routeUnderTest = postMastheadAdmin
   protected def db = AppConfig.instance[DBSession]
+  protected def controllerMethod = controllers.WebsiteControllers.postMastheadAdmin
 
   def mastheadStore = AppConfig.instance[MastheadStore]
-  // TODO fix these tests when we figure out how to test mutlipart in play2.1
-  ignore should "reject empty headlines" in new EgraphsTestApplication {
+
+  postMastheadAdmin.url should "reject empty headlines" in new EgraphsTestApplication {
     val mastheadId = newMastheadId
     db.connected(TransactionSerializable) {
       val Some(result) = performRequest(mastheadId = mastheadId.toString, headline = "", adminId = admin.id)
@@ -40,17 +40,18 @@ class PostMastheadAdminEndpointTests extends EgraphsUnitTest with AdminProtected
     }
   }
 
-  ignore should "accept a complete request" in new EgraphsTestApplication {
+  it should "accept a complete request" in new EgraphsTestApplication {
     val mastheadId = newMastheadId
+    val headline =  TestData.generateFullname()
     db.connected(TransactionSerializable) {
-      val Some(result) = performRequest(mastheadId = mastheadId.toString, adminId = admin.id)
+      val Some(result) = performRequest(mastheadId = mastheadId.toString, headline = headline, adminId = admin.id)
 
       status(result) should be(SEE_OTHER)
       redirectLocation(result) should be (Some(getMastheadAdmin(mastheadId).url))
 
       val newMasthead = mastheadStore.get(mastheadId)
 
-      newMasthead.headline should be("a headline")
+      newMasthead.headline should be(headline)
     }
   }
 
@@ -62,8 +63,8 @@ class PostMastheadAdminEndpointTests extends EgraphsUnitTest with AdminProtected
 
     val tempFile = File.createTempFile("afakefile", "txt")
     FileUtils.writeStringToFile(tempFile, (new Date()).toString)
-    val filename = "test.txt"
-    val fakeImageFile = Seq(FilePart("testFile", filename, Some("text/plain"),
+
+    val fakeImageFile = Seq(FilePart("testFile", "text.txt", Some("text/plain"),
       play.api.libs.Files.TemporaryFile(tempFile)))
 
     val body = MultipartFormData[TemporaryFile](
@@ -79,12 +80,12 @@ class PostMastheadAdminEndpointTests extends EgraphsUnitTest with AdminProtected
       fakeImageFile,
       badParts = Seq())
 
-    route(
-      FakeRequest(POST,
+     Some(controllers.WebsiteControllers.postMastheadAdmin(
+       FakeRequest(POST,
         postMastheadAdmin().url,
         FakeHeaders(Seq(HeaderNames.CONTENT_TYPE -> Seq("multipart/form-data"))),
         body = body
-      ).withAuthToken.withAdmin(adminId))
+      ).withAuthToken.withAdmin(adminId)))
   }
 
   private def newMastheadId : Long = {
