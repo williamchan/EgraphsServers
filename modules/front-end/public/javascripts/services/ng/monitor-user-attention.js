@@ -13,10 +13,12 @@
 define(
 [
   "ngApp",
+  "services/analytics",
+  "window",
   "services/logging",
   "module"
 ],
-function(ngApp, logging, module) {
+function(ngApp, analytics, window, logging, module) {
   var log = logging.namespace(module.id);
   var forEach = angular.forEach;
 
@@ -46,13 +48,27 @@ function(ngApp, logging, module) {
       link: function(scope, element, attrs, requisites) {
         var inputControl = requisites[0];
         var userAttention = requisites[1];
+        var analyticsCategory = scope.$parent.analyticsCategory?
+          scope.$parent.analyticsCategory:
+          window.location.href;
+        var events = analytics.eventCategory(analyticsCategory);
 
         inputControl.userAttention = userAttention;
 
-        element.bind('blur', function() {
-          scope.$apply(function() {
-            userAttention.setAttended(true);
-          });
+        element.focus(function() {
+          var durationEvent = events.startEvent(["Control focus removed", attrs.ngModel]);
+          var onBlur = function() {
+            scope.$apply(function() {
+              userAttention.setAttended(true);
+            });
+
+            element.unbind('blur', onBlur);
+            durationEvent.track();
+          };
+
+          events.track(["Control focused", attrs.ngModel]);
+
+          element.bind('blur', onBlur);
         });
 
         userAttention.listeners.push(function() {

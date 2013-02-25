@@ -18,14 +18,6 @@ trait HasCreatedUpdated {
   def created: Timestamp
 
   def updated: Timestamp
-
-  /**Renders the created and updated fields as a Map for use in the API */
-  def renderCreatedUpdatedForApi: Seq[(String, JsValueWrapper)] = {
-    Seq(
-      "created" -> Time.toApiFormat(created),
-      "updated" -> Time.toApiFormat(updated)
-    )
-  }
 }
 
 /**
@@ -36,12 +28,6 @@ trait HasCreatedUpdated {
  */
 trait SavesCreatedUpdated[T <: KeyedCaseClass[_] with HasCreatedUpdated] {
   this: InsertAndUpdateHooks[T] =>
-
-  def withCreatedUpdatedFromJson(toUpdate: T, json: JsValue): T = {
-    val created = Time.fromApiFormat((json \ "created").as[String])
-    val updated = Time.fromApiFormat((json \ "updated").as[String])
-    withCreatedUpdated(toUpdate, created, updated)
-  }
 
   //
   // Abstract members

@@ -3,6 +3,7 @@
 define([
   "page",
   "libs/tooltip",
+  "services/analytics",
   "window",
   "services/logging",
   "module",
@@ -11,11 +12,12 @@ define([
   "services/ng/angular-strap",
   "services/ng/thumbnail-selector"
 ],
-function(page, tooltip, window, logging, requireModule) {
+function(page, tooltip, analytics, window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
   var extend = angular.extend;
   var forEach = angular.forEach;
   var celebId = page.celebId;
+  var events = analytics.eventCategory("Personalize");
 
   return {
     ngControllers: {
@@ -31,6 +33,7 @@ function(page, tooltip, window, logging, requireModule) {
           celebId: celebId,
           products: page.products,
           cartApi: cartApi,
+          analyticsCategory: "Personalize",
           egraph: {
             isGift: "false",
             framedPrint: "false"
@@ -83,9 +86,13 @@ function(page, tooltip, window, logging, requireModule) {
 
     go: function() {
       $(document).ready(function() {
-        tooltip.apply();
+        tooltip.apply({analyticsCategory: "Personalize"});
+
+        $("button").click(function(event) {
+          var target = $(this);
+          events.track(["Button pressed", target.text().trim()]);
+        });
       });
-      log("All systems are go.");
     }
 
   };

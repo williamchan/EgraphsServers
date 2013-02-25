@@ -33,7 +33,7 @@ object MoneyFormatting {
   object Conversions {
 
     /**
-     * Pimped version of [[org.joda.cash.Money]].
+     * Pimped version of [[org.joda.money.Money]].
      */
     case class RichMoney(money: Money) {
 
@@ -65,7 +65,7 @@ object MoneyFormatting {
     }
 
     /**
-     * Provides explicit methods to translate `BigDecimals` into [[org.joda.cash.Money]]
+     * Provides explicit methods to translate `BigDecimals` into [[org.joda.money.Money]]
      */
     case class FinanceBigDecimal(bigDecimal: BigDecimal) {
       def toMoney(currency: CurrencyUnit = CurrencyUnit.USD): Money = {

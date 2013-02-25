@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.{TimeZone, Date}
 import java.text.{DateFormat, SimpleDateFormat}
 import org.joda.time.{DateTimeConstants, DateMidnight, DateTime}
+import play.api.libs.json._
 
 /**
  * Convenience methods for dealing with time
@@ -75,6 +76,22 @@ object Time {
    */
   def fromApiFormat(dateString: String): Timestamp = {
     new Timestamp(apiDateFormat.parse(dateString).getTime)
+  }
+
+  /**
+   * This will let you more easily write Dates to your json objects
+   * using the api formatting.
+   */
+  implicit object ApiDateFormat extends Format[Timestamp] {
+    def writes(timestamp: Timestamp): JsValue = {
+      JsString(toApiFormat(timestamp))
+    }
+
+    def reads(json: JsValue): JsResult[Timestamp] = {
+      JsSuccess {
+        Time.fromApiFormat(json.as[String])
+      }
+    }
   }
 
   /**

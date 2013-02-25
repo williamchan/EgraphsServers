@@ -85,24 +85,10 @@ class ProductTests extends EgraphsUnitTest
   "toJson" should "serialize the correctly for the API" in new EgraphsTestApplication {
     val product = TestData.newSavedProduct().copy(name = "Herp Derp", signingOriginX = 50, signingOriginY = 60).save()
 
-    val json = Json.toJson(product)
-    val productFromJson = json.as[Product]
+    val json = Json.toJson(JsProduct.from(product))
+    val productFromJson = json.as[JsProduct]
 
-    productFromJson.id should be (product.id)
-    productFromJson.signingScaleW should be (product.signingScaleW)
-    productFromJson.signingScaleH should be (product.signingScaleH)
-    productFromJson.signingOriginX should be (product.signingOriginX)
-    productFromJson.signingOriginY should be (product.signingOriginY)
-    productFromJson.signingAreaW should be (product.signingAreaW)
-    productFromJson.signingAreaH should be (product.signingAreaH)
-    productFromJson.created.getTime should be (product.created.getTime)
-    productFromJson.updated.getTime should be (product.updated.getTime)
-
-    // fields not read from json to an Order, because they are derived.
-    val iPadSigningPhotoUrl: String = product.photo.resizedWidth(product.signingScaleW).url
-    (json \ "urlSlug").as[String] should be("Herp-Derp")
-    (json \ "photoUrl").as[String] should be(iPadSigningPhotoUrl)
-    (json \ "iPadSigningPhotoUrl").as[String] should be(iPadSigningPhotoUrl)
+    productFromJson should be (JsProduct.from(product))
   }
 
   "findByCelebrityAndUrlSlug" should "return Product with matching name and celebrityId" in new EgraphsTestApplication {

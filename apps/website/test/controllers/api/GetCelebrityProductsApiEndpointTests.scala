@@ -10,6 +10,7 @@ import utils.TestData
 import services.AppConfig
 import services.db.TransactionSerializable
 import models.Product
+import models.JsProduct
 
 class GetCelebrityProductsApiEndpointTests 
   extends EgraphsUnitTest 
@@ -38,7 +39,7 @@ class GetCelebrityProductsApiEndpointTests
     status(result) should be (OK)
 
     val json = Json.parse(contentAsString(result))
-    val jsonProducts = json.asInstanceOf[JsArray].value
-    (jsonProducts.head.as[Product]).id should be (product.id)
+    val jsonProducts = json.as[JsArray].value
+    (jsonProducts.head.as[JsProduct]).id should be (product.id)
   }
 }

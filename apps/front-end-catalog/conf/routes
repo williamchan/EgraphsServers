@@ -46,7 +46,7 @@ GET     /ChoosePhoto/withRecentEgraphs                            controllers.Ch
 
 GET     /Complete/index                                           controllers.Complete.index
 
-GET     /Egraph/index                                             controllers.Egraph.egraph()
+GET     /Egraph/index                                             controllers.Egraph.egraph(isPromotional: Boolean ?= false)
 GET     /Egraph/embed                                             controllers.Egraph.egraph_player_embed()
 GET     /Egraph/landscape                                         controllers.Egraph.classicLandscape(isPromotional: Boolean ?= false)
 GET     /Egraph/portrait                                          controllers.Egraph.classicPortrait(isPromotional: Boolean ?= false)
@@ -59,6 +59,11 @@ GET     /Email/resetPassword                                      controllers.Em
 GET     /Email/verify                                             controllers.Email.verify
 GET     /Email/viewEgraph                                         controllers.Email.viewEgraph
 GET     /Email/viewGiftEgraph                                     controllers.Email.viewGiftEgraph
+
+GET     /Error/badRequest                                         controllers.Error.badRequest
+GET     /Error/error                                              controllers.Error.error
+GET     /Error/forbidden                                          controllers.Error.forbidden
+GET     /Error/notFound                                           controllers.Error.notFound
 
 GET     /Failed/creditcard_error                                  controllers.Failed.creditcard_error
 GET     /Failed/no_inventory                                      controllers.Failed.no_inventory

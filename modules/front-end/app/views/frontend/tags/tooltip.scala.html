@@ -1,4 +1,4 @@
-@(text: String, classes: Seq[String]=Seq.empty[String])(body: => Html)
+@(text: String, classes: Seq[String]=Seq.empty[String], event: String="")(body: => Html)
 @** 
   Tooltip library adapted from http://osvaldas.info/elegant-css-and-jquery-tooltip-responsive-mobile-friendly 
 
@@ -8,4 +8,4 @@
     <strong>Hey Dummy</strong>, it's a tooltip of course!
   }
 *@
-<div class="tooltip-link @classes.mkString(" ")"><a title="@HtmlFormat.escape(body.body)" rel="tooltip">@text</a></div>
+<div class="tooltip-link @classes.mkString(" ")"><a title="@HtmlFormat.escape(body.body)" rel="tooltip" @if(event != ""){event="@event"}>@text</a></div>

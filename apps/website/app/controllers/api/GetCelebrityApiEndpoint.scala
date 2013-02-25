@@ -5,6 +5,7 @@ import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.http.ControllerMethod
 import services.http.filters.HttpFilters
+import models.JsCelebrity
 
 private[controllers] trait GetCelebrityApiEndpoint { this: Controller =>
   protected def controllerMethod: ControllerMethod
@@ -19,7 +20,7 @@ private[controllers] trait GetCelebrityApiEndpoint { this: Controller =>
     httpFilters.requireAuthenticatedAccount.inRequest() { account =>
       httpFilters.requireCelebrityId.inAccount(account) { celeb =>
         Action {
-          Ok(Json.toJson(celeb))
+          Ok(Json.toJson(JsCelebrity.from(celeb)))
         }
       }
     }

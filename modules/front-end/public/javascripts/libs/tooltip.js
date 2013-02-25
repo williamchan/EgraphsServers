@@ -1,18 +1,35 @@
 // Tooltip library adapted from http://osvaldas.info/elegant-css-and-jquery-tooltip-responsive-mobile-friendly
-define([], function() {
+/*global angular */
+define(
+[
+  "services/analytics",
+  "window"
+],
+function(analytics, window) {
+
   return {
-    apply: function(selector) {
-      selector = selector || '[rel~=tooltip]';
+    apply: function(config) {
+      var _config = angular.extend({
+        selector: '[rel~=tooltip]',
+        analyticsCategory: window.location.pathname
+      }, config);
+      var selector = _config.selector;
 
       var targets = $( selector ),
         target  = false,
         tooltip = false,
         title   = false,
+        tip     = false,
         openTooltip = function()
       {
+
         target  = $( this );
         tip   = target.attr( 'title' );
         tooltip = $( '<div id="tooltip"></div>' );
+        var analyticsEventName = target.attr("event")? target.attr("event"): target.html();
+        var durationEvent = _config.analyticsCategory?
+          analytics.eventCategory(_config.analyticsCategory).startEvent(["Tooltip", analyticsEventName]):
+          {track: angular.noop};
      
         if( !tip || tip == '' )
           return false;
@@ -71,6 +88,11 @@ define([], function() {
           });
      
           target.attr( 'title', tip );
+          
+          target.unbind('mouseleave', remove_tooltip);
+          tooltip.unbind('click', remove_tooltip);
+
+          durationEvent.track();
         };
      
         target.bind( 'mouseleave', remove_tooltip );

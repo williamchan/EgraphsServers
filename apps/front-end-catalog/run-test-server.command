@@ -25,7 +25,7 @@ COMPILE_LESS_EXTERNALLY=${COMPILE_LESS_EXTERNALLY:-$DEFAULT_COMPILE_LESS_EXTERNA
 printf "\e[0;32m"
 if [ "$COMPILE_LESS_EXTERNALLY" == "y" ]; then
   printf "The Play! server will not be compiling less files. Make your external tool compile to:\e[0;00m\n"
-  echo "  $SCRIPT_DIR/../../modules/frontend-2/target/scala-2.9.1/resource_managed/main/public/stylesheets/main.min.css"
+  echo "  $SCRIPT_DIR/../../modules/frontend-2/target/scala-2.10.0/resource_managed/main/public/stylesheets/main.min.css"
   LESS_COMPILE_SETTING='set (play.Project.lessEntryPoints in "front-end") := Seq()'
 else
   echo "The Play! server will be compiling less files. Be prepared for some wait times..."
@@ -38,4 +38,4 @@ echo "Launching the front-end test server. Hold tight..."
 # Move to the build root
 cd $SCRIPT_DIR/../..
 
-play2 "project front-end-catalog" "$LESS_COMPILE_SETTING" "run $PORT"
+play "project front-end-catalog" "$LESS_COMPILE_SETTING" "run $PORT"
