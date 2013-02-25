@@ -46,7 +46,10 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
               val maybeCelebrity = celebrityStore.findByPublicName(starName)
 
               maybeCelebrity match {
-                case None => play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
+                case None => {
+                  play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
+                  //addRequestedStarToDB(starName, customerId)
+                }
                 case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
               }
 

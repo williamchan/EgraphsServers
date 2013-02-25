@@ -3,6 +3,8 @@ package controllers.website
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.mvc.Results.Redirect
+import play.api.mvc.AnyContent
+import play.api.mvc.Request
 import controllers.WebsiteControllers
 import controllers.routes.WebsiteControllers.{getLogin, getCustomerGalleryById}
 import services.http.POSTControllerMethod
@@ -38,23 +40,23 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
                 request.session.withCustomerId(validForm.customerId).withHasSignedUp
               )
             }
-            case Some(requestedStar) => {
-
-              val customerId = validForm.customerId
-              val maybeCelebrity = celebrityStore.findByPublicName(requestedStar)
-
-              maybeCelebrity match {
-                case None => play.Logger.info(requestedStar + " is not currently on Egraphs. Wah wah.")
-                case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + requestedStar + "!")
-              }
-
-              play.Logger.info("starName is " + requestedStar + ", customerId is " + customerId)
-              Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
-                request.session.withCustomerId(validForm.customerId).withHasSignedUp.removeRequestedStar)
-            }
+            case Some(requestedStar) => completeRequestStar(requestedStar, validForm.customerId)
           }
         }
       }
     }
+  }
+
+  private def completeRequestStar(requestedStar: String, customerId: Long)(implicit request: Request[AnyContent]) = {
+    val maybeCelebrity = celebrityStore.findByPublicName(requestedStar)
+
+    maybeCelebrity match {
+      case None => play.Logger.info(requestedStar + " is not currently on Egraphs. Wah wah.")
+      case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + requestedStar + "!")
+    }
+
+    play.Logger.info("starName is " + requestedStar + ", customerId is " + customerId)
+    Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
+      request.session.withCustomerId(customerId).withHasSignedUp.removeRequestedStar)
   }
 }
