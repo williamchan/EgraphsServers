@@ -320,12 +320,13 @@ case class JsCelebrity(
   publicName: String,
   enrollmentStatus: String,
   urlSlug: String,
-  created: Date,
-  updated: Date
+  created: Timestamp,
+  updated: Timestamp
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrity extends Function6[Long, String, String, String, Date, Date, JsCelebrity] {
+object JsCelebrity extends Function6[Long, String, String, String, Timestamp, Timestamp, JsCelebrity] {
+  import services.Time.ApiDateFormat
   implicit val celebrityFormats = Json.format[JsCelebrity]
 
   def from(celebrity: Celebrity): JsCelebrity = {

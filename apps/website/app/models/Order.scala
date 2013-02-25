@@ -85,12 +85,13 @@ case class JsOrder(
   orderType: String, // Oops, this should be more accurately named writtenMessageType
   requestedMessage: Option[String],
   messageToCelebrity: Option[String],
-  created: Date,
-  updated: Date
+  created: Timestamp,
+  updated: Timestamp
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsOrder extends Function14[Long, JsProduct, Long, String, Long, String, BigDecimal, String, String, String, Option[String], Option[String], Date, Date, JsOrder] {
+object JsOrder extends Function14[Long, JsProduct, Long, String, Long, String, BigDecimal, String, String, String, Option[String], Option[String], Timestamp, Timestamp, JsOrder] {
+  import services.Time._
   implicit val orderFormats = Json.format[JsOrder]
 
   def from(order: Order): JsOrder = {
