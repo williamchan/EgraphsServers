@@ -12,22 +12,19 @@ import egraphs.playutils.ResultUtils.RichResult
 
 class SignupModal @Inject() {
 
-  private val displayFrequencyInMillis = 2 * DateTimeConstants.MILLIS_PER_WEEK
+  private val displayFrequencyInSeconds = 2 * DateTimeConstants.SECONDS_PER_WEEK
 
-  private def notDisplayedRecently(session: Session): Boolean = {
-    val maybeLastSignupModalDisplay = session.lastSignupModalDisplay
-    maybeLastSignupModalDisplay.map { lastDisplayed => 
-      val thresholdDate = new Date(System.currentTimeMillis - displayFrequencyInMillis)
-      lastDisplayed.before(thresholdDate)
-    }.getOrElse(true)
+  private def displayedRecently(cookies: Cookies): Boolean = {
+    val maybeLastSignupModalDisplay = cookies.get(SignupModalDisplayedRecently.name).map(cookie => java.lang.Boolean.valueOf(cookie.value).booleanValue)
+    
+    maybeLastSignupModalDisplay.getOrElse(false)
   }
 
   def shouldDisplay[A](implicit request: Request[A]): Boolean = {
     def loggedIn = request.session.customerId.isDefined
-    def signedUp = request.session.hasSignedUp
+    def signedUp = request.cookies.get(HasSignedUp.name).map(cookie => java.lang.Boolean.valueOf(cookie.value).booleanValue).getOrElse(false)
 
-    println(s"!hasSignedUp = ${!request.session.hasSignedUp}, !loggedIn = ${!loggedIn}, notDisplayedRecently = ${notDisplayedRecently(request.session)}")
-    !loggedIn && !signedUp && notDisplayedRecently(request.session)
+    !loggedIn && !signedUp && !displayedRecently(request.cookies)
   }
 
   def apply[A](parser: BodyParser[A] = parse.anyContent)(actionFactory: Boolean => Action[A]): Action[A] = {
@@ -35,7 +32,7 @@ class SignupModal @Inject() {
       val displayModal = shouldDisplay(request)
       val result = actionFactory(displayModal)(request)
       if (displayModal) {
-        result.addingToSession((LastSignupModalDisplay.name -> System.currentTimeMillis.toString))
+        result.withCookies(Cookie(SignupModalDisplayedRecently.name, true.toString, maxAge = Some(displayFrequencyInSeconds), secure = false))
       } else {
         result
       }
