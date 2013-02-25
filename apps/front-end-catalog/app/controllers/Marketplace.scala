@@ -2,7 +2,6 @@ package controllers
 
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import models.frontend.contents.Section
 import models.frontend.marketplace._
 import helpers.DefaultImplicitTemplateParameters
 import scala.util.Random
@@ -47,7 +46,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   def verticalSet: List[VerticalViewModel] = {
     List(
       VerticalViewModel(id = 1, urlSlug="major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = Some("images/icon-logo-mlb.png"), active = true, categoryViewModels = mlbCategories()),
-      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = Some("images/icon-logo-nba.png"), categoryViewModels = nbaCategories() )
+      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = Some("images/icon-logo-nba.png"), categoryViewModels = nbaCategories()),
+      VerticalViewModel(id = 3, urlSlug="racing", verticalName = "racing", publicName = "Racing", shortName = "Racing", categoryViewModels = racingCategories() )
     )
   }
 
@@ -72,23 +72,32 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         iconUrl = Some("images/icon-logo-nba.png"),
         tileUrl = Some("images/nba-stadium.jpg"),
         categoryViewModels = mlbCategories(Option(false))
+      ),
+      VerticalViewModel(id = 3,
+        altText = "Get an egraph from a racing star.",
+        urlSlug="racing",
+        verticalName = "racing",
+        publicName = "Racing",
+        shortName = "Racing",
+        categoryViewModels = racingCategories()
       )
     )
   }
 
-  def resultSet: ResultSetViewModel = {
+  private def resultSet: ResultSetViewModel = {
       ResultSetViewModel(subtitle = Option("Showing 36 Results"), celebrities = celebViewModels(36))
   }
 
-  def landingResults: List[ResultSetViewModel] = {
+  private def landingResults: List[ResultSetViewModel] = {
     List(
       ResultSetViewModel(subtitle = Option("Major League Baseball"), verticalUrl = Option("/major-league-baseball"), celebrities = celebViewModels(3)),
-      ResultSetViewModel(subtitle = Option("National Basketball Association"), verticalUrl = Option("/national-basketball-association"), celebrities = celebViewModels(3))
+      ResultSetViewModel(subtitle = Option("National Basketball Association"), verticalUrl = Option("/national-basketball-association"), celebrities = celebViewModels(3)),
+      ResultSetViewModel(subtitle = Option("Racing"), verticalUrl = Option("/racing"), celebrities = celebViewModels(2))
     )
   }
 
 
-  def celebViewModels(quantity: Int): Iterable[MarketplaceCelebrity] = {
+  private def celebViewModels(quantity: Int): Iterable[MarketplaceCelebrity] = {
     for (i <- 0.until(quantity)) yield {
       MarketplaceCelebrity(
         id = i,
@@ -102,7 +111,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     }
   }
 
-  def mlbCategories(active: Option[Boolean] = None): List[CategoryViewModel] = {
+  private def mlbCategories(active: Option[Boolean] = None): List[CategoryViewModel] = {
     List(
       CategoryViewModel(
         id = 1,
@@ -143,10 +152,10 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     )
   }
 
-  def nbaCategories(active: Option[Boolean] = None): List[CategoryViewModel] = {
+  private def nbaCategories(active: Option[Boolean] = None): List[CategoryViewModel] = {
     List(
       CategoryViewModel(
-        id = 3,
+        id = 2,
         publicName = "Team",
         categoryValues = List(
           CategoryValueViewModel(id = 2, publicName = "Boston Celtics", active = active.getOrElse(coinflip.nextBoolean)),
@@ -160,7 +169,19 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
     )
   }
 
-  def sortOptions: Iterable[SortOptionViewModel] = {
+  private def racingCategories(active: Option[Boolean] = None): List[CategoryViewModel] = {
+    List(
+      CategoryViewModel(
+        id = 3,
+        publicName = "League",
+        categoryValues = List(
+          CategoryValueViewModel(id = 8, publicName = "Nascar", active = active.getOrElse(coinflip.nextBoolean))
+        )
+      )
+    )
+  }
+
+  private def sortOptions: Iterable[SortOptionViewModel] = {
     for {
       sortingType <- CelebritySortingTypes.values
     } yield {

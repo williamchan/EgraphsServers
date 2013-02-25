@@ -44,7 +44,8 @@ class VerticalStore @Inject() (categoryStore: CategoryStore) {
           iconUrl = Some("images/icon-logo-mlb.png"), tileUrl = Some("images/mlb-stadium.jpg"), featuredQuery =Some("mlb-featured")))
         case "NBA" => Some(Vertical(categoryValue = cv, tileUrl = Some("images/nba-stadium.jpg"), shortName = "NBA", urlSlug = "national-basketball-association",
           iconUrl = Some("images/icon-logo-nba.png"), featuredQuery =Some("nba-featured")))
-        case "Racing" => Some(Vertical(categoryValue = cv, shortName = "Racing", urlSlug = "racing"))
+        case "Racing" => Some(Vertical(categoryValue = cv, shortName = "NBA", urlSlug = "racing",
+          featuredQuery =Some("racing-featured")))
         case _ => None // Don't shit a brick if someone inadvertently adds a vertical
       }
     }
