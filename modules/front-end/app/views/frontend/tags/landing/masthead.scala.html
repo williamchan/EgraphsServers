@@ -5,6 +5,8 @@
 @import models.frontend.masthead._
 
 @video(text: String, target: String) = {
+  <h1>@masthead.headline</h1>
+  <h2>@masthead.subtitle</h2>
   <p class="play-egraph">
     <a id="masthead-video-button" href="@target" class="button">
       <strong>@text<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
@@ -12,20 +14,36 @@
   </p>
 }
 
+@simpleLink(text: String, target: String) = {
+  <h1>@masthead.headline</h1>
+  <h2>@masthead.subtitle</h2>
+  <p class="play-egraph">
+    <a href="@target" class="button">
+      <strong>@text</strong> <span>&raquo;</span>
+    </a>
+  </p>
+}
+
+@search = {
+  <h1>@masthead.headline</h1>
+  @searchbox("/stars", helper=false)
+}
+
+
 <section class="masthead-home item @if(active){active}" role="banner" style="background-image: url('@masthead.landingPageImageUrl');">
   <div class="banner-gradient">
     <div class="container">
       <div class="row">
         <div class="span6 header-parent">
-        <h1>@masthead.headline</h1>
-        <h2>@masthead.subtitle</h2>
+
         @{
           masthead.callToActionViewModel match {
-            case v: VideoPlayerViewModel => video(target = v.target, text=v.text)
+            case v: VideoPlayerViewModel => video(text = v.text, target = v.target)
+            case l: SimpleLinkViewModel => simpleLink(text = l.text, target = l.target)
+            case s: SearchBoxViewModel => search
             case _ =>  video(target = "derp", text="schlerp")
           }
         }
-
         </div>
       </div>
     </div>

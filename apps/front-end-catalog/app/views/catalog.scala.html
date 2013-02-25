@@ -36,7 +36,9 @@
       @landingEntry(controllerName: String) = {
         @catalogEntry(href="Landing/" + controllerName, description=controllerName)
       }
-
+      @catalogEntry("Landing/video", "Video masthead")
+      @catalogEntry("Landing/searchbox", "Searchbox masthead")
+      @catalogEntry("Landing/link", "Simple link")
       @for(number <- 0 until 9) {
         @landingEntry("featuredStars?count=" + number)
       }

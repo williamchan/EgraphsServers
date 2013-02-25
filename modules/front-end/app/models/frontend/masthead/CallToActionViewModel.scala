@@ -8,4 +8,3 @@ sealed trait CallToActionViewModel {
 case class SimpleLinkViewModel(text: String, target: String) extends CallToActionViewModel
 case class VideoPlayerViewModel(text: String, target: String) extends CallToActionViewModel
 case class SearchBoxViewModel(text: String, target: String) extends CallToActionViewModel
-case class InPageActionViewModel(text: String, target: String) extends CallToActionViewModel
