@@ -7,9 +7,10 @@ import play.api.data.validation.Constraints._
 import play.api.data.validation.Constraint
 import play.api.data.validation.Valid
 import play.api.data.validation.Invalid
-import play.api.mvc.{Action, Controller, Result}
+import play.api.mvc._
 import play.api.mvc.Results.{Ok, Redirect}
 import services.http.{WithoutDBConnection, EgraphsSession, POSTControllerMethod}
+import services.http.EgraphsSession.Key._
 import models._
 import services.mvc.ImplicitHeaderAndFooterData
 import controllers.WebsiteControllers
@@ -25,6 +26,7 @@ import egraphs.playutils.FlashableForm._
 import models.frontend.login_page.RegisterConsumerViewModel
 import services.AppConfig
 import services.http.forms.FormConstraints
+import services.http.EgraphsSession
 
 /**
  * The POST target for creating a new account at egraphs.
@@ -67,8 +69,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
           request.session
             .withCustomerId(customer.id)
             .withUsernameChanged
-            .withHasSignedUp
-        )
+        ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
       }
 
       redirects.merge

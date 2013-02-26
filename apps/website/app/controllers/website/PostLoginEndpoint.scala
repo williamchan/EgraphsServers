@@ -1,13 +1,13 @@
 package controllers.website
 
-import play.api.mvc.Action
-import play.api.mvc.Controller
+import play.api.mvc._
 import play.api.mvc.Results.Redirect
 import controllers.WebsiteControllers
 import controllers.routes.WebsiteControllers.{getLogin, getCustomerGalleryById}
 import services.http.POSTControllerMethod
 import services.http.forms.CustomerLoginFormFactory
 import services.http.EgraphsSession
+import services.http.EgraphsSession.Key._
 import services.http.EgraphsSession.Conversions._
 import models._
 
@@ -30,8 +30,8 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
   
         case Right(validForm) =>          
           Redirect(getCustomerGalleryById(validForm.customerId)).withSession(
-            request.session.withCustomerId(validForm.customerId).withHasSignedUp
-          )
+            request.session.withCustomerId(validForm.customerId)
+          ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
       }
     }
   }
