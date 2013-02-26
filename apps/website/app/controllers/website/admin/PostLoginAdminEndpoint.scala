@@ -1,17 +1,12 @@
 package controllers.website.admin
 
 import play.api.mvc.{Action, Controller}
-import play.api.mvc.Results.{Ok, Redirect}
-import controllers.WebsiteControllers
-import models.{Administrator, AdministratorStore}
-import services.http.{EgraphsSession, POSTControllerMethod}
+import models.AdministratorStore
+import services.http.POSTControllerMethod
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
-import play.api.data.validation.Constraint
-import play.api.data.validation.Valid
-import play.api.data.validation.Invalid
-import services.http.EgraphsSession._
+import play.api.data.validation.{Constraint, Invalid, Valid}
 import services.http.EgraphsSession.Conversions._
 
 private[controllers] trait PostLoginAdminEndpoint {

@@ -1,14 +1,14 @@
 @(inventoryBatches: Iterable[models.InventoryBatch],
   celebrity: models.Celebrity,
   inventoryRemaining: Int
-)(implicit paginationInfo: controllers.PaginationInfo,
+)(implicit paginationInfo: models.frontend.PaginationInfo,
   authToken: egraphs.authtoken.AuthenticityToken,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
 
 @import controllers.WebsiteControllers
 @import views.html.Application.content_base
-@import views.html.Application.tags.pagination
+@import views.html.frontend.tags.pagination
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
 @import views.html.frontend.base_template

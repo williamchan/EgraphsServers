@@ -1,15 +1,7 @@
 package controllers
 
 import services.Utils
-
-case class PaginationInfo(
-    showPaging: Boolean,
-    totalResultsStr: String,
-    firstUrl: Option[String],
-    prevUrl: Option[String],
-    nextUrl: Option[String],
-    lastUrl: Option[String]
-)
+import models.frontend.PaginationInfo
 
 object PaginationInfoFactory {
   def create[A](pagedQuery: (Iterable[A], Int, Option[Int]),

@@ -1,7 +1,6 @@
-@()(implicit paginationInfo: controllers.PaginationInfo)
+@()(implicit paginationInfo: models.frontend.PaginationInfo)
 
 <div class="pagination">
-  @import services.Utils.stringOptionToRichStringOption
   @if(paginationInfo.showPaging) {
   <ul>
     <li @if( paginationInfo.firstUrl.isEmpty ) {class="disabled"}><a href=@paginationInfo.firstUrl.getOrElse("")>First</a></li>
