@@ -94,7 +94,7 @@ case class Masthead (
     IOUtils.toByteArray(current.resourceAsStream("images/1550x556.jpg").get),
     keyBase="defaults/masthead",
     name="landingPageImage",
-    imageType=ImageAsset.Png,
+    imageType=ImageAsset.Jpeg,
     services=services.imageAssetServices.get
   )
 

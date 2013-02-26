@@ -244,7 +244,7 @@ case class Celebrity(id: Long = 0,
     IOUtils.toByteArray(current.resourceAsStream("images/1550x556.jpg").get),
     keyBase="defaults/celebrity",
     name="landingPageImage",
-    imageType=ImageAsset.Png,
+    imageType=ImageAsset.Jpeg,
     services=services.imageAssetServices.get
   )
 

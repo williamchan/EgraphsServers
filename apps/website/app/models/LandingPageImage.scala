@@ -23,7 +23,7 @@ trait LandingPageImage[T] {
     val newImageKey = "landing_" + Time.toBlobstoreFormat(Time.now)
 
     val entity = withLandingPageImageKey(key = Some(newImageKey))
-    val image = ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, imageAssetServices)
+    val image = ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Jpeg, imageAssetServices)
     (entity, image)
   }
 
@@ -50,7 +50,7 @@ trait LandingPageImage[T] {
   }
 
   def landingPageImage: ImageAsset = {
-    _landingPageImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=imageAssetServices))) match {
+    _landingPageImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Jpeg, services=imageAssetServices))) match {
       case Some(imageAsset) => imageAsset
       case None => defaultLandingPageImage
     }
