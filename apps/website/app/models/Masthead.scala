@@ -79,8 +79,8 @@ case class Masthead (
 
   // LandingPageImage
 
-  override val keyBase = {
-//    require(id > 0, "Cannot determine blobstore key when no id exists yet for this entity in the relational database")
+  override def keyBase = {
+    require(id > 0, "Cannot determine blobstore key when no id exists yet for this entity in the relational database")
     "masthead/" + id
   }
 
