@@ -74,17 +74,18 @@ trait PostMastheadAdminEndpoint {
 
             mastheadOption match {
               case Some(masthead) => {
-                val updatedMasthead = masthead.copy(
+                // Save with new data. Assigns a unique id to masthead, so that the optional
+                // saveWithLandingPageImage() doesn't use an ID of 0 for the blobstore.
+                val savedMasthead = masthead.copy(
                   name = validForm.name,
                   headline = validForm.headline,
                   subtitle = Utils.toOption(validForm.subtitle),
                   callToActionTarget = validForm.callToActionTarget,
                   callToActionText = validForm.callToActionText
-                ).withPublishedStatus(publishedStatus).withCallToActionType(callToActionType)
+                ).withPublishedStatus(publishedStatus).withCallToActionType(callToActionType).save()
 
-                val savedMasthead = landingPageImageOption match {
-                  case Some(image) => updatedMasthead.saveWithLandingPageImage(landingPageImageOption)
-                  case None => updatedMasthead.save()
+                landingPageImageOption.map { _ =>
+                  savedMasthead.saveWithLandingPageImage(landingPageImageOption)
                 }
 
                 Redirect(controllers.routes.WebsiteControllers.getMastheadAdmin(savedMasthead.id))

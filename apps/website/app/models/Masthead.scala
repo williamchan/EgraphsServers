@@ -79,7 +79,10 @@ case class Masthead (
 
   // LandingPageImage
 
-  override val keyBase = "masthead/" + id
+  override val keyBase = {
+//    require(id > 0, "Cannot determine blobstore key when no id exists yet for this entity in the relational database")
+    "masthead/" + id
+  }
 
   override def withLandingPageImageKey(key: Option[String]) : Masthead = {
     this.copy(_landingPageImageKey = key)
