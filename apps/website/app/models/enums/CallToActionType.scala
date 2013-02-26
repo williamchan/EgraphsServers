@@ -15,14 +15,21 @@ import models.frontend.masthead.{SearchBoxViewModel, VideoPlayerViewModel, Simpl
 object CallToActionType extends Enum {
   sealed trait EnumVal extends Value
 
+  /**
+   * Displays the "Get Started" arrow with a regular link.
+   */
   val SimpleLink = new EnumVal{
     val name = "SimpleLink"
   }
-
+  /**
+   * Displays a marketplace search box right in the masthead.
+   */
   val SearchBox = new EnumVal {
     val name = "Searchbox"
   }
-
+  /**
+   * Displays the "Get Started" arrow that plays the homepage intro video when clicked.
+   */
   val VideoPlayer = new EnumVal {
     val name = "VideoPlayer"
   }

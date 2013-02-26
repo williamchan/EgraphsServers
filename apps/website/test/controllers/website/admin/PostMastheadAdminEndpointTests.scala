@@ -15,7 +15,6 @@ import play.api.libs.Files.TemporaryFile
 import java.io.File
 import org.apache.commons.io.FileUtils
 import java.util.Date
-import play.api.mvc.MultipartFormData.FilePart
 import play.mvc.Http.HeaderNames
 import models.enums.{PublishedStatus, CallToActionType}
 import play.api.test.FakeHeaders

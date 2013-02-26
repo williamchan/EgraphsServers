@@ -3,7 +3,7 @@ package models.categories
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db.{SavesWithLongKey, Schema, KeyedCaseClass, Deletes}
-import com.google.inject.{Inject, Provider}
+import com.google.inject.Inject
 import models.{Masthead, Celebrity, HasCreatedUpdated, SavesCreatedUpdated}
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
@@ -14,7 +14,7 @@ import org.squeryl.dsl.ManyToMany
  * @param id
  * @param categoryId Id of parent category (e.g. Genre)
  * @param name Unique name to aid in administration
- * @param publicname Publicly facing name to be displayed in the view
+ * @param publicName Publicly facing name to be displayed in the view
  * @param created
  * @param updated
  * @param services
@@ -59,8 +59,6 @@ class CategoryValueStore @Inject() (
 
   /**
    * Return all CategoryValues.
-   * @param categoryId
-   * @return
    */
   def all() : Query[CategoryValue] = {
     from(schema.categoryValues)(
@@ -176,8 +174,6 @@ class CategoryValueStore @Inject() (
   // SavesWithLongKey[CategoryValue] methods
   //
   override val table = schema.categoryValues
-
-
 
   //
   // SavesCreatedUpdated[CategoryValue] methods

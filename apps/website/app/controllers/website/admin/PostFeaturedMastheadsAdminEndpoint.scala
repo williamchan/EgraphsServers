@@ -19,7 +19,6 @@ trait PostFeaturedMastheadsAdminEndpoint {
 
   /**
    * POSTs a new list of masthead IDs to be featured.
-   * @param mastheadIds the new set of celebrity IDs to feature
    *
    * @return a Redirect to the mastheads admin endpoint.
    */

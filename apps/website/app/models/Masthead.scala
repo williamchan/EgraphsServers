@@ -6,14 +6,11 @@ import frontend.landing.LandingMasthead
 import java.sql.Timestamp
 import services.{AppConfig, Time}
 import services.db.{Schema, SavesWithLongKey, DBSession, KeyedCaseClass}
-import services.blobs.AccessPolicy
 import com.google.inject.{Provider, Inject}
 import org.apache.commons.io.IOUtils
 import play.api.Play._
-import controllers.WebsiteControllers
 import org.squeryl.Query
 import org.squeryl.dsl.ManyToMany
-import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.landing.LandingMastheadsQuery
 
 case class MastheadServices @Inject() (
@@ -50,7 +47,11 @@ case class Masthead (
   //
   // Public members
   //
-  /**Persists by conveniently delegating to companion object's save method. */
+
+  /**
+   * Persists by conveniently delegating to companion object's save method.
+   **/
+
   override def save(): Masthead = {
     require(!headline.isEmpty, "Mastheads need headlines to be considered valid")
     services.store.save(this)
