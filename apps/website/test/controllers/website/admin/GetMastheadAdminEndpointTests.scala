@@ -15,7 +15,6 @@ class GetMastheadAdminEndpointTests extends EgraphsUnitTest with AdminProtectedR
   override def routeUnderTest = getCreateMastheadAdmin
   override def db = AppConfig.instance[DBSession]
 
-
   routeName(getCreateMastheadAdmin) should "serve a page to create a masthead when logged in" in new EgraphsTestApplication {
     val admin = db.connected(TransactionSerializable) {TestData.newSavedAdministrator()}
 

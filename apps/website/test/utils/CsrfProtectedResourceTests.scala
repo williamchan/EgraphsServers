@@ -13,7 +13,6 @@ trait CsrfProtectedResourceTests { this: EgraphsUnitTest =>
     val Some(result) = route(FakeRequest().toCall(routeUnderTest))
 
     status(result) should not be (OK)
-
     contentAsString(result) should include ("token")
   }
   

@@ -13,8 +13,7 @@ create table Masthead (
     _callToActionType varchar(128) not null,
     _publishedStatus varchar(128) not null,
     created timestamp not null
-);
-
+  );
 create sequence s_Masthead_id;
 
 create table MastheadCategoryValue (

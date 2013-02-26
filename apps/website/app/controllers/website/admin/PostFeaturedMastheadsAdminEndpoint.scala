@@ -32,6 +32,7 @@ trait PostFeaturedMastheadsAdminEndpoint {
             }
           }
           case None => List[Long]()
+          case _ => List[Long]()
         }
         featured.updateFeaturedMastheads(mastheadIds)
         Redirect(controllers.routes.WebsiteControllers.getMastheadsAdmin().url)

@@ -18,21 +18,18 @@ class PostFeaturedMastheadsAdminEndpointTests extends EgraphsUnitTest with CsrfP
   def mastheadStore = AppConfig.instance[MastheadStore]
   def featured = AppConfig.instance[Featured]
 
-  routeUnderTest.url should "associate mastheads as featured" in new EgraphsTestApplication {
-    val mastheadId0= newMastheadId
-    val mastheadId1 = newMastheadId
+  routeUnderTest.url should "associate masthead as featured" in new EgraphsTestApplication {
+    val mastheadId = newMastheadId
+
     db.connected(TransactionSerializable) {
-      val result = controllers.WebsiteControllers.postFeaturedMastheads(FakeRequest().withFormUrlEncodedBody(
-      "mastheadIds" -> mastheadId0.toString,
-      "mastheadIds" -> mastheadId1.toString
+      val result = controllers.WebsiteControllers.postFeaturedMastheads(FakeRequest().withAdmin(admin.id).withFormUrlEncodedBody(
+      "mastheadIds" -> mastheadId.toString
       ).withAuthToken)
       status(result) should be (SEE_OTHER)
       val mastheads = featured.categoryValue.mastheads
-      mastheads.size should be (2)
-      mastheads.exists(masthead => masthead.id == mastheadId0) should be (true)
-      mastheads.exists(masthead => masthead.id == mastheadId1) should be (true)
+      mastheads.size should be (1)
+      mastheads.exists(masthead => masthead.id == mastheadId) should be (true)
     }
-
   }
 
   private def newMastheadId : Long = {

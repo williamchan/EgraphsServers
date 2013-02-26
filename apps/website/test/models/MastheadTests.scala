@@ -15,7 +15,6 @@ class MastheadTests extends EgraphsUnitTest
 {
   def store = AppConfig.instance[MastheadStore]
 
-
   "Masthead" should "require a headline" in new EgraphsTestApplication {
     val exception = intercept[IllegalArgumentException] {
       Masthead().save()
@@ -55,7 +54,6 @@ class MastheadTests extends EgraphsUnitTest
   override def newEntityWithLandingPageImage = {
     Masthead(name = TestData.generateFullname(), headline = TestData.generateUsername())
   }
-
 
   // SavingEntityTests[Account] methods
   //

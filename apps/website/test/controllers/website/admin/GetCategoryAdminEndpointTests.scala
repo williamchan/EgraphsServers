@@ -8,7 +8,6 @@ import controllers.routes.WebsiteControllers.{getCategoryAdmin, getCreateCategor
 import utils.EgraphsUnitTest
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
-
 import utils.AdminProtectedResourceTests
 
 class GetCategoryAdminEndpointTests extends EgraphsUnitTest with AdminProtectedResourceTests {
@@ -21,7 +20,6 @@ class GetCategoryAdminEndpointTests extends EgraphsUnitTest with AdminProtectedR
 	val Some(result) = route(FakeRequest().withAdmin(admin.id).toCall(getCreateCategoryAdmin))
     status(result) should be (OK)		
   }
-  
 
   routeName(getCreateCategoryAdmin()) should "not serve a page to create a category page when not logged in" in new EgraphsTestApplication {
 	val Some(result) = route(FakeRequest().toCall(getCreateCategoryAdmin))

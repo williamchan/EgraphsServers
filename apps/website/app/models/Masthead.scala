@@ -20,7 +20,7 @@ case class MastheadServices @Inject() (
 )
 
 /**
-* Entity representing mastheads on the homepage
+ * Entity representing mastheads on the homepage
 */
 case class Masthead (
   id: Long = 0,
