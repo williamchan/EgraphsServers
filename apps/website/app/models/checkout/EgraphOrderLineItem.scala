@@ -28,7 +28,6 @@ case class EgraphOrderLineItemServices @Inject() (
 case class EgraphOrderLineItem(
   _entity: LineItemEntity = LineItemEntity(),
   _type: Option[EgraphOrderLineItemType] = None,
-  _printOrderItem: Option[PrintOrderLineItem] = None,
   @transient _services: EgraphOrderLineItemServices = AppConfig.instance[EgraphOrderLineItemServices]
 ) extends LineItem[Order]
   with HasLineItemEntity[EgraphOrderLineItem]
@@ -48,9 +47,13 @@ case class EgraphOrderLineItem(
     Json.toJson(Seq(thisJson) ++ printOrderJson.toSeq)
   }
 
-  override def domainObject: Order = (orderFromType orElse orderFromDb) getOrElse (throw new IllegalArgumentException("Order required."))
+  override lazy val domainObject: Order = (orderFromDb orElse orderFromType) getOrElse {
+    throw new IllegalArgumentException("Order required.")
+  }
 
-  override def itemType: EgraphOrderLineItemType = (_type orElse restoreItemType) getOrElse (throw new IllegalArgumentException("EgraphOrderLineItemType required."))
+  override lazy val itemType: EgraphOrderLineItemType = (_type orElse restoreItemType) getOrElse {
+    throw new IllegalArgumentException("EgraphOrderLineItemType required.")
+  }
 
   override def transact(checkout: Checkout) = {
     if (id > 0) { this.update() } else {
@@ -71,7 +74,10 @@ case class EgraphOrderLineItem(
   // Helpers
   //
   /** get actual print order */
-  protected def printOrderItem = _printOrderItem orElse { services.printOrderItemServices.findByOrderId(domainObject.id) }
+  protected[checkout] lazy val printOrderItem = optionIf (itemType.framedPrint) {
+    PrintOrderLineItemType(domainObject).getLineItem
+  }
+
 
   private def orderFromType = _type map { _.order}
 
@@ -81,18 +87,12 @@ case class EgraphOrderLineItem(
     EgraphOrderLineItemType.restore(entity, domainObject)
   }
 
-  private def clearGivenItemType = this.copy(_type = None)
-
   /** saves the order and optionally the print order if chosen */
   private def withSavedOrder(checkout: Checkout): EgraphOrderLineItem = {
-    def savedPrintOrder(forOrder: Order) = {
-      val printItem: Option[PrintOrderLineItem] = PrintOrderLineItemType(forOrder).lineItems().toSeq.flatten.headOption
-      printItem map { item => item.transactAsSubItem(checkout) }
-    }
-
     val buyerId = checkout.buyerCustomer.id
     val recipientId = checkout.recipientCustomer map (_.id) getOrElse buyerId
 
+    // save order
     val savedOrder = domainObject.copy(
       lineItemId = Some(id),
       buyerId = buyerId,
@@ -100,15 +100,15 @@ case class EgraphOrderLineItem(
       amountPaidInCurrency = this.amount.getAmount
     ).withPaymentStatus(PaymentStatus.Charged).save()
 
-    /**
-     * Save print order if framedPrint flag is true; the PrintOrder line item that appears in the checkouts lineitems
-     * is a dummy item for informative purposes as of CE-13.
-     */
-    val savedPrintOrderItem = if (itemType.framedPrint) savedPrintOrder(savedOrder) else None
+    // save print if necessary
+    if (itemType.framedPrint) {
+      PrintOrderLineItemType(savedOrder).getLineItem.transactAsSubItem(checkout)
+    }
 
-    this.clearGivenItemType // clear because its Order is no longer current
-      .copy(_printOrderItem = savedPrintOrderItem)
+    this.clearGivenItemType  // clear _type because orderFromType is no longer current
   }
+
+  private def clearGivenItemType = this.copy(_type = None)
 }
 
 
@@ -116,9 +116,9 @@ case class EgraphOrderLineItem(
 // Companion
 //
 object EgraphOrderLineItem {
-  def create(itemType: EgraphOrderLineItemType, amount: Money, printItem: Option[PrintOrderLineItem] = None) = {
+  def create(itemType: EgraphOrderLineItemType, amount: Money) = {
     val entity = LineItemEntity(_itemTypeId = itemType.id).withAmount(amount)
-    new EgraphOrderLineItem( entity, Some(itemType), printItem )
+    new EgraphOrderLineItem( entity, Some(itemType))
   }
 
   def apply(entity: LineItemEntity, typeEntity: LineItemTypeEntity) = new EgraphOrderLineItem(entity)

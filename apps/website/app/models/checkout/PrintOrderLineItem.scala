@@ -1,6 +1,6 @@
 package models.checkout
 
-import models.{OrderStore, PrintOrderStore, PrintOrder}
+import models.{Order, OrderStore, PrintOrderStore, PrintOrder}
 import com.google.inject.Inject
 import services.db.Schema
 import services.AppConfig
@@ -71,14 +71,21 @@ case class PrintOrderLineItem(
 
   /** saves print order */
   private def withSavedPrintOrder(checkout: Checkout) = {
-    // TODO(CE-13): add name to shipping address
-    val address = checkout.shippingAddress getOrElse (throw new MissingRequiredAddressException("PrintOrderLineItemType"))
-    val savedPrint = domainObject.withShippingAddress(address).copy(
+    val address = (givenShippingAddress orElse checkout.shippingAddress) getOrElse {
+      throw new MissingRequiredAddressException("PrintOrderLineItemType")
+    }
+
+    val savedPrint = domainObject.copy(
+      shippingAddress = address,
       lineItemId = Some(id),
       amountPaidInCurrency = this.amount.getAmount
     ).save()
+
     this.copy(_printOrder = Some(savedPrint))
   }
+
+  private def givenShippingAddress = optionIf(!domainObject.shippingAddress.isEmpty) { domainObject.shippingAddress }
+
 }
 
 

@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import forms.FakeFormData._
 import models.enums.CheckoutCodeType
 import models.OrderStore

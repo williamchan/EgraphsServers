@@ -2,7 +2,7 @@ package models.checkout
 
 import utils.{DBTransactionPerTest, EgraphsUnitTest}
 import LineItemMatchers._
-import checkout.Conversions._
+import Conversions._
 import LineItemTestData._
 
 

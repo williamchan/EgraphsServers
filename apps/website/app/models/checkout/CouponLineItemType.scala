@@ -2,7 +2,7 @@ package models.checkout
 
 import com.google.inject.Inject
 import models.{CouponStore, Coupon}
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.{Money, CurrencyUnit}
 import services.db.Schema

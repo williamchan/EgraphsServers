@@ -1,6 +1,6 @@
 package models.checkout
 
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import scala.Some
 import models.{Address, Account}
 import utils.TestData
@@ -10,7 +10,7 @@ case class CheckoutScenario(
   initialTypes: LineItemTypes,
   updateWithTypes: LineItemTypes = Nil  ,
   buyer: Option[Account] = Some(TestData.newSavedAccount()),
-  address: Option[Address] = Some(TestData.newSavedAddress()),
+  address: Option[String] = Some(TestData.random.nextString(10)),
   cashTransaction: Option[CashTransactionLineItemType] = Some(LineItemTestData.randomCashTransactionType)
 ) {
   import CheckoutScenario._
@@ -28,8 +28,9 @@ case class CheckoutScenario(
 
   lazy val transactedCheckout = initialCheckout.transacted(this)
   lazy val restoredCheckout = transactedCheckout.restored(this)
-  lazy val initialCheckout = address map { Checkout.create(initialTypes, buyer, _) } getOrElse {
-    Checkout.create(initialTypes, buyer)
+  lazy val initialCheckout = {
+    val checkout = Checkout.create(initialTypes).withShippingAddress(address)
+    buyer map { checkout.withBuyer(_) } getOrElse checkout
   }
 }
 

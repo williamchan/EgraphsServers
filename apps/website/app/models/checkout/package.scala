@@ -1,4 +1,4 @@
-package models.checkout
+package models
 
 import scala.collection.GenTraversable
 import org.joda.money.{CurrencyUnit, Money}
@@ -7,6 +7,9 @@ import models.enums._
 //TODO: Shouldn't this be up a level, so you don't have to import it from within
 // the package?
 package object checkout {
+
+  def optionIf[T](cond: Boolean)(definition: => T): Option[T] = if (cond) Some(definition) else None
+
   /**
    * Pimps some helpers on to `Seq`s of LineItem`s and `LineItemType`s and provides some
    * type aliases for convenience

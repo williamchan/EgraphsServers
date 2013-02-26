@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import models.{GiftCertificateStore, GiftCertificate}
 import services.AppConfig
 import services.db.{CanInsertAndUpdateEntityThroughServices, Schema}

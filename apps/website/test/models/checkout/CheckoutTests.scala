@@ -10,9 +10,7 @@ import utils.TestData._
 import services.AppConfig
 import services.Finance.TypeConversions._
 import models.checkout.LineItemMatchers._
-import models.checkout.checkout.Conversions._
-import models.checkout.Checkout._
-import models.enums.LineItemNature._
+import models.checkout.Conversions._
 import LineItemTestData._
 
 @RunWith(classOf[JUnitRunner])
@@ -79,7 +77,7 @@ class CheckoutTests extends EgraphsUnitTest
   }
 
   it should "be previewable without a buyer Account" in {
-    val checkout = Checkout.create(twoGiftCertificates, None, None)
+    val checkout = Checkout.create(twoGiftCertificates)
     checkout.toJson should not be (JsNull)
   }
 

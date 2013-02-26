@@ -140,11 +140,13 @@ case class EgraphCheckoutAdapter (
   protected def previewCheckout = {
     val types: Seq[LineItemType[_]] = Seq(order, coupon).flatten
     val zipcode = payment.flatMap(_.billingPostalCode)
-    val address = shippingAddress.map(_.address)
+    val address = shippingAddress.map(_.stringify)
     val recipientAccount = recipient map (_.account)
 
-    Checkout.create( types, Some(buyer.account), zipcode)
+    Checkout.create( types )
+      .withBuyer( buyer.account )
       .withRecipient( recipientAccount )
+      .withZipcode( zipcode )
       .withShippingAddress( address )
   }
 

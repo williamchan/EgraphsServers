@@ -3,7 +3,7 @@ package models.checkout
 import java.sql.{Connection, Timestamp}
 import models._
 import models.enums._
-import checkout.Conversions._
+import Conversions._
 import services.AppConfig
 import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientServices}
 
@@ -33,7 +33,9 @@ case class PersistedCheckout(
       CashTransactionLineItemType.create(token, zip)
   }
 
-  override lazy val shippingAddress = buyerAccount.addresses.headOption
+  override lazy val shippingAddress = {
+    for (print <- lineItems(CheckoutCodeType.PrintOrder).headOption) yield print.domainObject.shippingAddress
+  }
 
 
   //

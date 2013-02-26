@@ -29,7 +29,7 @@ class CheckoutEndpointTests extends EgraphsUnitTest with ClearsCacheBefore {
 
     status(result) should be (OK)
 
-    (contentJs \ LineItemNature.Discount.name) match {
+    (contentJs \ LineItemNature.Discount.name.toLowerCase) match {
       case discounts: JsArray =>
         val codeTypeJs = (discounts(0) \ "lineItemType" \ "codeType")
         codeTypeJs.asOpt[String] should be (Some(CheckoutCodeType.Coupon.name))
@@ -61,7 +61,8 @@ class CheckoutEndpointTests extends EgraphsUnitTest with ClearsCacheBefore {
     }
 
     val result = performPost(sessionId, celeb.id)
-    val url = contentAsString(result)
+    val content = Json.parse(contentAsString(result))
+    val url = (content \ "order" \ "confirmationUrl").as[String]
     status(result) should be (OK)
     url.filterNot(_.isDigit) should be (getOrderConfirmation(0).url.filterNot(_.isDigit))
   }

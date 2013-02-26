@@ -53,11 +53,12 @@ object LineItemTestData {
   def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
   def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
 
-  def newCheckout: FreshCheckout = {
-    val buyer = Some(newSavedAccount())
-    val address = newSavedAddress(buyer)
-    Checkout.create(Seq(randomGiftCertificateType), buyer, address)
+  def newCheckout = {
+    Checkout.create { Seq(randomGiftCertificateType) }
+      .withBuyer { newSavedAccount() }
+      .withShippingAddress { Some(TestData.random.nextString(10)) }
   }
+
   def newSavedCheckout() = newCheckout.insert()
   def newTransactedCheckout() = newCheckout.transact(Some(randomCashTransactionType))
 

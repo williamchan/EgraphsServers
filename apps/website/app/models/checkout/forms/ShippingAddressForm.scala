@@ -13,21 +13,11 @@ case class ShippingAddress(
   state: String,
   postalCode: String
 ) {
-  def stringify = listified mkString "\n"
-
-  //
-  // Helpers
-  //
-  def address = Address( // TODO: get rid of Address
-    addressLine1 = addressLine1,
-    addressLine2 = addressLine2,
-    city = city,
-    _state = state,
-    postalCode = postalCode
-  )
-
-  private def cityStateAndZip = "%s, %s %s".format(city, state, postalCode)
-  private def listified = List(name, addressLine1) ++ addressLine2.toList ++ List(cityStateAndZip)
+  /** follows the use in egraph purchase handler, though could be formatted nicer */
+  def stringify = {
+    val addrLine2 = addressLine2 getOrElse ""
+    List(name, addressLine1, addrLine2, city, state, postalCode) mkString(",")
+  }
 }
 
 

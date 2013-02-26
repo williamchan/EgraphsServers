@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import com.google.inject.Inject
 import models.enums.{LineItemNature, CheckoutCodeType}
 import models.{Order, PrintOrder}
@@ -43,6 +43,7 @@ case class PrintOrderLineItemTypeServices @Inject() (schema: Schema) extends Ins
  */
 case class PrintOrderLineItemType(
   forOrder: Order = Order(),
+  address: Option[String] = None,
   @transient _services: PrintOrderLineItemTypeServices = AppConfig.instance[PrintOrderLineItemTypeServices]
 )
   extends LineItemType[PrintOrder]
@@ -59,14 +60,20 @@ case class PrintOrderLineItemType(
   //
   override def id = _entity.id
 
-  override def lineItems(resolved: LineItems = Nil, unresolved: LineItemTypes = Nil): Option[Seq[PrintOrderLineItem]] = Some {
-    Seq( PrintOrderLineItem(this, printOrder) )
+  override def lineItems(resolved: LineItems = Nil, unresolved: LineItemTypes = Nil)
+  : Option[Seq[PrintOrderLineItem]] = Some {
+    Seq( getLineItem )
   }
 
   //
   // Helpers
   //
-  def printOrder = PrintOrder(orderId = forOrder.id)
+  def printOrder = PrintOrder(
+    orderId = forOrder.id,
+    shippingAddress = address getOrElse ""
+  )
+
+  def getLineItem = PrintOrderLineItem(this, printOrder)
 }
 
 

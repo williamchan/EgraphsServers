@@ -1,7 +1,7 @@
 package models.checkout
 
 import utils.{TestData, DBTransactionPerTest, DateShouldMatchers, EgraphsUnitTest}
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums._
 import services.AppConfig
 import scala.Some

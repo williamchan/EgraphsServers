@@ -2,7 +2,7 @@ package models.checkout
 
 import _root_.exception.InsufficientInventoryException
 import com.google.inject.Inject
-import checkout.Conversions._
+import Conversions._
 import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
 import java.sql.{Connection, Timestamp}
 import play.api.libs.json._
@@ -68,7 +68,7 @@ abstract class Checkout
   def recipientCustomer: Option[Customer]
 
   def payment: Option[CashTransactionLineItemType]
-  def shippingAddress: Option[Address]
+  def shippingAddress: Option[String]
 
   def save(): Checkout
   def zipcode: Option[String]
@@ -354,18 +354,13 @@ abstract class Checkout
 object Checkout {
 
   // Create
-  def create(types: LineItemTypes, buyer: Option[Account] = None, zipcode: Option[String] = None): FreshCheckout = {
-    FreshCheckout(0L, types, buyer, zipcode = zipcode)
-  }
-
-  def create(types: LineItemTypes, buyer: Option[Account], address: Address): FreshCheckout = {
-    val zipcode = address.postalCode
-    FreshCheckout(0L, types, buyer, shippingAddress = Some(address), zipcode = Some(zipcode))
-  }
+  def create(types: LineItemTypes) = FreshCheckout(_itemTypes = types)
 
   // Restore
   def restore(id: Long)(implicit services: CheckoutServices = AppConfig.instance[CheckoutServices])
-  : Option[PersistedCheckout] = { services.findById(id) }
+  : Option[PersistedCheckout] = {
+    services.findById(id)
+  }
 
   //
   // Checkout failure cases

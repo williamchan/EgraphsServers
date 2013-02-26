@@ -5,7 +5,7 @@ import org.joda.money.Money
 import org.scalatest.matchers.{ShouldMatchers, Matcher}
 import services.Finance.TypeConversions._
 import LineItemMatchers._
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.LineItemNature._
 import org.scalatest.FlatSpec
 

@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import com.google.inject.Inject
 import java.sql.Timestamp
 import org.joda.money.{CurrencyUnit, Money}

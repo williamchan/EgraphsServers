@@ -2,7 +2,7 @@ package models.checkout
 
 import java.sql.{Connection, Timestamp}
 import models._
-import checkout.Conversions._
+import Conversions._
 import services.AppConfig
 import scalaz.Lens
 import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientServices}
@@ -13,10 +13,10 @@ import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientService
  */
 case class FreshCheckout(
   id: Long = 0L,
-  _itemTypes: LineItemTypes,
-  _buyerAccount: Option[Account],
+  _itemTypes: LineItemTypes = Nil,
+  _buyerAccount: Option[Account] = None,
   recipientAccount: Option[Account] = None,
-  shippingAddress: Option[Address] = None,
+  shippingAddress: Option[String] = None,
   stripeToken: Option[String] = None,
   zipcode: Option[String] = None,
   @transient _services: CheckoutServices = AppConfig.instance[CheckoutServices]
@@ -59,10 +59,7 @@ case class FreshCheckout(
   //
   override def withAdditionalTypes(newTypes: LineItemTypes): FreshCheckout = copy(_itemTypes = newTypes ++ _itemTypes)
   override def withEntity(entity: CheckoutEntity): FreshCheckout = this.copy(entity.id)
-
-  override def save() = {
-    this.withShippingAddress(savedShippingAddress).insert()
-  }
+  override def save() = this.insert()
 
 
   //
@@ -71,16 +68,5 @@ case class FreshCheckout(
   def withBuyer(newBuyer: Account) = this.copy(_buyerAccount = Some(newBuyer))
   def withRecipient(newRecipient: Option[Account]) = this.copy(recipientAccount = newRecipient)
   def withZipcode(newZipcode: Option[String]) = this.copy(zipcode = newZipcode)
-  def withShippingAddress(newAddress: Option[Address]) = this.copy(shippingAddress = newAddress)
-
-  private def savedIfDefined(maybeAccount: Option[Account]) = maybeAccount map (_.id > 0) getOrElse true
-
-  private def savedShippingAddress() = shippingAddress map { address =>
-    address.copy(accountId = buyerAccount.id).save()
-  }
-
-  private def customerId = Lens[FreshCheckout, Long](
-    get = _ => _entity.customerId,
-    set = (checkout, newId) => checkout.withEntity(_entity.copy(customerId = newId))
-  )
+  def withShippingAddress(newAddress: Option[String]) = this.copy(shippingAddress = newAddress)
 }

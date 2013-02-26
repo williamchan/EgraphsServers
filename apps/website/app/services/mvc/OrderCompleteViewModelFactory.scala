@@ -40,7 +40,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
   }
 
   def fromEgraphPurchaseCheckout(checkout: Checkout): Option[OrderCompleteViewModel] = {
-    import models.checkout.checkout.Conversions._
+    import models.checkout.Conversions._
     import CheckoutCodeType._
 
     for ( orderItem <- checkout.lineItems(EgraphOrder).headOption) yield {

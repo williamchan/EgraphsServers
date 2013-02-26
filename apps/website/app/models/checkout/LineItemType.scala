@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import java.sql.Timestamp
 import models.enums._
 import models.SavesCreatedUpdated

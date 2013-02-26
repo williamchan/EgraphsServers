@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import org.scalatest.matchers.{Matcher, MatchResult, ShouldMatchers}
 import org.scalatest.FlatSpec
 import LineItemMatchers._

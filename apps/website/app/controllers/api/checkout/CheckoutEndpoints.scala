@@ -78,7 +78,7 @@ trait CheckoutEndpoints { this: Controller =>
   // Helpers
   //
   private def confirmationResultFor(checkout: Checkout)(implicit request: RequestHeader) = {
-    import models.checkout.checkout.Conversions._
+    import models.checkout.Conversions._
     import controllers.routes.WebsiteControllers.getOrderConfirmation
     val orderLineItem = checkout.lineItems(CheckoutCodeType.EgraphOrder).head
     val order = orderLineItem.domainObject

@@ -2,7 +2,7 @@ package models.checkout
 
 import com.google.inject.Inject
 import models.CashTransaction
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CashTransactionType, CheckoutCodeType, LineItemNature}
 import scalaz.{Scalaz, Lens}
 import services.db.{HasTransientServices, Schema}

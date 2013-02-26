@@ -29,6 +29,7 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
       desiredText -> optional(text(max = maxDesiredTextChars)),
       messageToCeleb -> optional(text(max = maxMessageToCelebChars)),
       framedPrint -> boolean,
+      "_address" -> ignored[Option[String]](None),
       "_services" -> ignored(instance[EgraphOrderLineItemTypeServices])
     )(EgraphOrderLineItemType.apply)(EgraphOrderLineItemType.unapply)
 

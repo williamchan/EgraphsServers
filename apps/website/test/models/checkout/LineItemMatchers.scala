@@ -2,7 +2,7 @@ package models.checkout
 
 import org.joda.money.Money
 import org.scalatest.matchers.{MatchResult, Matcher}
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{LineItemNature, CheckoutCodeType}
 import services.Finance.TypeConversions._
 import scala.collection.GenTraversable

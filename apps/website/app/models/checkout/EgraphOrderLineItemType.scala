@@ -1,12 +1,13 @@
 package models.checkout
 
-import checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
-import models.{ProductStore, OrderStore, Order, Product}
+import models._
 import org.joda.money.{CurrencyUnit, Money}
 import com.google.inject.Inject
 import services.db.{HasTransientServices, InsertsAndUpdates, Schema}
 import services.AppConfig
+import scala.Some
 
 
 //
@@ -50,6 +51,7 @@ case class EgraphOrderLineItemType(
   desiredText: Option[String] = None,
   messageToCeleb: Option[String] = None,
   framedPrint: Boolean = false,
+  addressForPrint: Option[String] = None,
   @transient _services: EgraphOrderLineItemTypeServices = AppConfig.instance[EgraphOrderLineItemTypeServices]
 )
 	extends LineItemType[Order]
@@ -67,8 +69,9 @@ case class EgraphOrderLineItemType(
   override def id = _entity.id
 
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some {
-    val print = if (!framedPrint) None else PrintOrderLineItemType(order).lineItems().flatMap(_.headOption)
-    Seq( EgraphOrderLineItem.create(this, price, print) ) ++ print.toSeq
+    val item = EgraphOrderLineItem.create(this, price)
+    val print = item.printOrderItem
+    Seq(item) ++ print.toSeq
   }
 
   //
@@ -92,6 +95,10 @@ case class EgraphOrderLineItemType(
     // TODO(CE-13): remove this from here, move to transact as above
     throw new IllegalArgumentException("Product is out of inventory.")
   }
+
+  def withoutPrint = copy(framedPrint = false, addressForPrint = None)
+  def withPrint = this.copy(framedPrint = true)
+  def withShippingAddress(shippingAddress: String) = this.copy(addressForPrint = Some(shippingAddress))
 }
 
 
@@ -102,14 +109,9 @@ object EgraphOrderLineItemType {
   def codeType = CheckoutCodeType.EgraphOrder
   def nature = LineItemNature.Product
 
-  def restore(entity: LineItemTypeEntity, order: Order, withPrint: Boolean = false) = {
-    new EgraphOrderLineItemType(
-      productId = order.productId,
-      recipientName = order.recipientName,
-      isGift = order.recipientId == order.buyerId,
-      desiredText = order.requestedMessage,
-      messageToCeleb = order.messageToCelebrity,
-      framedPrint = withPrint
-    )
+  def restore(entity: LineItemTypeEntity, order: Order): EgraphOrderLineItemType = {
+    val isGift = order.recipientId == order.buyerId
+    val desiredText = order.requestedMessage
+    new EgraphOrderLineItemType(order.productId, order.recipientName, isGift, desiredText, order.messageToCelebrity)
   }
 }
