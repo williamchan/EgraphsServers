@@ -1,32 +1,29 @@
 package models
 
+import java.sql.Timestamp
+import java.sql.Connection
+import java.util.Calendar
+import java.util.Date
+import java.text.SimpleDateFormat
+import org.joda.money.Money
+import org.joda.time.DateMidnight
+import org.joda.time.DateTime
+import org.squeryl.Query
+import org.apache.commons.lang3.time.DateUtils
 import com.google.inject._
 import play.api.libs.json._
-import play.api.libs.json.Json.JsValueWrapper
+import play.api.libs.functional.syntax._
+import play.api.mvc.RequestHeader
 import enums._
 import frontend.egraphs.{OrderDetails, PendingEgraphViewModel, FulfilledEgraphViewModel}
-import java.sql.Timestamp
-import java.util.Date
-import org.joda.money.Money
-import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
-import services.Finance.TypeConversions._
 import services._
-import blobs.AccessPolicy
-import mail.TransactionalMail
-import payment.{Charge, Payment}
-import org.squeryl.Query
-import com.google.inject.Inject
-import java.text.SimpleDateFormat
+import services.db._
+import services.Finance.TypeConversions._
+import services.blobs.AccessPolicy
+import services.mail.TransactionalMail
+import services.payment.{Charge, Payment}
+import services.social.{Twitter, Facebook}
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
-import social.{Twitter, Facebook}
-import play.api.mvc.RequestHeader
-import db.Deletes
-import java.sql.Connection
-import services.db.CurrentTransaction
-import org.joda.time.DateMidnight
-import org.apache.commons.lang3.time.DateUtils
-import java.util.Calendar
-import org.joda.time.DateTime
 import controllers.api.FulfilledOrderBundle
 
 case class OrderServices @Inject() (
@@ -73,87 +70,58 @@ object Order {
   def expectedDeliveryDate(celebrity: Celebrity): Date = {
     Order.expectedDateFromDelay(celebrity.expectedOrderDelayInMinutes)
   }
+}
 
-  def apply(
-    id: Long,
-    product: Product,
-    buyerId: Long,
-    recipientId: Long,
-    recipientName: String,
-    amountPaidInCents: BigDecimal,
-    _reviewStatus: String,
-    _orderType: String,
-    requestedMessage: Option[String],
-    messageToCelebrity: Option[String]
-  ): Order = {
-    new Order(
-      id = id,
-      productId = product.id,
-      buyerId = buyerId,
-      recipientId = recipientId,
-      recipientName = recipientName,
-      amountPaidInCurrency = amountPaidInCents, //TODO make sure this is correct amount
-      _reviewStatus = _reviewStatus,
-      _orderType = _orderType,
-      requestedMessage = requestedMessage,
-      messageToCelebrity = messageToCelebrity
+case class JsOrder(
+  id: Long,
+  product: JsProduct,
+  buyerId: Long,
+  buyerName: String,
+  recipientId: Long,
+  recipientName: String,
+  amountPaidInCents: BigDecimal,
+  reviewStatus: String,
+  audioPrompt: String,
+  orderType: String, // Oops, this should be more accurately named writtenMessageType
+  requestedMessage: Option[String],
+  messageToCelebrity: Option[String],
+  created: Timestamp,
+  updated: Timestamp
+)
+
+// TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
+object JsOrder extends Function14[Long, JsProduct, Long, String, Long, String, BigDecimal, String, String, String, Option[String], Option[String], Timestamp, Timestamp, JsOrder] {
+  import services.Time._
+  implicit val orderFormats = Json.format[JsOrder]
+
+  def from(order: Order): JsOrder = {
+    val buyer = order.buyer
+    
+    // Alias CelebrityChoosesMessage to SpecificMessage for now -- iPad doesn't need to know
+    // the difference.
+    val writtenMessageRequestToWrite = order.writtenMessageRequest match {
+      case WrittenMessageRequest.CelebrityChoosesMessage =>
+        WrittenMessageRequest.SpecificMessage
+      case otherValue =>
+        otherValue
+    }
+
+    JsOrder(
+      id = order.id,
+      product = JsProduct.from(order.product),
+      buyerId = order.buyerId,
+      buyerName = buyer.name,
+      recipientId = order.recipientId,
+      recipientName = order.recipientName,
+      amountPaidInCents = order.amountPaid.getAmountMinor,
+      reviewStatus = order.reviewStatus.name,
+      audioPrompt = ("Recipient: " + order.recipientName),
+      orderType = writtenMessageRequestToWrite.name, // Oops, this should be more accurately named writtenMessageType
+      requestedMessage = order.writtenMessageRequestText,
+      messageToCelebrity = order.messageToCelebrity,
+      created = order.created,
+      updated = order.updated
     )
-  }
-
-  implicit object OrderFormat extends Format[Order] {
-    def writes(order: Order): JsValue = {
-      val buyer = order.buyer
-
-      // Alias CelebrityChoosesMessage to SpecificMessage for now -- iPad doesn't need to know
-      // the difference.
-      val writtenMessageRequestToWrite = order.writtenMessageRequest match {
-        case WrittenMessageRequest.CelebrityChoosesMessage =>
-          WrittenMessageRequest.SpecificMessage
-        case otherValue =>
-          otherValue
-      }
-
-      val optionalFields = Utils.makeOptionalFieldMap(
-        List[(String, Option[JsValueWrapper])](
-          "requestedMessage" -> order.writtenMessageRequestText.map(Json.toJson(_)),
-          "messageToCelebrity" -> order.messageToCelebrity.map(Json.toJson(_))
-        )
-      )
-
-      val amountPaidInCents = JsNumber(order.amountPaid.getAmountMinor)
-      Json.obj(
-        "id" -> order.id,
-        "product" -> order.product,
-        "buyerId" -> order.buyerId,
-        "buyerName" -> buyer.name,
-        "recipientId" -> order.recipientId,
-        "recipientName" -> order.recipientName,
-        "amountPaidInCents" -> amountPaidInCents,
-        "reviewStatus" -> order.reviewStatus.name,
-        "audioPrompt" -> ("Recipient: " + order.recipientName),
-        "orderType" -> writtenMessageRequestToWrite.name // Oops, this should be more accurately named writtenMessageType
-      ) ++
-      Json.obj(order.renderCreatedUpdatedForApi: _*) ++
-      Json.obj(optionalFields.toSeq: _*)
-    }
-
-    def reads(json: JsValue): JsResult[Order] = {
-      JsSuccess {
-        val order = Order(
-          (json \ "id").as[Long],
-          (json \ "product").as[Product],
-          (json \ "buyerId").as[Long],
-          (json \ "recipientId").as[Long],
-          (json \ "recipientName").as[String],
-          (json \ "amountPaidInCents").as[BigDecimal],
-          (json \ "reviewStatus").as[String],
-          (json \ "orderType").as[String],
-          (json \ "requestedMessage").asOpt[String],
-          (json \ "messageToCelebrity").asOpt[String]
-        )
-        order.services.store.withCreatedUpdatedFromJson(order, json)
-      }
-    }
   }
 }
 
@@ -380,7 +348,7 @@ case class Order(
   //
   // Private members
   //
-  private def writtenMessageRequestText:Option[String] = {
+  private[models] def writtenMessageRequestText: Option[String] = {
     writtenMessageRequest match {
       case WrittenMessageRequest.SignatureOnly =>
         None

@@ -13,6 +13,7 @@ import anorm._
 import play.api.Play.current
 import play.api.libs.concurrent._
 import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
 import categories._
 import services.blobs.AccessPolicy
@@ -289,6 +290,32 @@ case class Celebrity(id: Long = 0,
   )
 }
 
+case class JsCelebrity(
+  id: Long,
+  publicName: String,
+  enrollmentStatus: String,
+  urlSlug: String,
+  created: Timestamp,
+  updated: Timestamp
+)
+
+// TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
+object JsCelebrity extends Function6[Long, String, String, String, Timestamp, Timestamp, JsCelebrity] {
+  import services.Time.ApiDateFormat
+  implicit val celebrityFormats = Json.format[JsCelebrity]
+
+  def from(celebrity: Celebrity): JsCelebrity = {
+    JsCelebrity(
+      id = celebrity.id,
+      publicName = celebrity.publicName,
+      enrollmentStatus = celebrity.enrollmentStatus.name,
+      urlSlug = celebrity.urlSlug,
+      created = celebrity.created,
+      updated = celebrity.updated
+    )
+  }
+}
+
 object Celebrity {
   val minProfileImageWidth = 100
   val minLogoWidth = 40
@@ -300,32 +327,6 @@ object Celebrity {
       val savedImage = image.save(AccessPolicy.Public)
       val saved = celebrity.save()
       CelebrityWithImage(saved, savedImage)
-    }
-  }
-
-  def apply(id: Long, _enrollmentStatus: String, publicName: String): Celebrity = {
-    new Celebrity(id = id, _enrollmentStatus = _enrollmentStatus, publicName = publicName)
-  }
-
-  implicit object CelebrityFormat extends Format[Celebrity] {
-    def writes(celebrity: Celebrity): JsValue = {
-      Json.obj(
-        "id" -> celebrity.id,
-        "enrollmentStatus" -> celebrity.enrollmentStatus.name,
-        "publicName" -> celebrity.publicName,
-        "urlSlug" -> celebrity.urlSlug
-      ) ++ Json.obj(celebrity.renderCreatedUpdatedForApi: _*)
-    }
-
-    def reads(json: JsValue): JsResult[Celebrity] = {
-      JsSuccess {
-        val celebrity = Celebrity(
-          (json \ "id").as[Long],
-          (json \ "enrollmentStatus").as[String],
-          (json \ "publicName").as[String]
-        )
-        celebrity.services.store.withCreatedUpdatedFromJson(celebrity, json)
-      }
     }
   }
 }

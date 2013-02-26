@@ -3,6 +3,19 @@
 @import controllers._
 @import views.html.frontend.tags
 
+@celebHeadline(name:String) = {
+  <h1>Get an egraph from @name</h1>
+}
+
+@standardHeadline = {
+  <h1>Get R.A. Dickey to wish your dad a happy birthday!</h1>
+  <p class="play-egraph">
+    <a href="#" class="button">
+      <strong>View Video<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
+    </a>
+  </p>
+}
+
 @videoModal = {
   <div id="video-modal" class="modal hide fade egraph-video-modal" data-backdrop="static">
     <div class="modal-header">

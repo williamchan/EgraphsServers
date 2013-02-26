@@ -30,14 +30,10 @@ class CelebrityTests extends EgraphsUnitTest
 
   "toJson" should "render to json format properly" in new EgraphsTestApplication {
     val celeb = TestData.newSavedCelebrity()
-    val json = Json.toJson(celeb)
-    val celebFromJson = json.as[Celebrity]
+    val json = Json.toJson(JsCelebrity.from(celeb))
+    val celebFromJson = json.as[JsCelebrity]
 
-    celebFromJson.id should be (celeb.id)
-    celebFromJson.publicName should be (celeb.publicName)
-    celebFromJson.urlSlug should be (celeb.urlSlug)
-    celebFromJson.created.getTime should be (celeb.created.getTime)
-    celebFromJson.updated.getTime should be (celeb.updated.getTime)
+    celebFromJson should be (JsCelebrity.from(celeb))
   }
 
   "A Celebrity" should "start with the default profile photo" in new EgraphsTestApplication {
