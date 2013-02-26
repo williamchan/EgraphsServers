@@ -23,7 +23,7 @@ trait PostMastheadAdminEndpoint {
   def postMastheadAdmin = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { case (admin, adminAccount) =>
       Action(parse.multipartFormData) { implicit request =>
-        val landingPageImageFile = request.body.file("landingPageImage").map(_.ref.file)
+        val landingPageImageFile = request.body.file("landingPageImage").map(_.ref.file).filterNot(_.length == 0)
         val landingPageImageOption = if (landingPageImageFile.isDefined) ImageUtil.parseImage(landingPageImageFile.get) else None
 
         val form = Form(mapping(
