@@ -102,7 +102,7 @@ case class CashTransactionLineItem(
 
       val txn = domainObject
       val token = txn.stripeCardTokenId getOrElse (throw new IllegalArgumentException("Stripe token required."))
-      val charge = services.payment.charge(txn.cash, token, "Checkout #" + checkout.id)
+      val charge = services.payment.charge(txn.cash, token, s"Checkout #$checkout.id for $checkout.buyerAccount.email")
       val newTransaction = txn.copy(stripeChargeId = Some(charge.id))
       this.copy(_maybeCashTransaction = Some(newTransaction))
     }

@@ -156,7 +156,7 @@ abstract class Checkout
         // TODO: this could be implemented more elegantly if LineItems return some Left error case directly
         case exc: Exception => Left {
           val refunded = txnItem flatMap (_.abortTransaction())
-           exc match {
+          exc match {
             case e: MissingRequiredAddressException => CheckoutFailedShippingAddressMissing(this, refunded, e.msg)
             case e: InsufficientInventoryException => CheckoutFailedInsufficientInventory(this, txnItem, refunded)
             case e: DomainObjectNotFoundException => CheckoutFailedDomainObjectNotFound(this, refunded, e.msg)
