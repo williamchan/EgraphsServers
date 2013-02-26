@@ -39,6 +39,7 @@ case class CelebrityServices @Inject() (
   accountStore: AccountStore,
   consumerApp: ConsumerApplication,
   categoryServices: CategoryServices,
+  celebritySecureInfoStore: CelebritySecureInfoStore,
   productStore: ProductStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
@@ -68,6 +69,7 @@ case class Celebrity(id: Long = 0,
                      _publishedStatus: String = PublishedStatus.Unpublished.name,
                      _landingPageImageKey: Option[String] = None,
                      _logoImageKey: Option[String] = None,
+                     secureInfoId: Option[Long] = None,
                      created: Timestamp = Time.defaultTimestamp,
                      updated: Timestamp = Time.defaultTimestamp,
                      services: CelebrityServices = AppConfig.instance[CelebrityServices]
@@ -114,6 +116,10 @@ case class Celebrity(id: Long = 0,
     services.productStore.findActiveProductsByCelebrity(id).toSeq
   }
 
+  def secureInfo: Option[CelebritySecureInfo] = {
+    secureInfoId.map(id => services.celebritySecureInfoStore.findById(id)).flatten.map(_.decrypt)
+  }
+
   /**
    * The orders sorted by most recently fulfilled.
    */
@@ -125,8 +131,21 @@ case class Celebrity(id: Long = 0,
    * If twitterUsername is not set, they might have a twitter account.
    * But if it is set to "none", we have checked, and they don't have one.
    */
-  def doesNotHaveTwitter = {
+  def doesNotHaveTwitter: Boolean = {
     twitterUsername.map(name => name.toLowerCase) == Some("none")
+  }
+
+  def isAccountSettingsComplete: Boolean = {
+    secureInfo match {
+      case None => false
+      case Some(info) =>
+        def numberOfContactMethods = {
+          val isRealEmail = if(!account.email.contains("@egraphs.com")) Some("real") else None
+          val maybeContactMethods = Set(isRealEmail, twitterUsername, info.smsPhone, info.voicePhone, info.agentEmail)
+          maybeContactMethods.flatten.size
+        }
+        info.hasAllDepositInformation && (numberOfContactMethods >= 3)
+    }
   }
 
   /**
