@@ -2,13 +2,12 @@ package models
 
 import enums._
 import utils.EgraphsUnitTest
-import services.db.DBSession
 import services.AppConfig
 import utils.TestData
 import utils.DBTransactionPerTest
 
 class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
-  private def db = AppConfig.instance[DBSession]
+
   private def orderStore = AppConfig.instance[OrderStore]
   private def orderQueryFilters = AppConfig.instance[OrderQueryFilters]
   
@@ -197,14 +196,14 @@ class OrderStoreTests extends EgraphsUnitTest with DBTransactionPerTest {
     val orderWithoutEgraph = will.buyUnsafe(product).approveByAdmin(admin).save()
 
     // Perform the test
-    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*)
+    val found = orderStore.findByCelebrity(celebrity.id, orderQueryFilters.actionableOnly: _*).toSeq
 
-    found.toSeq.length should be (2)
-    val rejectedByAdminOrder = ordersByEgraphState.find(_._1 == EgraphState.RejectedByAdmin).get._2
-    found.toSet should be (Set(
-      orderWithoutEgraph,
-      rejectedByAdminOrder
-    ))
+    found.length should be (3)
+    found.contains(orderWithoutEgraph) should be(true)
+    val orderWithRejectedByAdminEgraph = ordersByEgraphState.find(_._1 == EgraphState.RejectedByAdmin).get._2
+    found.contains(orderWithRejectedByAdminEgraph) should be(true)
+    val orderWithRejectedByMlbEgraph = ordersByEgraphState.find(_._1 == EgraphState.RejectedByMlb).get._2
+    found.contains(orderWithRejectedByMlbEgraph) should be(true)
   }
 
   it should "only include orders that are pendingAdminReview when composed with that filter" in new EgraphsTestApplication {

@@ -1,7 +1,6 @@
 package models
 
 import java.awt.image.BufferedImage
-import java.util.Date
 import java.sql.Timestamp
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.IOUtils
@@ -13,7 +12,6 @@ import anorm._
 import play.api.Play.current
 import play.api.libs.concurrent._
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
 import categories._
 import services.blobs.AccessPolicy
@@ -22,12 +20,10 @@ import services._
 import services.mail.TransactionalMail
 import services.Dimensions
 import services.mvc.celebrity.CelebrityViewConversions
-import services.mail.MailUtils
 import services.db.DBSession
 import models.frontend.landing.CatalogStar
 import models.frontend.marketplace.MarketplaceCelebrity
 import models.Celebrity.CelebrityWithImage
-import models.enums.EmailType
 import services.mvc.celebrity.CatalogStarsQuery
 import egraphs.playutils.{Gender, HasGender}
 
@@ -253,6 +249,13 @@ case class Celebrity(id: Long = 0,
     product.saveWithImageAssets(image, icon)
   }
 
+  /**
+   * @return whether this celebrity is in the MLB vertical, ie has a Category Value of name "MLB"
+   */
+  def isMlb: Boolean = {
+    categoryValues.exists(_.name == "MLB")
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -386,8 +389,8 @@ object CelebrityAccesskey {
    * @param accesskey the accesskey
    * @return the url with the accesskey as a query parameter. If no accesskey was provided, then the original url is returned.
    */
-  def urlWithAccesskey(urlBase: String, accesskey: String): String = {
-    if (accesskey.isEmpty) urlBase else urlBase + "?accesskey=" + accesskey
+  def urlWithAccesskey(url: String, accesskey: String): String = {
+    if (accesskey.isEmpty) url else url + "?accesskey=" + accesskey
   }
 }
 

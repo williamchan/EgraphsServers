@@ -36,6 +36,8 @@ private[controllers] trait GetEgraphsAdminEndpoint extends ImplicitHeaderAndFoot
           case "rejectedByAdmin" => egraphStore.getEgraphsAndResults(egraphQueryFilters.rejectedByAdmin)
           case "published" => egraphStore.getEgraphsAndResults(egraphQueryFilters.published)
           case "awaitingVerification" => egraphStore.getEgraphsAndResults(egraphQueryFilters.awaitingVerification)
+          case "pendingMlbReview" => egraphStore.getEgraphsAndResults(egraphQueryFilters.pendingMlbReview)
+          case "rejectedByMlb" => egraphStore.getEgraphsAndResults(egraphQueryFilters.rejectedByMlb)
           case "all" => egraphStore.getEgraphsAndResults()
           case _ => egraphStore.getEgraphsAndResults(egraphQueryFilters.pendingAdminReview)
         }

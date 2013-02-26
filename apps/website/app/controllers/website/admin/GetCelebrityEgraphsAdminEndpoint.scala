@@ -38,6 +38,8 @@ private[controllers] trait GetCelebrityEgraphsAdminEndpoint extends ImplicitHead
             case "rejectedByAdmin" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.rejectedByAdmin)
             case "published" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.published)
             case "awaitingVerification" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.awaitingVerification)
+            case "pendingMlbReview" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.pendingMlbReview)
+            case "rejectedByMlb" => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.rejectedByMlb)
             case "all" => egraphStore.getCelebrityEgraphsAndResults(celebrity)
             case _ => egraphStore.getCelebrityEgraphsAndResults(celebrity, egraphQueryFilters.pendingAdminReview)
           }

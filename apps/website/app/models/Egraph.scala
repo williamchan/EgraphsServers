@@ -333,14 +333,9 @@ case class Egraph(
   def isPendingEgraph: Boolean = {
     egraphState match {
       case EgraphState.Published |
-           EgraphState.RejectedByAdmin => false
-
-      case EgraphState.AwaitingVerification |
-           EgraphState.PassedBiometrics |
-           EgraphState.FailedBiometrics |
-           EgraphState.ApprovedByAdmin => true
-
-      case badValue => throw new Exception("Unexpected enum value: " + badValue)
+           EgraphState.RejectedByAdmin |
+           EgraphState.RejectedByMlb => false
+      case _ => true
     }
   }
 
@@ -355,7 +350,9 @@ case class Egraph(
   def approve(admin: Administrator): Egraph = {
     require(admin != null, "Must be approved by an Administrator")
     require(isApprovable, "Must have previously been checked by biometrics")
-    withEgraphState(ApprovedByAdmin)
+
+    val nextState = if (!celebrity.isMlb) ApprovedByAdmin else PendingMlbReview
+    withEgraphState(nextState)
   }
 
   def reject(admin: Administrator): Egraph = {
@@ -373,7 +370,7 @@ case class Egraph(
   }
 
   def publish(admin: Administrator): Egraph = {
-    require(admin != null, "Must be rejected by an Administrator")
+    require(admin != null, "Must be published by an Administrator")
     require(isPublishable, "Must have previously been approved by admin")
     require((services.store.findByOrder(orderId, services.egraphQueryFilters.notRejected).size == 1), "There is another Egraph in the admin flow for the same Order")
     withEgraphState(Published)
@@ -599,6 +596,14 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
     }
   }
 
+  def rejectedByMlb: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph._egraphState === RejectedByMlb.name)
+      }
+    }
+  }
+
   def passedBiometrics: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
@@ -623,6 +628,14 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
     }
   }
 
+  def pendingMlbReview: FilterOneTable[Egraph] = {
+    new FilterOneTable[Egraph] {
+      override def test(egraph: Egraph) = {
+        (egraph._egraphState === PendingMlbReview.name)
+      }
+    }
+  }
+
   def published: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
@@ -642,7 +655,7 @@ class EgraphQueryFilters @Inject() (schema: Schema) {
   def notRejected: FilterOneTable[Egraph] = {
     new FilterOneTable[Egraph] {
       override def test(egraph: Egraph) = {
-        not(egraph._egraphState === RejectedByAdmin.name)
+        not(egraph._egraphState in Seq(RejectedByAdmin.name, RejectedByMlb.name))
       }
     }
   }

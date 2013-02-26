@@ -60,14 +60,21 @@ class EgraphTests extends EgraphsUnitTest
     evaluating { TestData.newSavedOrder().newEgraph.assets } should produce [IllegalArgumentException]
   }
 
-  "approve" should "change state to ApprovedByAdmin" in new EgraphsTestApplication {
+  "approve" should "change state to ApprovedByAdmin for non-MLB egraphs" in new EgraphsTestApplication {
     val admin = Administrator().save()
-    Egraph().withEgraphState(EgraphState.PassedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
-    Egraph().withEgraphState(EgraphState.FailedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
+    TestData.newSavedEgraph().withEgraphState(EgraphState.PassedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
+    TestData.newSavedEgraph().withEgraphState(EgraphState.FailedBiometrics).approve(admin).egraphState should be(EgraphState.ApprovedByAdmin)
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.PassedBiometrics).approve(null)}
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.AwaitingVerification).approve(admin)}
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.Published).approve(admin)}
     intercept[IllegalArgumentException] {Egraph().withEgraphState(EgraphState.RejectedByAdmin).approve(admin)}
+  }
+
+  "approve" should "change state to PendingMlbReview for MLB egraphs" in new EgraphsTestApplication {
+    val admin = Administrator().save()
+    val egraph = TestData.newSavedEgraph()
+    TestData.assignToMlbCategoryValue(egraph.celebrity)
+    egraph.withEgraphState(EgraphState.PassedBiometrics).approve(admin).egraphState should be(EgraphState.PendingMlbReview)
   }
 
   "reject" should "change state to RejectedByAdmin" in new EgraphsTestApplication {
