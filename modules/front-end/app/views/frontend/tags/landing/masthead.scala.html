@@ -4,11 +4,11 @@
 
 @import models.frontend.masthead._
 
-@video(text: String, target: String) = {
+@video(text: String) = {
   <h1>@masthead.headline</h1>
   <h2>@masthead.subtitle</h2>
   <p class="play-egraph">
-    <a id="masthead-video-button" href="@target" class="button">
+    <a id="masthead-video-button" class="button">
       <strong>@text<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
     </a>
   </p>
@@ -17,7 +17,7 @@
 @simpleLink(text: String, target: String) = {
   <h1>@masthead.headline</h1>
   <h2>@masthead.subtitle</h2>
-  <p class="play-egraph">
+  <p class="get-started">
     <a href="@target" class="button">
       <strong>@text</strong> <span>&raquo;</span>
     </a>
@@ -38,10 +38,10 @@
 
         @{
           masthead.callToActionViewModel match {
-            case v: VideoPlayerViewModel => video(text = v.text, target = v.target)
+            case v: VideoPlayerViewModel => video(text = v.text)
             case l: SimpleLinkViewModel => simpleLink(text = l.text, target = l.target)
             case s: SearchBoxViewModel => search
-            case _ =>  video(target = "derp", text="schlerp")
+            case _ =>  video(text="Herp")
           }
         }
         </div>

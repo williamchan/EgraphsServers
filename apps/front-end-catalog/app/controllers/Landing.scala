@@ -25,7 +25,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def simpleLinkMasthead = Action {
-    val masthead = Some(makeMasthead(SimpleLinkViewModel("Get On It", "#")))
+    val masthead = Some(makeMasthead(SimpleLinkViewModel("Follow this link", "http://www.google.com")))
     Ok(views.html.frontend.landing(sampleStars.slice(0, 7), masthead, verticalViewModels = Marketplace.landingVerticalSet, marketplaceRoute  = marketplaceRoute))
   }
   /**
@@ -94,7 +94,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
   private def makeMasthead(callToActionViewModel: CallToActionViewModel) = {
     LandingMasthead(
       headline = "Use words to direct the user where to go",
-      subtitle = Some("Tell me where to go! (go!)"),
+      subtitle = Some("Tell me where to go!"),
       landingPageImageUrl = sampleMastheadUrl,
       callToActionViewModel = callToActionViewModel
     )

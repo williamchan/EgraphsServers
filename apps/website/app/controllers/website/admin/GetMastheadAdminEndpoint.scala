@@ -46,6 +46,7 @@ private[controllers] trait GetMastheadAdminEndpoint extends ImplicitHeaderAndFoo
   }
 
   private def CallToActionTypeToViewModel(actionType: CallToActionType.EnumVal) : CallToActionViewModel = {
+    // We pass in AngularJS bindings to enable users to preview their changes on the admin page easily.
     actionType match {
       case CallToActionType.VideoPlayer => VideoPlayerViewModel(text= "{{masthead.text}}", target = "{{masthead.target}}")
       case _ => VideoPlayerViewModel(text= "{{masthead.text}}", target = "{{masthead.target}}")
