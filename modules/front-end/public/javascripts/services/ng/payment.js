@@ -71,7 +71,13 @@ function(payment, validationDirective, ngApp, logging, module) {
             "invalid_cvc": "securityCode",
             "incorrect_cvc": "securityCode",
             "invalid_expiry_month": "cardExpMonth",
-            "invalid_expiry_year": "cardExpYear"
+            "invalid_expiry_year": "cardExpYear",
+
+            // Response codes that only report the parameter in error
+            "exp_year": "cardExpYear",
+            "exp_month": "cardExpMonth",
+            "number": "cardNumber",
+            "cvc": "securityCode"
           }[errorCode];
         };
 
@@ -91,7 +97,7 @@ function(payment, validationDirective, ngApp, logging, module) {
 
             payment.createToken(form, function(status, response) {
               scope.$apply(function() {
-                var errors;
+                var errors = {};
                 var data;
                 if (status === 200) {
                   log("Stripe card submission accepted.");
@@ -99,9 +105,9 @@ function(payment, validationDirective, ngApp, logging, module) {
                   setModel(tokenIdModel, data);
                   callbacks.onSubmitSuccess(data);
                 } else {
-                  var errorCode = response.error.code;
+                  var errorCode = response.error.code? response.error.code: response.error.param;
                   var errorControlName = controlNameForErrorCode(errorCode);
-                  errors = [{field:errorControlName, cause:errorCode}];
+                  errors[errorControlName] = [errorCode];
 
                   callbacks.onSubmitFail(data, errors);
                 }

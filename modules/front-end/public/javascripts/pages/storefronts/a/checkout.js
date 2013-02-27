@@ -142,6 +142,17 @@ function(page, tooltip, window, analytics, logging, requireModule) {
           return controls;
         };
 
+        $scope.submitting = function() {
+          var submitting = false;
+          forEach($scope.forms(), function(form) {
+            if (form.$submitting) {
+              submitting = true;
+            }
+          });
+
+          return submitting;
+        };
+
         /**
          * Returns the number of fields the user still has left to enter before able
          * to validly check out

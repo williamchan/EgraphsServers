@@ -364,8 +364,8 @@
                     <div class="errors" ng-show="(@monthField.userHasAttended && @yearField.userHasAttended) && (@monthField.invalid || @yearField.invalid)">
                       @monthField.ifError("remote_invalid_expiry_month") {incorrect expiration month}
                       @yearField.ifError("remote_invalid_expiry_year") {invalid expiration year}
-                      @monthField.ifError("required") {month required}
-                      @yearField.ifError("required") {year required}
+                      @monthField.ifError("required", "remote_exp_month") {month required}
+                      @yearField.ifError("required", "remote_exp_year") {year required}
                     </div>
                   }
                 }
@@ -419,11 +419,14 @@
         </section>
         <div class="field-reminder control-group">
           <div class="controls">
-            <div class="fields-remaining" ng-show="fieldsRemaining().length > 0">
+            <div class="fields-remaining" ng-show="fieldsRemaining().length > 0 && !submitting()">
               <img src="@EgraphsAssets.at("images/glyphicons-uparrow-circle-orange.png")"> <span class="num-remaining">{{fieldsRemaining().length}}</span> required fields remaining
             </div>
-            <div class="no-fields-remaining" ng-show="fieldsRemaining().length == 0">
+            <div class="no-fields-remaining" ng-show="fieldsRemaining().length == 0&& !submitting()">
               <img src="@EgraphsAssets.at("images/glyphicons-check-circle-green.png")"> All required fields complete!
+            </div>
+            <div class="validating" ng-show="submitting()">
+              <img src="@EgraphsAssets.at("images/ajax-loader.gif")"> Validating...
             </div>
           </div>
         </div>
