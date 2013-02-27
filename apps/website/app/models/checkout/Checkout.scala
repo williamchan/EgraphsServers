@@ -375,6 +375,7 @@ object Checkout {
   //
   sealed abstract class CheckoutFailed(val failedCheckoutData: FailedCheckoutData)
   protected[checkout] trait FailedCheckoutWithCharge { def charge: Option[Charge] }
+  trait FailedCheckoutWithException { def exception: Exception }
 
   case class CheckoutFailedCustomerMissing(
     checkout: Checkout,
@@ -391,6 +392,7 @@ object Checkout {
     cashTransactionType: Option[CashTransactionLineItemType],
     exception: StripeException
   ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
+    with FailedCheckoutWithException
 
 
   case class CheckoutFailedInsufficientInventory(
@@ -428,7 +430,7 @@ object Checkout {
     exception: Exception
   ) extends CheckoutFailed(
     FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem, charge)
-  ) with FailedCheckoutWithCharge
+  ) with FailedCheckoutWithCharge with FailedCheckoutWithException
 }
 
 case class FailedCheckoutData(

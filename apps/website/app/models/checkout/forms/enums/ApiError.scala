@@ -20,9 +20,4 @@ object ApiError extends egraphs.playutils.Enum {
   val InvalidProduct = new EnumVal("invalid_product") {}
   val NoInventory = new EnumVal("no_inventory") {}
   val InvalidCouponCode = new EnumVal("invalid_code") {}
-
-  //
-  // Transaction failures
-  //
-  val InsufficientInventory = new EnumVal("insufficient_inventory") {}
 }

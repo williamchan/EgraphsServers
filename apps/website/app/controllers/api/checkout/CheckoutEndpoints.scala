@@ -1,10 +1,10 @@
 package controllers.api.checkout
 
-import com.stripe.exception.StripeException
+import com.stripe.exception._
 import models.checkout.Checkout
+import Checkout._
 import models.checkout.CheckoutAdapterServices
-import models.checkout.Checkout.CheckoutFailedInsufficientInventory
-import models.checkout.Checkout.CheckoutFailedStripeException
+
 import models.checkout.forms.enums.ApiError
 import models.enums.CheckoutCodeType
 import play.api.mvc._
@@ -64,9 +64,10 @@ trait CheckoutEndpoints { this: Controller =>
               log(Json.stringify(checkout.summary))
 
               failure match {
-                case checkoutFailedInsufficientInventory: CheckoutFailedInsufficientInventory => insufficientInventoryResult
-                case CheckoutFailedStripeException(_, _, e) => stripeErrorResult(e)
-                case _ => InternalServerError
+                case CheckoutFailedStripeException(_, _, e: CardException) => stripeCardErrorResult(e)
+                case withoutInventory: CheckoutFailedInsufficientInventory => insufficientInventoryResult
+                case failedWithException: FailedCheckoutWithException => throw failedWithException.exception
+                case _ => BadRequest
               }
 
             case None =>
@@ -102,27 +103,19 @@ trait CheckoutEndpoints { this: Controller =>
     Ok(jsonResponse).flashing(request.flash + ("orderId" -> order.id.toString))
   }
 
-  private def stripeErrorResult(e: StripeException) = BadRequest {
-    println(s"***\n***stripe exception message: ${e.getMessage}\n***")
-
-    transactionErrorBody(
-      e.getMessage,
-      "Sorry, we were unable to charge your card. Please check your card information and make sure you're using a valid card."
-    )
+  private def stripeCardErrorResult(e: CardException) = BadRequest {
+    val cause = s"stripe_${e.getCode}"
+    log(s"Failure caused by ${cause}")
+    transactionErrorBody("payment", cause)
   }
 
-  private def insufficientInventoryResult = BadRequest {
-    transactionErrorBody(
-      ApiError.InsufficientInventory.name,
-      "Sorry, the product you attempted to purchase has run out of inventory ."
-    )
-  }
+  private def insufficientInventoryResult = BadRequest { transactionErrorBody("egraph", ApiError.NoInventory.name) }
 
-  private def transactionErrorBody(cause: String, msg: String) = Json.obj {
-    "errors" -> Json.obj (
-      "cause" -> cause,
-      "message" -> msg
-    )
+  private def transactionErrorBody(resource: String, cause: String) = Json.obj {
+    val causeJson = Json.arr { Json.toJson(cause) }
+    val resourceJson = Json.obj(resource -> causeJson)
+
+    "errors" -> resourceJson
   }
 }
 
