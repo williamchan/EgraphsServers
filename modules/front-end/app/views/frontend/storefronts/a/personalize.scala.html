@@ -119,14 +119,19 @@
           </div> <!-- end value-propositions -->
         <section id="buy-an-egraph">
           <h2 class="callout">
-            <img src='@EgraphsAssets.at("images/glyphicons-circle-arrow-down-orange.png")'></img>
-            Follow these steps to personally connect with @star.name for <span class="money">{{selectedProduct().currencySymbol}}{{selectedProduct().price}}</span>
+            <img src='@EgraphsAssets.at("images/glyphicons-circle-arrow-down-orange.png")'></img>          
+            @if(!star.isSoldOut) {          
+              Follow these steps to personally connect with @star.name for <span class="money">{{selectedProduct().currencySymbol}}{{selectedProduct().price}}</span>
+            } else {
+              <strong>Aw snap</strong>, @star.name has too many egraph orders queued up already! Sign up for our mailing list to be informed as soon as @star.pronoun.subject and your other favorite stars become available.
+            }
           </h2>
         </section>
       </div> <!-- end container -->
     </div> <!-- end main -->
 
     <div class="main-like">
+      @if(!star.isSoldOut) {
         <form name="egraphForm"
               remote-resource="{{cartApi.url}}/egraph"
               local-resource="egraph"
@@ -378,6 +383,26 @@
             </div>
           </section>
         </form>
+      } else {
+        @headerIcon("Become an egraphs insider", "glyphicons-envelope-orange.png")
+        <form class="control-group form-horizontal become-insider" ng-controller="MailerController" class="newsletter-signup" ng-cloak ng-submit="subscribe()" ng-init="message=''">
+          <label class="control-label" for="email">
+            Your email:
+              @fieldTooltip("Why should I sign up?", event="Why sign up?") {
+                <strong>Be informed and receive discounts.</strong> Joining our newsletter will keep you on top of your favorite stars and their availability. You'll also receive choice discounts available only to members.
+              }
+          </label>
+          <div class="controls">
+            <div class="input-append">
+              <input name="email" type="email"  ng-model="email"></input>
+              <button type="submit" class="btn"><i class="icon-envelope icon-white"></i></button>
+            </div>
+            <label>
+              {{ message }}
+            </label>
+          </div>
+        </form> <!-- End .control-group -->
+      }
     </div>
   </div>
 }
@@ -388,5 +413,5 @@
   headJs = headJs,
   jsMain = "pages/storefronts/a/personalize",
   body=baseBody,
-  bodyClasses=Seq("storefront-a-personalize")
+  bodyClasses=Seq("storefront-a-personalize") ++ {if(star.isSoldOut) Seq("sold-out") else Nil}
 )

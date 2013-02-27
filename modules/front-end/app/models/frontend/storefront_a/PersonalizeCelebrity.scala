@@ -13,7 +13,9 @@ case class PersonalizeStar (
   products: Seq[PersonalizeProduct],
   pronoun: PersonalPronouns,
   mastheadUrl: String
-)
+) {
+  def isSoldOut: Boolean = products.isEmpty
+}
 
 case class PersonalizeProduct (
   id: Long,

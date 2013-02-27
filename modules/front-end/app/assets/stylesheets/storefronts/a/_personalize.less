@@ -22,9 +22,12 @@
     height:0px;
     border-bottom: 1px solid white;
   }
+
+  &.sold-out #bottom .newsletter {
+    display:none;   
+  }
+
 }
-
-
 
 // Styles for the masthead of the storefront personalize page
 .storefront-a-personalize #personalize-masthead {
@@ -192,6 +195,7 @@
   }
 
   padding-top:0px;
+  padding-bottom:20px;
   top:0px;
 
   #main {
@@ -233,6 +237,9 @@
       padding-right:@gridGutterWidth;
       padding-top:8px;
       padding-bottom:8px;
+      margin-left:auto;
+      margin-right:auto;
+      max-width:600px;
       //background-color:#efefef;
       //border-right:1px solid #ccc;
       //border-top:1px solid #ccc;
@@ -259,6 +266,7 @@
   z-index:0;
   margin-left:auto;
   margin-right:auto;
+  margin-bottom:20px;
 
   @media (max-width:768px) {
     padding:16px 20px 20px 20px;
@@ -428,6 +436,9 @@
     border-color:transparent white;
   }
 
+  .input-append {
+    .celebrity-searchbox-container(@orange, @inputBorder, 270px);
+  }
 
   .btn-group {
     height:50px;

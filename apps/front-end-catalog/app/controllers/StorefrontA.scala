@@ -11,17 +11,18 @@ import org.joda.money.{CurrencyUnit, Money}
 
 object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
   def personalize = Action { request =>
-    val starName="Sergio Romo"
-    val star = PersonalizeStar(
-      id=1L,
-      name=starName,
-      products=products(starName, 3),
-      pronoun=FemalePersonalPronouns,
-      mastheadUrl = "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg"
-    )
-
     Ok(views.html.frontend.storefronts.a.personalize(
-      star,
+      star("Sergio Romo"),
+      "/checkout",
+      maxDesiredTextChars=60,
+      maxMessageToCelebChars=100,
+      testcase=Some("default")
+    ))
+  }
+
+  def personalizeSoldOut = Action { request =>
+    Ok(views.html.frontend.storefronts.a.personalize(
+      star("Sergio Romo").copy(products=Nil),
       "/checkout",
       maxDesiredTextChars=60,
       maxMessageToCelebChars=100,
@@ -33,6 +34,14 @@ object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
     val request = Form
     Ok(views.html.frontend.storefronts.a.checkout(personalizeUrl="/personalize", testcase=testcase))
   }
+
+  def star(starName: String) = PersonalizeStar(
+    id=1L,
+    name=starName,
+    products=products(starName, 3),
+    pronoun=FemalePersonalPronouns,
+    mastheadUrl = "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg"
+  )
 
   def products(star: String, n: Int=3): Seq[PersonalizeProduct] = {
     for ( i <- 1 to n) yield {
