@@ -42,11 +42,19 @@ function(page, tooltip, window, analytics, logging, requireModule) {
           $scope.codeRedeemerVisible = !$scope.codeRedeemerVisible;
           if(!$scope.codeRedeemerVisible) {
             // Toss away any entered codes since we are closing down the code-redeeming widget
-            $scope.coupon.couponCode = "";
+            $scope.coupon = {couponCode:""};
             $scope.couponForm.resource.submit();
             events.track(["Code Redeemer - Close"]);
           } else {
             events.track(["Code Redeemer - Open"]);
+          }
+        };
+
+        $scope.codeRedeemerText = function() {
+          if ($scope.codeRedeemerVisible) {
+            return "remove code";
+          } else {
+            return "redeem code";
           }
         };
 
@@ -107,7 +115,8 @@ function(page, tooltip, window, analytics, logging, requireModule) {
             forms.push($scope.recipientForm);
           }
 
-          if ($scope.codeRedeemerVisible) {
+          // Only include the coupon form in relevant forms if it's visible and has a value filled.
+          if ($scope.codeRedeemerVisible && ($scope.coupon && $scope.coupon.couponCode !== "")) {
             forms.push($scope.couponForm);
           }
 

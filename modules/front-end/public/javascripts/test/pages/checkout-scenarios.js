@@ -160,7 +160,17 @@ function(mockBackend, logging, module, ngApp) {
   var stubApi = function(path, propName) {
     mockBackend.stubResource({
       path: path,
-      get: function(data) { return [200, mockApi[propName], {}]; },
+      get: function(data) {
+
+        var hasProps = false;
+        var returnCode = 400;
+        
+        angular.forEach(mockApi[propName], function(prop, propName) {
+          returnCode = 200;
+        });
+
+        return [returnCode, mockApi[propName], {}];
+      },
       post: function(data) {
         mockApi[propName] = data;
         return [200, "", {}];

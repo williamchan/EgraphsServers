@@ -119,7 +119,7 @@
     </ul>
     <div class="discounts clearfix">
       <h2>Discounts</h2>
-       <a class="redeem-link" id="open-redeem" ng-click="toggleCodeRedeemerVisibility()">redeem code</a>
+       <a class="redeem-link" id="open-redeem" ng-click="toggleCodeRedeemerVisibility()">{{codeRedeemerText()}}</a>
        <ul ng-show="codeRedeemerVisible" class="line-items">
          <li class="discount {{cart.currentDiscount.status}}">
            <div class="image-and-description discount-field">
@@ -144,7 +144,6 @@
               @tooltip("How do I get one?") {
                 <strong>We reward our customers.</strong> Join our mailing list after ordering to get exclusive weekly deals on egraphs.
               }
-              <a class="redeem-link" id="close-redeem" ng-click="toggleCodeRedeemerVisibility()">actually, forget about it</a>
            </div>
          </li>
        </ul>
