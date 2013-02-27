@@ -87,6 +87,7 @@ GET      /admin/celebrities/$celebrityId<[0-9]+>/products                 contro
 POST     /admin/celebrities/$celebrityId<[0-9]+>/products                 controllers.WebsiteControllers.postCreateProductAdmin(celebrityId: Long)
 GET      /admin/celebrities/$celebrityId<[0-9]+>/products/create          controllers.WebsiteControllers.getCreateCelebrityProductAdmin(celebrityId: Long)
 POST     /admin/celebrities/$celebrityId<[0-9]+>/sendEmail                controllers.WebsiteControllers.postSendCelebrityWelcomeEmailAdmin(celebrityId: Long)
+GET      /admin/celebrityrequests                                         controllers.WebsiteControllers.getCelebrityRequestsAdmin
 GET      /admin/coupons                                                   controllers.WebsiteControllers.getCouponsAdmin
 POST     /admin/coupons                                                   controllers.WebsiteControllers.postCreateCouponAdmin
 GET      /admin/coupons/create                                            controllers.WebsiteControllers.getCreateCouponAdmin
@@ -142,14 +143,14 @@ GET     /login                                                      controllers.
 POST    /login                                                      controllers.WebsiteControllers.postLogin
 GET     /logout                                                     controllers.WebsiteControllers.getLogout
 POST    /logout                                                     controllers.WebsiteControllers.postLogout
-GET     /stars                                                      controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "")
-GET     /stars/:vertical                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical)
 GET     /orders/$orderId<[0-9]+>/confirm                            controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
 POST    /orders/$orderId<[0-9]+>/configure                          controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
 GET     /orders/$orderId<[0-9]+>/egraph-gift-explanation            controllers.WebsiteControllers.getEgraphExplanationCard(orderId: Long)
 GET     /privacy                                                    controllers.WebsiteControllers.getPrivacy
 POST    /register                                                   controllers.WebsiteControllers.postRegisterConsumerEndpoint
 POST    /requestStar                                                controllers.WebsiteControllers.postRequestStar
+GET     /stars                                                      controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "")
+GET     /stars/:vertical                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical)
 POST    /subscribe                                                  controllers.WebsiteControllers.postSubscribeEmail
 GET     /sweepstakes/insider                                        controllers.WebsiteControllers.getInsiderSweepstakes
 GET     /terms                                                      controllers.WebsiteControllers.getTerms

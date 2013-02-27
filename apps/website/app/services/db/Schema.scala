@@ -81,6 +81,8 @@ class Schema @Inject() (
       celebrity.urlSlug is unique,
       celebrity.bio is dbType("text")))
 
+  val celebrityRequests = table[CelebrityRequest]
+
   val checkouts = table[CheckoutEntity]("Checkout")
   // TODO(SER-499): Index declarations
 

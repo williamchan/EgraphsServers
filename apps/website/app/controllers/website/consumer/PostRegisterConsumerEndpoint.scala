@@ -25,11 +25,13 @@ import egraphs.playutils.FlashableForm._
 import models.frontend.login_page.RegisterConsumerViewModel
 import services.AppConfig
 import services.http.forms.FormConstraints
+import services.request.PostCelebrityRequestHelper
 
 /**
  * The POST target for creating a new account at egraphs.
  */
-private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAndFooterData {
+private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAndFooterData
+  with PostCelebrityRequestHelper {
   this: Controller =>
 
   //
@@ -63,14 +65,20 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
           AccountCreationEmail(account = account, verificationNeeded = true).send()
         }
 
-        Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
-          request.session
-            .withCustomerId(customer.id)
-            .withUsernameChanged
-            .withHasSignedUp
-        )
+        // Find out whether the user is creating an account to complete their celebrity request
+        val maybeRequestedStar = request.session.requestedStar
+        maybeRequestedStar match {
+          case None => {
+            Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
+              request.session
+                .withCustomerId(customer.id)
+                .withUsernameChanged
+                .withHasSignedUp
+            )
+          }
+          case Some(requestedStar) => completeRequestStar(requestedStar, customer.id)(request)
+        }
       }
-
       redirects.merge
     }
   }

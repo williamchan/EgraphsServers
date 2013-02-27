@@ -1,6 +1,7 @@
 package controllers.website.consumer
 
 import egraphs.authtoken.AuthenticityToken
+import models.CelebrityRequest
 import models.CelebrityStore
 import models.frontend.marketplace.RequestStarViewModel
 import play.api.data._
@@ -11,6 +12,8 @@ import play.api.data.validation.Valid
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.AppConfig
+import services.db.DBSession
+import services.db.TransactionSerializable
 import services.http.EgraphsSession._
 import services.http.EgraphsSession.Conversions._
 import services.http.filters._
@@ -23,6 +26,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
   this: Controller =>
 
   protected def celebrityStore: CelebrityStore
+  protected def dbSession: DBSession
   protected def httpFilters: HttpFilters
   protected def postController: POSTControllerMethod
 
@@ -48,9 +52,16 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
               maybeCelebrity match {
                 case None => {
                   play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
-                  //addRequestedStarToDB(starName, customerId)
+
+                  // add row to celebrityRequests table
+                  dbSession.connected(TransactionSerializable) {
+                    CelebrityRequest(
+                      celebrityName = starName,
+                      customerId = customerId).save()
+                  }
                 }
                 case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
+                //send email immediately
               }
 
               play.Logger.info("starName is " + validForm.starName + ", customerId is " + customerId)

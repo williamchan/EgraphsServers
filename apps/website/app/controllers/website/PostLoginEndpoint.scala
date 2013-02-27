@@ -7,16 +7,20 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import controllers.WebsiteControllers
 import controllers.routes.WebsiteControllers.{getLogin, getCustomerGalleryById}
+import services.db.DBSession
+import services.db.TransactionSerializable
 import services.http.POSTControllerMethod
 import services.http.forms.CustomerLoginFormFactory
 import services.http.EgraphsSession
 import services.http.EgraphsSession.Conversions._
+import services.request.PostCelebrityRequestHelper
 import models._
 
-private[controllers] trait PostLoginEndpoint { this: Controller =>
+private[controllers] trait PostLoginEndpoint extends PostCelebrityRequestHelper { this: Controller =>
   import services.http.forms.Form.Conversions._
 
   protected def celebrityStore: CelebrityStore
+  protected def dbSession: DBSession
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
   protected def customerLoginForms: CustomerLoginFormFactory
@@ -33,6 +37,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
   
         case Right(validForm) => {
 
+          // Find out whether the user is logging in to complete their celebrity request
           val maybeRequestedStar = request.session.requestedStar
           maybeRequestedStar match {
             case None => {
@@ -40,23 +45,10 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
                 request.session.withCustomerId(validForm.customerId).withHasSignedUp
               )
             }
-            case Some(requestedStar) => completeRequestStar(requestedStar, validForm.customerId)
+            case Some(requestedStar) => completeRequestStar(requestedStar, validForm.customerId)(request)
           }
         }
       }
     }
-  }
-
-  private def completeRequestStar(requestedStar: String, customerId: Long)(implicit request: Request[AnyContent]) = {
-    val maybeCelebrity = celebrityStore.findByPublicName(requestedStar)
-
-    maybeCelebrity match {
-      case None => play.Logger.info(requestedStar + " is not currently on Egraphs. Wah wah.")
-      case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + requestedStar + "!")
-    }
-
-    play.Logger.info("starName is " + requestedStar + ", customerId is " + customerId)
-    Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
-      request.session.withCustomerId(customerId).withHasSignedUp.removeRequestedStar)
   }
 }

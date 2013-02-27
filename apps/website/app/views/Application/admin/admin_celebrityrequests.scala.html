@@ -1,0 +1,44 @@
+@(celebrityRequests: Iterable[models.CelebrityRequest])(
+  implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData)
+
+@import views.html.frontend.base_template
+
+@body = {
+<section id="content" class="top admin-content" role="main">
+  <div id="main" class="sub">
+    <div class="container" id="celebrity-admin">
+      
+      <h1> We did something </h1>
+
+      <table class="table table-hover table-condensed">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Id</th>
+            <th>Celebrity Name</th>  
+            <th>Customer Id</th>
+            <th>Status</th>
+          </tr>
+        </thead>  
+       @celebrityRequests.map { case (celebrityRequest) =>
+        <tr>
+          <td>
+            <a class="preview-link" href="/admin/celebrities/">
+              Reject
+            </a>
+          </td>
+          <td>@celebrityRequest.id</td>
+          <td>@celebrityRequest.celebrityName</td>
+          <td>@celebrityRequest.customerId</td>
+          <td>@celebrityRequest.celebrityRequestStatus</td>
+        </tr>
+        }
+      </table>
+    </div>
+  </div>
+</section>
+}
+
+@base_template(title="Admin - Celebrity Requests", body=body, jsMain="pages/admin/celebrity")

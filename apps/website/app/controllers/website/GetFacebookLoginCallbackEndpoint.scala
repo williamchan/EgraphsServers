@@ -19,8 +19,9 @@ import services.http.EgraphsSession.Conversions._
 import play.api.data._
 import play.api.data.Forms._
 import services.email.AccountCreationEmail
+import services.request.PostCelebrityRequestHelper
 
-private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { this: Controller =>
+private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging with PostCelebrityRequestHelper { this: Controller =>
 
   protected def dbSession: DBSession
   protected def controllerMethod: ControllerMethod
@@ -80,11 +81,17 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
               }
             }
 
-            Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
-              session.withCustomerId(customer.id)
-            )
+            // Find out whether the user is logging in via Facebook to complete their celebrity request
+            val maybeRequestedStar = request.session.requestedStar
+            maybeRequestedStar match {
+              case None => {
+                Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
+                  session.withCustomerId(customer.id)
+                )
+              }
+              case Some(requestedStar) => completeRequestStar(requestedStar, customer.id)(request)
+            }
           }
-
           maybeRedirectSuccess.getOrElse(redirectAndLogError(fbUserInfo))
         }
         case _ => {
