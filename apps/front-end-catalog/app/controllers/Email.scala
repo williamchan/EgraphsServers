@@ -3,6 +3,7 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models.frontend.email._
+import egraphs.playutils.Gender
 
 /**
  * Permutations of Emails.
@@ -17,12 +18,14 @@ object Email extends Controller {
         recipientName = "Carlos Pena",
         recipientEmail = "carlos@egraphs.com",
         celebrityName = "David Price",
+        celebrityGender = Gender.Male,
         productName = "First MLB Victory",
         orderDate = "June 12, 2012",
         orderId = "2387354",
         pricePaid = "$50.00",
         deliveredByDate = "June 19, 2012",
         faqHowLongLink = "https://www.egraphs.com/faq#how-long",
+        printOrderShippingAddress = "1234 Cherry Lane New York, NY 12345",
         hasPrintOrder = true
       )
     ))
