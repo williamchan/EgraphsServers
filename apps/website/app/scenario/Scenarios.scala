@@ -3,6 +3,7 @@ package scenario
 import services.db.Schema
 import services.blobs.Blobs
 import egraphs.playutils.Encodings.Base64
+import egraphs.playutils.Gender
 import org.apache.commons.mail.HtmlEmail
 import org.squeryl.PrimitiveTypeMode._
 import models._
@@ -395,13 +396,14 @@ class Scenarios extends DeclaresScenarios {
           recipientName = "Andrew Smith",
           recipientEmail = "me@egraphs.com",
           celebrityName = "Celebrity Joe",
+          celebrityGender = Gender.Male,
           productName = "Product 1",
           orderDate = "Jan 1, 2012",
           orderId = "1234",
           pricePaid = "$50.00",
           deliveredByDate = "Jan 8, 2012",
           faqHowLongLink = "/faq#how-long",
-          hasPrintOrder = true
+          maybePrintOrderShippingAddress = Some("1234 Cherry Lane New York, NY 12345")
         )
 
       val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
