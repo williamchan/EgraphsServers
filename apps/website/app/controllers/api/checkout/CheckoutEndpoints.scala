@@ -67,7 +67,7 @@ trait CheckoutEndpoints { this: Controller =>
                 case CheckoutFailedStripeException(_, _, e: CardException) => stripeCardErrorResult(e)
                 case withoutInventory: CheckoutFailedInsufficientInventory => insufficientInventoryResult
                 case failedWithException: FailedCheckoutWithException => throw failedWithException.exception
-                case _ => BadRequest
+                case _ => InternalServerError
               }
 
             case None =>
