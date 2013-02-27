@@ -91,13 +91,13 @@ case class Celebrity(id: Long = 0,
   //
   // Additional DB columns
   //
-  /**The slug used to access this Celebrity's page on the main site. */
+  /** The slug used to access this Celebrity's page on the main site. */
   val urlSlug: String = Utils.slugify(publicName, false) // Slugify without lower-casing
 
   //
   // Public members
   //
-  /**Persists by conveniently delegating to companion object's save method. */
+  /** Persists by conveniently delegating to companion object's save method. */
   def save(): Celebrity = {
     require(!publicName.isEmpty, "A celebrity without a publicName is hardly a celebrity at all.")
     services.store.save(this)
@@ -107,7 +107,7 @@ case class Celebrity(id: Long = 0,
     services.accountStore.findByCelebrityId(id).get
   }
 
-  /**Returns all of the celebrity's Products */
+  /** Returns all of the celebrity's Products */
   def products(filters: FilterOneTable[Product]*): Query[Product] = {
     services.productStore.findByCelebrity(id, filters: _*)
   }
@@ -116,7 +116,7 @@ case class Celebrity(id: Long = 0,
     services.productStore.findActiveProductsByCelebrity(id).toSeq
   }
 
-  def secureInfo: Option[CelebritySecureInfo] = {
+  def secureInfo: Option[DecryptedCelebritySecureInfo] = {
     secureInfoId.map(id => services.celebritySecureInfoStore.findById(id)).flatten.map(_.decrypt)
   }
 
@@ -136,14 +136,15 @@ case class Celebrity(id: Long = 0,
   }
 
   def isAccountSettingsComplete: Boolean = {
-    secureInfo match {
+    isAccountSettingsComplete(secureInfo)
+  }
+
+  // This method allows efficient reuse of code with CelebritySecureInfo
+  private[models] def isAccountSettingsComplete(maybeSecureInfo: Option[CelebritySecureInfo]): Boolean = {
+    maybeSecureInfo match {
       case None => false
       case Some(info) =>
-        def numberOfContactMethods = {
-          val isRealEmail = if(!account.email.contains("@egraphs.com")) Some("real") else None
-          val maybeContactMethods = Set(isRealEmail, twitterUsername, info.smsPhone, info.voicePhone, info.agentEmail)
-          maybeContactMethods.flatten.size
-        }
+        def numberOfContactMethods = info.numberOfContactMethods + (if (twitterUsername.isDefined) 1 else 0)
         info.hasAllDepositInformation && (numberOfContactMethods >= 3)
     }
   }
@@ -339,12 +340,13 @@ case class JsCelebrity(
   publicName: String,
   enrollmentStatus: String,
   urlSlug: String,
+  accountSettingsComplete: Boolean,
   created: Timestamp,
   updated: Timestamp
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrity extends Function6[Long, String, String, String, Timestamp, Timestamp, JsCelebrity] {
+object JsCelebrity extends Function7[Long, String, String, String, Boolean, Timestamp, Timestamp, JsCelebrity] {
   import services.Time.ApiDateFormat
   implicit val celebrityFormats = Json.format[JsCelebrity]
 
@@ -353,6 +355,7 @@ object JsCelebrity extends Function6[Long, String, String, String, Timestamp, Ti
       id = celebrity.id,
       publicName = celebrity.publicName,
       enrollmentStatus = celebrity.enrollmentStatus.name,
+      accountSettingsComplete = celebrity.isAccountSettingsComplete,
       urlSlug = celebrity.urlSlug,
       created = celebrity.created,
       updated = celebrity.updated

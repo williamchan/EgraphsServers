@@ -2,11 +2,72 @@ package models
 
 import java.sql.Timestamp
 import com.google.inject.Inject
+import play.api.libs.Crypto._
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 import models.enums.BankAccountType
 import models.enums.HasDepositAccountType
 import services.db._
 import services.Time
 import services.AppConfig
+
+case class JsCelebrityContactInfo(
+  id: Long,
+  accountSettingsComplete: Boolean,
+  contactEmail: Option[String],
+  smsPhone: Option[String],
+  voicePhone: Option[String],
+  agentEmail: Option[String]
+)
+
+// TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
+object JsCelebrityContactInfo extends Function6[Long, Boolean, Option[String], Option[String], Option[String], Option[String], JsCelebrityContactInfo] {
+  implicit val celebrityContactInfoFormats = Json.format[JsCelebrityContactInfo]
+
+  def from(celebrity: Celebrity): JsCelebrityContactInfo = {
+    val secureInfo = celebrity.secureInfo
+    JsCelebrityContactInfo(
+      id = celebrity.id,
+      accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
+      contactEmail = secureInfo.map(_.contactEmail).flatten,
+      smsPhone = secureInfo.map(_.smsPhone).flatten,
+      voicePhone = secureInfo.map(_.voicePhone).flatten,
+      agentEmail = secureInfo.map(_.agentEmail).flatten
+    )
+  }
+}
+
+case class JsCelebrityDepositInfo(
+  id: Long,
+  accountSettingsComplete: Boolean,
+  streetAddress: Option[String],
+  city: Option[String],
+  postalCode: Option[String],
+  country: Option[String],
+  depositAccountType: Option[String],
+  depositAccountRoutingNumber: Option[Int],
+  depositAccountNumber: Option[Long]
+)
+
+// TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
+object JsCelebrityDepositInfo extends Function9[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[String], Option[Int], Option[Long], JsCelebrityDepositInfo] {
+  implicit val celebrityDepositInfoFormats = Json.format[JsCelebrityDepositInfo]
+
+  def from(celebrity: Celebrity): JsCelebrityDepositInfo = {
+    val secureInfo = celebrity.secureInfo
+    JsCelebrityDepositInfo(
+      id = celebrity.id,
+      accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
+      streetAddress = secureInfo.map(_.streetAddress).flatten,
+      city = secureInfo.map(_.city).flatten,
+      postalCode = secureInfo.map(_.postalCode).flatten,
+      country = secureInfo.map(_.country).flatten,
+      depositAccountType = secureInfo.map(info => info._depositAccountType).flatten,
+      depositAccountRoutingNumber = secureInfo.map(_.depositAccountRoutingNumber).flatten,
+      depositAccountNumber = secureInfo.map(_.depositAccountNumber).flatten
+    )
+  }
+}
 
 /**
  * Services used by each celebrity secure info instance
@@ -18,6 +79,7 @@ case class CelebritySecureInfoServices @Inject() (
 
 case class DecryptedCelebritySecureInfo(
   id: Long = 0,
+  contactEmail: Option[String] = None,
   smsPhone: Option[String] = None,
   voicePhone: Option[String] = None,
   agentEmail: Option[String] = None,
@@ -26,8 +88,8 @@ case class DecryptedCelebritySecureInfo(
   postalCode: Option[String] = None,
   country: Option[String] = None,
   _depositAccountType: Option[String] = None,
-  depositAccountRoutingNumber: Option[Int] = None,
-  depositAccountNumber: Option[Int] = None,
+  _depositAccountRoutingNumber: Option[String] = None,
+  _depositAccountNumber: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CelebritySecureInfoServices = AppConfig.instance[CelebritySecureInfoServices]
@@ -35,18 +97,22 @@ case class DecryptedCelebritySecureInfo(
   with HasCreatedUpdated
   with HasDepositAccountType[DecryptedCelebritySecureInfo]
 {
-  def encrypted = EncryptedCelebritySecureInfo(
+  lazy val depositAccountRoutingNumber: Option[Int] = _depositAccountRoutingNumber.map(_.toInt)
+  lazy val depositAccountNumber: Option[Long] = _depositAccountNumber.map(_.toLong)
+
+  def encrypt = EncryptedCelebritySecureInfo(
     id = id,
-    smsPhone = smsPhone.map(encrypt(_)),
-    voicePhone = voicePhone.map(encrypt(_)),
-    agentEmail = agentEmail.map(encrypt(_)),
-    streetAddress = streetAddress.map(encrypt(_)),
-    city = city.map(encrypt(_)),
-    postalCode = postalCode.map(encrypt(_)),
-    country = country.map(encrypt(_)),
+    contactEmail = contactEmail.map(encryptAES(_)),
+    smsPhone = smsPhone.map(encryptAES(_)),
+    voicePhone = voicePhone.map(encryptAES(_)),
+    agentEmail = agentEmail.map(encryptAES(_)),
+    streetAddress = streetAddress.map(encryptAES(_)),
+    city = city.map(encryptAES(_)),
+    postalCode = postalCode.map(encryptAES(_)),
+    country = country.map(encryptAES(_)),
     _depositAccountType = _depositAccountType,
-    depositAccountRoutingNumber = depositAccountRoutingNumber.map(encrypt(_)),
-    depositAccountNumber = depositAccountNumber.map(encrypt(_)),
+    _depositAccountRoutingNumber = _depositAccountRoutingNumber.map(encryptAES(_)),
+    _depositAccountNumber = _depositAccountNumber.map(encryptAES(_)),
     created = created,
     updated = updated
   )
@@ -58,6 +124,7 @@ case class DecryptedCelebritySecureInfo(
 
 case class EncryptedCelebritySecureInfo(
   id: Long = 0,
+  contactEmail: Option[String] = None,
   smsPhone: Option[String] = None,
   voicePhone: Option[String] = None,
   agentEmail: Option[String] = None,
@@ -66,8 +133,8 @@ case class EncryptedCelebritySecureInfo(
   postalCode: Option[String] = None,
   country: Option[String] = None,
   _depositAccountType: Option[String] = None,
-  depositAccountRoutingNumber: Option[Int] = None,
-  depositAccountNumber: Option[Int] = None,
+  _depositAccountRoutingNumber: Option[String] = None,
+  _depositAccountNumber: Option[String] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CelebritySecureInfoServices = AppConfig.instance[CelebritySecureInfoServices]
@@ -76,18 +143,19 @@ case class EncryptedCelebritySecureInfo(
   with HasCreatedUpdated
   with HasDepositAccountType[EncryptedCelebritySecureInfo]
 {
-  def decrypted = DecryptedCelebritySecureInfo(
+  def decrypt = DecryptedCelebritySecureInfo(
     id = id,
-    smsPhone = smsPhone.map(decrypt(_)),
-    voicePhone = voicePhone.map(decrypt(_)),
-    agentEmail = agentEmail.map(decrypt(_)),
-    streetAddress = streetAddress.map(decrypt(_)),
-    city = city.map(decrypt(_)),
-    postalCode = postalCode.map(decrypt(_)),
-    country = country.map(decrypt(_)),
+    contactEmail = contactEmail.map(decryptAES(_)),
+    smsPhone = smsPhone.map(decryptAES(_)),
+    voicePhone = voicePhone.map(decryptAES(_)),
+    agentEmail = agentEmail.map(decryptAES(_)),
+    streetAddress = streetAddress.map(decryptAES(_)),
+    city = city.map(decryptAES(_)),
+    postalCode = postalCode.map(decryptAES(_)),
+    country = country.map(decryptAES(_)),
     _depositAccountType = _depositAccountType,
-    depositAccountRoutingNumber = depositAccountRoutingNumber.map(decrypt(_)),
-    depositAccountNumber = depositAccountNumber.map(decrypt(_)),
+    _depositAccountRoutingNumber = _depositAccountRoutingNumber.map(decryptAES(_).toInt.toString), // this tests the string is really an int.
+    _depositAccountNumber = _depositAccountNumber.map(decryptAES(_).toLong.toString), // this tests the string is really a long.
     created = created,
     updated = updated
   )
@@ -104,19 +172,25 @@ case class EncryptedCelebritySecureInfo(
 
 abstract class CelebritySecureInfo {
   def id: Long
+  def contactEmail: Option[String]
   def smsPhone: Option[String]
   def voicePhone: Option[String]
   def agentEmail: Option[String]
   def streetAddress: Option[String]
-  def city: Option[String] = None
+  def city: Option[String]
   def postalCode: Option[String]
   def country: Option[String]
   def _depositAccountType: Option[String]
-  def depositAccountRoutingNumber: Option[Int]
-  def depositAccountNumber: Option[Int]
+  def _depositAccountRoutingNumber: Option[String]
+  def _depositAccountNumber: Option[String]
   def created: Timestamp
   def updated: Timestamp
-  
+
+  def numberOfContactMethods: Int = {
+    val maybeContactMethods = Set(contactEmail, smsPhone, voicePhone, agentEmail)
+    maybeContactMethods.flatten.size
+  }
+
   def hasAllDepositInformation: Boolean = {
     val maybeAllDepositInfo = Set(
       streetAddress,
@@ -124,8 +198,8 @@ abstract class CelebritySecureInfo {
       postalCode,
       country,
       _depositAccountType,
-      depositAccountRoutingNumber,
-      depositAccountNumber
+      _depositAccountRoutingNumber,
+      _depositAccountNumber
     )
     maybeAllDepositInfo.filter(_.isDefined) == maybeAllDepositInfo
   }
