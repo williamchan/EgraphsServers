@@ -447,7 +447,7 @@
             </button><img style="position:relative;left:5px" src="@EgraphsAssets.at("images/ajax-loader.gif")" ng-show="transacting" />
             <div id="this-will-charge" ng-show="fieldsRemaining().length == 0">
               <span class="money">${{cart.total}}</span> will be charged
-              <span ng-show="cart.total > 0">to your {{stripeToken.data.card.type}}********{{stripeToken.data.card.last4}}</span>
+              <span ng-show="cart.total > 0">to your card.</span>
               <span ng-show="cart.total <= 0">to you. This one's on us!</span>
             </div>
             @*<div id="or-edit"><a href="#">Edit your order</a></div>*@
