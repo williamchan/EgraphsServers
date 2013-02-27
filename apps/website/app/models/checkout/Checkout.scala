@@ -13,6 +13,7 @@ import services.AppConfig
 import services.db._
 import services.payment.Charge
 import services.config.ConfigFileProxy
+import com.stripe.exception.StripeException
 
 //
 // Services
@@ -280,16 +281,23 @@ abstract class Checkout
   private def resolveCashTransactionAndCharge(maybeTxnType: Option[CashTransactionLineItemType])
   : Either[CheckoutFailed, Option[CashTransactionLineItem]] =
   {
-    val txnItem = for (
-      txnType <- maybeTxnType;
-      txnItems <- txnType.lineItems(Seq(balance));
-      txnItem <- txnItems.headOption
-    ) yield txnItem
 
-    (txnItem, balance.amount.isZero) match {
-      case (Some(item), false) => Right { Some(item.makeCharge(this)) }
-      case (None, false) => Left{ CheckoutFailedCashTransactionResolutionError(this, maybeTxnType) }
-      case (_, true)  => Right(None)
+    if (balance.amount.isZero) Right(None) else {
+
+      val maybeExceptionOrCharged = for (
+        txnType <- maybeTxnType;
+        txnItems <- txnType.lineItems(Seq(balance));
+        txnItem <- txnItems.headOption
+      ) yield txnItem.makeCharge(this)
+
+      maybeExceptionOrCharged map {
+        case Right(item) => Right(Some(item))
+        case Left(se: StripeException) => Left {
+          CheckoutFailedStripeException(this, maybeTxnType, se)
+        }
+      } getOrElse Left {
+        CheckoutFailedCashTransactionResolutionError(this, maybeTxnType)
+      }
     }
   }
 
@@ -377,6 +385,13 @@ object Checkout {
     checkout: Checkout,
     cashTransactionType: Option[CashTransactionLineItemType]
   ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
+
+  case class CheckoutFailedStripeException(
+    checkout: Checkout,
+    cashTransactionType: Option[CashTransactionLineItemType],
+    exception: StripeException
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
+
 
   case class CheckoutFailedInsufficientInventory(
     checkout: Checkout,

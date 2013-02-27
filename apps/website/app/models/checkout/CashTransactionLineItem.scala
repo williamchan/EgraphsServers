@@ -7,6 +7,7 @@ import services.AppConfig
 import services.db.{Schema, CanInsertAndUpdateEntityThroughServices}
 import services.payment.Payment
 import models.enums.LineItemNature
+import com.stripe.exception.{CardException, StripeException}
 
 
 //
@@ -90,10 +91,10 @@ case class CashTransactionLineItem(
    * @param checkout for which the charge is being made
    * @return CashTransactionLineItem with an update domainObject
    */
-  def makeCharge(checkout: Checkout): CashTransactionLineItem = {
+  def makeCharge(checkout: Checkout): Either[StripeException, CashTransactionLineItem] = {
     require(amount.negated == domainObject.cash, "Line item amount and transaction amount are out of sync")
 
-    if (checkout.balance.amount.isZero) { this }
+    if (checkout.balance.amount.isZero) Right { this }
     else {
       require(checkout.balance.amount == domainObject.cash, "Checkout balance and transaction amount are out of sync")
       require(checkout.id > 0, "Checkout with persisted entity required to make charge.")
@@ -102,9 +103,19 @@ case class CashTransactionLineItem(
 
       val txn = domainObject
       val token = txn.stripeCardTokenId getOrElse (throw new IllegalArgumentException("Stripe token required."))
-      val charge = services.payment.charge(txn.cash, token, s"Checkout #$checkout.id for $checkout.buyerAccount.email")
-      val newTransaction = txn.copy(stripeChargeId = Some(charge.id))
-      this.copy(_maybeCashTransaction = Some(newTransaction))
+      val description = s"Checkout #$checkout.id for $checkout.buyerAccount.email"
+
+      try {
+        val charge = services.payment.charge(txn.cash, token, description)
+        val newTransaction = txn.copy(stripeChargeId = Some(charge.id))
+        val itemWithNewTransaction = this.copy(_maybeCashTransaction = Some(newTransaction))
+
+        Right(itemWithNewTransaction)
+
+      } catch {
+        case e: StripeException => Left(e)
+        case e: Throwable => throw e
+      }
     }
   }
 

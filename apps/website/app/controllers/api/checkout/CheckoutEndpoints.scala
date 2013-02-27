@@ -1,13 +1,18 @@
 package controllers.api.checkout
 
-import play.api.mvc.{RequestHeader, Controller, AnyContent, Action}
-import services.http.{WithDBConnection, POSTApiControllerMethod, ControllerMethod}
-import services.http.filters.HttpFilters
-import models.checkout.{Checkout, CheckoutAdapterServices}
+import com.stripe.exception.StripeException
+import models.checkout.Checkout
+import models.checkout.CheckoutAdapterServices
+import models.checkout.Checkout.CheckoutFailedInsufficientInventory
+import models.checkout.Checkout.CheckoutFailedStripeException
+import models.checkout.forms.enums.ApiError
 import models.enums.CheckoutCodeType
-import services.db.TransactionSerializable
-import services.logging.Logging
+import play.api.mvc._
 import play.api.libs.json._
+import services.db.TransactionSerializable
+import services.http.{POSTApiControllerMethod, ControllerMethod, WithDBConnection}
+import services.http.filters.HttpFilters
+import services.logging.Logging
 
 /**
  * Should this be CheckoutAdapterEndpoints, maybe?
@@ -48,6 +53,7 @@ trait CheckoutEndpoints { this: Controller =>
       Action { implicit request =>
         checkoutAdapters.decache(celebrity.id) map { checkout =>
           checkout.transact() match {
+
             case Some(Right(transacted)) =>
               checkout.cart.emptied.save()
               confirmationResultFor(transacted)
@@ -57,7 +63,11 @@ trait CheckoutEndpoints { this: Controller =>
               log(Json.stringify(checkout.formState))
               log(Json.stringify(checkout.summary))
 
-              BadRequest
+              failure match {
+                case checkoutFailedInsufficientInventory: CheckoutFailedInsufficientInventory => insufficientInventoryResult
+                case CheckoutFailedStripeException(_, _, e) => stripeErrorResult(e)
+                case _ => InternalServerError
+              }
 
             case None =>
               error(s"Failed to transact checkout due to invalid state: session=$sessionIdSlug, celeb=$checkoutIdSlug}")
@@ -90,6 +100,29 @@ trait CheckoutEndpoints { this: Controller =>
       )
     )
     Ok(jsonResponse).flashing(request.flash + ("orderId" -> order.id.toString))
+  }
+
+  private def stripeErrorResult(e: StripeException) = BadRequest {
+    println(s"***\n***stripe exception message: ${e.getMessage}\n***")
+
+    transactionErrorBody(
+      e.getMessage,
+      "Sorry, we were unable to charge your card. Please check your card information and make sure you're using a valid card."
+    )
+  }
+
+  private def insufficientInventoryResult = BadRequest {
+    transactionErrorBody(
+      ApiError.InsufficientInventory.name,
+      "Sorry, the product you attempted to purchase has run out of inventory ."
+    )
+  }
+
+  private def transactionErrorBody(cause: String, msg: String) = Json.obj {
+    "errors" -> Json.obj (
+      "cause" -> cause,
+      "message" -> msg
+    )
   }
 }
 
