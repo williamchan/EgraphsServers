@@ -30,17 +30,35 @@ case class MarketplaceCelebrity(
     photoUrl: String,
     storefrontUrl: String,
     inventoryRemaining: Int,
+    soldout: Boolean,
     minPrice: Int,
     maxPrice: Int, 
     secondaryText: String)
-{
-  def soldout: Boolean = (inventoryRemaining <= 0)
-  def hasInventoryRemaining: Boolean = !soldout
-}
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object MarketplaceCelebrity extends Function8[Long, String, String, String, Int, Int, Int, String, MarketplaceCelebrity]{
+object MarketplaceCelebrity extends Function9[Long, String, String, String, Int, Boolean, Int, Int, String, MarketplaceCelebrity]{
   implicit val marketplaceCelebrityFormats = Json.format[MarketplaceCelebrity]
+
+  def make(
+    id: Long = 0,
+    publicName: String,
+    photoUrl: String,
+    storefrontUrl: String,
+    inventoryRemaining: Int,
+    minPrice: Int,
+    maxPrice: Int,
+    secondaryText: String
+  ): MarketplaceCelebrity = MarketplaceCelebrity(
+    id = id,
+    publicName = publicName,
+    photoUrl = photoUrl,
+    storefrontUrl = storefrontUrl,
+    inventoryRemaining = inventoryRemaining,
+    soldout = (inventoryRemaining <= 0),
+    minPrice = minPrice,
+    maxPrice = maxPrice,
+    secondaryText = secondaryText
+  )
 }
 
 /**
@@ -71,12 +89,13 @@ case class CategoryViewModel(
    * Turn this representation into a convenient JSON representation for our front end code. 
    **/
   def asActiveMap : Map[String, JsValue] = {
-      Map(
-         "c" + id.toString -> 
-          Json.toJson(categoryValues.filter(cv => cv.active).map( fv => 
-            Json.toJson(fv.id)  
-          ))
+    Map(
+      "c" + id.toString ->
+        Json.toJson(categoryValues.filter(cv => cv.active).map(fv =>
+          Json.toJson(fv.id)
+        )
       )
+    )
   }
   /**
    * Determine whether or not there is an active value in this code. 
