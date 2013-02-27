@@ -21,6 +21,7 @@ object ApiControllers extends Controller
   with GetCustomerApiEndpoint
   with GetCustomerEgraphsApiEndpoint
   with GetTopEgraphsApiEndpoint
+  with PostCelebrityApiEndpoint
   with PostCelebrityOrderApiEndpoint
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint

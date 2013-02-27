@@ -1,5 +1,6 @@
 package models.enums
 
+import play.api.libs.json._
 import egraphs.playutils.Enum
 
 /**
@@ -8,11 +9,27 @@ import egraphs.playutils.Enum
 object BankAccountType extends Enum {
   sealed trait EnumVal extends Value
 
-  val Published = new EnumVal {
+  val Checking = new EnumVal {
     val name = "Checking"
   }
-  val Unpublished = new EnumVal {
+  val Savings = new EnumVal {
     val name = "Savings"
+  }
+
+  /**
+   * This will let you more easily write BankAccountType to your json objects
+   * using the api formatting.
+   */
+  implicit object ApiDateFormat extends Format[EnumVal] {
+    def writes(accountType: EnumVal): JsValue = {
+      JsString(accountType.name)
+    }
+
+    def reads(json: JsValue): JsResult[EnumVal] = {
+      JsSuccess {
+        BankAccountType(json.as[String]).get
+      }
+    }
   }
 }
 
@@ -25,7 +42,7 @@ trait HasDepositAccountType[T] {
     ))
   }
 
-  def withDepositAccountType(depositAccountType: BankAccountType.EnumVal): T
+  def withDepositAccountType(maybeDepositAccountType: Option[BankAccountType.EnumVal]): T
 }
 
 // Note: make HasPaymentAccountType if we even need that, don't reuse HasDepositAccount for that.

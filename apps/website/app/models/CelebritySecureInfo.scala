@@ -14,6 +14,7 @@ import services.AppConfig
 case class JsCelebrityContactInfo(
   id: Long,
   accountSettingsComplete: Boolean,
+  twitterUsername: Option[String],
   contactEmail: Option[String],
   smsPhone: Option[String],
   voicePhone: Option[String],
@@ -21,7 +22,7 @@ case class JsCelebrityContactInfo(
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrityContactInfo extends Function6[Long, Boolean, Option[String], Option[String], Option[String], Option[String], JsCelebrityContactInfo] {
+object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[String], JsCelebrityContactInfo] {
   implicit val celebrityContactInfoFormats = Json.format[JsCelebrityContactInfo]
 
   def from(celebrity: Celebrity): JsCelebrityContactInfo = {
@@ -29,6 +30,7 @@ object JsCelebrityContactInfo extends Function6[Long, Boolean, Option[String], O
     JsCelebrityContactInfo(
       id = celebrity.id,
       accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
+      twitterUsername = celebrity.twitterUsername,
       contactEmail = secureInfo.map(_.contactEmail).flatten,
       smsPhone = secureInfo.map(_.smsPhone).flatten,
       voicePhone = secureInfo.map(_.voicePhone).flatten,
@@ -44,13 +46,15 @@ case class JsCelebrityDepositInfo(
   city: Option[String],
   postalCode: Option[String],
   country: Option[String],
-  depositAccountType: Option[String],
-  depositAccountRoutingNumber: Option[Int],
-  depositAccountNumber: Option[Long]
+  depositAccountType: Option[BankAccountType.EnumVal],
+  depositAccountRoutingNumber: Option[Int] = None,
+  depositAccountNumber: Option[Long] = None,
+  anonymousDepositAccountRoutingNumber: Option[String] = None,
+  anonymousDepositAccountNumber: Option[String] = None
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrityDepositInfo extends Function9[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[String], Option[Int], Option[Long], JsCelebrityDepositInfo] {
+object JsCelebrityDepositInfo extends Function11[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[BankAccountType.EnumVal], Option[Int], Option[Long], Option[String], Option[String], JsCelebrityDepositInfo] {
   implicit val celebrityDepositInfoFormats = Json.format[JsCelebrityDepositInfo]
 
   def from(celebrity: Celebrity): JsCelebrityDepositInfo = {
@@ -62,9 +66,9 @@ object JsCelebrityDepositInfo extends Function9[Long, Boolean, Option[String], O
       city = secureInfo.map(_.city).flatten,
       postalCode = secureInfo.map(_.postalCode).flatten,
       country = secureInfo.map(_.country).flatten,
-      depositAccountType = secureInfo.map(info => info._depositAccountType).flatten,
-      depositAccountRoutingNumber = secureInfo.map(_.depositAccountRoutingNumber).flatten,
-      depositAccountNumber = secureInfo.map(_.depositAccountNumber).flatten
+      depositAccountType = secureInfo.map(info => info.depositAccountType).flatten,
+      anonymousDepositAccountRoutingNumber = secureInfo.map(_.anonymizedDepositAccountRoutingNumber).flatten,
+      anonymousDepositAccountNumber = secureInfo.map(_.anonymizedDepositAccountNumber).flatten
     )
   }
 }
@@ -100,6 +104,12 @@ case class DecryptedCelebritySecureInfo(
   lazy val depositAccountRoutingNumber: Option[Int] = _depositAccountRoutingNumber.map(_.toInt)
   lazy val depositAccountNumber: Option[Long] = _depositAccountNumber.map(_.toLong)
 
+  def anonymizedDepositAccountRoutingNumber: Option[String] = _depositAccountRoutingNumber.map(CelebritySecureInfo.anonymized(_, 4))
+  def anonymizedDepositAccountNumber: Option[String] = _depositAccountNumber.map(CelebritySecureInfo.anonymized(_, 4))
+
+  def withDepositAccountRoutingNumber(maybeRoutingNumber: Option[Int]): DecryptedCelebritySecureInfo = copy(_depositAccountRoutingNumber = maybeRoutingNumber.map(_.toString))
+  def withDepositAccountNumber(maybeAccountNumber: Option[Long]): DecryptedCelebritySecureInfo = copy(_depositAccountNumber = maybeAccountNumber.map(_.toString))
+
   def encrypt = EncryptedCelebritySecureInfo(
     id = id,
     contactEmail = contactEmail.map(encryptAES(_)),
@@ -117,8 +127,8 @@ case class DecryptedCelebritySecureInfo(
     updated = updated
   )
 
-  override def withDepositAccountType(depositAccountType: BankAccountType.EnumVal) = {
-    this.copy(_depositAccountType = Some(depositAccountType.name))
+  override def withDepositAccountType(maybeDepositAccountType: Option[BankAccountType.EnumVal]) = {
+    this.copy(_depositAccountType = maybeDepositAccountType.map(_.name))
   }
 }
 
@@ -143,6 +153,10 @@ case class EncryptedCelebritySecureInfo(
   with HasCreatedUpdated
   with HasDepositAccountType[EncryptedCelebritySecureInfo]
 {
+  def save(): EncryptedCelebritySecureInfo = {
+    services.store.save(this)
+  }
+
   def decrypt = DecryptedCelebritySecureInfo(
     id = id,
     contactEmail = contactEmail.map(decryptAES(_)),
@@ -160,8 +174,8 @@ case class EncryptedCelebritySecureInfo(
     updated = updated
   )
 
-  override def withDepositAccountType(depositAccountType: BankAccountType.EnumVal) = {
-    this.copy(_depositAccountType = Some(depositAccountType.name))
+  override def withDepositAccountType(maybeDepositAccountType: Option[BankAccountType.EnumVal]) = {
+    this.copy(_depositAccountType = maybeDepositAccountType.map(_.name))
   }
 
   //
@@ -202,6 +216,20 @@ abstract class CelebritySecureInfo {
       _depositAccountNumber
     )
     maybeAllDepositInfo.filter(_.isDefined) == maybeAllDepositInfo
+  }
+}
+
+object CelebritySecureInfo {
+  /**
+   * Takes a string and shows the last $takeRight characters and replaces
+   * all other characters with '*'.
+   *   For example:
+   *     val x = anonymized("123456789", 3)
+   *     x == "******789" // would be true
+   */
+  def anonymized(insecure: String, takeRight: Int): String = {
+    val hint = insecure.takeRight(takeRight)
+    ("*" * (insecure.size - hint.size)) + hint
   }
 }
 

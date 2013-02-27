@@ -82,6 +82,9 @@ class Schema @Inject() (
       celebrity.bio is dbType("text")))
 
   val encryptedCelebritySecureInfos = table[EncryptedCelebritySecureInfo]
+  on(encryptedCelebritySecureInfos)(encryptedCelebritySecureInfo =>
+    declare(
+      encryptedCelebritySecureInfo.contactEmail is unique))
 
   val checkouts = table[CheckoutEntity]("Checkout")
   // TODO(SER-499): Index declarations
@@ -219,8 +222,8 @@ class Schema @Inject() (
   val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)
     .via((category, categoryValue) => category.id === categoryValue.categoryId)
 
-  val celebrityToCelebritySecureInfos = oneToManyRelation(celebrities, encryptedCelebritySecureInfos)
-    .via((celebrity, encryptedCelebritySecureInfo) => celebrity.secureInfoId === encryptedCelebritySecureInfo.id)
+  val celebrityToCelebritySecureInfos = oneToManyRelation(encryptedCelebritySecureInfos, celebrities)
+    .via((encryptedCelebritySecureInfo, celebrity) => encryptedCelebritySecureInfo.id === celebrity.secureInfoId)
   on(celebrities)(celebrity => declare(celebrity.secureInfoId is (unique)))
   celebrityToCelebritySecureInfos.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
