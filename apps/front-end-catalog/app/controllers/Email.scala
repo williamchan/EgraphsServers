@@ -25,8 +25,7 @@ object Email extends Controller {
         pricePaid = "$50.00",
         deliveredByDate = "June 19, 2012",
         faqHowLongLink = "https://www.egraphs.com/faq#how-long",
-        printOrderShippingAddress = "1234 Cherry Lane New York, NY 12345",
-        hasPrintOrder = true
+        maybePrintOrderShippingAddress = Some("1234 Cherry Lane New York, NY 12345")
       )
     ))
   }

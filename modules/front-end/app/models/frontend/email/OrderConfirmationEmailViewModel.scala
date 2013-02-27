@@ -15,6 +15,8 @@ case class OrderConfirmationEmailViewModel(
   pricePaid: String,
   deliveredByDate: String,
   faqHowLongLink: String,
-  printOrderShippingAddress: String,
-  hasPrintOrder: Boolean
-)
+  maybePrintOrderShippingAddress: Option[String]
+) {
+  def printOrderShippingAddress: String = maybePrintOrderShippingAddress getOrElse ("")
+  def hasPrintOrder: Boolean = maybePrintOrderShippingAddress.isDefined
+}

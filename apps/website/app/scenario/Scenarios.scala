@@ -403,8 +403,7 @@ class Scenarios extends DeclaresScenarios {
           pricePaid = "$50.00",
           deliveredByDate = "Jan 8, 2012",
           faqHowLongLink = "/faq#how-long",
-          printOrderShippingAddress = "1234 Cherry Lane New York, NY 12345",
-          hasPrintOrder = true
+          maybePrintOrderShippingAddress = Some("1234 Cherry Lane New York, NY 12345")
         )
 
       val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
