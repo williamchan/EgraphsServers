@@ -30,14 +30,17 @@ trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controll
         otherFilter = httpFilters.requireCelebrityPublishedAccess.filter((maybeUnpublishedCelebrity, accesskey))
       ) { celeb =>
         Action { implicit request =>
-          val products = celeb.productsInActiveInventoryBatches()
-          val maybeMostExpensive = products.sortBy(_.price.getAmount).headOption
+          val products = celeb.activeProductsAndInventoryBatches
+            .filter { case (product, inventory) => inventory.hasInventory }
+            .map { case (product, _) => product }
+
+          val maybeCheapest = products.sortBy(_.price.getAmount).headOption
 
           val productViews = for (
             product <- products;
-            mostExpensive <- maybeMostExpensive.toSeq
+            cheapest <- maybeCheapest.toSeq
           ) yield {
-            product.asPersonalizeThumbView.copy(selected=product == mostExpensive)
+            product.asPersonalizeThumbView.copy(selected=product == cheapest)
           }
           val starView = celeb.asPersonalizeStar(productViews)
 
