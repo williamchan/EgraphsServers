@@ -587,6 +587,7 @@ class Schema @Inject() (
       factoryFor(blobKeys) is BlobKey(services = injector.instance[BlobKeyServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
+      factoryFor(encryptedCelebritySecureInfos) is EncryptedCelebritySecureInfo(services = injector.instance[CelebritySecureInfoServices]),
       factoryFor(celebrityCategoryValues) is CelebrityCategoryValue(services = injector.instance[CategoryServices]),
       factoryFor(coupons) is Coupon(services = injector.instance[CouponServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
