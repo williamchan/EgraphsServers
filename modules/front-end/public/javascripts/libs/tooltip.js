@@ -89,13 +89,13 @@ function(analytics, window) {
      
           target.attr( 'title', tip );
           
-          target.unbind('mouseleave', remove_tooltip);
+          target.unbind('click mouseleave', remove_tooltip);
           tooltip.unbind('click', remove_tooltip);
 
           durationEvent.track();
         };
      
-        target.bind( 'mouseleave', remove_tooltip );
+        target.bind( 'click mouseleave', remove_tooltip );
         tooltip.bind( 'click', remove_tooltip );
       };
      
