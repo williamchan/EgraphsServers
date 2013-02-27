@@ -20,7 +20,8 @@
     headline: "@masthead.headline",
     subtitle: "@masthead.subtitle.getOrElse("")",
     callToActionTarget : "@masthead.callToActionTarget",
-    callToActionText: "@masthead.callToActionText"
+    callToActionText: "@masthead.callToActionText",
+    callToActionType: "@masthead.callToActionType.name"
   };
 }
 
@@ -67,27 +68,28 @@
                   <div class="controls">
                    <textarea name="subtitle" type="text" rows="2" ng-model="masthead.subtitle"></textarea>
                   </div>
-                  <label class="control-label">CTA Text</label>
-                  <div class="controls">
-                   <input name="callToActionText" type="text" class="input-large" ng-model="masthead.callToActionText">
-                    <span class="help-block">
-                      A CTA is a <a href="http://en.wikipedia.org/wiki/Call_to_action_(marketing)">call to action.</a> 
-                    </span>        
-                  </div>
                   <label class="control-label">CTA Type</label>
                   <div class="controls">
                     @for(cta <- CallToActionType.values) {
-                      <input type="radio" name="callToActionTypeString" value="@cta.name" @if(cta.name == masthead.callToActionType.name) {checked="checked"}>@cta.name
+                      <input type="radio" name="callToActionTypeString" ng-model="masthead.callToActionType" value="@cta.name" @if(cta.name == masthead.callToActionType.name) {checked="checked"}>@cta.name
                     }
                       
                      <span class="help-block">
+                      A CTA is a <a href="http://en.wikipedia.org/wiki/Call_to_action_(marketing)">call to action.</a> <br>
                       Save and refresh to view. 
                      </span>
                   </div>
-                  
-                  <label class="control-label">CTA Target</label>
-                  <div class="controls">
-                   <input name="callToActionTarget" type="text" class="input-large" ng-model="masthead.callToActionTarget">
+                  <div ng-show="masthead.callToActionType != 'Searchbox'">
+                    <label class="control-label">CTA Text</label>
+                    <div class="controls">
+                      <input name="callToActionText" type="text" class="input-large" ng-model="masthead.callToActionText">
+                    </div>
+                  </div>  
+                  <div ng-show="masthead.callToActionType == 'SimpleLink'">
+                    <label class="control-label">CTA Target</label>
+                    <div class="controls">
+                     <input name="callToActionTarget" type="text" class="input-large" ng-model="masthead.callToActionTarget">
+                    </div>
                   </div>
                   
                   <label class="control-label">Image</label>
