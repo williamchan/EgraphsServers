@@ -6,6 +6,7 @@ import play.api.mvc.Session
 import play.api.mvc.Call
 import egraphs.playutils.Enum
 import java.util.Date
+import org.joda.time.DateTimeConstants
 
 case class EgraphsSession(session: Session) {
   import EgraphsSession.Key
@@ -21,14 +22,6 @@ case class EgraphsSession(session: Session) {
 
   def isUsernameChanged: Option[Boolean] = {
     getBoolean(Key.UsernameChanged.name)
-  }
-
-  def hasSignedUp: Boolean = {
-    getBoolean(Key.HasSignedUp.name).getOrElse(false)
-  }
-
-  def lastSignupModalDisplay: Option[Date] = {
-    getDate(Key.LastSignupModalDisplay.name)
   }
 
   def withAdminId(id: Long): Session = {
@@ -67,24 +60,12 @@ case class EgraphsSession(session: Session) {
     session + (Key.UsernameChanged.name -> true.toString)
   }
 
-  def withHasSignedUp: Session = {
-    session + (Key.HasSignedUp.name -> true.toString)
-  }
-
-  def withLastSignupModalDisplay: Session = {
-    session + (Key.LastSignupModalDisplay.name -> System.currentTimeMillis.toString)
-  }
-
   def getLong(key: String): Option[Long] = {
     try {
       session.get(key).map(value => value.toLong)
     } catch {
       case _: NumberFormatException => None
     }
-  }
-
-  def getDate(key: String): Option[Date] = {
-    getLong(key).map(long => new Date(long))
   }
 
   def getBoolean(key: String): Option[Boolean] = {
@@ -94,6 +75,8 @@ case class EgraphsSession(session: Session) {
 
 object EgraphsSession {
   val SESSION_ID_KEY = "___ID"
+
+  val COOKIE_MAX_AGE = 3 * 52 * DateTimeConstants.SECONDS_PER_WEEK
 
   /**
    * Acceptable objects to use as keys on the EgraphsSession.
@@ -107,8 +90,8 @@ object EgraphsSession {
     val CustomerId = new EnumVal("customer") {}
     val UsernameChanged = new EnumVal("username_changed") {}
     val HasSignedUp = new EnumVal("has_signed_up") {}
-    val LastSignupModalDisplay = new EnumVal("last_signup_modal_display") {}
     val RequestedStar = new EnumVal("requested_star") {}
+    val SignupModalDisplayedRecently = new EnumVal("signup_modal_displayed_recently") {}
   }
 
   object Conversions {

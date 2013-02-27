@@ -1,7 +1,6 @@
 package controllers.website
 
-import play.api.mvc.Action
-import play.api.mvc.Controller
+import play.api.mvc._
 import play.api.mvc.Results.Redirect
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
@@ -12,6 +11,7 @@ import services.db.TransactionSerializable
 import services.http.POSTControllerMethod
 import services.http.forms.CustomerLoginFormFactory
 import services.http.EgraphsSession
+import services.http.EgraphsSession.Key._
 import services.http.EgraphsSession.Conversions._
 import services.request.PostCelebrityRequestHelper
 import models._
@@ -42,8 +42,8 @@ private[controllers] trait PostLoginEndpoint extends PostCelebrityRequestHelper 
           maybeRequestedStar match {
             case None => {
               Redirect(getCustomerGalleryById(validForm.customerId)).withSession(
-                request.session.withCustomerId(validForm.customerId).withHasSignedUp
-              )
+                request.session.withCustomerId(validForm.customerId)
+              ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
             }
             case Some(requestedStar) => completeRequestStar(requestedStar, validForm.customerId)(request)
           }
