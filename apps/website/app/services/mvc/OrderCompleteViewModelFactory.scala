@@ -73,6 +73,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
     val totalAmountPaid = cashTransaction.map(_.cash).getOrElse(Money.zero(CurrencyUnit.USD))
     val isLiveConsumerSite = (config.applicationBaseUrl == "https://www.egraphs.com/")
     val printPrice = maybePrintOrder.map(_.amountPaid).getOrElse(Money.zero(CurrencyUnit.USD))
+    val printOrderShippingAddress = maybePrintOrder.map(_.shippingAddress).getOrElse("")
     
     OrderCompleteViewModel (
       orderDate = order.created,
@@ -91,6 +92,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       discount = None,
       digitalPrice = product.price,
       printPrice = printPrice,
+      printOrderShippingAddress = printOrderShippingAddress,
       hasPrintOrder = maybePrintOrder.isDefined,
       withAffiliateMarketing = isLiveConsumerSite
     )
