@@ -7,7 +7,7 @@ import models.{Masthead, MastheadStore}
 import services.http.filters.HttpFilters
 import models.enums.CallToActionType.EnumVal
 import models.enums.CallToActionType
-import models.frontend.masthead.{VideoPlayerViewModel, CallToActionViewModel}
+import models.frontend.masthead.{SearchBoxViewModel, VideoPlayerViewModel, CallToActionViewModel}
 
 
 private[controllers] trait GetMastheadAdminEndpoint extends ImplicitHeaderAndFooterData {
@@ -25,7 +25,7 @@ private[controllers] trait GetMastheadAdminEndpoint extends ImplicitHeaderAndFoo
         val maybeMasthead = mastheadStore.findById(mastheadId)
         maybeMasthead match {
           case Some(masthead) => Ok(views.html.Application.admin.admin_masthead_detail(masthead,
-            postMastheadUrl, callToActionViewModel = CallToActionTypeToViewModel(masthead.callToActionType), errorFields))
+            postMastheadUrl, callToActionViewModel = CallToActionType.toViewModel(masthead.callToActionType), errorFields))
           case None => NotFound("No masthead with this ID exists")
         }
 
@@ -40,16 +40,8 @@ private[controllers] trait GetMastheadAdminEndpoint extends ImplicitHeaderAndFoo
           headline = "An Example headline",
           subtitle = Some("an example subtitle"), 
           callToActionText = "Click here!"
-        ), postMastheadUrl, callToActionViewModel = CallToActionTypeToViewModel(CallToActionType.VideoPlayer), errorFields))
+        ), postMastheadUrl, callToActionViewModel = VideoPlayerViewModel(text= "{{masthead.text}}", target = "{{masthead.target}}"), errorFields))
       }
-    }
-  }
-
-  private def CallToActionTypeToViewModel(actionType: CallToActionType.EnumVal) : CallToActionViewModel = {
-    // We pass in AngularJS bindings to enable users to preview their changes on the admin page easily.
-    actionType match {
-      case CallToActionType.VideoPlayer => VideoPlayerViewModel(text= "{{masthead.text}}", target = "{{masthead.target}}")
-      case _ => VideoPlayerViewModel(text= "{{masthead.text}}", target = "{{masthead.target}}")
     }
   }
 

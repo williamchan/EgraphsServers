@@ -34,7 +34,7 @@ object CallToActionType extends Enum {
     val name = "VideoPlayer"
   }
 
-  def toViewModel(callToActionType: CallToActionType.EnumVal, text: String, target: String) = {
+  def toViewModel(callToActionType: CallToActionType.EnumVal, text: String = "", target: String = "") = {
     callToActionType match {
       case SimpleLink => SimpleLinkViewModel(text, target)
       case SearchBox => SearchBoxViewModel(text, target)

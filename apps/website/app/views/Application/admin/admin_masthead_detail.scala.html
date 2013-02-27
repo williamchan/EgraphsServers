@@ -17,25 +17,26 @@
 @headJs = {
   Egraphs.page.masthead = {
     name: "@masthead.name",
-    headline: "@masthead.headline",
-    subtitle: "@masthead.subtitle.getOrElse("")",
-    callToActionTarget : "@masthead.callToActionTarget",
-    callToActionText: "@masthead.callToActionText",
-    callToActionType: "@masthead.callToActionType.name"
+    headline: "@Html(masthead.headline)",
+    subtitle: "@Html(masthead.subtitle.getOrElse(""))",
+    callToActionTarget : "@Html(masthead.callToActionTarget)",
+    callToActionText: "@Html(masthead.callToActionText)",
+    callToActionType: "@Html(masthead.callToActionType.name)"
   };
 }
 
 @mastheadSection = {
   @tags.landing.masthead(
     LandingMasthead(
-      headline = "{{masthead.headline}}",
-      subtitle = Option("{{masthead.subtitle}}"),
+      headline = "",
       landingPageImageUrl = masthead.landingPageImage.resizedWidth(1550).getSaved(services.blobs.AccessPolicy.Public).url,
       callToActionViewModel = CallToActionType.toViewModel(masthead.callToActionType, 
-        "{{masthead.callToActionText}}", 
-        "{{masthead.callToActionTarget}}"
+        "",
+        ""
       )
-    ) 
+    ),
+    active = false,
+    ngBindings = true
   )  
 }
 

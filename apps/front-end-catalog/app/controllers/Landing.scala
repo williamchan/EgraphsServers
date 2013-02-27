@@ -93,8 +93,8 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
 
   private def makeMasthead(callToActionViewModel: CallToActionViewModel) = {
     LandingMasthead(
-      headline = "Use words to direct the user where to go",
-      subtitle = Some("Tell me where to go!"),
+      headline = "Direct the user's attention",
+      subtitle = Some("Click here!"),
       landingPageImageUrl = sampleMastheadUrl,
       callToActionViewModel = callToActionViewModel
     )

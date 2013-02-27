@@ -1,31 +1,64 @@
 @(masthead: models.frontend.landing.LandingMasthead,
-  active: Boolean = false
+  active: Boolean = false,
+  ngBindings: Boolean = false
 )
 
 @import models.frontend.masthead._
 
-@video(text: String) = {
-  <h1>@masthead.headline</h1>
-  <h2>@masthead.subtitle</h2>
+@ngHeadline = {
+  @if(ngBindings) {
+    <h1 ng-bind-html-unsafe="masthead.headline"></h1>
+  } else {
+    <h1>@masthead.headline</h1>
+  }
+}
+
+@ngSubtitle = {
+  @if(ngBindings) {
+    <h2 ng-bind-html-unsafe="masthead.subtitle"></h2>
+  } else {
+    <h2>@masthead.subtitle</h2>
+  }
+}
+
+@ngText = {
+  @if(ngBindings) {
+    <span class="binding" ng-bind-html-unsafe="masthead.callToActionText"></span>
+  } else {
+    @masthead.callToActionViewModel.text
+  }
+}
+
+@ngTarget = {
+  @if(ngBindings) {
+    {{masthead.callToActionTarget}}
+  } else {
+    @masthead.callToActionViewModel.target
+  }
+}
+
+@video = {
+  @ngHeadline
+  @ngSubtitle
   <p class="play-egraph">
     <a id="masthead-video-button" class="button">
-      <strong>@text<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
+      <strong>@ngText<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
     </a>
   </p>
 }
 
-@simpleLink(text: String, target: String) = {
-  <h1>@masthead.headline</h1>
-  <h2>@masthead.subtitle</h2>
+@simpleLink = {
+  @ngHeadline
+  @ngSubtitle
   <p class="get-started">
-    <a href="@target" class="button">
-      <strong>@text</strong> <span>&raquo;</span>
+    <a href="@ngTarget" class="button">
+      <strong>@ngText</strong> <span>&raquo;</span>
     </a>
   </p>
 }
 
 @search = {
-  <h1>@masthead.headline</h1>
+  @ngHeadline
   @searchbox("/stars", helper=false)
 }
 
@@ -38,10 +71,10 @@
 
         @{
           masthead.callToActionViewModel match {
-            case v: VideoPlayerViewModel => video(text = v.text)
-            case l: SimpleLinkViewModel => simpleLink(text = l.text, target = l.target)
+            case v: VideoPlayerViewModel => video
+            case l: SimpleLinkViewModel => simpleLink
             case s: SearchBoxViewModel => search
-            case _ =>  video(text="Herp")
+            case _ =>  video
           }
         }
         </div>
