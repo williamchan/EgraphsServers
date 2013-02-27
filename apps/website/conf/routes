@@ -38,7 +38,9 @@ GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/pub
 GET     /api/1.0/client                                         controllers.ApiControllers.getIOSClient(redirectToItmsLink: Boolean ?= false)
 GET     /api/1.0/celebrities/me                                 controllers.ApiControllers.getCelebrity
 GET     /api/1.0/celebrities/me/settings/contact                controllers.ApiControllers.getCelebrityContactInfo
+POST    /api/1.0/celebrities/me/settings/contact                controllers.ApiControllers.postCelebrityContactInfo
 GET     /api/1.0/celebrities/me/settings/deposit                controllers.ApiControllers.getCelebrityDepositInfo
+POST    /api/1.0/celebrities/me/settings/deposit                controllers.ApiControllers.postCelebrityDepositInfo
 GET     /api/1.0/celebrities/me/enrollmenttemplate              controllers.ApiControllers.getCelebrityEnrollmentTemplate
 GET     /api/1.0/celebrities/me/mobileappinfo                   controllers.ApiControllers.getCelebrityMobileAppInfo
 GET     /api/1.0/celebrities/me/products                        controllers.ApiControllers.getCelebrityProducts

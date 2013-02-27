@@ -26,7 +26,10 @@ object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], O
   implicit val celebrityContactInfoFormats = Json.format[JsCelebrityContactInfo]
 
   def from(celebrity: Celebrity): JsCelebrityContactInfo = {
-    val secureInfo = celebrity.secureInfo
+    from(celebrity, celebrity.secureInfo)
+  }
+
+  def from(celebrity: Celebrity, secureInfo: Option[DecryptedCelebritySecureInfo]): JsCelebrityContactInfo = {
     JsCelebrityContactInfo(
       id = celebrity.id,
       accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
@@ -58,7 +61,10 @@ object JsCelebrityDepositInfo extends Function11[Long, Boolean, Option[String], 
   implicit val celebrityDepositInfoFormats = Json.format[JsCelebrityDepositInfo]
 
   def from(celebrity: Celebrity): JsCelebrityDepositInfo = {
-    val secureInfo = celebrity.secureInfo
+    from(celebrity, celebrity.secureInfo)
+  }
+
+  def from(celebrity: Celebrity, secureInfo: Option[DecryptedCelebritySecureInfo]): JsCelebrityDepositInfo = {
     JsCelebrityDepositInfo(
       id = celebrity.id,
       accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
