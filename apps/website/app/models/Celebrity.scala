@@ -676,7 +676,7 @@ class CelebrityStore @Inject() (
     for {
       star <- catalogStarsSearch(maybeQuery, refinements)
     } yield {
-      MarketplaceCelebrity(
+      MarketplaceCelebrity.make(
         id = star.id,
         publicName = star.name,
         photoUrl = star.marketplaceImageUrl,
