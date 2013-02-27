@@ -39,6 +39,6 @@ trait PostCelebrityRequestHelper {
 
     play.Logger.info("starName is " + requestedStar + ", customerId is " + customerId)
     Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
-      request.session.withCustomerId(customerId).withHasSignedUp.removeRequestedStar)
+      request.session.withCustomerId(customerId).removeRequestedStar)
   }
 }
