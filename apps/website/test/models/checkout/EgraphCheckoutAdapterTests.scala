@@ -1,6 +1,7 @@
 package models.checkout
 
 import Conversions._
+import forms.BuyerDetails
 import forms.FakeFormData._
 import models.enums.CheckoutCodeType
 import models.OrderStore
@@ -24,7 +25,12 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
       order = Some(randomEgraphOrderType()),
       coupon = Some(randomCouponType()),
       payment = Some(randomCashTransactionType),
-      buyerEmail = Some(TestData.generateEmail())
+      buyerDetails = Some(
+        BuyerDetails(
+          Some(TestData.generateFullname()),
+          TestData.generateEmail()
+        )
+      )
     )
   }
 
@@ -46,7 +52,7 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
     for (leftPayment <- left.payment; rightPayment <- right.payment)
       leftPayment should be (rightPayment.copy(_services = leftPayment._services))
 
-    left.buyerEmail should be (right.buyerEmail)
+    left.buyerDetails should be (right.buyerDetails)
     left.recipientEmail should be (right.recipientEmail)
     left.shippingAddress should be (right.shippingAddress)
   }
@@ -116,7 +122,7 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
       .copy(recipientName = recipient.name)
 
     val adapter = newModel.withOrder(Some(order))
-      .withBuyerEmail(Some(buyer.email))
+      .withBuyer( Some(BuyerDetails(None, buyer.email)) )
       .withRecipientEmail { if (gift) Some(recipient.email) else None }
       .withShippingAddress { if (print) Some(shippingAddress) else None }
 

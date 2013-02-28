@@ -35,9 +35,9 @@ trait CheckoutResourceEndpoints { this: Controller =>
   //
   // Private Members
   //
-  private lazy val buyer = checkoutControllers[String](
+  private lazy val buyer = checkoutControllers[BuyerDetails](
     BuyerForm,
-    (resource, checkout) => checkout.withBuyerEmail(resource)
+    (resource, checkout) => checkout.withBuyer(resource)
   )
 
   private lazy val recipient = checkoutControllers[String](

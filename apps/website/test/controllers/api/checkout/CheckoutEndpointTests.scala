@@ -10,6 +10,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import models.enums.{CheckoutCodeType, LineItemNature}
 import models.checkout.{EgraphCheckoutAdapter, LineItemTestData}
+import models.checkout.forms.BuyerDetails
 
 
 class CheckoutEndpointTests extends EgraphsUnitTest with ClearsCacheBefore {
@@ -56,8 +57,14 @@ class CheckoutEndpointTests extends EgraphsUnitTest with ClearsCacheBefore {
       EgraphCheckoutAdapter(celeb.id)
         .withOrder( Some(randomEgraphOrderType()) )
         .withPayment( Some(randomCashTransactionType) )
-        .withBuyerEmail( Some(TestData.generateEmail()) )
-        .cache()(postRequest(sessionId, celeb.id))
+        .withBuyer(
+          Some(
+            BuyerDetails(
+              Some(TestData.generateFullname()),
+              TestData.generateEmail()
+            )
+          )
+        ).cache()(postRequest(sessionId, celeb.id))
     }
 
     val result = performPost(sessionId, celeb.id)

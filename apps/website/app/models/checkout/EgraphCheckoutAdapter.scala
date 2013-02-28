@@ -36,7 +36,7 @@ case class CheckoutAdapterServices @Inject() (
  * @param order - to be transacted, required
  * @param coupon - to be applied to checkout
  * @param payment - to be charged if balance is nonZero
- * @param buyerEmail - email of buyer, required
+ * @param buyerDetails - email of buyer, required
  * @param recipientEmail - email of giftee, required if order is a gift
  * @param shippingAddress - shipping address for print, required if order is physical
  * @param _services
@@ -47,7 +47,7 @@ case class EgraphCheckoutAdapter (
   order: Option[EgraphOrderLineItemType] = None,
   coupon: Option[CouponLineItemType] = None,
   payment: Option[CashTransactionLineItemType] = None,
-  buyerEmail: Option[String] = None,
+  buyerDetails: Option[BuyerDetails] = None,
   recipientEmail: Option[String] = None,
   shippingAddress: Option[ShippingAddress] = None,
   @transient _services: CheckoutAdapterServices = AppConfig.instance[CheckoutAdapterServices]
@@ -56,9 +56,9 @@ case class EgraphCheckoutAdapter (
   //
   // Members
   //
-  def buyer = CheckoutBuyer(buyerEmail)
+  def buyer = new CheckoutBuyer(buyerDetails)
 
-  def recipient = recipientEmail map { email => CheckoutRecipient(Some(email)) }
+  def recipient = recipientEmail map { email => new CheckoutRecipient(Some(email)) }
 
   def cart(implicit request: RequestHeader): ServerSession = services.cartFactory(celebId)
 
@@ -97,7 +97,7 @@ case class EgraphCheckoutAdapter (
   def withOrder(order: Option[EgraphOrderLineItemType] = None) = this.copy(order = order)
   def withCoupon(coupon: Option[CouponLineItemType] = None) = this.copy(coupon = coupon)
   def withPayment(payment: Option[CashTransactionLineItemType] = None) = this.copy(payment = payment)
-  def withBuyerEmail(buyer: Option[String] = None) = this.copy(buyerEmail = buyer)
+  def withBuyer(buyer: Option[BuyerDetails] = None) = this.copy(buyerDetails = buyer)
   def withRecipientEmail(recipient: Option[String] = None) = this.copy(recipientEmail = recipient)
   def withShippingAddress(shippingAddress: Option[ShippingAddress] = None) = this.copy(shippingAddress = shippingAddress)
 
@@ -116,7 +116,7 @@ case class EgraphCheckoutAdapter (
     printValidationStatus(checkout)
 
     order.isDefined &&
-    buyerEmail.isDefined &&
+    buyerDetails.isDefined &&
     (recipientEmail.isDefined || !isGift) &&
     (shippingAddress.isDefined || !hasPrint) &&
     (payment.isDefined || previewCheckout.total.amount.isZero)
@@ -126,7 +126,7 @@ case class EgraphCheckoutAdapter (
     log(s"""" +
        Validating order before purchase:
          has order? ${order.isDefined}
-         has buyerEmail? ${buyerEmail.isDefined}
+         has buyerEmail? ${buyerDetails.isDefined}
          has recipientEmail? ${recipientEmail.isDefined}
            isGift? ${isGift}
          has shippingAddress? ${shippingAddress.isDefined}
@@ -157,26 +157,24 @@ case class EgraphCheckoutAdapter (
 
 
   /** Helper classes for dealing with Account and Customer related business for buyer and recipient */
-  protected case class CheckoutBuyer(email: Option[String]) extends CheckoutCustomer(isGiftee = false)
+  protected class CheckoutBuyer(details: Option[BuyerDetails]) extends CheckoutCustomer(details, isGiftee = false)
+  protected class CheckoutRecipient(email: Option[String]) extends CheckoutCustomer(email map (BuyerDetails(None, _)), isGiftee = true)
 
-
-  protected case class CheckoutRecipient(email: Option[String]) extends CheckoutCustomer(isGiftee = true)
-
-
-  protected abstract class CheckoutCustomer(isGiftee: Boolean) {
-    def email: Option[String]
+  protected abstract class CheckoutCustomer(details: Option[BuyerDetails], isGiftee: Boolean) {
+    def email = details map (_.email)
+    def emailHandle = email map (_.split('@').head)
 
     def customer: Customer = getOrCreate(
-      existing = email flatMap {services.customerStore.findByEmail(_)} )(
+      existing = email flatMap { services.customerStore.findByEmail(_) } )(
       create = account.createCustomer(name)
     )
 
     def name: String = {
-      def nameFromShipping = if (isGiftee) None else shippingAddress map { _.name } // buyer name would be on shipping addres
+      def nameFromDetails = details flatMap { _.name }
       def nameFromOrder = if (!isForMe) None else order map { _.recipientName }
-      def nameFromEmail = email map { _.split('@').head }
+      def nameFromShipping = if (isGiftee) None else shippingAddress map { _.name } // buyer name would be on shipping address
 
-      getOrCreate(nameFromOrder, nameFromShipping, nameFromEmail) ("")
+      getOrCreate(nameFromDetails, nameFromOrder, nameFromShipping, emailHandle) ("")
     }
 
     def account: Account = getOrCreate(
