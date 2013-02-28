@@ -32,4 +32,8 @@ class Featured @Inject() (
     // cost = 3 queries
     categoryValueStore.updateCelebrities(categoryValue, newFeaturedCelebIds)
   }
+
+  def updateFeaturedMastheads(newFeaturedMastheadIds: Iterable[Long]) {
+    categoryValueStore.updateMastheads(categoryValue, newFeaturedMastheadIds)
+  }
 }

@@ -85,7 +85,7 @@ class Schema @Inject() (
   // TODO(SER-499): Index declarations
 
   val coupons = table[Coupon]
-  on(coupons)(coupon => 
+  on(coupons)(coupon =>
     declare(
       columns(coupon.code, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
       columns(coupon._usageType, coupon.startDate, coupon.endDate, coupon.isActive) are indexed,
@@ -121,6 +121,14 @@ class Schema @Inject() (
 
   val lineItemTypes = table[LineItemTypeEntity]("LineItemType")
   // TODO(SER-499): Index declarations
+
+  val mastheads = table[Masthead]
+  on(mastheads)(masthead =>
+    declare(
+      masthead.headline is dbType("text"),
+      masthead.subtitle is dbType("text")
+    )
+  )
 
   val orders = table[Order]("Orders")
   on(orders)(order =>
@@ -195,6 +203,11 @@ class Schema @Inject() (
   on(inventoryBatchProducts)(inventoryBatchProduct =>
     declare(
       columns(inventoryBatchProduct.inventoryBatchId, inventoryBatchProduct.productId) are unique))
+
+  val mastheadCategoryValues = manyToManyRelation(mastheads, categoryValues).via[MastheadCategoryValue] ((m, cv, mcv) =>
+      (mcv.mastheadId === m.id, mcv.categoryValueId === cv.id))
+  mastheadCategoryValues.leftForeignKeyDeclaration.constrainReference(onDelete cascade)
+  mastheadCategoryValues.rightForeignKeyDeclaration.constrainReference(onDelete cascade)
 
   val videoAssetsCelebrity = manyToManyRelation(videoAssets, celebrities)
     .via[VideoAssetCelebrity]((videoAsset, celebrity, join) => (join.videoId === videoAsset.id, join.celebrityId === celebrity.id))
@@ -589,6 +602,8 @@ class Schema @Inject() (
       factoryFor(categoryValueRelationships) is CategoryValueRelationship(services = injector.instance[CategoryServices]),
       factoryFor(inventoryBatches) is InventoryBatch(services = injector.instance[InventoryBatchServices]),
       factoryFor(inventoryBatchProducts) is InventoryBatchProduct(services = injector.instance[InventoryBatchProductServices]),
+      factoryFor(mastheads) is Masthead(services = injector.instance[MastheadServices]),
+      factoryFor(mastheadCategoryValues) is MastheadCategoryValue(services = injector.instance[CategoryServices]),
       factoryFor(orders) is Order(services = injector.instance[OrderServices]),
       factoryFor(printOrders) is PrintOrder(services = injector.instance[PrintOrderServices]),
       factoryFor(products) is Product(services = injector.instance[ProductServices]),

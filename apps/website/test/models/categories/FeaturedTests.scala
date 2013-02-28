@@ -14,7 +14,7 @@ class FeaturedTests extends EgraphsUnitTest with DBTransactionPerTest {
 
   "categoryValue" should "create a featured category value and internal category are not already there" in new EgraphsTestApplication {
     deleteFeaturedCategoryValue()
-
+    // TODO we should think of a way to extend our categoryvalue system to support general tagging of all database entities.
     val featured = featuredToTest
     val categoryValue = featured.categoryValue
 

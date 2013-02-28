@@ -12,13 +12,14 @@
 @import views.html.frontend.base_template
 @import egraphs.authtoken.AuthenticityToken
 @import models.Celebrity
+@import models.LandingPageImage
 
 @headline = {
   Celebrity Image audit
 }
 
 @expectedRatio = {
-  @(Celebrity.minLandingPageImageWidth.toDouble / Celebrity.minLandingPageImageHeight.toDouble)
+  @(LandingPageImage.minImageWidth.toDouble /LandingPageImage.minImageHeight.toDouble)
 }
 
 @body = {
@@ -31,8 +32,8 @@
           <tr>
             <th>Id</th>
             <th>Public Name</th>
-            <th>Landing Image Width (suggested @Celebrity.minLandingPageImageWidth)</th>  
-            <th>Landing Image Height (suggested @Celebrity.minLandingPageImageHeight)</th>
+            <th>Landing Image Width (suggested @LandingPageImage.minImageWidth)</th>  
+            <th>Landing Image Height (suggested @LandingPageImage.minImageHeight)</th>
             <th>Landing Ratio (expected @expectedRatio)</th>
           </tr>
         </thead>  
@@ -56,7 +57,7 @@
             } else {
               @{
                 val ratio = (landingWidth.toDouble / landingHeight.toDouble)
-                if (((Celebrity.minLandingPageImageWidth.toDouble / Celebrity.minLandingPageImageHeight.toDouble) - ratio).abs < 0.00001 ) {
+                if (((LandingPageImage.minImageWidth.toDouble / LandingPageImage.minImageHeight.toDouble) - ratio).abs < 0.00001 ) {
                   Html("""<p style="color: black">""" + ratio + "</p>")
                 } else {
                   Html("""<p style="color: red">""" + ratio + "</p>")

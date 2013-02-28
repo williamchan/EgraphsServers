@@ -27,6 +27,8 @@ trait AllAdminEndpoints
   with GetEgraphsAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
+  with GetMastheadsAdminEndpoint
+  with GetMastheadAdminEndpoint
   with GetOrderAdminEndpoint
   with GetOrdersAdminEndpoint
   with GetPrintOrderAdminEndpoint
@@ -48,6 +50,8 @@ trait AllAdminEndpoints
   with PostFreegraphAdminEndpoint
   with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
+  with PostMastheadAdminEndpoint
+  with PostFeaturedMastheadsAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
   with PostProcessVideoAdminEndpoint

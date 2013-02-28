@@ -12,7 +12,7 @@ import models.categories._
 import services.AppConfig
 import services.db.{DBSession, TransactionSerializable}
 
-class PostFilterValueAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests with AdminProtectedResourceTests{
+class PostCategoryValueAdminEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests with AdminProtectedResourceTests{
   override protected def routeUnderTest = postCategoryValueAdmin
   override protected def db = AppConfig.instance[DBSession]
   def categoryStore = AppConfig.instance[CategoryStore]
