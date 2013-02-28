@@ -9,7 +9,6 @@ import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 import services.mvc.marketplace.MarketplaceServices
 import services.http.ControllerMethod
-import services.http.filters.HttpFilters
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
 import services.db.TransactionSerializable
@@ -31,7 +30,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def catalogStarsQuery: CatalogStarsQuery
   protected def dbSession: DBSession
   protected def featured: Featured
-  protected def httpFilters: HttpFilters
   protected def verticalStore: VerticalStore
   protected def marketplaceServices: MarketplaceServices
 

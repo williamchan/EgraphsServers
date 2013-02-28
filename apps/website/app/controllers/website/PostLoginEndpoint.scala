@@ -5,7 +5,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import controllers.WebsiteControllers
-import controllers.routes.WebsiteControllers.{getLogin, getCustomerGalleryById}
+import controllers.routes.WebsiteControllers.getLogin
 import services.db.DBSession
 import services.db.TransactionSerializable
 import services.http.POSTControllerMethod
@@ -39,19 +39,16 @@ private[controllers] trait PostLoginEndpoint extends PostCelebrityRequestHelper 
 
           // Find out whether the user is logging in to complete their celebrity request
           val maybeRequestedStar = request.session.requestedStar
-          maybeRequestedStar match {
-            case None => {
-              Redirect(getCustomerGalleryById(validForm.customerId)).withSession(
-                request.session.withCustomerId(validForm.customerId)
-              ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
-            }
+          val redirectCall: Call = maybeRequestedStar match {
+            case None => controllers.routes.WebsiteControllers.getCustomerGalleryById(validForm.customerId)
             case Some(requestedStar) => {
               completeRequestStar(requestedStar, validForm.customerId)
-              Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
-                request.session.withCustomerId(validForm.customerId).removeRequestedStar
-              ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
+              controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
             }
           }
+          Redirect(redirectCall).withSession(
+            request.session.withCustomerId(validForm.customerId).removeRequestedStar
+          ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
         }
       }
     }

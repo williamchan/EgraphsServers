@@ -85,19 +85,16 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging with
 
             // Find out whether the user is logging in via Facebook to complete their celebrity request
             val maybeRequestedStar = request.session.requestedStar
-            maybeRequestedStar match {
-              case None => {
-                Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
-                  session.withCustomerId(customer.id)
-                ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
-              }
+            val redirectCall: Call = maybeRequestedStar match {
+              case None => controllers.routes.WebsiteControllers.getAccountSettings
               case Some(requestedStar) => {
                 completeRequestStar(requestedStar, customer.id)
-                Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
-                  session.withCustomerId(customer.id).removeRequestedStar
-                ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
+                controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
               }
             }
+            Redirect(redirectCall).withSession(
+              session.withCustomerId(customer.id).removeRequestedStar
+            ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
           }
           maybeRedirectSuccess.getOrElse(redirectAndLogError(fbUserInfo))
         }
