@@ -185,7 +185,7 @@
                 name="recipientForm"
                 class="ajax"
                 novalidate
-                ng-show="isGift">
+                ng-show="egraph.isGift">
             @withField("recipient", "email") { field =>
               <div class="control-group">
                 <label class="control-label" for="@field.id">
@@ -212,7 +212,9 @@
                 novalidate>
             <div class="control-group">
               @withField("buyer", "email") { field =>
-                <label class="control-label" for="@field.id">Your Email@requiredStar:</label>
+                <label class="control-label" for="@field.id">
+                  Your Email@requiredStar:
+                </label>
                 <div class="controls">
                   <input @field.identityAttributes
                          type="email"
@@ -222,7 +224,26 @@
                   @field.standardErrorDiv
                 </div>
               }
-            </div> <!-- End .control-group.recipientName -->
+            </div> <!-- End .control-group -->
+            <div class="control-group" ng-show="egraph.isGift">
+              @withField("buyer", "name") { field =>
+                <label class="control-label" for="@field.id">
+                  Your Name@requiredStar:
+                  @tooltip("How is this used?", event="How is name used?") {
+                    You will be attributed by name on the e-mail {{egraph.recipientName}} receives when his/her online egraph is ready, as well as on your order confirmation receipt.
+                  }
+                  </label>
+                <div class="controls">
+                  <input @field.identityAttributes
+                         type="email"
+                         monitor-user-attention
+                         resource-property>
+                         
+                  @field.standardErrorDiv
+                </div>
+              }
+            </div> <!-- End .control-group -->
+
           </form>
 
           <div id="framed-print-delivery" ng-show="cart.requiresShipping">

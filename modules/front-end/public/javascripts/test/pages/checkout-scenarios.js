@@ -290,7 +290,8 @@ function(mockBackend, logging, module, ngApp) {
         checkout._addProduct(framedPrintLineItem());
 
         mockApi.egraph = {
-          isGift: "true"
+          isGift: "true",
+          recipientName: "Joe Recipient"
         };
         configureDefaultCheckoutApi();
       }

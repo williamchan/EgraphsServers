@@ -385,23 +385,25 @@
         </form>
       } else {
         @headerIcon("Become an egraphs insider", "glyphicons-envelope-orange.png")
-        <form class="control-group form-horizontal become-insider" ng-controller="MailerController" class="newsletter-signup" ng-cloak ng-submit="subscribe()" ng-init="message=''">
-          <label class="control-label" for="email">
-            Your email:
-              @fieldTooltip("Why should I sign up?", event="Why sign up?") {
-                <strong>Be informed and receive discounts.</strong> Joining our newsletter will keep you on top of your favorite stars and their availability. You'll also receive choice discounts available only to members.
-              }
-          </label>
-          <div class="controls">
-            <div class="input-append">
-              <input name="email" type="email"  ng-model="email"></input>
-              <button type="submit" class="btn"><i class="icon-envelope icon-white"></i></button>
-            </div>
-            <label>
-              {{ message }}
+        <div class="form-horizontal">
+          <form class="control-group become-insider" ng-controller="MailerController" class="newsletter-signup" ng-cloak ng-submit="subscribe()" ng-init="message=''">
+            <label class="control-label" for="email">
+              Your email:
+                @fieldTooltip("Why should I sign up?", event="Why sign up?") {
+                  <strong>Be informed and receive discounts.</strong> Joining our newsletter will keep you on top of your favorite stars and their availability. You'll also receive choice discounts available only to members.
+                }
             </label>
-          </div>
-        </form> <!-- End .control-group -->
+            <div class="controls">
+              <div class="input-append">
+                <input name="email" type="email"  ng-model="email"></input>
+                <button type="submit" class="btn"><i class="icon-envelope icon-white"></i></button>
+              </div>
+              <label>
+                {{ message }}
+              </label>
+            </div>
+          </form> <!-- End .control-group -->
+        </div>
       }
     </div>
   </div>

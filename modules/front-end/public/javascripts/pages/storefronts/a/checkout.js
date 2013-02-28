@@ -30,11 +30,12 @@ function(page, tooltip, window, analytics, logging, requireModule) {
           codeRedeemerVisible: false,
           states: states,
           cartApi: cartApi,
-          analyticsCategory: "Checkout"
+          analyticsCategory: "Checkout",
+          egraph: {}
         });
 
         cartApi.egraph().success(function(egraph) {
-          $scope.isGift = egraph.isGift === "true";
+          $scope.egraph = egraph;
         });
 
         /** Toggles visibility of the discount redeeming widget */
@@ -125,7 +126,7 @@ function(page, tooltip, window, analytics, logging, requireModule) {
             $scope.buyerForm
           ];
 
-          if ($scope.isGift) {
+          if ($scope.egraph.isGift) {
             forms.push($scope.recipientForm);
           }
 
