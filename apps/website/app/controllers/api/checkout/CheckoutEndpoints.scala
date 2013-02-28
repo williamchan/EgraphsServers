@@ -124,7 +124,7 @@ trait CheckoutEndpoints { this: Controller =>
       ).send()
     }
 
-    // return API-specified confirmation result 
+    // return API-specified confirmation result
     confirmationResultFor(checkout)
   }
 

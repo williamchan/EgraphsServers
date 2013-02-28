@@ -9,6 +9,7 @@ import scalaz.Lens
 import models.enums.PaymentStatus
 import play.api.libs.json.{JsValue, Json}
 import services.blobs.AccessPolicy
+import models.ImageAsset.Jpeg
 
 
 //
@@ -41,8 +42,10 @@ case class EgraphOrderLineItem(
   /** includes print order item's json if it exists */
   override def toJson = {
     val product = domainObject.product
-    val imageUrl = product.celebrity.profilePhoto.getSaved(AccessPolicy.Public).url
-    val thisJson = jsonify(product.name, product.description, Some(id), Some(imageUrl))
+    val imageUrl = product.photo.resizedWidth(60).withImageType(Jpeg).getSaved(AccessPolicy.Public).url
+    val name = s"Online Egraph from ${product.celebrity.publicName}"
+    val description = s"For ${domainObject.recipientName}. Photo: ${product.name}."
+    val thisJson = jsonify(name, description, Some(id), Some(imageUrl))
     val printOrderJson = printOrderItem map (_.toJsonAsSubItem)
     Json.toJson(Seq(thisJson) ++ printOrderJson.toSeq)
   }
