@@ -109,11 +109,9 @@ private[controllers] trait MlbpaEndpoints extends ImplicitHeaderAndFooterData { 
   private def hasMlbpaAccess(session: Session): Boolean = session.get(EgraphsSession.Key.MlbpaAccess.name).exists(_ == "1")
 
   private def sendEgraphRejectionNoticeEmail(egraphId: Long, rejectReason: String) {
-    val emailHeaders = email.EmailViewModel(subject = "MLB egraph rejected by MLB", toAddresses = List(("mlbpa-rejection-notices@egraphs.com", None)))
     val egraphUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphAdmin(egraphId).url)
-    val emailBody = "Rejected egraph: " + egraphUrl + System.getProperty("line.separator") + "Rejection reason: " + rejectReason
-
-    transactionalMail.send(mailStack = emailHeaders, templateContentParts = List(("mlbpa-rejection-notice", emailBody)))
+    val emailHeaders = email.EmailViewModel(subject = "MLB rejected " + egraphUrl + " - Reason: " + rejectReason, toAddresses = List(("mlbpa-rejection-notices@egraphs.com", None)))
+    transactionalMail.send(mailStack = emailHeaders, templateContentParts = List(("mlbpa-rejection-notice", "")))
   }
 
   private case class PostMlbpaLoginForm(username: String, password: String)
