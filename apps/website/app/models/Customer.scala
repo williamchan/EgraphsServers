@@ -159,11 +159,17 @@ class CustomerStore @Inject() (
   def createByEmail(email: String, name: String): Customer = {
     val accountOption = accountStore.findByEmail(email)
     val account = accountOption.getOrElse(Account(email = email, _services = accountServices.get))
-    val unsavedCustomer = account.createCustomer(name)
     val unsavedUsernameHistory = account.createUsername()
-    val customer = unsavedCustomer.save()
-    account.copy(customerId = Some(customer.id)).save()
-    val usernameHistory = unsavedUsernameHistory.copy(customerId = customer.id).save()
+
+    val customer = account.customerId match {
+      case Some(id) => get(id)
+      case None => {
+        val newCust = account.createCustomer(name).save()
+        account.copy(customerId = Some(newCust.id)).save()
+        newCust
+      }
+    }
+    unsavedUsernameHistory.copy(customerId = customer.id).save()
 
     customer
   }
