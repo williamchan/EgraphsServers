@@ -22,71 +22,43 @@
 <section id="content" role="main">
   <div id="main">
     <div class="container">
-  <a href="/logout">Logout</a>
-  <h1>MLBPA Review @paginationInfo.totalResultsStr egraphs remaining</h1>
+      <a href="/logout"><button class="btn btn-block toggle" type="button">Logout</button></a>
+      <h1>MLBPA Review @paginationInfo.totalResultsStr remaining</h1>
 
-  @for(egraphView <- egraphViews) {
-    <div class="form row">
-      <div class="span6 form-column">
-        <video class="video-js vjs-default-skin" controls
-               preload="auto" width="400px" height="252px"
-               data-setup="{}">
-          <source src="@egraphView.egraphMp4Url" type='video/mp4'>
-        </video>
-      </div>
-      <div class="span6 form-column">
-        <h2>@egraphView.celebrityName</h2>
+      @for(egraphView <- egraphViews) {
+      <div class="form row">
+        <div class="span6 form-column">
+          <video class="video-js vjs-default-skin" controls
+                 preload="auto" width="400px" height="252px"
+                 data-setup="{}">
+            <source src="@egraphView.egraphMp4Url" type='video/mp4'>
+          </video>
+        </div>
+        <div class="span6 form-column">
+          <h2>@egraphView.celebrityName</h2>
 
-        @safeForm('method -> "POST", 'action -> postMlbpaEgraph(egraphView.egraphId)) {
+          @safeForm('method -> "POST", 'action -> postMlbpaEgraph(egraphView.egraphId)) {
           <input name="egraphState" type="hidden" value="ApprovedByAdmin">
           <button type="submit" class="btn primary fade in">Approve</button>
-        }
+          }
 
-        @safeForm('class -> "mlbpa-reject", 'method -> "POST", 'action -> postMlbpaEgraph(egraphView.egraphId)) {
+          @safeForm('class -> "mlbpa-reject", 'method -> "POST", 'action -> postMlbpaEgraph(egraphView.egraphId)) {
           <label>Rejection reason</label>
+
           <div class="input">
             <textarea name="rejectReason" rows="2"></textarea>
           </div>
           <input name="egraphState" type="hidden" value="RejectedByMlb">
           <button type="submit" class="btn primary fade in">Reject</button>
-        }
+          }
 
-      </div>
-    </div>
-    <hr/>
-  }
-
-  @** Begin test area *@
-  <div class="form row">
-    <div class="span6 form-column">
-      <video class="video-js vjs-default-skin" controls
-             preload="auto" width="400px" height="252px"
-             data-setup="{}">
-        <source src="https://d3kp0rxeqzwisk.cloudfront.net/egraphs/50/video/width-600px-v0.mp4" type='video/mp4'>
-      </video>
-    </div>
-    <div class="span6 form-column">
-      <h2>Pedro Martinez</h2>
-
-      @safeForm('method -> "POST", 'action -> postMlbpaEgraph(1)) {
-        <input name="egraphState" type="hidden" value="ApprovedByAdmin">
-        <button type="submit" class="btn primary fade in">Approve</button>
-      }
-
-      @safeForm('class -> "mlbpa-reject", 'method -> "POST", 'action -> postMlbpaEgraph(1)) {
-        <label>Rejection reason</label>
-        <div class="input">
-          <textarea name="rejectReason" rows="2"></textarea>
         </div>
-        <input name="egraphState" type="hidden" value="RejectedByMlb">
-        <button type="submit" class="btn primary fade in">Reject</button>
+      </div>
+      <hr/>
       }
-    </div>
-  </div>
-  @** End test area *@
 
-  @pagination()
-</div>
+      @pagination()
+    </div>
   </div>
 </section>
 }
