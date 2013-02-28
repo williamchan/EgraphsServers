@@ -113,13 +113,14 @@ trait CheckoutEndpoints { this: Controller =>
           recipientName = recipientCustomer.name,
           recipientEmail = recipientAccount.email,
           celebrityName = product.celebrity.publicName,
+          celebrityGender = product.celebrity.gender,
           productName = product.name,
           orderDate = order.created.formatDayAsPlainLanguage,
           orderId = order.id.toString,
           pricePaid = order.amountPaid.formatSimply,
           deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
           faqHowLongLink = consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
-          hasPrintOrder = maybePrintOrder.isDefined
+          maybePrintOrderShippingAddress = maybePrintOrder map (_.shippingAddress)
         )
       ).send()
     }
