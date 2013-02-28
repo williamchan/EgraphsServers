@@ -107,7 +107,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         inventoryRemaining = coinflip.nextInt(20),
         minPrice = 45,
         maxPrice = 90,
-        secondaryText = "Los Angeles Angels of Anaheim")
+        secondaryText = "Los Angeles Angels of Anaheim",
+        soldout = coinflip.nextBoolean)
     }
   }
 
