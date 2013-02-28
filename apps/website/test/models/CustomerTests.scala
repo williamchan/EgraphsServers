@@ -143,6 +143,11 @@ class CustomerTests extends EgraphsUnitTest
     usernameHistoryStore.findCurrentByCustomer(customer) should not be (None)
   }
 
+  "createByEmail" should "use preexisting customer if available" in new EgraphsTestApplication {
+    val customer = TestData.newSavedCustomer()
+    customerStore.createByEmail(customer.account.email, "fananas") should be(customer)
+  }
+
   private def createCustomerWithFindOrCreateByEmail(): (Customer, Account) = {
     val account = TestData.newSavedAccount()
     account.customerId should be(None)

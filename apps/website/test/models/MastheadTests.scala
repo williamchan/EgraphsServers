@@ -52,7 +52,7 @@ class MastheadTests extends EgraphsUnitTest
   //
   
   override def newEntityWithLandingPageImage = {
-    Masthead(name = TestData.generateFullname(), headline = TestData.generateUsername())
+    Masthead(name = TestData.generateFullname(), headline = TestData.generateUsername()).save()
   }
 
   // SavingEntityTests[Account] methods
