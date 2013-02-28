@@ -13,6 +13,9 @@ import services.db.TransactionSerializable
 import services.http.{POSTApiControllerMethod, ControllerMethod, WithDBConnection}
 import services.http.filters.HttpFilters
 import services.logging.Logging
+import services.email.OrderConfirmationEmail
+import models.frontend.email.OrderConfirmationEmailViewModel
+import services.ConsumerApplication
 
 /**
  * Should this be CheckoutAdapterEndpoints, maybe?
@@ -28,6 +31,7 @@ trait CheckoutEndpoints { this: Controller =>
   protected def httpFilters: HttpFilters
   protected def checkoutAdapters: CheckoutAdapterServices
   protected def postApiController: POSTApiControllerMethod
+  protected def consumerApp: ConsumerApplication
 
   //
   // Controllers
@@ -56,7 +60,7 @@ trait CheckoutEndpoints { this: Controller =>
 
             case Some(Right(transacted)) =>
               checkout.cart.emptied.save()
-              confirmationResultFor(transacted)
+              confirmationResultAndEmailFor(transacted)
 
             case Some(Left(failure)) =>
               error(s"Failed to transact checkout due to $failure: session=$sessionIdSlug, celeb=$checkoutIdSlug}")
@@ -88,6 +92,42 @@ trait CheckoutEndpoints { this: Controller =>
   //
   // Helpers
   //
+  private def confirmationResultAndEmailFor(checkout: Checkout)(implicit request: RequestHeader) = {
+    import _root_.frontend.formatting.DateFormatting.Conversions._
+    import controllers.routes.WebsiteControllers.getFAQ
+    import models.checkout.Conversions._
+    import services.Finance.TypeConversions._
+
+    // send confirmation email
+    for (orderItem <- checkout.lineItems(CheckoutCodeType.EgraphOrder).headOption) yield {
+      val order = orderItem.domainObject
+      val product = order.product
+      val maybePrintOrder = checkout.lineItems(CheckoutCodeType.PrintOrder).headOption map (_.domainObject)
+      val recipientAccount = checkout.recipientAccount getOrElse checkout.buyerAccount
+      val recipientCustomer = checkout.recipientCustomer getOrElse checkout.buyerCustomer
+
+      OrderConfirmationEmail(
+        OrderConfirmationEmailViewModel(
+          buyerName = checkout.buyerCustomer.name,
+          buyerEmail = checkout.buyerAccount.email,
+          recipientName = recipientCustomer.name,
+          recipientEmail = recipientAccount.email,
+          celebrityName = product.celebrity.publicName,
+          productName = product.name,
+          orderDate = order.created.formatDayAsPlainLanguage,
+          orderId = order.id.toString,
+          pricePaid = order.amountPaid.formatSimply,
+          deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
+          faqHowLongLink = consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
+          hasPrintOrder = maybePrintOrder.isDefined
+        )
+      ).send()
+    }
+
+    // return API-specified confirmation result 
+    confirmationResultFor(checkout)
+  }
+
   private def confirmationResultFor(checkout: Checkout)(implicit request: RequestHeader) = {
     import models.checkout.Conversions._
     import controllers.routes.WebsiteControllers.getOrderConfirmation

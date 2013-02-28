@@ -24,8 +24,10 @@ case class PersistedCheckout(
   override lazy val buyerAccount: Account = buyerCustomer.account
 
   // todo: provide real implementation when these are needed after point of transaction
-  override def recipientAccount: Option[Account] = None
-  override def recipientCustomer: Option[Customer] = None
+  override def recipientAccount: Option[Account] = recipientCustomer map (_.account)
+  override def recipientCustomer: Option[Customer] = {
+    lineItems(CheckoutCodeType.EgraphOrder).headOption map { _.domainObject.recipient }
+  }
 
   /** cash transaction to be made if changes are transacted */
   override def payment: Option[CashTransactionLineItemType] = {
