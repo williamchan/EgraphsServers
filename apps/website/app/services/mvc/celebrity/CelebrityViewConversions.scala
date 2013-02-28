@@ -54,7 +54,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       case Some(celeb) => celeb.marketplaceImageUrl
       case None => ""
     }
-    MarketplaceCelebrity(
+    MarketplaceCelebrity.make(
       id = celeb.id,
       publicName = celeb.publicName,
       photoUrl = photoUrl,

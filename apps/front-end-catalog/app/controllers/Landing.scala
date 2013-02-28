@@ -1,24 +1,39 @@
 package controllers
 
-import play.api._
 import play.api.mvc._
-import models.frontend.landing.{CatalogStar}
+import models.frontend.landing.{LandingMasthead, CatalogStar}
 import models.frontend.marketplace.{CategoryValueViewModel, VerticalViewModel}
 import helpers.DefaultImplicitTemplateParameters
 import models.frontend.header.HeaderData
 import egraphs.playutils.Gender
+import models.frontend.masthead.{SearchBoxViewModel, VideoPlayerViewModel, CallToActionViewModel, SimpleLinkViewModel}
 
 /**
  * Permutations of the landing page
  */
 object Landing extends Controller with DefaultImplicitTemplateParameters {
 
+
+  def videoMasthead = Action {
+    val masthead = Some(makeMasthead(VideoPlayerViewModel("Watch Video", "#")))
+    Ok(views.html.frontend.landing(sampleStars.slice(0, 7), masthead, verticalViewModels = Marketplace.landingVerticalSet, marketplaceRoute  = marketplaceRoute))
+  }
+
+  def searchboxMasthead = Action {
+    val masthead = Some(makeMasthead(SearchBoxViewModel("Find your stars", "#")))
+    Ok(views.html.frontend.landing(sampleStars.slice(0, 7), masthead, verticalViewModels = Marketplace.landingVerticalSet, marketplaceRoute  = marketplaceRoute))
+  }
+
+  def simpleLinkMasthead = Action {
+    val masthead = Some(makeMasthead(SimpleLinkViewModel("Follow this link", "http://www.google.com")))
+    Ok(views.html.frontend.landing(sampleStars.slice(0, 7), masthead, verticalViewModels = Marketplace.landingVerticalSet, marketplaceRoute  = marketplaceRoute))
+  }
   /**
    * Displays a permutation of the landing page with "catalog stars" counting
    * 0 <= n <= sampleStars.length
    **/
   def featuredStars(count: Int) = Action {
-    Ok(views.html.frontend.landing(sampleStars.slice(0, count),verticalViewModels = Marketplace.landingVerticalSet, marketplaceRoute  = marketplaceRoute))
+    Ok(views.html.frontend.landing(sampleStars.slice(0, count), None, verticalViewModels = Marketplace.landingVerticalSet, marketplaceRoute  = marketplaceRoute))
   }
 
 
@@ -28,29 +43,37 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
 
    def giftMessaging = Action {
     implicit val headerData = HeaderData(giftCertificateLink = Some("/gift"))
-    Ok(views.html.frontend.landing(sampleStars, Marketplace.landingVerticalSet, signup = false, marketplaceRoute)(headerData, defaultFooterData, authenticityToken))
+    Ok(views.html.frontend.landing(sampleStars, None, Marketplace.landingVerticalSet, signup = false, marketplaceRoute)(headerData, defaultFooterData, authenticityToken))
    }
 
   def signupOn = Action {
     val stars = sampleStars.map(star => star.copy(inventoryRemaining = 0))
-    Ok(views.html.frontend.landing(sampleStars, Marketplace.landingVerticalSet, signup = true, marketplaceRoute))
+    Ok(views.html.frontend.landing(sampleStars, None, Marketplace.landingVerticalSet, signup = true, marketplaceRoute))
   }
 
   def featuredStarsWithNoInventory() = Action {
     val stars = sampleStars.map(star => star.copy(inventoryRemaining = 0))
-    Ok(views.html.frontend.landing(stars, Marketplace.landingVerticalSet, signup = false, marketplaceRoute))
+    Ok(views.html.frontend.landing(stars, None, Marketplace.landingVerticalSet, signup = false, marketplaceRoute))
   }
 
   def singleCelebrity(publicName: String,
                        casualName: String,
                        isMale: Boolean) = Action {
+
+    val masthead = LandingMasthead(
+      headline = "Get an egraph from " + publicName,
+      landingPageImageUrl = sampleMastheadUrl,
+      callToActionViewModel = SimpleLinkViewModel(text = "Get Started", target = "#")
+    )
+
     Ok(views.html.frontend.celebrity_landing(
       getStartedUrl = "/David-Price/photos",
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
       landingPageImageUrl = EgraphsAssets.at("images/ortiz_masthead.jpg").url,
-      celebrityGender = if (isMale) { Gender.Male } else { Gender.Female })
-    )
+      celebrityGender = if (isMale) { Gender.Male } else { Gender.Female },
+      masthead
+    ))
   }
 
   private def makeSampleStar(id: Long, name: String, secondaryText: Option[String]): CatalogStar = {
@@ -68,8 +91,18 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
     )
   }
 
+  private def makeMasthead(callToActionViewModel: CallToActionViewModel) = {
+    LandingMasthead(
+      headline = "Direct the user's attention",
+      subtitle = Some("Click here!"),
+      landingPageImageUrl = sampleMastheadUrl,
+      callToActionViewModel = callToActionViewModel
+    )
+  }
+
   private val sampleImageUrl = "http://placehold.it/440x157"
   private val sampleMarketplaceImageUrl = EgraphsAssets.at("images/660x350.gif").url
+  private val sampleMastheadUrl = EgraphsAssets.at("images/ortiz_masthead.jpg").url
   private val marketplaceRoute = "/stars"
   private val sampleStars = Seq(
     makeSampleStar(1, "David Price", Some("Tampa Bay Rays")),
