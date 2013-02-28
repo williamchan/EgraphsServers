@@ -55,7 +55,7 @@ object LineItemTestData {
 
   def newCheckout = {
     Checkout.create { Seq(randomGiftCertificateType) }
-      .withBuyer { newSavedAccount() }
+      .withBuyerAccount { newSavedAccount() }
       .withShippingAddress { Some(TestData.random.nextString(10)) }
   }
 

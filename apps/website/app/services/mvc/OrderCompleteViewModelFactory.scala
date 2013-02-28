@@ -39,6 +39,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
     )
   }
 
+  /** from new purchase flow for egraph purchases */
   def fromEgraphPurchaseCheckout(checkout: Checkout): Option[OrderCompleteViewModel] = {
     import models.checkout.Conversions._
     import CheckoutCodeType._

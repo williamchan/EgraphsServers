@@ -74,7 +74,7 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
     val (buyer, _, adapter) = BuyerRecipientAdapter()
 
     adapter.buyer.account.email should be (buyer.email)
-    adapter.buyer.customer.name should be (buyer.name)
+    Some(adapter.buyer.customer.name) should be (buyer.name)
     adapter.recipient should be (None)
   }
 
@@ -82,7 +82,7 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
     val (buyer, _, adapter) = BuyerRecipientAdapter(print = true)
 
     adapter.buyer.account.email should be (buyer.email)
-    adapter.buyer.customer.name should be (buyer.name)
+    Some(adapter.buyer.customer.name) should be (buyer.name)
     adapter.recipient should be (None)
   }
 
@@ -90,41 +90,40 @@ class EgraphCheckoutAdapterTests extends EgraphsUnitTest
     val (buyer, recipient, adapter) = BuyerRecipientAdapter(gift = true)
 
     adapter.buyer.account.email should be (buyer.email)
-    buyer.email should startWith (adapter.buyer.customer.name)
+    Some(adapter.buyer.customer.name) should be (buyer.name)
     adapter.recipient should be ('defined)
     adapter.recipient.get.account.email should be (recipient.email)
-    adapter.recipient.get.customer.name should be (recipient.name)
+    Some(adapter.recipient.get.customer.name) should be (recipient.name)
   }
 
   it should "have reasonable buyer/recipient names and emails in gift & print scenario" in {
     val (buyer, recipient, adapter) = BuyerRecipientAdapter(print = true, gift = true)
 
     adapter.buyer.account.email should be (buyer.email)
-    adapter.buyer.customer.name should be (buyer.name)
+    Some(adapter.buyer.customer.name) should be (buyer.name)
     adapter.recipient should be ('defined)
     adapter.recipient.get.account.email should be (recipient.email)
-    adapter.recipient.get.customer.name should be (recipient.name)
+    Some(adapter.recipient.get.customer.name) should be (recipient.name)
   }
 
 
   //
   // Helpers
   //
-  private case class NameEmail(name: String, email: String)
   private def BuyerRecipientAdapter(print: Boolean = false, gift: Boolean = false) = {
     import TestData._
 
-    val buyer = NameEmail(generateFullname(), generateEmail())
-    val recipient = if (!gift) buyer else NameEmail(generateFullname(), generateEmail())
-    val shippingAddress = randomShippingAddress.copy(name = buyer.name)
+    val buyer = BuyerDetails(generateFullname(), generateEmail())
+    val recipient = if (!gift) buyer else BuyerDetails(generateFullname(), generateEmail())
+    val shippingAddress = randomShippingAddress.copy(name = buyer.name.get)
 
     val order = LineItemTestData.randomEgraphOrderType(withPrint = print, isGift = gift)
-      .copy(recipientName = recipient.name)
+      .copy(recipientName = recipient.name.get)
 
     val adapter = newModel.withOrder(Some(order))
-      .withBuyer( Some(BuyerDetails(None, buyer.email)) )
-      .withRecipientEmail { if (gift) Some(recipient.email) else None }
       .withShippingAddress { if (print) Some(shippingAddress) else None }
+      .withRecipientEmail { if (gift) Some(recipient.email) else None }
+      .withBuyer( Some(buyer) )
 
     (buyer, recipient, adapter)
   }

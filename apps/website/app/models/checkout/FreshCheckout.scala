@@ -15,7 +15,9 @@ case class FreshCheckout(
   id: Long = 0L,
   _itemTypes: LineItemTypes = Nil,
   _buyerAccount: Option[Account] = None,
+  _buyerCustomer: Option[Customer] = None,
   recipientAccount: Option[Account] = None,
+  _recipientCustomer: Option[Customer] = None,
   shippingAddress: Option[String] = None,
   stripeToken: Option[String] = None,
   zipcode: Option[String] = None,
@@ -39,14 +41,18 @@ case class FreshCheckout(
   /** `LineItem`s to be transacted (all of them) */
   override def pendingItems: LineItems = lineItems
 
-  override lazy val buyerCustomer: Customer = services.customerStore.findOrCreateByEmail(buyerAccount.email)
+  override lazy val buyerCustomer: Customer = _buyerCustomer getOrElse {
+    services.customerStore.findOrCreateByEmail(buyerAccount.email)
+  }
 
   override lazy val buyerAccount: Account = _buyerAccount getOrElse {
     throw new Exception("Attempting operation requiring buyer without defining buyer first.")
   }
 
-  override lazy val recipientCustomer: Option[Customer] = recipientAccount map { account =>
-    services.customerStore.findOrCreateByEmail(account.email)
+  override lazy val recipientCustomer: Option[Customer] = _buyerCustomer orElse {
+    recipientAccount map { account =>
+      services.customerStore.findOrCreateByEmail(account.email)
+    }
   }
 
   override def payment = for (token <- stripeToken; zip <- zipcode) yield CashTransactionLineItemType.create(token, zip)
@@ -65,8 +71,11 @@ case class FreshCheckout(
   //
   // Helper methods
   //
-  def withBuyer(newBuyer: Account) = this.copy(_buyerAccount = Some(newBuyer))
-  def withRecipient(newRecipient: Option[Account]) = this.copy(recipientAccount = newRecipient)
+  def withBuyerAccount(newBuyer: Account) = this.copy(_buyerAccount = Some(newBuyer))
+  def withBuyerCustomer(newBuyer: Customer) = this.copy(_buyerCustomer = Some(newBuyer))
+  def withRecipientAccount(newRecipient: Option[Account]) = this.copy(recipientAccount = newRecipient)
+  def withRecipientCustomer(newRecipient: Option[Customer]) = this.copy(_recipientCustomer = newRecipient)
+
   def withZipcode(newZipcode: Option[String]) = this.copy(zipcode = newZipcode)
   def withShippingAddress(newAddress: Option[String]) = this.copy(shippingAddress = newAddress)
 }

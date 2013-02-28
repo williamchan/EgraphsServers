@@ -126,7 +126,8 @@ case class EgraphCheckoutAdapter (
     log(s"""" +
        Validating order before purchase:
          has order? ${order.isDefined}
-         has buyerEmail? ${buyerDetails.isDefined}
+         has buyer? ${buyerDetails.isDefined}
+           has name? ${buyerDetails map (_.name.isDefined) getOrElse (false)}
          has recipientEmail? ${recipientEmail.isDefined}
            isGift? ${isGift}
          has shippingAddress? ${shippingAddress.isDefined}
@@ -137,23 +138,38 @@ case class EgraphCheckoutAdapter (
   }
 
   /** generate a Checkout without saving any Customers or Accounts */
-  protected def previewCheckout = {
+  protected[checkout] def previewCheckout = {
     val types: Seq[LineItemType[_]] = Seq(order, coupon).flatten
     val zipcode = payment.flatMap(_.billingPostalCode)
     val address = shippingAddress.map(_.stringify)
     val recipientAccount = recipient map (_.account)
+    val recipientCustomer = recipient map (_.customer)
 
     Checkout.create( types )
-      .withBuyer( buyer.account )
-      .withRecipient( recipientAccount )
+      .withBuyerAccount( buyer.account )
+      .withBuyerCustomer( buyer.customer )
+      .withRecipientAccount( recipientAccount )
+      .withRecipientCustomer( recipientCustomer)
       .withZipcode( zipcode )
       .withShippingAddress( address )
   }
 
   /** try to generate a Checkout ready to transact -- should be able to transact if `validated` is true */
-  protected def makeActualCheckout(): FreshCheckout = previewCheckout
-    .withRecipient { recipient map (_.account.save()) }
-    .withBuyer { buyer.account.save() }
+  protected def makeActualCheckout(): FreshCheckout = {
+    val (buyerCustomer, buyerAccount) = buyer.savedCustomerAndAccount()
+    val (recipientCustomer, recipientAccount) = recipient match {
+      case None => (None, None)
+      case Some(checkoutRecipient) =>
+        val (customer, recip) = checkoutRecipient.savedCustomerAndAccount()
+        (Some(customer), Some(recip))
+    }
+
+    previewCheckout
+      .withBuyerAccount( buyerAccount )
+      .withBuyerCustomer( buyerCustomer )
+      .withRecipientAccount( recipientAccount )
+      .withRecipientCustomer( recipientCustomer)
+  }
 
 
   /** Helper classes for dealing with Account and Customer related business for buyer and recipient */
@@ -162,27 +178,39 @@ case class EgraphCheckoutAdapter (
 
   protected abstract class CheckoutCustomer(details: Option[BuyerDetails], isGiftee: Boolean) {
     def email = details map (_.email)
-    def emailHandle = email map (_.split('@').head)
+
+    def name  = {
+      def fromDetailsOrOrder = details flatMap { _.name } orElse {
+        optionIf(isForMe) { order map (_.recipientName) } flatten
+      }
+
+      getOrCreate(fromDetailsOrOrder, "")
+    }
 
     def customer: Customer = getOrCreate(
-      existing = email flatMap { services.customerStore.findByEmail(_) } )(
+      existing = maybeExistingCustomer,
       create = account.createCustomer(name)
     )
 
-    def name: String = {
-      def nameFromDetails = details flatMap { _.name }
-      def nameFromOrder = if (!isForMe) None else order map { _.recipientName }
-      def nameFromShipping = if (isGiftee) None else shippingAddress map { _.name } // buyer name would be on shipping address
-
-      getOrCreate(nameFromDetails, nameFromOrder, nameFromShipping, emailHandle) ("")
-    }
-
     def account: Account = getOrCreate(
-      existing = email flatMap { services.accountStore.findByEmail(_) } )(
+      existing = maybeExistingAccount,
       create = Account( email = email.getOrElse("") )
     )
 
+    def savedCustomerAndAccount() = {
+      val savedCustomer = getOrCreate(
+        existing = maybeExistingCustomer,
+        create = account.createCustomer(name).save()
+      )
+      val savedAccount = account.copy(customerId = Some(savedCustomer.id)).save()
+
+      (savedCustomer, savedAccount)
+    }
+
     private def isForMe = !isGift || isGiftee
-    private def getOrCreate[T](existing: Option[T]*)(create: => T): T = existing.flatten.headOption getOrElse create
+    private def getOrCreate[T](existing: Option[T], create: => T): T = existing getOrElse create
+
+    private def maybeExistingAccount = email flatMap { services.accountStore.findByEmail(_) }
+    private def maybeExistingCustomer = email flatMap { services.customerStore.findByEmail(_) }
   }
 }

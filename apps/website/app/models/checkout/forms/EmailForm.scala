@@ -5,6 +5,7 @@ import play.api.data.{Form, Forms}
 
 /** used for posting buyer and recipient emails from checkout page */
 case class BuyerDetails(name: Option[String], email: String)
+object BuyerDetails { def apply(_name: String, _email: String) = new BuyerDetails(Some(_name), _email) }
 
 object BuyerForm extends CheckoutForm[BuyerDetails] {
   object FormKeys {

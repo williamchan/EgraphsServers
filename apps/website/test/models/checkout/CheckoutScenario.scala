@@ -30,7 +30,7 @@ case class CheckoutScenario(
   lazy val restoredCheckout = transactedCheckout.restored(this)
   lazy val initialCheckout = {
     val checkout = Checkout.create(initialTypes).withShippingAddress(address)
-    buyer map { checkout.withBuyer(_) } getOrElse checkout
+    buyer map { checkout.withBuyerAccount(_) } getOrElse checkout
   }
 }
 
