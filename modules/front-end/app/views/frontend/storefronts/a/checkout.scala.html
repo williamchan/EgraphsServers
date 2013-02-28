@@ -431,7 +431,7 @@
             <div class="payment-errors general-errors" ng-show="stripeForm.$error.remote_transaction">
               We failed to successfully charge this card. Correct the payment form or try another card?
             </div>
-            <div class="general-errors" @*ng-show="errors.noInventory"*@>
+            <div class="general-errors" ng-show="errors.noInventory">
               Sorry, but this star's queue <em>just</em> filled up with orders! Sign up for our newsletter at the bottom of this page to be informed when your favorite stars will be available again.
             </div>
             <div class="general-errors" ng-show="errors.serverError">
