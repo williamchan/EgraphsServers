@@ -76,6 +76,33 @@ class PostCelebrityApiEndpointTests
     }
   }
 
+  it should "return a bad request if an email has invalid formatting" in new EgraphsTestApplication {
+    // Set up the scenario
+    val (celebrity, celebrityAccount, secureInfo) = db.connected(TransactionSerializable) {
+      val celebrity = TestData.newSavedCelebrity()
+      (celebrity, celebrity.account, celebrity.secureInfo)
+    }
+
+    val newContactInfo = secureInfo.get.copy(contactEmail = Some("invalid_email_address"))
+    val requestJson = Json.toJson(JsCelebrityContactInfo.from(celebrity, Some(newContactInfo)))
+
+    // Execute the request
+    val url = controllers.routes.ApiControllers.postCelebrityContactInfo.url
+    val req = FakeRequest(POST, url).withJsonBody(requestJson).withCredentials(celebrityAccount)
+    val Some(result) = route(req)
+
+    // Test expectations
+    status(result) should be(BAD_REQUEST)
+
+    db.connected(TransactionSerializable) {
+      val maybeSavedContactInfo = celebrityStore.findById(celebrity.id).get.secureInfo
+      maybeSavedContactInfo.isDefined should be(true)
+      val Some(savedContactInfo) = maybeSavedContactInfo
+      // nothing should have changed in the db
+      savedContactInfo.contactEmail should be(secureInfo.get.contactEmail)
+    }
+  }
+
   "postCelebrityDepositInfo" should "create a new celebrity deposit info if none exists" in new EgraphsTestApplication {
     // Set up the scenario
     val (celebrity, celebrityAccount) = db.connected(TransactionSerializable) {
@@ -129,7 +156,7 @@ class PostCelebrityApiEndpointTests
     }
   }
 
-  it should "update a celebrity deposit acount info if " in new EgraphsTestApplication {
+  it should "update a celebrity deposit acount info if it already exists" in new EgraphsTestApplication {
     // Set up the scenario
     val (celebrity, celebrityAccount, secureInfo) = db.connected(TransactionSerializable) {
       val celebrity = TestData.newSavedCelebrity()
