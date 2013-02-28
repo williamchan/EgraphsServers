@@ -19,7 +19,22 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
   //
   // Controllers
   //
-  def getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
+  def getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug: String) = {
+    Action { req => NotFound }
+  }
+
+  def getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug: String) = {
+    Action { req => NotFound }
+  }
+
+  def getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: Option[String]=None) = {
+    Action { req => NotFound }
+  }
+
+
+
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
@@ -28,7 +43,8 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
     }
   }
 
-  def getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: Option[String]=None) = controllerMethod.withForm()
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug: String, creditCardMsg: Option[String]=None) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
@@ -37,7 +53,8 @@ private[consumer] trait StorefrontFailedConsumerEndpoints
     }
   }
 
-  def getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
