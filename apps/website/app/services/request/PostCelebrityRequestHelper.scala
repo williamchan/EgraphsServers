@@ -15,30 +15,15 @@ trait PostCelebrityRequestHelper {
   protected def celebrityStore: CelebrityStore
   protected def dbSession: DBSession  
 
-  protected def completeRequestStar(requestedStar: String, customerId: Long)(implicit request: Request[AnyContent]): Result = {
+  protected def completeRequestStar(requestedStar: String, customerId: Long) = {
 
-    val maybeCelebrity = {
-      dbSession.connected(TransactionSerializable) {
-        celebrityStore.findByPublicName(requestedStar)
-      }
+    // add row to celebrityRequests table
+    dbSession.connected(TransactionSerializable) {
+      CelebrityRequest(
+        celebrityName = requestedStar,
+        customerId = customerId).save()
     }
 
-    maybeCelebrity match {
-      case None => {
-        play.Logger.info(requestedStar + " is not currently on Egraphs. Wah wah.")
-
-        // add row to celebrityRequests table
-        dbSession.connected(TransactionSerializable) {
-          CelebrityRequest(
-            celebrityName = requestedStar,
-            customerId = customerId).save()
-        }
-      }
-      case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + requestedStar + "!")
-    }
-
-    play.Logger.info("starName is " + requestedStar + ", customerId is " + customerId)
-    Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
-      request.session.withCustomerId(customerId).removeRequestedStar)
+    play.Logger.info("Request a Star: starName is " + requestedStar + ", customerId is " + customerId)
   }
 }

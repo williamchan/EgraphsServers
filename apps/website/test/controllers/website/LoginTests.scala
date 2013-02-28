@@ -8,6 +8,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import egraphs.playutils.ResultUtils.RichResult
 import models.AccountStore
+import models.CelebrityStore
 import services.http.forms._
 import services.http.forms.Form.Conversions._
 import services.http.forms.CustomerLoginForm.Fields
@@ -36,7 +37,7 @@ class LoginTests extends EgraphsUnitTest with ClearsCacheBefore with CsrfProtect
     val result = controllers.WebsiteControllers.postLogin().apply(request)
 
     status(result) should be (SEE_OTHER)
-    redirectLocation(result) should be (Some(getLogin().url))
+    redirectLocation(result) should be (Some(getLogin(None).url))
 
     db.connected(TransactionSerializable) {
       val customerFormOption = AppConfig.instance[CustomerLoginFormFactory].read(result.flash.get.asFormReadable)
@@ -69,15 +70,15 @@ class LoginTests extends EgraphsUnitTest with ClearsCacheBefore with CsrfProtect
 
     // Check expectations
     status(result) should be (SEE_OTHER)
-    redirectLocation(result) should not be (Some(getLogin().url))
+    redirectLocation(result) should not be (Some(getLogin(None).url))
     maybeResultCustomerId should be (account.customerId)
   }
 
   private class MockLoginController extends Controller with PostLoginEndpoint {
+    override val celebrityStore = AppConfig.instance[CelebrityStore]
     override val postController = Stubs.postControllerMethod
+    override val dbSession = AppConfig.instance[DBSession]
     override val accountStore = AppConfig.instance[AccountStore]
     override val customerLoginForms = AppConfig.instance[CustomerLoginFormFactory]
   }
-
-
 }

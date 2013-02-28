@@ -21,8 +21,10 @@ import services.http.forms.FormConstraints
 import services.http.{POSTControllerMethod, WithDBConnection}
 import services.mail.BulkMailList
 import services.mvc.ImplicitHeaderAndFooterData
+import services.request.PostCelebrityRequestHelper
 
-private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFooterData {
+private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFooterData
+  with PostCelebrityRequestHelper {
   this: Controller =>
 
   protected def celebrityStore: CelebrityStore
@@ -37,6 +39,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
     Action { implicit request =>
 
       val form = PostRequestStarEndpoint.form
+
       form.bindFromRequest.fold(
         formWithErrors => BadRequest("Something has gone wrong with request a star form submit"),
         validForm => {
@@ -47,27 +50,12 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
 
             case Right(customerAndAccount) => {
               val customerId = customerAndAccount._1.id
-              val maybeCelebrity = celebrityStore.findByPublicName(starName)
 
-              maybeCelebrity match {
-                case None => {
-                  play.Logger.info(starName + " is not currently on Egraphs. Wah wah.")
-
-                  // add row to celebrityRequests table
-                  dbSession.connected(TransactionSerializable) {
-                    CelebrityRequest(
-                      celebrityName = starName,
-                      customerId = customerId).save()
-                  }
-                }
-                case Some(celebrity) => play.Logger.info("We already have that celebrity, silly! Buy an egraph from " + starName + "!")
-                //send email immediately
-              }
-
-              play.Logger.info("starName is " + validForm.starName + ", customerId is " + customerId)
+              completeRequestStar(starName, customerId)
               Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
             }
             case Left(result) => {
+              // redirect to login page, add requested star name to session for post-login lookup
               Redirect(controllers.routes.WebsiteControllers.getLogin(
                 maybeBannerMessage = Some("**Please log in to complete your request**")
               )).withSession(request.session.withRequestedStar(starName))

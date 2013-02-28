@@ -15,7 +15,9 @@ import services.ConsumerApplication
 import services.social.Facebook
 import services.logging.Logging
 import services.config.ConfigFileProxy
+import services.http.EgraphsSession
 import services.http.EgraphsSession.Conversions._
+import services.http.EgraphsSession.Key._
 import play.api.data._
 import play.api.data.Forms._
 import services.email.AccountCreationEmail
@@ -87,9 +89,14 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging with
               case None => {
                 Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
                   session.withCustomerId(customer.id)
-                )
+                ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
               }
-              case Some(requestedStar) => completeRequestStar(requestedStar, customer.id)(request)
+              case Some(requestedStar) => {
+                completeRequestStar(requestedStar, customer.id)
+                Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
+                  session.withCustomerId(customer.id).removeRequestedStar
+                ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
+              }
             }
           }
           maybeRedirectSuccess.getOrElse(redirectAndLogError(fbUserInfo))

@@ -45,7 +45,12 @@ private[controllers] trait PostLoginEndpoint extends PostCelebrityRequestHelper 
                 request.session.withCustomerId(validForm.customerId)
               ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
             }
-            case Some(requestedStar) => completeRequestStar(requestedStar, validForm.customerId)(request)
+            case Some(requestedStar) => {
+              completeRequestStar(requestedStar, validForm.customerId)
+              Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
+                request.session.withCustomerId(validForm.customerId).removeRequestedStar
+              ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
+            }
           }
         }
       }

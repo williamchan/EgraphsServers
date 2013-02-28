@@ -77,7 +77,15 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
                 .withUsernameChanged
             ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
           }
-          case Some(requestedStar) => completeRequestStar(requestedStar, customer.id)(request)
+          case Some(requestedStar) => {
+            completeRequestStar(requestedStar, customer.id)
+            Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
+              request.session
+                .withCustomerId(customer.id)
+                .withUsernameChanged
+                .removeRequestedStar
+            ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
+          }
         }
       }
       redirects.merge
