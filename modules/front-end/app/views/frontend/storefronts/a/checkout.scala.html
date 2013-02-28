@@ -318,6 +318,7 @@
                   <input @field.identityAttributes monitor-user-attention resource-property required credit-card-number />
                   @field.errorDiv {
                     @field.ifError("required") {required}
+                    @field.ifError("remote_card_declined") {card declined}
                     
                     @field.ifError(
                       "creditCardNumber",
@@ -427,6 +428,15 @@
             <div class="validating" ng-show="submitting()">
               <img src="@EgraphsAssets.at("images/ajax-loader.gif")"> Validating...
             </div>
+            <div class="payment-errors general-errors" ng-show="stripeForm.$error.remote_transaction">
+              We failed to successfully charge this card. Correct the payment form or try another card?
+            </div>
+            <div class="general-errors" @*ng-show="errors.noInventory"*@>
+              Sorry, but this star's queue <em>just</em> filled up with orders! Sign up for our newsletter at the bottom of this page to be informed when your favorite stars will be available again.
+            </div>
+            <div class="general-errors" ng-show="errors.serverError">
+              Sorry, but it looks like we're having server difficulties. Try again later and hopefully things will go more smoothly...
+            </div >           
           </div>
         </div>
       </div>
@@ -438,7 +448,7 @@
             <button type="button"
                     class="button"
                     ng-click="transactCheckout()"
-                    ng-disabled="fieldsRemaining().length > 0 || transacting">
+                    ng-disabled="fieldsRemaining().length > 0 || transacting || errors">
               <strong>
                 <em>Purchase now</em> 
               </strong>

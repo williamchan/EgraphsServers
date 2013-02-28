@@ -22,14 +22,66 @@ function(payment, validationDirective, ngApp, logging, module) {
     expiryYear: "creditCardExpiryYear"
   };
 
+  var controlNameForErrorCode = function(errorCode) {
+    return {
+      "invalid_number": "cardNumber",
+      "incorrect_number": "cardNumber",
+      "card_declined": "cardNumber",
+      "expired_card": "cardNumber",
+      "processing_error": "cardNumber",
+      "invalid_cvc": "securityCode",
+      "incorrect_cvc": "securityCode",
+      "invalid_expiry_month": "cardExpMonth",
+      "invalid_expiry_year": "cardExpYear",
+
+      // Response codes that only report the parameter in error
+      "exp_year": "cardExpYear",
+      "exp_month": "cardExpMonth",
+      "number": "cardNumber",
+      "cvc": "securityCode"
+    }[errorCode];
+  };
+
   ngApp.directive("stripeResource", ["$parse", "$http", function($parse, $http) {
     return {
       restrict: 'A',
-      require: ["remoteResource"],
+      controller: ["$scope", function($scope) {
+        var self = this;
+
+        self.setForm = function(form) {
+          self.form = form;
+        };
+
+        self.setErrors = function(stripeErrors) {
+          forEach(stripeErrors, function(error) {
+            var errorPrefix = "stripe_";
+            var errorCode;
+            var controlName;
+            var control;
+            if (error.indexOf(errorPrefix) === 0) {
+              errorCode = error.replace(errorPrefix, "");
+              controlName = controlNameForErrorCode(errorCode);
+              control = self.form[controlName];
+              if (control) {
+                control.$setValidity("remote_" + errorCode, false);
+              } else {
+                self.form.$setValidity("remote_" + errorCode, false);
+              }
+            }
+          });
+        };
+      }],
+      require: ["stripeResource", "form", "remoteResource"],
       link: function(scope, element, attrs, requisites) {
         var tokenIdModel = attrs.stripeResource + ".id";
         var tokenDataModel = attrs.stripeResource + ".data";
-        var remoteResourceCtrl = requisites[0];
+        var stripeCtrl = requisites[0];
+        var formCtrl = requisites[1];
+        var remoteResourceCtrl = requisites[2];
+
+        stripeCtrl.setForm(formCtrl);
+        formCtrl.stripe = stripeCtrl;
+
         var getModel = function(modelStr) { return $parse(modelStr)(scope); };
         var setModel = function(modelStr, value) { return $parse(modelStr).assign(scope, value); };
 
@@ -60,26 +112,6 @@ function(payment, validationDirective, ngApp, logging, module) {
             });
           }
         });
-        
-        var controlNameForErrorCode = function(errorCode) {
-          return {
-            "invalid_number": "cardNumber",
-            "incorrect_number": "cardNumber",
-            "card_declined": "cardNumber",
-            "expired_card": "cardNumber",
-            "processing_error": "cardNumber",
-            "invalid_cvc": "securityCode",
-            "incorrect_cvc": "securityCode",
-            "invalid_expiry_month": "cardExpMonth",
-            "invalid_expiry_year": "cardExpYear",
-
-            // Response codes that only report the parameter in error
-            "exp_year": "cardExpYear",
-            "exp_month": "cardExpMonth",
-            "number": "cardNumber",
-            "cvc": "securityCode"
-          }[errorCode];
-        };
 
         remoteResourceCtrl.setResourceBehavior({
           get: function(controls, onSuccess) {

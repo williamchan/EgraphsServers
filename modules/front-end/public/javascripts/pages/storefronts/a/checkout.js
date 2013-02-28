@@ -92,16 +92,30 @@ function(page, tooltip, window, analytics, logging, requireModule) {
 
         $scope.transactCheckout = function() {
           $scope.transacting = true;
+
           cartApi.transact().success(function(response) {
             var order = response.order;
             log("Successfully purchased. Order is: ");
             log(order);
             window.location.href = order.confirmationUrl;
           })
-          .error(function(errors) {
+          .error(function(data, status) {
+            var errors;
             $scope.transacting = false;
-            log("Oh snap I got some errors trying to buy this order");
-            log(errors);
+
+            if (status === 400) {
+              errors = data.errors;
+              if (errors.payment) {
+                $scope.stripeForm.stripe.setErrors(errors.payment.concat("stripe_transaction"));
+              }
+
+              if (errors.egraph) {
+                $scope.errors = {noInventory:true};
+              }
+            } else if (status === 500) {
+              $scope.errors = {serverError:true};
+              log("Server error. Not much we can do about it...");
+            }
           });
         };
 
@@ -186,7 +200,7 @@ function(page, tooltip, window, analytics, logging, requireModule) {
          * Otherwise returns "enteringData"
          */
         $scope.orderStatus = function() {
-          if ($scope.fieldsRemaining().length === 0) {
+          if ($scope.fieldsRemaining().length === 0 && !$scope.errors) {
             return "readyForReview";
           } else {
             return "enteringData";
@@ -194,7 +208,7 @@ function(page, tooltip, window, analytics, logging, requireModule) {
         };
 
         $scope.orderCompleteIcon = function() {
-          if ($scope.fieldsRemaining().length > 0 ) {
+          if ($scope.fieldsRemaining().length > 0 && !$scope.errors) {
             return "glyphicons-x-circle-orange.png";
           } else {
             return "glyphicons-check-circle-dense-green.png";

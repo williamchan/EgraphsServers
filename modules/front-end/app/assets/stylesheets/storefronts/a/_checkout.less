@@ -11,6 +11,17 @@ body.storefront-a-checkout {
     display:block;
   }
 
+  .general-errors {
+    margin-top:10px;
+    @color: darken(@orange, 10%);
+    border:1px solid @color;
+    padding:10px;
+    border-radius:10px;
+    background-color:lighten(@orange, 42%);
+    color:@color;
+    font-style:normal;
+  }
+
   // The funny shopping-cart navbar
   .top {
     text-align:center;
@@ -362,7 +373,7 @@ body.storefront-a-checkout {
               border:1px solid #ddd;
               background-color:white;
               width:60px;
-              height:60px;
+              min-height:35px;
             }
           }
 

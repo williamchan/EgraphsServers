@@ -19,7 +19,7 @@ function(window, logging, requireModule) {
     return {
       track: function() {
         var end = new Date().getTime();
-        onComplete((end - start) / 1000);
+        onComplete(end - start);
       }
     };
   };

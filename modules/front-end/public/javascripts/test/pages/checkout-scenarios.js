@@ -68,7 +68,7 @@ function(mockBackend, logging, module, ngApp) {
       name: "Sergio Romo egraph",
       description: "For Herp Derpson with note I'm your biggest fan!. He will sign the photo Heart of a Warrior.",
       amount: 50,
-      imageUrl: "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png",
+      imageUrl: "https://d3kp0rxeqzwisk.cloudfront.net/product/416/20120823100121825/w340.jpg",
       lineItemType: {
         codeType: "EgraphOrderLineItem"
       }
@@ -88,16 +88,24 @@ function(mockBackend, logging, module, ngApp) {
     };
   };
 
-  var checkoutApiShouldReturn = function(checkout) {
+  var checkoutApiShouldReturn = function(checkout, post) {
+    var _post = post || function() {
+      return [
+        200,
+        {
+          "order": {
+            "id": 1,
+            "confirmationUrl": "/orders/1/confirm"
+          }
+        },
+        {}
+      ];
+    };
+
     mockBackend.setBehavior(function($httpBackend) {
       var checkoutRegex = /checkouts\/[0-9]+$/;
       $httpBackend.whenGET(checkoutRegex).respond(checkout);
-      $httpBackend.whenPOST(checkoutRegex).respond({
-        "order": {
-          "id": 1,
-          "confirmationUrl": "/orders/1/confirm"
-        }
-      });
+      $httpBackend.whenPOST(checkoutRegex).respond(_post);
     });
   };
 
@@ -284,6 +292,54 @@ function(mockBackend, logging, module, ngApp) {
         mockApi.egraph = {
           isGift: "true"
         };
+        configureDefaultCheckoutApi();
+      }
+    },
+
+    "transact-errors": {
+      bootstrap: function() {
+        checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
+
+        checkoutApiShouldReturn(checkout, function() {
+          return [
+            400,
+            {
+              errors: {
+                payment: [
+                  "stripe_incorrect_number",
+                  "stripe_invalid_number",
+                  "stripe_invalid_expiry_month",
+                  "stripe_invalid_expiiry_year",
+                  "stripe_invalid_cvc",
+                  "stripe_expired_card",
+                  "stripe_incorrect_cvc",
+                  "stripe_card_declined",
+                  "stripe_processing_error"
+                ],
+                egraph: ["no_inventory"]
+              }
+            },
+            {}
+          ];
+        });
+        populateForms();
+
+
+        configureDefaultCheckoutApi();
+      }
+    },
+
+    "transact-server-error": {
+      bootstrap: function() {
+        checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
+
+        checkoutApiShouldReturn(checkout, function() {
+          return [500, undefined, {}];
+        });
+        populateForms();
+
         configureDefaultCheckoutApi();
       }
     },
