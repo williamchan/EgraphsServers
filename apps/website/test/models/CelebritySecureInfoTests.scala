@@ -21,10 +21,10 @@ class CelebritySecureInfoTests extends EgraphsUnitTest
 
   "encrypt/decrypt" should "be able to arrive at the same thing" in {
     val decrypted = DecryptedCelebritySecureInfo(
-      contactEmail = Some(TestData.generateEmail("myyk", "clamazon.com")),
+      contactEmail = Some(TestData.generateEmail("bezos", "clamazon.com")),
       smsPhone = Some(RandomStringUtils.randomNumeric(10)),
       voicePhone = Some(RandomStringUtils.randomNumeric(10)),
-      agentEmail = Some(TestData.generateEmail("myyksAgent", "clamazon.com")),
+      agentEmail = Some(TestData.generateEmail("bezosAgent", "clamazon.com")),
       streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
       postalCode = Some("ABC 123"),

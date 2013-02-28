@@ -52,12 +52,13 @@ case class JsCelebrityDepositInfo(
   depositAccountType: Option[BankAccountType.EnumVal],
   depositAccountRoutingNumber: Option[Int] = None,
   depositAccountNumber: Option[Long] = None,
+  isDepositAccountChange: Option[Boolean] = None,
   anonymousDepositAccountRoutingNumber: Option[String] = None,
   anonymousDepositAccountNumber: Option[String] = None
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrityDepositInfo extends Function11[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[BankAccountType.EnumVal], Option[Int], Option[Long], Option[String], Option[String], JsCelebrityDepositInfo] {
+object JsCelebrityDepositInfo extends Function12[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[BankAccountType.EnumVal], Option[Int], Option[Long], Option[Boolean], Option[String], Option[String], JsCelebrityDepositInfo] {
   implicit val celebrityDepositInfoFormats = Json.format[JsCelebrityDepositInfo]
 
   def from(celebrity: Celebrity): JsCelebrityDepositInfo = {

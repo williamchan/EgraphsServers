@@ -32,9 +32,7 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
                   voicePhone = contactInfo.voicePhone,
                   agentEmail = contactInfo.agentEmail
                 ).encrypt.save()
-                println(s"!!!!!!!!!!!!!!!!!!!!!!!!!! 1 ${secureInfo.decrypt}")
-                val celebritySaved = celebrity.copy(secureInfoId = Some(secureInfo.id)).save()
-                println(s"!!!!!!!!!!!!!!!!!!!!!!!!!! 1 $celebritySaved")
+                celebrity.copy(secureInfoId = Some(secureInfo.id)).save()
                 Ok
             }
           }
@@ -51,20 +49,28 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
             play.api.Logger.info(s"postCelebrityDepositInfo attempt for celebrity $celebrity")
             val maybeDepositInfo = request.body.asJson.map(_.asOpt[JsCelebrityDepositInfo]).flatten
             maybeDepositInfo match {
-              case None => BadRequest("Could not parse json into JsCelebrityDepositInfo.")
+              case None =>
+                BadRequest("Could not parse json into JsCelebrityDepositInfo.")
               case Some(depositInfo) =>
-                val existingSecureInfo = celebrity.secureInfo.getOrElse(DecryptedCelebritySecureInfo())
-                val secureInfo = existingSecureInfo.copy(
-                  streetAddress = depositInfo.streetAddress,
-                  city = depositInfo.city,
-                  postalCode = depositInfo.postalCode,
-                  country = depositInfo.country
-                ).withDepositAccountType(depositInfo.depositAccountType)
-                .withDepositAccountRoutingNumber(depositInfo.depositAccountRoutingNumber)
-                .withDepositAccountNumber(depositInfo.depositAccountNumber)
-                .encrypt.save()
-                celebrity.copy(secureInfoId = Some(secureInfo.id)).save()
-                Ok
+                if (!depositInfo.isDepositAccountChange.isDefined) {
+                  BadRequest("Must have value isDepositAccountChange.")
+                } else {
+                  val existingSecureInfo = celebrity.secureInfo.getOrElse(DecryptedCelebritySecureInfo())
+                  val partialSecureInfo = existingSecureInfo.copy(
+                    streetAddress = depositInfo.streetAddress,
+                    city = depositInfo.city,
+                    postalCode = depositInfo.postalCode,
+                    country = depositInfo.country)
+
+                  val updatedSecureInfo = if (depositInfo.isDepositAccountChange.get) {
+                    partialSecureInfo.withDepositAccountType(depositInfo.depositAccountType)
+                      .withDepositAccountRoutingNumber(depositInfo.depositAccountRoutingNumber)
+                      .withDepositAccountNumber(depositInfo.depositAccountNumber)
+                  } else partialSecureInfo
+                  val savedSecureInfo = updatedSecureInfo.encrypt.save()
+                  celebrity.copy(secureInfoId = Some(savedSecureInfo.id)).save()
+                  Ok
+                }
             }
           }
         }
