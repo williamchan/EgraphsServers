@@ -12,7 +12,6 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
   protected def postApiController: POSTApiControllerMethod
   protected def httpFilters: HttpFilters
 
-  //TODO: Add email address validation
   def postCelebrityContactInfo() = {
     postApiController() {
       httpFilters.requireAuthenticatedAccount.inRequest() { account =>
@@ -27,10 +26,10 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
                 contactInfo.twitterUsername.map(twitter => celebrity.copy(twitterUsername = Some(twitter)).save())
                 val existingSecureInfo = celebrity.secureInfo.getOrElse(DecryptedCelebritySecureInfo())
                 val secureInfo = existingSecureInfo.copy(
-                  contactEmail = contactInfo.contactEmail,
+                  contactEmail = contactInfo.contactEmail.map(_.value),
                   smsPhone = contactInfo.smsPhone,
                   voicePhone = contactInfo.voicePhone,
-                  agentEmail = contactInfo.agentEmail
+                  agentEmail = contactInfo.agentEmail.map(_.value)
                 ).encrypt.save()
                 celebrity.copy(secureInfoId = Some(secureInfo.id)).save()
                 Ok

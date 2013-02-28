@@ -15,14 +15,14 @@ case class JsCelebrityContactInfo(
   id: Long,
   accountSettingsComplete: Boolean,
   twitterUsername: Option[String],
-  contactEmail: Option[String],
+  contactEmail: Option[EmailAddress],
   smsPhone: Option[String],
   voicePhone: Option[String],
-  agentEmail: Option[String]
+  agentEmail: Option[EmailAddress]
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[String], JsCelebrityContactInfo] {
+object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], Option[EmailAddress], Option[String], Option[String], Option[EmailAddress], JsCelebrityContactInfo] {
   implicit val celebrityContactInfoFormats = Json.format[JsCelebrityContactInfo]
 
   def from(celebrity: Celebrity): JsCelebrityContactInfo = {
@@ -34,10 +34,10 @@ object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], O
       id = celebrity.id,
       accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
       twitterUsername = celebrity.twitterUsername,
-      contactEmail = secureInfo.map(_.contactEmail).flatten,
+      contactEmail = secureInfo.map(info => info.contactEmail.map(EmailAddress(_))).flatten,
       smsPhone = secureInfo.map(_.smsPhone).flatten,
       voicePhone = secureInfo.map(_.voicePhone).flatten,
-      agentEmail = secureInfo.map(_.agentEmail).flatten
+      agentEmail = secureInfo.map(info => info.agentEmail.map(EmailAddress(_))).flatten
     )
   }
 }
