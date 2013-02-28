@@ -5,7 +5,7 @@ import scala.concurrent.duration._
 import play.api.test.FakeRequest
 import play.api.Configuration
 import play.api.Play
-import play.api.http.HeaderNames
+import play.api.http.{Writeable, HeaderNames}
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.concurrent.Promise
 import play.api.libs.Files.TemporaryFile
@@ -131,6 +131,7 @@ object FunctionalTestUtils {
   trait DomainRequestBase[T, U] {
     def request: FakeRequest[T]
     def requestWithAuthTokenInBody: FakeRequest[U]
+    def requestWithAdminIdInBody(adminId: Long): FakeRequest[U]
 
     val authToken = "fake-auth-token"
 
@@ -138,8 +139,9 @@ object FunctionalTestUtils {
       request.withSession(request.session.withCustomerId(customerId).data.toSeq: _*)
     }
 
-    def withAdmin(adminId: Long): FakeRequest[T] = {
-      request.withSession(request.session.withAdminId(adminId).data.toSeq: _*)
+    def withAdmin(adminId: Long): FakeRequest[U] = {
+      val newSession = request.session + (EgraphsSession.Key.AdminId.name -> adminId.toString)
+      requestWithAdminIdInBody(adminId).withSession(newSession.data.toSeq: _*)
     }
 
     def withAuthToken: FakeRequest[U] = {
@@ -158,6 +160,15 @@ object FunctionalTestUtils {
       val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
       val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
       val newBody = existingBody + ("authenticityToken" -> Seq(authToken))
+      val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
+
+      request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*)
+    }
+
+    override def requestWithAdminIdInBody(adminId: Long): FakeRequest[AnyContentAsFormUrlEncoded] = {
+      val formUrlEncodedRequest = request.asInstanceOf[FakeRequest[AnyContentAsFormUrlEncoded]]
+      val existingBody = formUrlEncodedRequest.body.asFormUrlEncoded.getOrElse(Map())
+      val newBody = existingBody + (EgraphsSession.Key.AdminId.name -> Seq(adminId.toString))
       val newBodySingleValues = newBody.map(kv => (kv._1, kv._2.head))
 
       request.withFormUrlEncodedBody(newBodySingleValues.toSeq: _*)
@@ -186,5 +197,31 @@ object FunctionalTestUtils {
       val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)
       newRequest
     }
+
+    override def requestWithAdminIdInBody(adminId: Long) : FakeRequest[MultipartFormData[TemporaryFile]] = {
+      val multipartEncodedRequest = request.asInstanceOf[FakeRequest[MultipartFormData[TemporaryFile]]]
+
+      val existingDataParts = multipartEncodedRequest.body.dataParts
+      val existingFiles = multipartEncodedRequest.body.files
+      val existingBadParts = multipartEncodedRequest.body.badParts
+
+      val newDataParts = existingDataParts + (EgraphsSession.Key.AdminId.name -> Seq(adminId.toString))
+
+      val newMultipart = MultipartFormData[TemporaryFile](newDataParts, existingFiles, existingBadParts)
+      val newRequest = FakeRequest(request.method, request.uri, request.headers, newMultipart)
+      newRequest
+    }
   }
+
+  object Conversions {
+    implicit def fakeAnyContentRequestToDomainRequest[T <: AnyContent](fakeRequest: FakeRequest[T]) = {
+      new DomainRequest(fakeRequest)
+    }
+
+    implicit def fakeMultipartContentRequestToDomainRequest[T](fakeRequest: FakeRequest[T]) = {
+      new MultipartDomainRequest(fakeRequest)
+    }
+  }
+
+  implicit val writeable : Writeable[MultipartFormData[TemporaryFile]] = Writeable(x => Array[Byte](), Some("text/plain"))
 }

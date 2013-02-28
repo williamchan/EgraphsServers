@@ -1,8 +1,4 @@
-@(celebrityPublicName: Option[String] = None,
-  mastheadMessage: Option[String] = None,
-  mastheadImageUrl: String, 
-  getStartedUrl: Option[String] = None
-)
+@(mastheadOption: Option[models.frontend.landing.LandingMasthead])
 
 @import controllers._
 @import views.html.frontend.tags
@@ -32,36 +28,11 @@
         </div>
       </div>  
       <div class="modal-body-separator">
-        <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true" href="">Close</a>
+        <button data-dismiss="modal" class="modal-dismissal" aria-hidden="true">Close</button>
       </div>
     </div>
   </div>     
 }
 
-<section id="masthead-home" role="banner" class="flyout-pull-right" style="background-image: url(@mastheadImageUrl);">
-  <div class="banner-gradient">
-    <div class="container">
-      <div class="row">
-
-        <div class="span6 header-parent">
-          @{
-              celebrityPublicName match {
-                case None => standardHeadline
-                case Some(name) => celebHeadline(name)
-              }
-            }
-            @getStartedUrl.map{ url =>
-            @{
-              celebrityPublicName match {
-                case None => {}
-                case Some(name) => tags.landing.get_started(url)
-              }
-            }
-          }
-        </div>
-      </div>
-    </div>
-  </div>
-  @videoModal
-</section> <!-- end #masthead-home -->
-     
+@tags.landing.masthead(mastheadOption.getOrElse(models.frontend.landing.DefaultLanding.masthead))
+@videoModal

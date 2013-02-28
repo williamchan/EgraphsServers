@@ -39,6 +39,7 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[ImageAssetServices].in[Singleton]
     bind[InventoryBatchServices].in[Singleton]
     bind[InventoryBatchProductServices].in[Singleton]
+    bind[MastheadServices].in[Singleton]
     bind[MarketplaceServices].in[Singleton]
     bind[OrderServices].in[Singleton]
     bind[PrintOrderServices].in[Singleton]

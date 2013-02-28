@@ -137,7 +137,7 @@ case class EgraphPurchaseHandler(
     // Persist the Order. This is executed in its own database transaction.
     // cashTransaction can be None if the order was free (due to coupons).
     // maybePrintOrder can be Some if printingOption is "HighQualityPrint".
-    val (order: Order, _: Customer, _: Customer, cashTransaction: Option[_], maybePrintOrder: Option[_], didCreateBuyer: Boolean) = try {
+    val (order: Order, _: Customer, _: Customer, cashTransaction: Option[_], maybePrintOrder: Option[PrintOrder], didCreateBuyer: Boolean) = try {
       persistOrder(buyerEmail = buyerEmail,
         buyerName = buyerName,
         recipientEmail = recipientEmail,
@@ -182,13 +182,14 @@ case class EgraphPurchaseHandler(
         recipientName = recipientName,
         recipientEmail = recipientEmail,
         celebrityName = celebrity.publicName,
+        celebrityGender = celebrity.gender,
         productName = product.name,
         orderDate = order.created.formatDayAsPlainLanguage,
         orderId = order.id.toString,
         pricePaid = totalAmountPaid.formatSimply,
         deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
         faqHowLongLink = services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
-        hasPrintOrder = maybePrintOrder.isDefined
+        maybePrintOrderShippingAddress = maybePrintOrder.map(_.shippingAddress)
       )
     ).send()
 

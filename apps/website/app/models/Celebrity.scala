@@ -72,11 +72,8 @@ case class Celebrity(id: Long = 0,
   with HasPublishedStatus[Celebrity]
   with HasEnrollmentStatus[Celebrity]
   with HasGender[Celebrity]
+  with LandingPageImage[Celebrity]
 {
-
-  /**
-   * FilterValues celebrity is tagged withs
-   */
 
   lazy val categoryValues = services.categoryServices.categoryValueStore.categoryValues(this)
   
@@ -92,7 +89,7 @@ case class Celebrity(id: Long = 0,
   // Public members
   //
   /**Persists by conveniently delegating to companion object's save method. */
-  def save(): Celebrity = {
+  override def save(): Celebrity = {
     require(!publicName.isEmpty, "A celebrity without a publicName is hardly a celebrity at all.")
     services.store.save(this)
   }
@@ -154,21 +151,6 @@ case class Celebrity(id: Long = 0,
       .getOrElse(defaultProfile)
   }
 
-  def withLandingPageImage(imageData: Array[Byte]): CelebrityWithImage = {
-    val newImageKey = "landing_" + Time.toBlobstoreFormat(Time.now)
-    CelebrityWithImage(
-      celebrity=this.copy(_landingPageImageKey=Some(newImageKey)),
-      image=ImageAsset(imageData, keyBase, newImageKey, ImageAsset.Png, services.imageAssetServices.get)
-    ).save()
-  }
-
-  def landingPageImage: ImageAsset = {
-    _landingPageImageKey.flatMap(theKey => Some(ImageAsset(keyBase, theKey, ImageAsset.Png, services=services.imageAssetServices.get))) match {
-      case Some(imageAsset) => imageAsset
-      case None => defaultLandingPageImage
-    }
-  }
-
   def withLogoImage(imageData: Array[Byte]): CelebrityWithImage = {
     val newImageKey = "logo_" + Time.toBlobstoreFormat(Time.now)
     CelebrityWithImage(
@@ -187,21 +169,6 @@ case class Celebrity(id: Long = 0,
   def saveWithImageAssets(/*profileImage: Option[BufferedImage], */ landingPageImage: Option[BufferedImage], logoImage: Option[BufferedImage]): Celebrity = {
     //TODO: refactor profile image saving to here
     saveWithLandingPageImage(landingPageImage).saveWithLogoImage(logoImage)
-  }
-
-  private def saveWithLandingPageImage(landingPageImage: Option[BufferedImage]): Celebrity = {
-    landingPageImage match {
-      case None => this
-      case Some(image) => {
-        val landingPageImageBytes = {
-          import ImageUtil.Conversions._
-
-          val croppedImage = ImageUtil.crop(image, Celebrity.defaultLandingPageImageDimensions)
-          croppedImage.asByteArray(ImageAsset.Jpeg)
-        }
-        withLandingPageImage(landingPageImageBytes).save().celebrity
-      }
-    }
   }
 
   private def saveWithLogoImage(logoImage: Option[BufferedImage]): Celebrity = {
@@ -276,6 +243,20 @@ case class Celebrity(id: Long = 0,
     this.copy(_gender = gender.name)
   }
 
+  override lazy val defaultLandingPageImage = ImageAsset(
+    IOUtils.toByteArray(current.resourceAsStream("images/1550x556.jpg").get),
+    keyBase="defaults/celebrity",
+    name="landingPageImage",
+    imageType=ImageAsset.Jpeg,
+    services=services.imageAssetServices.get
+  )
+
+  override def withLandingPageImageKey(key: Option[String]) : Celebrity = {
+    this.copy(_landingPageImageKey = key)
+  }
+
+  override def imageAssetServices = services.imageAssetServices.get
+
   //
   // Private members
   //
@@ -290,7 +271,7 @@ case class Celebrity(id: Long = 0,
    * The blobstore folder name upon which all resources relating to this celebrity should base
    * their keys. This value can not be determined if the entity has not yet been saved.
    */
-  private def keyBase = {
+  override def keyBase = {
     require(id > 0, "Cannot determine blobstore key when no id exists yet for this entity in the relational database")
     "celebrity/" + id
   }
@@ -302,13 +283,7 @@ case class Celebrity(id: Long = 0,
     imageType=ImageAsset.Png,
     services=services.imageAssetServices.get
   )
-  lazy val defaultLandingPageImage = ImageAsset(
-    IOUtils.toByteArray(current.resourceAsStream("images/1550x556.jpg").get),
-    keyBase="defaults/celebrity",
-    name="landingPageImage",
-    imageType=ImageAsset.Png,
-    services=services.imageAssetServices.get
-  )
+
   lazy val defaultLogoImage = ImageAsset(
     IOUtils.toByteArray(current.resourceAsStream("images/40x40.jpg").get),
     keyBase="defaults/celebrity",
@@ -346,12 +321,7 @@ object JsCelebrity extends Function6[Long, String, String, String, Timestamp, Ti
 
 object Celebrity {
   val minProfileImageWidth = 100
-  val minLandingPageImageWidth = 1550
-  val minLandingPageImageHeight = 556
   val minLogoWidth = 40
-
-  val defaultLandingPageImageDimensions = Dimensions(width = minLandingPageImageWidth, height = minLandingPageImageHeight)
-  val landingPageImageAspectRatio = minLandingPageImageWidth.toDouble / minLandingPageImageHeight
   val defaultLogoDimensions = Dimensions(width = minLogoWidth, height = minLogoWidth)
 
   // Similar to ProductWithPhoto
@@ -679,7 +649,7 @@ class CelebrityStore @Inject() (
     for {
       star <- catalogStarsSearch(maybeQuery, refinements)
     } yield {
-      MarketplaceCelebrity(
+      MarketplaceCelebrity.make(
         id = star.id,
         publicName = star.name,
         photoUrl = star.marketplaceImageUrl,

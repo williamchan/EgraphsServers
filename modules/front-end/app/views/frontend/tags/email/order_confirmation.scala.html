@@ -1,5 +1,7 @@
 @(orderConfirmationEmailStack: models.frontend.email.OrderConfirmationEmailViewModel)
 
+@import egraphs.playutils.Grammar._
+
 <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; line-height: 40px; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 0;">
   Order Confirmation
 </p>
@@ -19,8 +21,8 @@
 
 <img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-rule-content.gif" width="520" height="42" />
 
-<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">
-  ORDER DETAILS
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">
+  Order Details
 </p>
 
 <table cellpadding="0" cellspacing="0" width="100%">
@@ -44,14 +46,14 @@
     </th>
     <td>
       <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-        @orderConfirmationEmailStack.buyerName
+        @orderConfirmationEmailStack.buyerEmail
       </p>
     </td>
   </tr>
   <tr>
     <th align="left">
       <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-        Egraph Owner:
+        Egraph Recipient:
       </p>
     </th>
     <td>
@@ -63,7 +65,7 @@
   <tr>
     <th align="left">
       <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-        Owner's Email:
+        Recipient Email:
       </p>
     </th>
     <td>
@@ -120,25 +122,39 @@
       </p>
     </td>
   </tr>
-  <tr>
-    <th align="left">
-      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-        <a href="@orderConfirmationEmailStack.faqHowLongLink">Expected Digital Delivery:</a>
-      </p>
-    </th>
-    <td>
-      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-        @orderConfirmationEmailStack.deliveredByDate
-      </p>
-    </td>
-  </tr>
 </table>
 
 <img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-rule-content.gif" width="520" height="42" />
 
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">
+  When will you get the egraph?
+</p>
+
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  @orderConfirmationEmailStack.celebrityName will create it as soon as @subjectPronoun(orderConfirmationEmailStack.celebrityGender) can -- on average it takes 2 weeks. It's depends on @possessivePronoun(orderConfirmationEmailStack.celebrityGender) schedule, so it may be much faster, or it may be slower!
+</p>
+
 @if(orderConfirmationEmailStack.hasPrintOrder) {
-  <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">Your framed print is expected to arrive 3 weeks after your digital delivery. The framed print will NOT arrive by December 24. We want to upfront about print delivery timing because we don't want to ruin anyone's Christmas.</p>
+  <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+    Your framed print is expected to arrive 3 weeks after your digital delivery. When your package ships you'll receive an email with tracking information for an exact delivery date.
+  </p>
+
+  <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+    It will be shipped to:<br>
+    @orderConfirmationEmailStack.printOrderShippingAddress
+  </p>
 }
+
+<img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-rule-content.gif" width="520" height="42" />
+
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">
+  Order Changes
+</p>
+
+<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+  To make changes to your order, please contact egraphs support at 
+  <a style="color: #29abe2;" href="mailto:support@@egraphs.com">support@@egraphs.com</a>
+</p>
 
 <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">Thank you,<br />
   The Egraphs Team

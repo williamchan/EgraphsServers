@@ -15,6 +15,8 @@ case class CategoryServices @Inject() (
   categoryValueStore: CategoryValueStore,
   categoryValueRelationshipStore: CategoryValueRelationshipStore,
   celebrityStore: CelebrityStore,
+  mastheadStore: MastheadStore,
+  mastheadCategoryValueStore: MastheadCategoryValueStore,
   schema: Schema
 )
 

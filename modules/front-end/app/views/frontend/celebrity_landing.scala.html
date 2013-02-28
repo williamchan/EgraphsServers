@@ -1,4 +1,4 @@
-@(getStartedUrl: String, celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityGender: egraphs.playutils.Gender.EnumVal = egraphs.playutils.Gender.Male
+@(getStartedUrl: String, celebrityPublicName: String, celebrityCasualName: String, landingPageImageUrl: String, celebrityGender: egraphs.playutils.Gender.EnumVal = egraphs.playutils.Gender.Male, masthead: models.frontend.landing.LandingMasthead
 )(implicit headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
@@ -12,7 +12,7 @@
 
 @baseBody = {
 
-  @tags.landing.masthead_section(Option(celebrityPublicName), Option(celebrityMastheadMessage), landingPageImageUrl, Option(getStartedUrl))
+  @tags.landing.masthead_section(Some(masthead))
 
   <section id="content" role="main" class="landing">
 

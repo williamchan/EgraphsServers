@@ -45,6 +45,7 @@ case class OrderCompleteViewModel (
   discount: Option[Money],
   digitalPrice: Money,
   printPrice: Money,
+  printOrderShippingAddress: String,
   hasPrintOrder: Boolean,
   withAffiliateMarketing: Boolean = false
 )

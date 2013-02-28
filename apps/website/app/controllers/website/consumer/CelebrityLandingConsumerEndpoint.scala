@@ -10,6 +10,8 @@ import models.frontend.footer.FooterData
 import play.api.templates.Html
 import services.http.filters.HttpFilters
 import egraphs.authtoken.AuthenticityToken
+import models.frontend.landing.LandingMasthead
+import models.frontend.masthead.SimpleLinkViewModel
 
 private[consumer] trait CelebrityLandingConsumerEndpoint
   extends ImplicitHeaderAndFooterData
@@ -42,12 +44,20 @@ object CelebrityLandingConsumerEndpoint {
 
     val getStartedUrlBase = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug).url
     val publicName = celebrity.publicName
+
+    val masthead = LandingMasthead(
+      headline = "Get an egraph from " + publicName,
+      landingPageImageUrl = landingPageImageUrl,
+      callToActionViewModel = SimpleLinkViewModel(text = "Get Started", target = CelebrityAccesskey.urlWithAccesskey(getStartedUrlBase, accesskey))
+      )
+
     views.html.frontend.celebrity_landing(
       getStartedUrl = CelebrityAccesskey.urlWithAccesskey(getStartedUrlBase, accesskey),
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
-      celebrityGender = celebrity.gender
+      celebrityGender = celebrity.gender,
+      masthead = masthead
     )
   }
 

@@ -76,6 +76,9 @@ GET     /GiftCertificateCheckout/index                            controllers.Gi
 GET     /Storefront-A/personalize                                 controllers.StorefrontA.personalize
 GET     /Storefront-A/checkout                                    controllers.StorefrontA.checkout(testcase: Option[String] ?= None)
 
+GET     /Landing/video                                            controllers.Landing.videoMasthead
+GET     /Landing/searchbox                                        controllers.Landing.searchboxMasthead
+GET     /Landing/link                                             controllers.Landing.simpleLinkMasthead
 GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
 GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory
 GET     /Landing/giftMessaging                                    controllers.Landing.giftMessaging

@@ -1,4 +1,5 @@
 @(stars:Iterable[models.frontend.landing.CatalogStar],
+  mastheadOption: Option[models.frontend.landing.LandingMasthead],
   verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
   signup:Boolean = false,
   marketplaceRoute : String = "/stars"
@@ -152,13 +153,7 @@
   @headerData.giftCertificateLink.map { link =>
     @tags.landing.announcement_bar()
   }
-  @tags.landing.masthead_section(
-    celebrityPublicName=None,
-    mastheadMessage=None,
-    mastheadImageUrl=EgraphsAssets.at("images/landing-masthead.jpg").url,
-    getStartedUrl=Some("/stars")
-  )
-
+  @tags.landing.masthead_section(mastheadOption)
   <section id="content" role="main" class="landing">
 
     <div id="main">

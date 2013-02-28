@@ -4,7 +4,7 @@ define(["Egraphs",
  "services/logging",
  "module",
  "bootstrap/bootstrap-tooltip",
- "bootstrap/bootstrap-popover",
+ "bootstrap/bootstrap-transition",
  "services/responsive-modal"],
 function (Egraphs, marketplace, logging, requireModule) {
   /**
@@ -112,7 +112,6 @@ function (Egraphs, marketplace, logging, requireModule) {
         $(".all-teams").click(verticalFunction);
         $(".vertical-tile").click(verticalFunction);
         $(".cv-link").click(categoryFunction);
-
       });
     }
   };
