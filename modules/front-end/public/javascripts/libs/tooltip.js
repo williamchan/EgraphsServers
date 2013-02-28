@@ -6,6 +6,7 @@ define(
   "window"
 ],
 function(analytics, window) {
+  var noop = angular.noop;
 
   return {
     apply: function(config) {
@@ -18,12 +19,14 @@ function(analytics, window) {
       var targets = $( selector ),
         target  = false,
         tooltip = false,
+        remove_current = angular.noop,
         title   = false,
         tip     = false,
         openTooltip = function()
       {
+        if(target) { remove_current(); }
 
-        target  = $( this );
+        target = $( this );
         tip   = target.attr( 'title' );
         tooltip = $( '<div id="tooltip"></div>' );
         var analyticsEventName = target.attr("event")? target.attr("event"): target.html();
@@ -89,17 +92,25 @@ function(analytics, window) {
      
           target.attr( 'title', tip );
           
-          target.unbind('click mouseleave', remove_tooltip);
-          tooltip.unbind('click', remove_tooltip);
+          //target.unbind('click', remove_tooltip);
+          //tooltip.unbind('click', remove_tooltip);
+          $('body').unbind('touchstart click', remove_tooltip);
+          target.unbind('click', remove_tooltip);
+          target.bind('click', openTooltip);
 
           durationEvent.track();
+          target = false;
         };
-     
-        target.bind( 'click mouseleave', remove_tooltip );
-        tooltip.bind( 'click', remove_tooltip );
+
+        target.unbind('click', openTooltip);
+        target.bind('click', remove_tooltip);
+        $('body').bind( 'touchstart click', remove_tooltip);
+        remove_current = remove_tooltip;
+        // target.bind( 'click', remove_tooltip );
+        // tooltip.bind( 'click', remove_tooltip );
       };
      
-      targets.bind( 'mouseenter', openTooltip);
+      targets.bind('click', openTooltip);
     }
   };
 });
