@@ -2,12 +2,8 @@ package controllers.website
 
 import play.api.mvc._
 import play.api.mvc.Results.Redirect
-import play.api.mvc.AnyContent
-import play.api.mvc.Request
 import controllers.WebsiteControllers
 import controllers.routes.WebsiteControllers.getLogin
-import services.db.DBSession
-import services.db.TransactionSerializable
 import services.http.POSTControllerMethod
 import services.http.forms.CustomerLoginFormFactory
 import services.http.EgraphsSession
@@ -20,7 +16,6 @@ private[controllers] trait PostLoginEndpoint extends PostCelebrityRequestHelper 
   import services.http.forms.Form.Conversions._
 
   protected def celebrityStore: CelebrityStore
-  protected def dbSession: DBSession
   protected def postController: POSTControllerMethod
   protected def accountStore: AccountStore
   protected def customerLoginForms: CustomerLoginFormFactory

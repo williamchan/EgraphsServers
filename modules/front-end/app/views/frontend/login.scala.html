@@ -29,12 +29,7 @@
   }
 }
 
-@bannerMessage = @{
-  maybeBannerMessage match {
-    case Some(bannerMessage) => bannerMessage
-    case None => ""
-  }
-}
+@bannerMessage = @{maybeBannerMessage.getOrElse("")}
 
 @header = {How do you want to sign in?}
 

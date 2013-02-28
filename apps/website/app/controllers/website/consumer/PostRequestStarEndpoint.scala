@@ -1,6 +1,5 @@
 package controllers.website.consumer
 
-import egraphs.authtoken.AuthenticityToken
 import models.CelebrityRequest
 import models.CelebrityStore
 import models.frontend.marketplace.RequestStarViewModel
@@ -19,7 +18,6 @@ import services.http.EgraphsSession.Conversions._
 import services.http.filters._
 import services.http.forms.FormConstraints
 import services.http.{POSTControllerMethod, WithDBConnection}
-import services.mail.BulkMailList
 import services.mvc.ImplicitHeaderAndFooterData
 import services.request.PostCelebrityRequestHelper
 

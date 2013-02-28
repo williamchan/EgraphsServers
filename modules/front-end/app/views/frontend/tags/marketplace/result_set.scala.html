@@ -8,9 +8,6 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@import views.html.frontend.tags.storefront_breadcrumbs_responsive
-@import views.html.frontend.tags
-@import models.frontend.forms.{Field, FormError}
 @import views.frontend.Utils.bootstrapFields
 @import egraphs.authtoken.AuthenticityToken.safeForm
 
@@ -61,7 +58,7 @@
 
 @requestStarContentIfZeroResults = {
   @if(results.celebrities.size == 0) {
-    <section class="span4">
+    <section id="request-star-section">
 
         @safeForm(
           'id -> "request-star-form",

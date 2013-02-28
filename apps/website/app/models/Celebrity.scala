@@ -390,12 +390,6 @@ class CelebrityStore @Inject() (
     }
   }
 
-  def findByPublicName(name: String): Option[Celebrity] = {
-    from(schema.celebrities)(celebrity =>
-      where(celebrity.publicName === name)
-        select (celebrity)).headOption
-  }
-
   // TODO(erem): Test this one
   def findByEgraphId(egraphId: Long): Option[Celebrity] = {
     from(schema.celebrities, schema.products, schema.orders, schema.egraphs)(
