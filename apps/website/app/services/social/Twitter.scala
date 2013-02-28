@@ -1,6 +1,7 @@
 package services.social
 
 import models.Celebrity
+import models.Order
 
 object Twitter {
 
@@ -9,18 +10,16 @@ object Twitter {
    * @param viewEgraphUrl url to egraph page
    * @return a link with everything Twitter needs to make a tweet
    */
-  def getEgraphShareLink(celebrity: Celebrity, viewEgraphUrl: String): String = {
-    views.frontend.Utils.getTwitterShareLink(link = viewEgraphUrl, text = getTweetText(celebrity))
+  def getEgraphShareLink(celebrity: Celebrity, order: Order, viewEgraphUrl: String): String = {
+    views.frontend.Utils.getTwitterShareLink(link = viewEgraphUrl, text = getTweetText(celebrity, order))
   }
 
-  def getTweetText(celebrity: Celebrity): String = {
-    val tweetTextIfCelebHasTwitterName = for {
-      celebTwitterName <- celebrity.twitterUsername if (!celebrity.doesNotHaveTwitter)
-    } yield {
-      "Hey @" + celebTwitterName + " this is one choice egraph you made."
+  def getTweetText(celebrity: Celebrity, order: Order): String = {
+    val celebNameToAppearInTweet = if(celebrity.twitterUsername.isDefined && !celebrity.doesNotHaveTwitter) {
+      "@" + celebrity.twitterUsername.get
+    } else {
+      celebrity.publicName
     }
-    tweetTextIfCelebHasTwitterName.getOrElse {
-      "Check out this choice egraph from " + celebrity.publicName + "."
-    }
+    "An egraph for " + order.recipientName + " from " + celebNameToAppearInTweet
   }
 }
