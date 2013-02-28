@@ -185,7 +185,7 @@
                 name="recipientForm"
                 class="ajax"
                 novalidate
-                ng-show="egraph.isGift">
+                ng-show="egraph.isGift == 'true'">
             @withField("recipient", "email") { field =>
               <div class="control-group">
                 <label class="control-label" for="@field.id">
@@ -225,7 +225,7 @@
                 </div>
               }
             </div> <!-- End .control-group -->
-            <div class="control-group" ng-show="egraph.isGift">
+            <div class="control-group" ng-show="egraph.isGift == 'true'">
               @withField("buyer", "name") { field =>
                 <label class="control-label" for="@field.id">
                   Your Name@requiredStar:

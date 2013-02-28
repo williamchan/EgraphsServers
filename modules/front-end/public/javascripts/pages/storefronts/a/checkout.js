@@ -126,7 +126,7 @@ function(page, tooltip, window, analytics, logging, requireModule) {
             $scope.buyerForm
           ];
 
-          if ($scope.egraph.isGift) {
+          if ($scope.egraph.isGift === "true") {
             forms.push($scope.recipientForm);
           }
 
