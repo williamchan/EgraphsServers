@@ -17,6 +17,7 @@
 @import views.html.frontend.tags
 @import play.api.libs.json._
 @import egraphs.playutils.Gender
+@import org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript
 
 @loremIpsum = {
   <h2> Lorem ipsum dolor sit amet</h2>
@@ -147,6 +148,7 @@
         (a, b) => a ++ b.asActiveMap)
     }.toMap).toString());
   Egraphs.page.queryUrl = "@marketplaceRoute";
+  Egraphs.page.mastheadName = "@escapeEcmaScript(mastheadOption.getOrElse(models.frontend.landing.DefaultLanding.masthead).name)";
 }
 
 @baseBody = {
