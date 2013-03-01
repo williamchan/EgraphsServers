@@ -1,12 +1,12 @@
 /* Scripting for the landing page */
-define(["Egraphs",
+define(["page",
  "pages/marketplace",
  "services/logging",
  "module",
  "bootstrap/bootstrap-tooltip",
  "bootstrap/bootstrap-transition",
  "services/responsive-modal"],
-function (Egraphs, marketplace, logging, requireModule) {
+function (page, marketplace, logging, requireModule) {
   /**
    * Functions for the new landing page that share dependencies with the marketplace.
    * Marketplace.js contains mixpanel tracking events.
@@ -25,7 +25,7 @@ function (Egraphs, marketplace, logging, requireModule) {
   // Select a category value.
   var categoryFunction = function(e) {
       var link = $(this);
-      var category = window.Egraphs.page.categories["c" + link.attr("data-category")];
+      var category = page.categories["c" + link.attr("data-category")];
       var catVal = parseInt(link.attr("data-categoryvalue"), 10);
       marketplace.updateCategories(catVal, category, $(this).attr("data-vertical"));
       marketplace.reloadPage();
@@ -56,6 +56,7 @@ function (Egraphs, marketplace, logging, requireModule) {
           event.target.seekTo(7.0);
           event.target.playVideo();
           mixpanel.track("Watched homepage video");
+          _gaq.push(['_trackEvent', 'Landing', 'Played Video']);
         };
 
         // Initialize the YouTube video and start playing.
@@ -112,6 +113,8 @@ function (Egraphs, marketplace, logging, requireModule) {
         $(".all-teams").click(verticalFunction);
         $(".vertical-tile").click(verticalFunction);
         $(".cv-link").click(categoryFunction);
+         _gaq.push(['_trackEvent', 'Landing', 'Masthead', page.mastheadName || "blank"]);
+
       });
     }
   };
