@@ -10,7 +10,8 @@ define([
   "bootstrap/bootstrap-button",
   "services/ng/checkout",
   "services/ng/angular-strap",
-  "services/ng/thumbnail-selector"
+  "services/ng/thumbnail-selector",
+  "services/ng/resource-form"
 ],
 function(page, tooltip, analytics, window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
