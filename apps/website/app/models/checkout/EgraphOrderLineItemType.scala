@@ -3,7 +3,7 @@ package models.checkout
 import models.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 import models._
-import org.joda.money.{CurrencyUnit, Money}
+import models.enums.WrittenMessageRequest
 import com.google.inject.Inject
 import services.db.{HasTransientServices, InsertsAndUpdates, Schema}
 import services.AppConfig
@@ -82,7 +82,7 @@ case class EgraphOrderLineItemType(
     messageToCelebrity = messageToCeleb,
     requestedMessage = desiredText,
     inventoryBatchId = inventoryBatch.id // TODO(CE-13): move inventory batch check to EgraphOrderLineItem#transact
-  )
+  ).withWrittenMessageRequest(writtenMessageRequest)
 
   lazy val product = services.productStore.findById(productId) getOrElse {
     throw new IllegalArgumentException("Valid product id required.")
@@ -98,6 +98,11 @@ case class EgraphOrderLineItemType(
   def withoutPrint = copy(framedPrint = false, addressForPrint = None)
   def withPrint = this.copy(framedPrint = true)
   def withShippingAddress(shippingAddress: String) = this.copy(addressForPrint = Some(shippingAddress))
+
+  private def writtenMessageRequest = desiredText match {
+    case Some(_) => WrittenMessageRequest.SpecificMessage
+    case None => WrittenMessageRequest.CelebrityChoosesMessage
+  }
 }
 
 
