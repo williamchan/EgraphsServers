@@ -19,6 +19,13 @@ import services.blobs.AccessPolicy
 import services.mail.TransactionalMail
 import services.ConsumerApplication
 
+/**
+ * These endpoints enable MLBPA to review every MLB-related egraph.
+ *
+ * The normal admin flow has been changed so that when Egraphs admins approve an MLB-related egraph, the state changes
+ * to 'PendingMlbReview' Egraphs with this state are viewable under these endpoints. Once the MLBPA approves an egraph,
+ * then that egraph reenters the normal admin flow with state equal to 'ApprovedByAdmin' and can be published.
+ */
 private[controllers] trait MlbpaEndpoints extends ImplicitHeaderAndFooterData { this: Controller =>
 
   protected def controllerMethod: ControllerMethod
@@ -29,6 +36,7 @@ private[controllers] trait MlbpaEndpoints extends ImplicitHeaderAndFooterData { 
   protected def transactionalMail: TransactionalMail
   protected def consumerApp: ConsumerApplication
 
+  // Hard-coded login to be used by MLBPA. I didn't want to create a new account type for them.
   private val mlbpaUsername = "egraphsMlbpa"
   private val mlbpaPassword = "c8Eh6fyI5WS38Fs"
 
@@ -57,6 +65,9 @@ private[controllers] trait MlbpaEndpoints extends ImplicitHeaderAndFooterData { 
     }
   }
 
+  /**
+   * If user has MLBPA access, then a list view of egraphs awaiting MLBPA approval is returned.
+   */
   def getMlbpaEgraphs = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       if (hasMlbpaAccess(request.session)) {
@@ -80,6 +91,10 @@ private[controllers] trait MlbpaEndpoints extends ImplicitHeaderAndFooterData { 
     }
   }
 
+  /**
+   * Enables MLBPA reviewers to approve or reject an MLB-related egraph. Upon rejection, an email is sent to the
+   * internal mailing list at mlbpa-rejection-notices@egraphs.com.
+   */
   def postMlbpaEgraph(egraphId: Long) = postController() {
     httpFilters.requireEgraphId(egraphId) { egraph =>
       Action { implicit request =>
