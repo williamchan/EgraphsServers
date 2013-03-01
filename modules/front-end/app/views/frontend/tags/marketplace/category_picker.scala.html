@@ -2,7 +2,7 @@
 
 @displayVerticals(verticals: List[models.frontend.marketplace.VerticalViewModel]) = {
   @for(vertical <- verticals) {
-  <h2>@vertical.publicName</h2>
+  <h2><a href="/stars/@vertical.urlSlug">@vertical.publicName</a></h2>
     <ol>
       @for(category <- vertical.categoryViewModels) {
         <li>
@@ -11,14 +11,14 @@
             <ol>
               @for((categoryValue, idx) <- category.categoryValues.sorted.zipWithIndex) {
                 <li>
-                  <a class="cv-link @if(categoryValue.active){active} else{ @if(condense && idx > 10){condensed}}" title="" data-category="@category.id" data-categoryvalue="@categoryValue.id" data-vertical="@vertical.urlSlug">
+                  <a class="cv-link @if(categoryValue.active){active} else{ @if(condense && idx > 3){condensed}}" title="" data-category="@category.id" data-categoryvalue="@categoryValue.id" data-vertical="@vertical.urlSlug">
                   @if(categoryValue.active){<i>&times;</i> <span>@categoryValue.publicName</span> } else {
                     @categoryValue.publicName
                   }
                   </a>
                 </li>
               }
-              @if(condense && category.categoryValues.size > 11){
+              @if(condense && category.categoryValues.size > 4){
                 <li><a class="show-all">Show all&hellip;</a></li>
               }
             </ol>
