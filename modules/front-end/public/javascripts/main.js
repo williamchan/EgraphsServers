@@ -55,7 +55,7 @@ require(Egraphs.page.jsMain, function() {
         (onBootstrapped || noop)();
       });
     };
-  (window._gaq || []).push(["_trackTiming", "Asset Loading", "Require modules", jsAssetsLoaded - jsAssetStart]);
+  (window._gaq || []).push(["_trackTiming", "Asset Loading", "Require modules", jsAssetsLoaded - jsAssetStart, undefined, 100]);
 
   for (i; i < numModules; i++) {
     mainModule = mainModules[i];
