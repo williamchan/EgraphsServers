@@ -44,6 +44,11 @@ object Email extends Controller {
         viewEgraphUrl = "https://www.egraphs.com/gallery/carlosdiaz/davidortiz1",
         celebrityPublicName = "Big Papi",
         recipientName = "Carlos Pena"
+      ),
+      CouponModuleEmailViewModel(
+        discountAmount = 15,
+        code = "XXXXXXXX",
+        daysUntilExpiration = 7
       )
     ))
   }
@@ -55,6 +60,11 @@ object Email extends Controller {
         celebrityPublicName = "Big Papi",
         recipientName = "Carlos Pena",
         buyerName = "Mr. Generous"
+      ),
+      CouponModuleEmailViewModel(
+        discountAmount = 15,
+        code = "XXXXXXXX",
+        daysUntilExpiration = 7
       )
     ))
   }

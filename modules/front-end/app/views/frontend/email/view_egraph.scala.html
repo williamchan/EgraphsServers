@@ -1,4 +1,5 @@
-@(viewEgraphEmailStack: models.frontend.email.ViewEgraphEmailViewModel)
+@(viewEgraphEmailStack: models.frontend.email.ViewEgraphEmailViewModel,
+  couponModuleEmailStack: models.frontend.email.CouponModuleEmailViewModel)
 
 @import views.html.frontend.tags
 @import models.frontend.email.ViewEgraphEmailViewModel
@@ -11,4 +12,5 @@
 }
 
 @tags.email.view_egraph(viewEgraphEmailStack)
+@tags.email.promotional.coupon(couponModuleEmailStack)
 @tags.email.footer()
