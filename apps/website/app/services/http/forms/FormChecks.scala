@@ -206,7 +206,7 @@ class FormChecks @Inject()(accountStore: AccountStore, couponStore: CouponStore,
    */
   def isEmailAddress(toValidate: String, message: String="Valid email address required")
   : Either[FormError, String] = {
-    if (!toValidate.isEmpty && emailPattern.matcher(toValidate).matches()) {
+    if (!toValidate.isEmpty && EmailAddress.isValid(toValidate)) {
       Right(toValidate)
     } else {
       error(message)
@@ -308,9 +308,6 @@ class FormChecks @Inject()(accountStore: AccountStore, couponStore: CouponStore,
   private def error(message: String): Left[FormError, Nothing] = {
     Left(new SimpleFormError(message))
   }
-  
-  /** Email address regexp copied from Play 1.2.4 */
-  private val emailPattern = Pattern.compile("[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[a-zA-Z0-9](?:[\\w-]*[\\w])?");
 }
 
 object FormChecks {
