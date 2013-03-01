@@ -43,6 +43,8 @@ class GetCelebrityApiEndpointTests
     val json = Json.parse(contentAsString(result))
     val celebrityFromJson = json.as[JsCelebrity]
 
-    celebrityFromJson should be (JsCelebrity.from(celebrity))
+    db.connected(TransactionSerializable) {
+      celebrityFromJson should be (JsCelebrity.from(celebrity))
+    }
   }
 }
