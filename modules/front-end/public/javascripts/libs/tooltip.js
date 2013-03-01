@@ -27,7 +27,7 @@ function(analytics, window) {
         if(target) { remove_current(); }
 
         target = $( this );
-        tip   = target.attr( 'title' );
+        tip   = target.attr( 'data-tooltip' );
         tooltip = $( '<div id="tooltip"></div>' );
         var analyticsEventName = target.attr("event")? target.attr("event"): target.html();
         var durationEvent = _config.analyticsCategory?
@@ -37,7 +37,7 @@ function(analytics, window) {
         if( !tip || tip == '' )
           return false;
      
-        target.removeAttr( 'title' );
+        target.removeAttr( 'data-tooltip' );
         tooltip.css( 'opacity', 0 )
              .html( tip )
              .appendTo( 'body' );
@@ -90,7 +90,7 @@ function(analytics, window) {
             $( this ).remove();
           });
      
-          target.attr( 'title', tip );
+          target.attr( 'data-tooltip', tip );
           
           //target.unbind('click', remove_tooltip);
           //tooltip.unbind('click', remove_tooltip);
