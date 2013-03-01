@@ -49,13 +49,11 @@ class CelebrityRequestStore @Inject() (schema: Schema)
 
   import org.squeryl.PrimitiveTypeMode._
 
-  def getCelebrityRequestsWithStatus(status: CelebrityRequestStatus.EnumVal): List[CelebrityRequest] = {
+  def getCelebrityRequestsWithStatus(status: CelebrityRequestStatus.EnumVal): Iterable[CelebrityRequest] = {
 
-    val queryResult = from(schema.celebrityRequests)(celebrityRequest =>
+    from(schema.celebrityRequests)(celebrityRequest =>
       where(celebrityRequest._celebrityRequestStatus === status.name)
         select (celebrityRequest))
-
-    queryResult.toList
   }
 
   def getAll: Iterable[CelebrityRequest] = {

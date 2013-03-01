@@ -9,15 +9,12 @@ import services.http.forms.CustomerLoginFormFactory
 import services.http.EgraphsSession
 import services.http.EgraphsSession.Key._
 import services.http.EgraphsSession.Conversions._
-import services.request.PostCelebrityRequestHelper
 import models._
 
-private[controllers] trait PostLoginEndpoint extends PostCelebrityRequestHelper { this: Controller =>
+private[controllers] trait PostLoginEndpoint { this: Controller =>
   import services.http.forms.Form.Conversions._
 
-  protected def celebrityStore: CelebrityStore
   protected def postController: POSTControllerMethod
-  protected def accountStore: AccountStore
   protected def customerLoginForms: CustomerLoginFormFactory
 
   def postLogin() = postController() {
@@ -28,19 +25,15 @@ private[controllers] trait PostLoginEndpoint extends PostCelebrityRequestHelper 
       // Handle valid or error cases
       nonValidatedForm.errorsOrValidatedForm match {
         case Left(errors) =>
-          nonValidatedForm.redirectThroughFlash(getLogin(None).url)(request.flash)
+          nonValidatedForm.redirectThroughFlash(getLogin().url)(request.flash)
   
         case Right(validForm) => {
 
           // Find out whether the user is logging in to complete their celebrity request
-          val maybeRequestedStar = request.session.requestedStar
-          val redirectCall: Call = maybeRequestedStar match {
-            case None => controllers.routes.WebsiteControllers.getCustomerGalleryById(validForm.customerId)
-            case Some(requestedStar) => {
-              completeRequestStar(requestedStar, validForm.customerId)
-              controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
-            }
-          }
+          val redirectCall: Call = request.session.requestedStarRedirectOrCall(
+            validForm.customerId,
+            controllers.routes.WebsiteControllers.getCustomerGalleryById(validForm.customerId))
+
           Redirect(redirectCall).withSession(
             request.session.withCustomerId(validForm.customerId).removeRequestedStar
           ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))

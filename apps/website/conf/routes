@@ -5,10 +5,10 @@
 ###
 ### Test routes
 ###
-GET     /test/scenarios                          controllers.website.nonproduction.ScenarioController.list
-GET     /test/scenarios/clear                    controllers.website.nonproduction.ScenarioController.clear
-GET     /test/scenarios/:urlSlug                 controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
-GET     /test/storefront-a/checkout              controllers.WebsiteControllers.storefrontACheckout
+GET     /test/scenarios                                                   controllers.website.nonproduction.ScenarioController.list
+GET     /test/scenarios/clear                                             controllers.website.nonproduction.ScenarioController.clear
+GET     /test/scenarios/:urlSlug                                          controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
+GET     /test/storefront-a/checkout                                       controllers.WebsiteControllers.storefrontACheckout
 
 ###
 ### Production routes
@@ -18,38 +18,39 @@ GET     /test/storefront-a/checkout              controllers.WebsiteControllers.
 ## Defaults
 ##
 
-# Need this TRUE conditional, otherwise the if (play.id == test) conditional from above
-# applies to ALL THE REST OF THE ROUTES.
+# Need this TRUE conditional, otherwise the if (play.id == test)
+# conditional from above applies to ALL THE REST OF THE ROUTES.
 #%{ if (true) }%
 
 # Home page
-GET     /blob/files/*blobKey                                       controllers.WebsiteControllers.getBlob(blobKey: String)
+GET     /blob/files/*blobKey                                              controllers.WebsiteControllers.getBlob(blobKey: String)
 
 # Map static resources from the /app/public folder to the /public path
-#GET     /public/                                staticDir:public
-GET     /favicon.ico                            controllers.Assets.at(path="/public", file="images/favicon.ico")
-GET     /robots.txt                             controllers.Assets.at(path="/public", file="robots.txt")
-GET     /sitemap.txt                            controllers.Assets.at(path="/public", file="sitemap.txt")
-GET     /documents/CelebrityAgreement           controllers.Assets.at(path="/public", file="documents/CelebrityAgreement.pdf")
+#GET     /public/                                                         staticDir:public
+GET     /favicon.ico                                                      controllers.Assets.at(path="/public", file="images/favicon.ico")
+GET     /robots.txt                                                       controllers.Assets.at(path="/public", file="robots.txt")
+GET     /sitemap.txt                                                      controllers.Assets.at(path="/public", file="sitemap.txt")
+GET     /documents/CelebrityAgreement                                     controllers.Assets.at(path="/public", file="documents/CelebrityAgreement.pdf")
 
 ##
 ## API
 ##
-GET     /api/1.0/client                                         controllers.ApiControllers.getIOSClient(redirectToItmsLink: Boolean ?= false)
-GET     /api/1.0/celebrities/me                                 controllers.ApiControllers.getCelebrity
-GET     /api/1.0/celebrities/me/enrollmenttemplate              controllers.ApiControllers.getCelebrityEnrollmentTemplate
-GET     /api/1.0/celebrities/me/mobileappinfo                   controllers.ApiControllers.getCelebrityMobileAppInfo
-GET     /api/1.0/celebrities/me/products                        controllers.ApiControllers.getCelebrityProducts
-GET     /api/1.0/celebrities/me/orders                          controllers.ApiControllers.getCelebrityOrders(signerActionable:Option[Boolean] ?= None)
-POST    /api/1.0/celebrities/me/enrollmentsamples               controllers.ApiControllers.postEnrollmentSample
-POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>         controllers.ApiControllers.postCelebrityOrder(orderId:Long)
-POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs controllers.ApiControllers.postEgraph(orderId:Long)
-POST    /api/1.0/celebrities/me/videoasset                      controllers.ApiControllers.postVideoAsset
+GET     /api/1.0/client                                                   controllers.ApiControllers.getIOSClient(redirectToItmsLink: Boolean ?= false)
+GET     /api/1.0/celebrities/me                                           controllers.ApiControllers.getCelebrity
+GET     /api/1.0/celebrities/me/enrollmenttemplate                        controllers.ApiControllers.getCelebrityEnrollmentTemplate
+GET     /api/1.0/celebrities/me/mobileappinfo                             controllers.ApiControllers.getCelebrityMobileAppInfo
+GET     /api/1.0/celebrities/me/products                                  controllers.ApiControllers.getCelebrityProducts
+GET     /api/1.0/celebrities/me/orders                                    controllers.ApiControllers.getCelebrityOrders(signerActionable:Option[Boolean] ?= None)
+POST    /api/1.0/celebrities/me/enrollmentsamples                         controllers.ApiControllers.postEnrollmentSample
+POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>                   controllers.ApiControllers.postCelebrityOrder(orderId:Long)
+POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs           controllers.ApiControllers.postEgraph(orderId:Long)
+POST    /api/1.0/celebrities/me/videoasset                                controllers.ApiControllers.postVideoAsset
 
-##      The following customer endpoints are used for egraph-exploration prototyping. Work in progress. Not finalized.
-GET     /api/1.0/customers/me                                   controllers.ApiControllers.getCustomer
-GET     /api/1.0/customers/me/egraphs                           controllers.ApiControllers.getCustomerEgraphs
-GET     /api/1.0/egraphs/top                                    controllers.ApiControllers.getTopEgraphs
+## The following customer endpoints are used for egraph-exploration
+## prototyping. Work in progress. Not finalized.
+GET     /api/1.0/customers/me                                             controllers.ApiControllers.getCustomer
+GET     /api/1.0/customers/me/egraphs                                     controllers.ApiControllers.getCustomerEgraphs
+GET     /api/1.0/egraphs/top                                              controllers.ApiControllers.getTopEgraphs
 
 ##
 ## Admin
@@ -124,69 +125,70 @@ POST     /admin/videoassets/$id<[0-9]+>                                   contro
 ## Consumer Website
 ##
 
-GET     /                                                           controllers.WebsiteControllers.getRootConsumerEndpoint
-GET     /about                                                      controllers.WebsiteControllers.getAbout
-GET     /account/settings                                           controllers.WebsiteControllers.getAccountSettings
-POST    /account/settings                                           controllers.WebsiteControllers.postAccountSettings
-GET     /account/recover                                            controllers.WebsiteControllers.getRecoverAccount
-POST    /account/recover                                            controllers.WebsiteControllers.postRecoverAccount
-GET     /account/reset                                              controllers.WebsiteControllers.getResetPassword(email: String, secretKey: String)
-POST    /account/reset                                              controllers.WebsiteControllers.postResetPassword
-GET     /account/verify                                             controllers.WebsiteControllers.getVerifyAccount(email: String, resetKey: String)
-GET     /account/:galleryCustomerId/gallery                         controllers.WebsiteControllers.getCustomerGalleryById(galleryCustomerId: Long)
-GET     /account/:username                                          controllers.WebsiteControllers.getCustomerGalleryByUsername(username: String)
-GET     /affiliates                                                 controllers.WebsiteControllers.getAffiliates
-#GET     /careers                                                    controllers.WebsiteControllers.getCareers
-GET     /egraph/$orderId<[0-9]+>                                    controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
-GET     /$orderId<[0-9]+>                                           controllers.WebsiteControllers.getEgraph(orderId: Long)
-GET     /$orderId<[0-9]+>/classic                                   controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
-GET     /$orderId<[0-9]+>/embed                                     controllers.WebsiteControllers.getEgraphPlayerEmbed(orderId: Long)
-GET     /facebooklogin/callback                                     controllers.WebsiteControllers.getFacebookLoginCallback
-GET     /faq                                                        controllers.WebsiteControllers.getFAQ
-GET     /inside-an-egraph                                           controllers.WebsiteControllers.getInsideEgraph
-GET     /login                                                      controllers.WebsiteControllers.getLogin(maybeBannerMessage: Option[String])
-POST    /login                                                      controllers.WebsiteControllers.postLogin
-GET     /logout                                                     controllers.WebsiteControllers.getLogout
-POST    /logout                                                     controllers.WebsiteControllers.postLogout
-GET     /orders/$orderId<[0-9]+>/confirm                            controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
-POST    /orders/$orderId<[0-9]+>/configure                          controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
-GET     /orders/$orderId<[0-9]+>/egraph-gift-explanation            controllers.WebsiteControllers.getEgraphExplanationCard(orderId: Long)
-GET     /privacy                                                    controllers.WebsiteControllers.getPrivacy
-POST    /register                                                   controllers.WebsiteControllers.postRegisterConsumerEndpoint
-POST    /requestStar                                                controllers.WebsiteControllers.postRequestStar
-GET     /stars                                                      controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "")
-GET     /stars/:vertical                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical)
-POST    /subscribe                                                  controllers.WebsiteControllers.postSubscribeEmail
-GET     /sweepstakes/insider                                        controllers.WebsiteControllers.getInsiderSweepstakes
-GET     /terms                                                      controllers.WebsiteControllers.getTerms
+GET     /                                                                 controllers.WebsiteControllers.getRootConsumerEndpoint
+GET     /about                                                            controllers.WebsiteControllers.getAbout
+GET     /account/settings                                                 controllers.WebsiteControllers.getAccountSettings
+POST    /account/settings                                                 controllers.WebsiteControllers.postAccountSettings
+GET     /account/recover                                                  controllers.WebsiteControllers.getRecoverAccount
+POST    /account/recover                                                  controllers.WebsiteControllers.postRecoverAccount
+GET     /account/reset                                                    controllers.WebsiteControllers.getResetPassword(email: String, secretKey: String)
+POST    /account/reset                                                    controllers.WebsiteControllers.postResetPassword
+GET     /account/verify                                                   controllers.WebsiteControllers.getVerifyAccount(email: String, resetKey: String)
+GET     /account/:galleryCustomerId/gallery                               controllers.WebsiteControllers.getCustomerGalleryById(galleryCustomerId: Long)
+GET     /account/:username                                                controllers.WebsiteControllers.getCustomerGalleryByUsername(username: String)
+GET     /affiliates                                                       controllers.WebsiteControllers.getAffiliates
+#GET     /careers                                                         controllers.WebsiteControllers.getCareers
+GET     /egraph/$orderId<[0-9]+>                                          controllers.WebsiteControllers.getEgraphRedirect(orderId: Long)
+GET     /$orderId<[0-9]+>                                                 controllers.WebsiteControllers.getEgraph(orderId: Long)
+GET     /$orderId<[0-9]+>/classic                                         controllers.WebsiteControllers.getEgraphClassic(orderId: Long)
+GET     /$orderId<[0-9]+>/embed                                           controllers.WebsiteControllers.getEgraphPlayerEmbed(orderId: Long)
+GET     /facebooklogin/callback                                           controllers.WebsiteControllers.getFacebookLoginCallback
+GET     /faq                                                              controllers.WebsiteControllers.getFAQ
+GET     /inside-an-egraph                                                 controllers.WebsiteControllers.getInsideEgraph
+GET     /login                                                            controllers.WebsiteControllers.getLogin(maybeBannerMessage: Option[String] ?= None)
+POST    /login                                                            controllers.WebsiteControllers.postLogin
+GET     /logout                                                           controllers.WebsiteControllers.getLogout
+POST    /logout                                                           controllers.WebsiteControllers.postLogout
+GET     /orders/$orderId<[0-9]+>/confirm                                  controllers.WebsiteControllers.getOrderConfirmation(orderId: Long)
+POST    /orders/$orderId<[0-9]+>/configure                                controllers.WebsiteControllers.postOrderPrivacy(orderId: Long)
+GET     /orders/$orderId<[0-9]+>/egraph-gift-explanation                  controllers.WebsiteControllers.getEgraphExplanationCard(orderId: Long)
+GET     /privacy                                                          controllers.WebsiteControllers.getPrivacy
+POST    /register                                                         controllers.WebsiteControllers.postRegisterConsumerEndpoint
+POST    /requestStar                                                      controllers.WebsiteControllers.postRequestStar
+GET     /stars                                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "")
+GET     /stars/:vertical                                                  controllers.WebsiteControllers.getMarketplaceResultPage(vertical)
+POST    /subscribe                                                        controllers.WebsiteControllers.postSubscribeEmail
+GET     /sweepstakes/insider                                              controllers.WebsiteControllers.getInsiderSweepstakes
+GET     /terms                                                            controllers.WebsiteControllers.getTerms
 
-GET     /:celebrityUrlSlug                                          controllers.WebsiteControllers.getCelebrityLanding(celebrityUrlSlug: String, accesskey: String ?= "")
-GET     /:celebrityUrlSlug/photos                                   controllers.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug: String, accesskey: String ?= "")
-GET     /:celebrityUrlSlug/photos/:productUrlSlug                   controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug:String, accesskey: String ?= "")
-POST    /:celebrityUrlSlug/photos/:productUrlSlug                   controllers.WebsiteControllers.postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/personalize       controllers.WebsiteControllers.getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/personalize       controllers.WebsiteControllers.postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/review            controllers.WebsiteControllers.getStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/review            controllers.WebsiteControllers.postStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/checkout          controllers.WebsiteControllers.getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/checkout          controllers.WebsiteControllers.postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/finalize          controllers.WebsiteControllers.getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
-POST    /:celebrityUrlSlug/photos/:productUrlSlug/finalize          controllers.WebsiteControllers.postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error          controllers.WebsiteControllers.getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug:String, creditCardMsg: Option[String] ?= None)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/no-inventory      controllers.WebsiteControllers.getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug:String)
-GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error    controllers.WebsiteControllers.getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug                                                controllers.WebsiteControllers.getCelebrityLanding(celebrityUrlSlug: String, accesskey: String ?= "")
+GET     /:celebrityUrlSlug/photos                                         controllers.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug: String, accesskey: String ?= "")
+GET     /:celebrityUrlSlug/photos/:productUrlSlug                         controllers.WebsiteControllers.getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug:String, accesskey: String ?= "")
+POST    /:celebrityUrlSlug/photos/:productUrlSlug                         controllers.WebsiteControllers.postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/personalize             controllers.WebsiteControllers.getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/personalize             controllers.WebsiteControllers.postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/review                  controllers.WebsiteControllers.getStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/review                  controllers.WebsiteControllers.postStorefrontReview(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/checkout                controllers.WebsiteControllers.getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/checkout                controllers.WebsiteControllers.postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/finalize                controllers.WebsiteControllers.getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
+POST    /:celebrityUrlSlug/photos/:productUrlSlug/finalize                controllers.WebsiteControllers.postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error                controllers.WebsiteControllers.getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug:String, creditCardMsg: Option[String] ?= None)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/no-inventory            controllers.WebsiteControllers.getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug:String)
+GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error          controllers.WebsiteControllers.getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug:String)
 
 ##
-## Admin Restricted Functionality - We want to keep certain admin functionality off customer-facing servers.
+## Admin Restricted Functionality - We want to keep certain admin
+## functionality off customer-facing servers.
 ##
 #%{ if (play.configuration.getProperty('admin.tools.enabled') == 'full') }%
-GET     /admin/printorders                                          controllers.WebsiteControllers.getPrintOrdersAdmin
-GET     /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
-POST    /admin/printorders/$printOrderId<[0-9]+>                    controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
-POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                 controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
+GET     /admin/printorders                                                controllers.WebsiteControllers.getPrintOrdersAdmin
+GET     /admin/printorders/$printOrderId<[0-9]+>                          controllers.WebsiteControllers.getPrintOrderAdmin(printOrderId: Long)
+POST    /admin/printorders/$printOrderId<[0-9]+>                          controllers.WebsiteControllers.postPrintOrderAdmin(printOrderId: Long)
+POST    /:celebrityUrlSlug/:productUrlSlug/buy-demo                       controllers.WebsiteControllers.postBuyDemoProduct(celebrityUrlSlug: String, productUrlSlug: String)
 
-GET     /assets/*file                                               controllers.EgraphsAssets.at(path=controllers.EgraphsAssets.defaultPath, file)
+GET     /assets/*file                                                     controllers.EgraphsAssets.at(path=controllers.EgraphsAssets.defaultPath, file)
 
 # Redirect any requests with trailing slashes to the slash-less version.
 # TODO: PLAY2.1 verify this still works after it starts compiling again
-GET     /*resourcePath/                                             controllers.SlayTrailingSlashesController.slayTrailingSlashes(resourcePath)
+GET     /*resourcePath/                                                   controllers.SlayTrailingSlashesController.slayTrailingSlashes(resourcePath)

@@ -21,9 +21,8 @@ import services.http.EgraphsSession.Key._
 import play.api.data._
 import play.api.data.Forms._
 import services.email.AccountCreationEmail
-import services.request.PostCelebrityRequestHelper
 
-private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging with PostCelebrityRequestHelper { this: Controller =>
+private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { this: Controller =>
 
   protected def dbSession: DBSession
   protected def controllerMethod: ControllerMethod
@@ -84,14 +83,10 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging with
             }
 
             // Find out whether the user is logging in via Facebook to complete their celebrity request
-            val maybeRequestedStar = request.session.requestedStar
-            val redirectCall: Call = maybeRequestedStar match {
-              case None => controllers.routes.WebsiteControllers.getAccountSettings
-              case Some(requestedStar) => {
-                completeRequestStar(requestedStar, customer.id)
-                controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
-              }
-            }
+            val redirectCall: Call = request.session.requestedStarRedirectOrCall(
+              customer.id,
+              controllers.routes.WebsiteControllers.getAccountSettings)
+
             Redirect(redirectCall).withSession(
               session.withCustomerId(customer.id).removeRequestedStar
             ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
@@ -102,7 +97,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging with
           log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
             ", error_reason = " + error_reason.getOrElse("") +
             ", error_description = " + error_description.getOrElse(""))
-          Redirect(controllers.routes.WebsiteControllers.getLogin(None))
+          Redirect(controllers.routes.WebsiteControllers.getLogin())
         }
       }
       Ok
@@ -111,7 +106,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging with
 
   private def redirectAndLogError(fbUserInfo: JsValue): Result = {
     error("Facebook did not respond with expected user info format: " + Json.stringify(fbUserInfo))
-    Redirect(controllers.routes.WebsiteControllers.getLogin(None))
+    Redirect(controllers.routes.WebsiteControllers.getLogin())
   }
 
   /**

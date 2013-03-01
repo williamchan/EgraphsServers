@@ -26,14 +26,12 @@ import egraphs.playutils.FlashableForm._
 import models.frontend.login_page.RegisterConsumerViewModel
 import services.AppConfig
 import services.http.forms.FormConstraints
-import services.request.PostCelebrityRequestHelper
 import services.http.EgraphsSession
 
 /**
  * The POST target for creating a new account at egraphs.
  */
-private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAndFooterData
-  with PostCelebrityRequestHelper {
+private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
   //
@@ -48,7 +46,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   //
   // Controllers
   //
-  def postRegisterConsumerEndpoint = postController(dbSettings = WithoutDBConnection) {
+  def postRegisterConsumerEndpoint = postController() {
     Action { implicit request =>
       val redirects = for(
         // Get either the account and customer or a redirect back to the sign-in page
@@ -68,15 +66,11 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         }
 
         // Find out whether the user is creating an account to complete their celebrity request
-        val maybeRequestedStar = request.session.requestedStar
-        val redirectCall: Call = maybeRequestedStar match {
-          case None => controllers.routes.WebsiteControllers.getAccountSettings
-          case Some(requestedStar) => {
-            completeRequestStar(requestedStar, customer.id)
-            controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
-          }
-        }
-        Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")).withSession(
+        val redirectCall: Call = request.session.requestedStarRedirectOrCall(
+          customer.id,
+          controllers.routes.WebsiteControllers.getAccountSettings)
+
+        Redirect(redirectCall).withSession(
           request.session
             .withCustomerId(customer.id)
             .withUsernameChanged
@@ -95,7 +89,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
 
       form.bindFromRequest.fold(
         formWithErrors => {
-          Left(Redirect(controllers.routes.WebsiteControllers.getLogin(None)).flashingFormData(formWithErrors))
+          Left(Redirect(controllers.routes.WebsiteControllers.getLogin()).flashingFormData(formWithErrors))
         }
         , validForm => {
           // The form validation already told us we can add this fella to the DB

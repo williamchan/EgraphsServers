@@ -41,8 +41,7 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
         loginForm = makeLoginFormView,
         registrationForm = PostRegisterConsumerEndpoint.form.bindWithFlashData,
         registrationActionUrl = controllers.routes.WebsiteControllers.postRegisterConsumerEndpoint.url,
-        fbAuthUrl = fbOauthUrl,
-        maybeBannerMessage = maybeBannerMessage
+        fbAuthUrl = fbOauthUrl
       )).withSession(request.session + (Facebook._fbState -> fbState))
     }
   }

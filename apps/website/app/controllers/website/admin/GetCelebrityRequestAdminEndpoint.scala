@@ -15,12 +15,11 @@ private[controllers] trait GetCelebrityRequestAdminEndpoint extends ImplicitHead
   protected def httpFilters: HttpFilters
 
   def getCelebrityRequestsAdmin = controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireAdministratorLogin.inSession() {
-      case (admin, adminAccount) =>
-        Action { implicit request =>
-          val celebrityRequests = celebrityRequestStore.getAll
-          Ok(views.html.Application.admin.admin_celebrityrequests(celebrityRequests))
-        }
+    httpFilters.requireAdministratorLogin.inSession() { case (admin, adminAccount) =>
+      Action { implicit request =>
+        val celebrityRequests = celebrityRequestStore.getAll
+        Ok(views.html.Application.admin.admin_celebrityrequests(celebrityRequests))
+      }
     }
   }  
 }

@@ -1,7 +1,6 @@
 package controllers.website.consumer
 
 import models.CelebrityRequest
-import models.CelebrityStore
 import models.frontend.marketplace.RequestStarViewModel
 import play.api.data._
 import play.api.data.Forms._
@@ -11,8 +10,6 @@ import play.api.data.validation.Valid
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import services.AppConfig
-import services.db.DBSession
-import services.db.TransactionSerializable
 import services.http.EgraphsSession._
 import services.http.EgraphsSession.Conversions._
 import services.http.filters._
@@ -21,19 +18,16 @@ import services.http.{POSTControllerMethod, WithDBConnection}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.request.PostCelebrityRequestHelper
 
-private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFooterData
-  with PostCelebrityRequestHelper {
+private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
 
-  protected def celebrityStore: CelebrityStore
-  protected def dbSession: DBSession
   protected def httpFilters: HttpFilters
   protected def postController: POSTControllerMethod
 
   /**
    * Store requested star and associated email for later notification.
    */
-  def postRequestStar = postController(dbSettings = WithDBConnection(readOnly = true)) {
+  def postRequestStar = postController() {
     Action { implicit request =>
 
       val form = PostRequestStarEndpoint.form
@@ -46,10 +40,10 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
           val eitherCustomerAndAccountOrResult = httpFilters.requireCustomerLogin.filterInSession()
           eitherCustomerAndAccountOrResult match {
 
-            case Right(customerAndAccount) => {
-              val customerId = customerAndAccount._1.id
+            case Right((customer, account)) => {
+              val customerId = customer.id
 
-              completeRequestStar(starName, customerId)
+              PostCelebrityRequestHelper.completeRequestStar(starName, customerId)
               Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
             }
             case Left(result) => {

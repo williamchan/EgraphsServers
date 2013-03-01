@@ -1,12 +1,15 @@
 package services.http
 
 import com.google.inject.Inject
-import services.Utils
-import play.api.mvc.Session
-import play.api.mvc.Call
 import egraphs.playutils.Enum
 import java.util.Date
 import org.joda.time.DateTimeConstants
+import play.api.mvc.AnyContent
+import play.api.mvc.Session
+import play.api.mvc.Call
+import play.api.mvc.Request
+import services.request.PostCelebrityRequestHelper
+import services.Utils
 
 case class EgraphsSession(session: Session) {
   import EgraphsSession.Key
@@ -70,6 +73,18 @@ case class EgraphsSession(session: Session) {
 
   def getBoolean(key: String): Option[Boolean] = {
     session.get(key).map(value => java.lang.Boolean.valueOf(value))
+  }
+
+  // Convenience method for request a star feature that figures out post-login redirect
+  def requestedStarRedirectOrCall(customerId: Long, otherCall: Call): Call = {
+    val maybeRequestedStar = requestedStar
+    maybeRequestedStar match {
+      case None => otherCall
+      case Some(requestedStar) => {
+        PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId)
+        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
+      }
+    }
   }
 }
 

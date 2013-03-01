@@ -64,7 +64,7 @@ trait ImplicitHeaderAndFooterData {
       )
     }
 
-    headerLoggedInOption.toRight(HeaderNotLoggedIn(controllers.routes.WebsiteControllers.getLogin(None).url))
+    headerLoggedInOption.toRight(HeaderNotLoggedIn(controllers.routes.WebsiteControllers.getLogin().url))
   }
 
   private def getCustomerOption(session: Session): Option[Customer] = {
