@@ -9,7 +9,7 @@
   @if(ngBindings) {
     <h1 ng-bind-html-unsafe="masthead.headline"></h1>
   } else {
-    <h1>@masthead.headline</h1>
+    <h1>@Html(masthead.headline)</h1>
   }
 }
 
@@ -17,7 +17,9 @@
   @if(ngBindings) {
     <h2 ng-bind-html-unsafe="masthead.subtitle"></h2>
   } else {
-    <h2>@masthead.subtitle</h2>
+    @masthead.subtitle.map { subtitle =>
+      <h2>@Html(subtitle)</h2>
+    }
   }
 }
 
@@ -25,7 +27,7 @@
   @if(ngBindings) {
     <span class="binding" ng-bind-html-unsafe="masthead.callToActionText"></span>
   } else {
-    @masthead.callToActionViewModel.text
+    @Html(masthead.callToActionViewModel.text)
   }
 }
 
