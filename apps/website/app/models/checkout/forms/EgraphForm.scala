@@ -24,7 +24,7 @@ object EgraphForm extends CheckoutForm[EgraphOrderLineItemType] {
     // TODO use dependency injector to apply services instead of static call
     mapping(
       productId -> longNumber.verifying(validProductId),
-      recipientName -> text(3, 30),
+      recipientName -> text(1, 100),
       isGift -> boolean,
       desiredText -> optional(text(max = maxDesiredTextChars)),
       messageToCeleb -> optional(text(max = maxMessageToCelebChars)),
