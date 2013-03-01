@@ -3,6 +3,7 @@ package models
 import services.{Dimensions, ImageUtil, Time}
 import scala.Some
 import java.awt.image.BufferedImage
+import services.blobs.AccessPolicy
 
 /**
  * Provides some default functionality for objects that want to have a 1550x556px image for shoving in the masthead
@@ -16,7 +17,7 @@ trait LandingPageImage[T] {
   def keyBase: String
   def withLandingPageImageKey(key: Option[String]) : T with LandingPageImage[T]
   def imageAssetServices: ImageAssetServices
-  def save: T
+  def save(): T
 
 
   def withLandingPageImage(imageData: Array[Byte]): (T with LandingPageImage[T], ImageAsset) = {
@@ -43,8 +44,8 @@ trait LandingPageImage[T] {
           croppedImage.asByteArray(ImageAsset.Jpeg)
         }
         val (entity, newImage) = withLandingPageImage(landingPageImageBytes)
-        newImage.save()
-        entity.save
+        newImage.save(AccessPolicy.Public)
+        entity.save()
       }
     }
   }
