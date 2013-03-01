@@ -172,7 +172,7 @@ function(mockBackend, logging, module, ngApp) {
 
         var hasProps = false;
         var returnCode = 400;
-        
+
         angular.forEach(mockApi[propName], function(prop, propName) {
           returnCode = 200;
         });
@@ -325,7 +325,6 @@ function(mockBackend, logging, module, ngApp) {
           ];
         });
         populateForms();
-
 
         configureDefaultCheckoutApi();
       }

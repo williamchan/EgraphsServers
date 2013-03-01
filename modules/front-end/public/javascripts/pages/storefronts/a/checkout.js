@@ -9,6 +9,7 @@ define([
   "module",
   "services/ng/payment",
   "services/ng/checkout",
+  "services/ng/resource-form",
   "services/responsive-modal",
   "bootstrap/bootstrap-button"
 ],

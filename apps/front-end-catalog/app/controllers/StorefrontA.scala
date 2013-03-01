@@ -22,7 +22,7 @@ object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
 
   def personalizeSoldOut = Action { request =>
     Ok(views.html.frontend.storefronts.a.personalize(
-      star("Sergio Romo").copy(products=Nil),
+      star("Sergio Romo").copy(products=Nil, isSoldOut=true),
       "/checkout",
       maxDesiredTextChars=60,
       maxMessageToCelebChars=100,

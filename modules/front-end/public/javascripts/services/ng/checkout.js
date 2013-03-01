@@ -8,8 +8,7 @@ define(
   "ngApp",
   "services/logging",
   "module",
-  "services/ng/http-config",
-  "services/ng/resource-form"
+  "services/ng/http-config"
 ],
 function(page, ngApp, logging, module) {
   var log = logging.namespace(module.id);

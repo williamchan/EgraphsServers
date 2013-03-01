@@ -42,7 +42,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
    **/
 
    def giftMessaging = Action {
-    implicit val headerData = HeaderData(giftCertificateLink = Some("/gift"))
+    implicit val headerData = HeaderData(giftCertificateLink = Some("/gift"), sessionId="1")
     Ok(views.html.frontend.landing(sampleStars, None, Marketplace.landingVerticalSet, signup = false, marketplaceRoute)(headerData, defaultFooterData, authenticityToken))
    }
 
