@@ -56,6 +56,11 @@ trait LineItemType[+T] extends HasLineItemNature with HasCodeType {
 }
 
 
+trait SubLineItemType[T] extends LineItemType[T] {
+  override def lineItems(resolvedItems: LineItems = Nil, pendingResolution: LineItemTypes = Nil) = Some(Nil)
+  def lineItemsAsSubType: LineItems
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 

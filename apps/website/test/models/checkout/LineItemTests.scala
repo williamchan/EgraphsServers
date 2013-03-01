@@ -80,8 +80,10 @@ trait LineItemTests[TypeT <: LineItemType[_], ItemT <: LineItem[_]] {
   //
   // Helpers
   //
-  def resolve(itemType: TypeT) = itemType.lineItems(resolvableItemSets.head, Nil)
-    .get
+  def resolve(itemType: TypeT) = itemType match {
+    case subType: SubLineItemType[_] => subType.lineItemsAsSubType
+    case _ => itemType.lineItems(resolvableItemSets.head, Nil).get
+  }
 
   def newLineItem: ItemT = resolve(newItemType).ofCodeType(
     newItemType.codeType.asInstanceOf[CheckoutCodeType with OfCheckoutClass[TypeT, ItemT]]

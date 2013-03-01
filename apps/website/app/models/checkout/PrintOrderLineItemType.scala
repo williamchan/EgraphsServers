@@ -46,7 +46,7 @@ case class PrintOrderLineItemType(
   address: Option[String] = None,
   @transient _services: PrintOrderLineItemTypeServices = AppConfig.instance[PrintOrderLineItemTypeServices]
 )
-  extends LineItemType[PrintOrder]
+  extends SubLineItemType[PrintOrder]
   with LineItemTypeEntityGetters[PrintOrderLineItemType]
   with HasTransientServices[PrintOrderLineItemTypeServices]
 {
@@ -60,12 +60,6 @@ case class PrintOrderLineItemType(
   //
   override def id = _entity.id
 
-  /** Return no line items because this lineitem generation is handled in EgraphOrderLineItemType */
-  override def lineItems(resolved: LineItems = Nil, unresolved: LineItemTypes = Nil)
-  : Option[Seq[PrintOrderLineItem]] = Some {
-    Nil
-  }
-
   //
   // Helpers
   //
@@ -75,7 +69,9 @@ case class PrintOrderLineItemType(
   )
 
   // TODO: define a SubLineItemType trait to make this required and handle overriding lineItems appropriately
-  def getLineItem = PrintOrderLineItem(this, printOrder)
+  override def lineItemsAsSubType: Seq[PrintOrderLineItem] = Seq {
+    PrintOrderLineItem(this, printOrder)
+  }
 }
 
 

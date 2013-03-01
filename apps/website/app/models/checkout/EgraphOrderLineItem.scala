@@ -78,8 +78,8 @@ case class EgraphOrderLineItem(
   //
   /** get actual print order */
   protected[checkout] lazy val printOrderItem = optionIf (itemType.framedPrint) {
-    PrintOrderLineItemType(domainObject).getLineItem
-  }
+    PrintOrderLineItemType(domainObject).lineItemsAsSubType.headOption
+  }.flatten
 
 
   private def orderFromType = _type map { _.order}
@@ -105,7 +105,8 @@ case class EgraphOrderLineItem(
 
     // save print if necessary
     if (itemType.framedPrint) {
-      PrintOrderLineItemType(savedOrder).getLineItem.transactAsSubItem(checkout)
+      PrintOrderLineItemType(savedOrder).lineItemsAsSubType.head
+        .transactAsSubItem(checkout)
     }
 
     this.clearGivenItemType  // clear _type because orderFromType is no longer current
