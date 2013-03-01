@@ -25,12 +25,12 @@ trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controll
   //
   def getPersonalize(celebrityUrlSlug: String, accesskey: String = ""): Action[AnyContent] =
   controllerMethod.withForm() { implicit authToken =>
-    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedCelebrity =>
-      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedCelebrity)(
-        otherFilter = httpFilters.requireCelebrityPublishedAccess.filter((maybeUnpublishedCelebrity, accesskey))
-      ) { celeb =>
+    httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celebrity =>
+      httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(celebrity)(
+        otherFilter = httpFilters.requireCelebrityPublishedAccess.filter((celebrity, accesskey))
+      ) { accessibleCeleb =>
         Action { implicit request =>
-          val products = celeb.activeProductsAndInventoryBatches
+          val products = accessibleCeleb.activeProductsAndInventoryBatches
             .filter { case (product, inventory) => inventory.hasInventory }
             .map { case (product, _) => product }
 
@@ -42,7 +42,7 @@ trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controll
           ) yield {
             product.asPersonalizeThumbView.copy(selected=product == cheapest)
           }
-          val starView = celeb.asPersonalizeStar(productViews)
+          val starView = accessibleCeleb.asPersonalizeStar(productViews)
 
           Ok(views.html.frontend.storefronts.a.personalize(
             starView,
@@ -59,7 +59,7 @@ trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controll
     httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { celeb =>
       Action { implicit request =>
         // Only serve the page if there's a valid Egraph order in the checkout
-        checkouts.decacheOrCreate(celeb.id).order.map { form =>
+        checkouts.decacheOrCreate(celeb.id).order.map { _ =>
           Ok(views.html.frontend.storefronts.a.checkout(
             celebId=celeb.id,
             personalizeUrl=WebsiteControllers.getPersonalize(celebrityUrlSlug, accesskey).url,

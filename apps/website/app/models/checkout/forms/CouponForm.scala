@@ -6,11 +6,13 @@ import services.AppConfig
 import models.checkout._
 import scala.Some
 
-
+/**
+ * CheckoutForm for coupons. It produces an Option[CouponLineItemType] so that the submission
+ * of an empty couponCode is valid.
+ */
 object CouponForm extends CheckoutForm[Option[CouponLineItemType]]{
 
   object FormKeys {
-    val _codeLength = Coupon.defaultCodeLength
     val couponCode = "couponCode"
   }
 

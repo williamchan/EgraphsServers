@@ -14,6 +14,18 @@ import com.google.inject.Inject
 import services.logging.Logging
 
 class CheckoutResourceControllerFactory @Inject() (services: CheckoutResourceControllerServices) {
+  /**
+   * Creates controller instances for checkout subresources (e.g. payment, egraph, recipient, buyer)
+   *
+   * @param resourceForm the [[models.checkout.forms.CheckoutForm]] for the resource of interest,
+   *                     e.g. [[models.checkout.forms.CouponForm]]
+   * @param setResource a setter function that provides an optional instance of the
+   *                    parameterized type T to an [[models.checkout.EgraphCheckoutAdapter]]
+   * @tparam T the domain object that this checkout form produces. Usually a type of
+   *           [[models.checkout.LineItemType]]
+   * @return an object with post and get functions, each of which accepts a sessionIdSlug: String and
+   *         a checkoutIdSlug: Long (which should be a celebrityId)
+   */
   def apply[T](
     resourceForm: CheckoutForm[T],
     setResource: (Option[T], EgraphCheckoutAdapter) => EgraphCheckoutAdapter

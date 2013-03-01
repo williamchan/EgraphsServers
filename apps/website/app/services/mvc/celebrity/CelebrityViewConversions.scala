@@ -65,7 +65,8 @@ class CelebrityViewConversions(celeb: Celebrity) {
       pronoun= celeb.gender match {
         case Gender.Male | Gender.Neutral => MalePersonalPronouns
         case _ => FemalePersonalPronouns
-      }
+      },
+      isSoldOut=products.isEmpty
     )
   }
   

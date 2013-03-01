@@ -3,7 +3,7 @@ package controllers
 import controllers.api._
 import checkout.{CheckoutEndpoints, CheckoutResourceControllerFactory, CheckoutResourceEndpoints}
 import play.api.mvc.Controller
-import services.http.{POSTControllerMethod, ControllerMethod, POSTApiControllerMethod}
+import services.http.{ControllerMethod, POSTApiControllerMethod}
 import services.db.DBSession
 import akka.actor.ActorRef
 import models.{EnrollmentBatchStore, EnrollmentBatchServices, OrderQueryFilters, OrderStore}
@@ -26,7 +26,6 @@ object ApiControllers extends Controller
   with PostEgraphApiEndpoint
   with PostEnrollmentSampleApiEndpoint
   with PostVideoAssetApiEndpoint
-
   with CheckoutResourceEndpoints
   with CheckoutEndpoints
 {

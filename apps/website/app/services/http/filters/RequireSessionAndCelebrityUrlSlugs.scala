@@ -22,7 +22,7 @@ class RequireSessionAndCelebrityUrlSlugs @Inject() (
     requireCelebrityId(celebrityId, parser) { celebFromId =>
       def celebrityPublishedFilter = requireCelebrityPublishedAccess.filter((celebFromId, accessKey))
       requireAdministratorLogin.inSessionOrUseOtherFilter(celebFromId, parser)(otherFilter = celebrityPublishedFilter) { celebrity =>
-        requireSessionUrlSlug(sessionId) { sessionId =>
+        requireSessionUrlSlug(sessionId, parser) { sessionId =>
           Action[T](parser) { request =>
             actionFactory(sessionId, celebrity).apply(request)
           }

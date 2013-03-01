@@ -60,9 +60,10 @@ case class PrintOrderLineItemType(
   //
   override def id = _entity.id
 
+  /** Return no line items because this lineitem generation is handled in EgraphOrderLineItemType */
   override def lineItems(resolved: LineItems = Nil, unresolved: LineItemTypes = Nil)
   : Option[Seq[PrintOrderLineItem]] = Some {
-    Seq( getLineItem )
+    Nil
   }
 
   //
@@ -73,6 +74,7 @@ case class PrintOrderLineItemType(
     shippingAddress = address getOrElse ""
   )
 
+  // TODO: define a SubLineItemType trait to make this required and handle overriding lineItems appropriately
   def getLineItem = PrintOrderLineItem(this, printOrder)
 }
 

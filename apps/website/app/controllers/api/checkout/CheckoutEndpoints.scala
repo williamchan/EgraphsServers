@@ -38,8 +38,8 @@ trait CheckoutEndpoints { this: Controller =>
   //
   /** Returns JSON representation of the checkout */
   def getCheckout(sessionIdSlug: UrlSlug, checkoutIdSlug: Long): Action[AnyContent] = {
-    // Make read-only because sometimes EgraphOrderLineItemType doesn't exist for every Product.
-    // We should generate them for each product and then deprecate readOnly here.
+    // Allow write because sometimes EgraphOrderLineItemType doesn't exist for every Product.
+    // We should pre-generate them for each product and then deprecate readOnly here.
     controllerMethod(WithDBConnection(TransactionSerializable, readOnly=false)) {
       httpFilters.requireSessionAndCelebrityUrlSlugs(sessionIdSlug, checkoutIdSlug) { (sessionId, celebrity) =>
         Action { implicit request =>

@@ -108,7 +108,7 @@ case class Celebrity(id: Long = 0,
   }
 
   def productsInActiveInventoryBatches(): Seq[Product] = {
-    this.activeProductsAndInventoryBatches.map(pair => pair._1)
+    this.activeProductsAndInventoryBatches.unzip._1
   }
 
   def activeProductsAndInventoryBatches: Seq[(Product, InventoryBatch)] = {

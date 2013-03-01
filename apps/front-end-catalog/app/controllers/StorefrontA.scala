@@ -35,15 +35,19 @@ object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
     Ok(views.html.frontend.storefronts.a.checkout(personalizeUrl="/personalize", testcase=testcase))
   }
 
-  def star(starName: String) = PersonalizeStar(
-    id=1L,
-    name=starName,
-    products=products(starName, 3),
-    pronoun=FemalePersonalPronouns,
-    mastheadUrl = "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg"
-  )
+  def star(starName: String) = {
+    val products = makeProducts(starName, 3)
+    PersonalizeStar(
+      id=1L,
+      name=starName,
+      products=products,
+      pronoun=FemalePersonalPronouns,
+      mastheadUrl = "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg",
+      isSoldOut=products.isEmpty
+    )
+  }
 
-  def products(star: String, n: Int=3): Seq[PersonalizeProduct] = {
+  def makeProducts(star: String, n: Int=3): Seq[PersonalizeProduct] = {
     for ( i <- 1 to n) yield {
       PersonalizeProduct(
         id=i,

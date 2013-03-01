@@ -11,7 +11,6 @@ import services.{AppConfig, Time}
 import services.db._
 import services.Finance.TypeConversions._
 import util.Random
-import scala.Some
 
 case class CouponServices @Inject()(store: CouponStore, giftCertificateStore: GiftCertificateStore)
 

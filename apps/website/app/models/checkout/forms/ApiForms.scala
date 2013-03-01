@@ -40,7 +40,7 @@ object ApiForms {
   }
 
   def validProductId(implicit productStore: ProductStore = instance[ProductStore]) = Constraint[Long] { (id: Long) =>
-    val product = productStore.findById(id).headOption
+    val product = productStore.findById(id)
     val availableInventory = product flatMap (_.availableInventoryBatches.headOption)
     (product, availableInventory) match {
       case (Some(_), Some(_)) => Valid

@@ -49,7 +49,7 @@ case class FreshCheckout(
     throw new Exception("Attempting operation requiring buyer without defining buyer first.")
   }
 
-  override lazy val recipientCustomer: Option[Customer] = _buyerCustomer orElse {
+  override lazy val recipientCustomer: Option[Customer] = _recipientCustomer orElse {
     recipientAccount map { account =>
       services.customerStore.findOrCreateByEmail(account.email)
     }

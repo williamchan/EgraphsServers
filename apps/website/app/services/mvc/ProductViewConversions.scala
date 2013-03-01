@@ -5,7 +5,7 @@ import models.frontend.storefront._
 import models.ImageAsset.Jpeg
 import controllers.routes.WebsiteControllers.{getStorefrontChoosePhotoCarousel, postStorefrontChoosePhoto}
 import models._
-import frontend.storefront_a.{PersonalizeProduct, PersonalizeStar}
+import frontend.storefront_a.PersonalizeProduct
 import models.frontend.storefront.ChoosePhotoCarouselProduct
 import models.frontend.storefront.ProductOrientation
 import models.frontend.storefront.ChoosePhotoTileProduct

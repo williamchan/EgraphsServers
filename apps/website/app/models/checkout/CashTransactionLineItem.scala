@@ -4,10 +4,9 @@ import com.google.inject.Inject
 import models.{CashTransaction, CashTransactionStore}
 import scalaz.Lens
 import services.AppConfig
-import services.db.{Schema, CanInsertAndUpdateEntityThroughServices}
+import services.db.Schema
 import services.payment.Payment
-import models.enums.LineItemNature
-import com.stripe.exception.{CardException, StripeException}
+import com.stripe.exception.StripeException
 
 
 //

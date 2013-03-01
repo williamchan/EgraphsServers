@@ -88,6 +88,10 @@ case class EgraphCheckoutAdapter (
   //
   def summary = previewCheckout.toJson
 
+  /**
+   * @return None if the checkout's constituent API resources had not been provided, Some(Left(_)) if transacting
+   *        the checkout failed in some way, Some(Right(_)) if transacting succeeded
+   */
   def transact() = if (validated) Some(makeActualCheckout().transact(payment)) else None
 
 
@@ -180,11 +184,10 @@ case class EgraphCheckoutAdapter (
     def email = details map (_.email)
 
     def name  = {
-      def fromDetailsOrOrder = details flatMap { _.name } orElse {
-        optionIf(isForMe) { order map (_.recipientName) } flatten
-      }
+      def fromDetails = details flatMap { _.name }
+      def fromOrder = optionIf(isForMe) { order map (_.recipientName) } flatten
 
-      getOrCreate(fromDetailsOrOrder, "")
+      getOrCreate(fromDetails orElse fromOrder, "")
     }
 
     def customer: Customer = getOrCreate(

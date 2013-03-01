@@ -7,7 +7,6 @@ import org.joda.money.{CurrencyUnit, Money}
 import com.google.inject.Inject
 import services.db.{HasTransientServices, InsertsAndUpdates, Schema}
 import services.AppConfig
-import scala.Some
 
 
 //
@@ -110,7 +109,7 @@ object EgraphOrderLineItemType {
   def nature = LineItemNature.Product
 
   def restore(entity: LineItemTypeEntity, order: Order): EgraphOrderLineItemType = {
-    val isGift = order.recipientId == order.buyerId
+    val isGift = order.recipientId != order.buyerId
     val desiredText = order.requestedMessage
     new EgraphOrderLineItemType(order.productId, order.recipientName, isGift, desiredText, order.messageToCelebrity)
   }

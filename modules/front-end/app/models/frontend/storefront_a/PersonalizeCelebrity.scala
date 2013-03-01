@@ -12,10 +12,9 @@ case class PersonalizeStar (
   name: String,
   products: Seq[PersonalizeProduct],
   pronoun: PersonalPronouns,
-  mastheadUrl: String
-) {
-  def isSoldOut: Boolean = products.isEmpty
-}
+  mastheadUrl: String,
+  isSoldOut: Boolean
+)
 
 case class PersonalizeProduct (
   id: Long,

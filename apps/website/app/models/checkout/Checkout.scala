@@ -277,7 +277,14 @@ abstract class Checkout
   //
   // helpers
   //
-  /** get the line item of the given `CashTransactionLineItemType` as applied to this checkout and charge it */
+  /**
+   * get the line item of the given `CashTransactionLineItemType` as applied to this checkout and charge it
+   *
+   * @return Left(Failure) if it failed to charge the card (likely) or
+   *            failed to resolve the charge LineItem from the CashTransactionLineItemType (unlikely)
+   *         Right(None) if the checkout had 0 balance and thus didn't need to charge anything
+   *         Right(Some(charge)) if a payment was successfully made
+   */
   private def resolveCashTransactionAndCharge(maybeTxnType: Option[CashTransactionLineItemType])
   : Either[CheckoutFailed, Option[CashTransactionLineItem]] =
   {
