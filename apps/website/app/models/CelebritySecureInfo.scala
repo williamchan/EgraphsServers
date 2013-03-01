@@ -12,8 +12,8 @@ import services.Time
 import services.AppConfig
 
 case class JsCelebrityContactInfo(
-  id: Long,
-  accountSettingsComplete: Boolean,
+  id: Option[Long],
+  accountSettingsComplete: Option[Boolean],
   twitterUsername: Option[String],
   contactEmail: Option[EmailAddress],
   smsPhone: Option[String],
@@ -22,7 +22,7 @@ case class JsCelebrityContactInfo(
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], Option[EmailAddress], Option[String], Option[String], Option[EmailAddress], JsCelebrityContactInfo] {
+object JsCelebrityContactInfo extends Function7[Option[Long], Option[Boolean], Option[String], Option[EmailAddress], Option[String], Option[String], Option[EmailAddress], JsCelebrityContactInfo] {
   implicit val celebrityContactInfoFormats = Json.format[JsCelebrityContactInfo]
 
   def from(celebrity: Celebrity): JsCelebrityContactInfo = {
@@ -31,8 +31,8 @@ object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], O
 
   def from(celebrity: Celebrity, secureInfo: Option[DecryptedCelebritySecureInfo]): JsCelebrityContactInfo = {
     JsCelebrityContactInfo(
-      id = celebrity.id,
-      accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
+      id = Some(celebrity.id),
+      accountSettingsComplete = Some(celebrity.isAccountSettingsComplete(secureInfo)),
       twitterUsername = celebrity.twitterUsername,
       contactEmail = secureInfo.map(info => info.contactEmail.map(EmailAddress(_))).flatten,
       smsPhone = secureInfo.map(_.smsPhone).flatten,
@@ -43,8 +43,8 @@ object JsCelebrityContactInfo extends Function7[Long, Boolean, Option[String], O
 }
 
 case class JsCelebrityDepositInfo(
-  id: Long,
-  accountSettingsComplete: Boolean,
+  id: Option[Long],
+  accountSettingsComplete: Option[Boolean],
   streetAddress: Option[String],
   city: Option[String],
   postalCode: Option[String],
@@ -58,7 +58,7 @@ case class JsCelebrityDepositInfo(
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrityDepositInfo extends Function12[Long, Boolean, Option[String], Option[String], Option[String], Option[String], Option[BankAccountType.EnumVal], Option[Int], Option[Long], Option[Boolean], Option[String], Option[String], JsCelebrityDepositInfo] {
+object JsCelebrityDepositInfo extends Function12[Option[Long], Option[Boolean], Option[String], Option[String], Option[String], Option[String], Option[BankAccountType.EnumVal], Option[Int], Option[Long], Option[Boolean], Option[String], Option[String], JsCelebrityDepositInfo] {
   implicit val celebrityDepositInfoFormats = Json.format[JsCelebrityDepositInfo]
 
   def from(celebrity: Celebrity): JsCelebrityDepositInfo = {
@@ -67,8 +67,8 @@ object JsCelebrityDepositInfo extends Function12[Long, Boolean, Option[String], 
 
   def from(celebrity: Celebrity, secureInfo: Option[DecryptedCelebritySecureInfo]): JsCelebrityDepositInfo = {
     JsCelebrityDepositInfo(
-      id = celebrity.id,
-      accountSettingsComplete = celebrity.isAccountSettingsComplete(secureInfo),
+      id = Some(celebrity.id),
+      accountSettingsComplete = Some(celebrity.isAccountSettingsComplete(secureInfo)),
       streetAddress = secureInfo.map(_.streetAddress).flatten,
       city = secureInfo.map(_.city).flatten,
       postalCode = secureInfo.map(_.postalCode).flatten,
