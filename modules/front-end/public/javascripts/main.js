@@ -38,8 +38,10 @@ define("ngModules", [], function() {
 });
 define("config", [], function() { return Egraphs.config; });
 
+var jsAssetStart = new Date().getTime();
 require(Egraphs.page.jsMain, function() {
   var mainModules = arguments,
+    jsAssetsLoaded = new Date().getTime(),
     numModules = mainModules.length,
     i = 0,
     mainModule,
@@ -53,6 +55,7 @@ require(Egraphs.page.jsMain, function() {
         (onBootstrapped || noop)();
       });
     };
+  (window._gaq || []).push(["_trackTiming", "Asset Loading", "Require modules", jsAssetsLoaded - jsAssetStart]);
 
   for (i; i < numModules; i++) {
     mainModule = mainModules[i];
