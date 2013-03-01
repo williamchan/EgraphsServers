@@ -99,7 +99,7 @@ trait HasTransientServices[T] { this: Serializable =>
   protected def _services: T
 
   /** accessor, defaults to injected instance */
-  def services(implicit manifest: Manifest[T]): T = if (_services == null) _services else defaultServices
+  def services(implicit manifest: Manifest[T]): T = if (_services != null) _services else defaultServices
 
   /** fallback for after deserialization */
   protected def defaultServices(implicit manifest: Manifest[T]): T = AppConfig.instance[T]

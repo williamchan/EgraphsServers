@@ -16,10 +16,11 @@ object LineItemTestData {
   def seqOf[T](gen: => T)(n: Int): Seq[T] = (0 to n).toSeq.map(_ => gen)
 
 
-  def randomEgraphOrderType(withPrint: Boolean = false, product: Option[Product] = None) = EgraphOrderLineItemType(
+  def randomEgraphOrderType(withPrint: Boolean = false, product: Option[Product] = None, isGift: Boolean = false) = EgraphOrderLineItemType(
     productId = (product getOrElse newSavedProduct()).id,
     recipientName = generateFullname(),
-    framedPrint = withPrint
+    framedPrint = withPrint,
+    isGift = isGift
   )
   def randomEgraphOrderItem(withPrint: Boolean = false) = randomEgraphOrderType(withPrint).lineItems(Nil, Nil).get.head
 
@@ -37,13 +38,13 @@ object LineItemTestData {
 
   def taxItemOn(subtotal: SubtotalLineItem): TaxLineItem = randomTaxType.lineItems(Seq(subtotal), Nil).get.head
   def randomTaxItem: TaxLineItem = taxItemOn(randomSubtotalItem)
-  def randomTaxType: TaxLineItemType = TaxLineItemType("98888", randomTaxRate, Some("Test tax"))
+  def randomTaxType: TaxLineItemType = TaxLineItemType(zipcode, randomTaxRate, Some("Test tax"))
 
   def randomSubtotalItem: SubtotalLineItem = SubtotalLineItem(randomMoney)
   def randomTotalItem = TotalLineItem(randomMoney)
   def randomBalanceItem = BalanceLineItem(randomMoney)
 
-  def randomCashTransactionType = CashTransactionLineItemType.create(Some(stripePayment.testToken().id), zipcode)
+  def randomCashTransactionType = CashTransactionLineItemType.create(stripePayment.testToken().id, zipcode)
   def randomCashTransactionItem = {
     val services = AppConfig.instance[CashTransactionLineItemServices].copy(payment = yesMaamPayment)
     randomCashTransactionType.lineItems(Seq(randomBalanceItem)).get.head.copy(_services = services)
@@ -52,11 +53,12 @@ object LineItemTestData {
   def randomMoney = BigDecimal(random.nextInt(200)).toMoney()
   def randomTaxRate = BigDecimal(random.nextInt(15).toDouble / 100)
 
-  def newCheckout: FreshCheckout = {
-    val buyer = Some(newSavedAccount())
-    val address = newSavedAddress(buyer)
-    Checkout.create(Seq(randomGiftCertificateType), buyer, address)
+  def newCheckout = {
+    Checkout.create { Seq(randomGiftCertificateType) }
+      .withBuyerAccount { newSavedAccount() }
+      .withShippingAddress { Some(TestData.random.nextString(10)) }
   }
+
   def newSavedCheckout() = newCheckout.insert()
   def newTransactedCheckout() = newCheckout.transact(Some(randomCashTransactionType))
 
@@ -66,5 +68,5 @@ object LineItemTestData {
     val pment = AppConfig.instance[T]; pment.bootstrap(); pment
   }
 
-  protected def zipcode = Some("98888")
+  protected def zipcode = "98888"
 }

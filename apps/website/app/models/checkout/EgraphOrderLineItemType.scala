@@ -1,9 +1,9 @@
 package models.checkout
 
-import checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
-import models.{ProductStore, OrderStore, Order, Product}
-import org.joda.money.{CurrencyUnit, Money}
+import models._
+import models.enums.WrittenMessageRequest
 import com.google.inject.Inject
 import services.db.{HasTransientServices, InsertsAndUpdates, Schema}
 import services.AppConfig
@@ -50,6 +50,7 @@ case class EgraphOrderLineItemType(
   desiredText: Option[String] = None,
   messageToCeleb: Option[String] = None,
   framedPrint: Boolean = false,
+  addressForPrint: Option[String] = None,
   @transient _services: EgraphOrderLineItemTypeServices = AppConfig.instance[EgraphOrderLineItemTypeServices]
 )
 	extends LineItemType[Order]
@@ -67,8 +68,9 @@ case class EgraphOrderLineItemType(
   override def id = _entity.id
 
   override def lineItems(resolvedItems: LineItems, pendingResolution: LineItemTypes) = Some {
-    val print: LineItems = if (!framedPrint) Nil else PrintOrderLineItemType(order).lineItems().getOrElse(Nil)
-    Seq( EgraphOrderLineItem(this, price) ) ++ print
+    val item = EgraphOrderLineItem.create(this, price)
+    val print = item.printOrderItem
+    Seq(item) ++ print.toSeq
   }
 
   //
@@ -80,7 +82,7 @@ case class EgraphOrderLineItemType(
     messageToCelebrity = messageToCeleb,
     requestedMessage = desiredText,
     inventoryBatchId = inventoryBatch.id // TODO(CE-13): move inventory batch check to EgraphOrderLineItem#transact
-  )
+  ).withWrittenMessageRequest(writtenMessageRequest)
 
   lazy val product = services.productStore.findById(productId) getOrElse {
     throw new IllegalArgumentException("Valid product id required.")
@@ -92,6 +94,15 @@ case class EgraphOrderLineItemType(
     // TODO(CE-13): remove this from here, move to transact as above
     throw new IllegalArgumentException("Product is out of inventory.")
   }
+
+  def withoutPrint = copy(framedPrint = false, addressForPrint = None)
+  def withPrint = this.copy(framedPrint = true)
+  def withShippingAddress(shippingAddress: String) = this.copy(addressForPrint = Some(shippingAddress))
+
+  private def writtenMessageRequest = desiredText match {
+    case Some(_) => WrittenMessageRequest.SpecificMessage
+    case None => WrittenMessageRequest.CelebrityChoosesMessage
+  }
 }
 
 
@@ -102,14 +113,9 @@ object EgraphOrderLineItemType {
   def codeType = CheckoutCodeType.EgraphOrder
   def nature = LineItemNature.Product
 
-  def restore(entity: LineItemTypeEntity, order: Order, withPrint: Boolean = false) = {
-    new EgraphOrderLineItemType(
-      productId = order.productId,
-      recipientName = order.recipientName,
-      isGift = order.recipientId == order.buyerId,
-      desiredText = order.requestedMessage,
-      messageToCeleb = order.messageToCelebrity,
-      framedPrint = withPrint
-    )
+  def restore(entity: LineItemTypeEntity, order: Order): EgraphOrderLineItemType = {
+    val isGift = order.recipientId != order.buyerId
+    val desiredText = order.requestedMessage
+    new EgraphOrderLineItemType(order.productId, order.recipientName, isGift, desiredText, order.messageToCelebrity)
   }
 }

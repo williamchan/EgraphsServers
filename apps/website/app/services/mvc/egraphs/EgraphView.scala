@@ -36,11 +36,7 @@ object EgraphView {
     val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
     val iframeUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphPlayerEmbed(order.id).url)
     val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-    val celebrityNameForTweet = celebrity.twitterUsername match {
-      case Some(username) => "@" + username
-      case None => celebrity.publicName
-    }
-    val tweetText = "An egraph for " + order.recipientName + " from " + celebrityNameForTweet
+    val tweetText = Twitter.getTweetText(celebrity, order)
     val shareOnPinterestLink = Pinterest.getPinterestShareLink(
       url = thisPageLink,
       media = egraphStillUrl,
@@ -114,7 +110,7 @@ object EgraphView {
       thumbnailUrl = pngImageUrl,
       viewEgraphUrl = thisPageLink)
 
-    val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = thisPageLink)
+    val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, order = order, viewEgraphUrl = thisPageLink)
 
     views.html.frontend.egraph_classic(
       signerName = celebrity.publicName,

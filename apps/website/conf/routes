@@ -8,7 +8,6 @@
 GET     /test/scenarios                                                   controllers.website.nonproduction.ScenarioController.list
 GET     /test/scenarios/clear                                             controllers.website.nonproduction.ScenarioController.clear
 GET     /test/scenarios/:urlSlug                                          controllers.website.nonproduction.ScenarioController.scenario(urlSlug: String)
-GET     /test/storefront-a/checkout                                       controllers.WebsiteControllers.storefrontACheckout
 
 ###
 ### Production routes
@@ -45,6 +44,28 @@ POST    /api/1.0/celebrities/me/enrollmentsamples                         contro
 POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>                   controllers.ApiControllers.postCelebrityOrder(orderId:Long)
 POST    /api/1.0/celebrities/me/orders/$orderId<[0-9]+>/egraphs           controllers.ApiControllers.postEgraph(orderId:Long)
 POST    /api/1.0/celebrities/me/videoasset                                controllers.ApiControllers.postVideoAsset
+
+# Checkout API
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+> controllers.ApiControllers.getCheckout(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+> controllers.ApiControllers.postCheckout(sessionId: String, checkoutId: Long)
+
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/buyer controllers.ApiControllers.getCheckoutBuyer(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/buyer controllers.ApiControllers.postCheckoutBuyer(sessionId: String, checkoutId: Long)
+
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/recipient controllers.ApiControllers.getCheckoutRecipient(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/recipient controllers.ApiControllers.postCheckoutRecipient(sessionId: String, checkoutId: Long)
+
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/coupon controllers.ApiControllers.getCheckoutCoupon(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/coupon controllers.ApiControllers.postCheckoutCoupon(sessionId: String, checkoutId: Long)
+
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/egraph controllers.ApiControllers.getCheckoutEgraph(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/egraph controllers.ApiControllers.postCheckoutEgraph(sessionId: String, checkoutId: Long)
+
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/shipping-address controllers.ApiControllers.getCheckoutShippingAddress(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/shipping-address controllers.ApiControllers.postCheckoutShippingAddress(sessionId: String, checkoutId: Long)
+
+GET     /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/payment controllers.ApiControllers.getCheckoutPayment(sessionId: String, checkoutId: Long)
+POST    /api/1.0/sessions/:sessionId/checkouts/$checkoutId<\d+>/payment controllers.ApiControllers.postCheckoutPayment(sessionId: String, checkoutId: Long)
 
 ## The following customer endpoints are used for egraph-exploration
 ## prototyping. Work in progress. Not finalized.
@@ -176,6 +197,9 @@ POST    /:celebrityUrlSlug/photos/:productUrlSlug/finalize                contro
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/cc-error                controllers.WebsiteControllers.getStorefrontCreditCardError(celebrityUrlSlug: String, productUrlSlug:String, creditCardMsg: Option[String] ?= None)
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/no-inventory            controllers.WebsiteControllers.getStorefrontNoInventory(celebrityUrlSlug: String, productUrlSlug:String)
 GET     /:celebrityUrlSlug/photos/:productUrlSlug/purchase-error          controllers.WebsiteControllers.getStorefrontPurchaseError(celebrityUrlSlug: String, productUrlSlug:String)
+
+GET     /:celebrityUrlSlug/connect                                        controllers.WebsiteControllers.getPersonalize(celebrityUrlSlug: String, accesskey: String ?= "")
+GET     /:celebrityUrlSlug/checkout                                       controllers.WebsiteControllers.getCheckout(celebrityUrlSlug: String, accesskey: String ?= "")
 
 ##
 ## Admin Restricted Functionality - We want to keep certain admin

@@ -10,6 +10,8 @@ import play.api.mvc.RequestHeader
 import controllers.WebsiteControllers
 import services.mail.BulkMailList
 import services.config.ConfigFileProxy
+import services.http.EgraphsSession.Conversions._
+import services.logging.Logging
 
 /**
  * Provides implicit data necessary to render the header and footer of the website's
@@ -17,6 +19,8 @@ import services.config.ConfigFileProxy
  */
 //TODO and analytics rename
 trait ImplicitHeaderAndFooterData {
+  import ImplicitHeaderAndFooterData._
+
   protected def customerStore: CustomerStore
   protected def bulkMailList: BulkMailList
   protected def config: ConfigFileProxy
@@ -26,6 +30,10 @@ trait ImplicitHeaderAndFooterData {
       loggedInStatus = getHeaderLoggedInStatus(request.session),
       deploymentInformation = Option(DeploymentInformation(System.getProperty("deploymentTime"))),
       enableLogging=config.enableFrontendLogging,
+      sessionId=request.session.id.getOrElse {
+        error("Tried to serve header data without session ID in request")
+        ""
+      },
       //TODO: move into it's own implicit object
       updateMixpanelAlias = shouldUpdateMixpanelAlias(request.session)
     )
@@ -80,3 +88,5 @@ trait ImplicitHeaderAndFooterData {
     session.isUsernameChanged.getOrElse(false)
   }
 }
+
+object ImplicitHeaderAndFooterData extends Logging

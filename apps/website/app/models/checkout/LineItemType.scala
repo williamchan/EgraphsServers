@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import java.sql.Timestamp
 import models.enums._
 import models.SavesCreatedUpdated
@@ -55,6 +55,11 @@ trait LineItemType[+T] extends HasLineItemNature with HasCodeType {
   : Option[LineItems]
 }
 
+
+trait SubLineItemType[T] extends LineItemType[T] {
+  override def lineItems(resolvedItems: LineItems = Nil, pendingResolution: LineItemTypes = Nil) = Some(Nil)
+  def lineItemsAsSubType: LineItems
+}
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

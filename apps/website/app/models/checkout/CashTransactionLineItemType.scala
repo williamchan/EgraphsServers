@@ -2,7 +2,7 @@ package models.checkout
 
 import com.google.inject.Inject
 import models.CashTransaction
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CashTransactionType, CheckoutCodeType, LineItemNature}
 import scalaz.{Scalaz, Lens}
 import services.db.{HasTransientServices, Schema}
@@ -119,7 +119,8 @@ object CashTransactionLineItemType {
   }
 
 
-  def create(stripeCardTokenId: Option[String], billingPostalCode: Option[String])(
+  @deprecated("Favor the #create that doesn't use option types", "02/2013")
+  def createOptional(stripeCardTokenId: Option[String], billingPostalCode: Option[String])(
     implicit services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
   ) = {
     new CashTransactionLineItemType(
@@ -129,6 +130,18 @@ object CashTransactionLineItemType {
       _maybeItemEntity = None
     )
   }
+
+  def create(stripeCardTokenId: String, billingPostalCode: String)(
+    implicit services: CashTransactionLineItemTypeServices = AppConfig.instance[CashTransactionLineItemTypeServices]
+  ) = {
+    new CashTransactionLineItemType(
+      _entity = paymentEntity,
+      billingPostalCode = Some(billingPostalCode),
+      stripeCardTokenId = Some(stripeCardTokenId),
+      _maybeItemEntity = None
+    )
+  }
+
 
   // todo(refunds): define a method to create refund transactions
 

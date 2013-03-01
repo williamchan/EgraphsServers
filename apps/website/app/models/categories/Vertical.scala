@@ -1,6 +1,7 @@
 package models.categories
 
 import com.google.inject.Inject
+import services.Utils
 
 /**
  * This is a hardcoded, limited version of how a true vertical store will work.
@@ -44,9 +45,10 @@ class VerticalStore @Inject() (categoryStore: CategoryStore) {
           iconUrl = Some("images/icon-logo-mlb.png"), tileUrl = Some("images/mlb-stadium.jpg"), featuredQuery =Some("mlb-featured")))
         case "NBA" => Some(Vertical(categoryValue = cv, tileUrl = Some("images/nba-stadium.jpg"), shortName = "NBA", urlSlug = "national-basketball-association",
           iconUrl = Some("images/icon-logo-nba.png"), featuredQuery =Some("nba-featured")))
-        case "Racing" => Some(Vertical(categoryValue = cv, shortName = "NBA", urlSlug = "racing",
+        case "Racing" => Some(Vertical(categoryValue = cv, shortName = "Racing", urlSlug = "racing",
           featuredQuery =Some("racing-featured")))
-        case _ => None // Don't shit a brick if someone inadvertently adds a vertical
+        // If someone adds a vertical, throw it on the left hand side.
+        case _ => Some(Vertical(categoryValue = cv, shortName = cv.publicName, urlSlug = Utils.slugify(cv.publicName, true), featuredQuery = None))
       }
     }
 

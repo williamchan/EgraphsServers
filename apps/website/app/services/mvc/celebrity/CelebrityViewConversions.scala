@@ -11,6 +11,9 @@ import services.mvc.celebrity._
 import services.AppConfig
 import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
 import com.google.inject.{Provider, Inject}
+import models.frontend.storefront_a.{PersonalizeProduct, PersonalizeStar}
+import egraphs.playutils.Gender
+import models.frontend.{FemalePersonalPronouns, MalePersonalPronouns}
 
 /**
  * Converts Celebrities into various view models defined in the front-end module
@@ -48,6 +51,24 @@ class CelebrityViewConversions(celeb: Celebrity) {
       twitterUsername = celeb.twitterUsername
     )
   }
+
+  def asPersonalizeStar(products: Seq[PersonalizeProduct]): PersonalizeStar = {
+    PersonalizeStar(
+      id=celeb.id,
+      name=celeb.publicName,
+      mastheadUrl=celeb
+        .landingPageImage
+        .withImageType(ImageAsset.Jpeg)
+        .getSaved(AccessPolicy.Public)
+        .url,
+      products=products,
+      pronoun= celeb.gender match {
+        case Gender.Male | Gender.Neutral => MalePersonalPronouns
+        case _ => FemalePersonalPronouns
+      },
+      isSoldOut=products.isEmpty
+    )
+  }
   
   def asMarketplaceCelebrity(minPrice: Int, maxPrice: Int, inventoryRemaining: Int) : MarketplaceCelebrity = {
     val photoUrl = catalogStarsQuery().find(c => c.id == celeb.id) match {
@@ -58,7 +79,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       id = celeb.id,
       publicName = celeb.publicName,
       photoUrl = photoUrl,
-      storefrontUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url,
+      storefrontUrl = controllers.routes.WebsiteControllers.getPersonalize(celeb.urlSlug).url,
       inventoryRemaining = inventoryRemaining,
       minPrice = minPrice,
       maxPrice = maxPrice,
@@ -83,7 +104,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       .resizedWidth(660)
       .getSaved(AccessPolicy.Public).url // expensive call
 
-    val choosePhotoUrl = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrityUrlSlug = celeb.urlSlug).url
+    val connectUrl = controllers.routes.WebsiteControllers.getPersonalize(celeb.urlSlug).url
 
     CatalogStar(
       id = celeb.id,
@@ -92,7 +113,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
       organization = celeb.organization,
       imageUrl = mastheadImageUrl,
       marketplaceImageUrl = marketplaceImageUrl,
-      storefrontUrl = choosePhotoUrl,
+      storefrontUrl = connectUrl,
       inventoryRemaining = inventoryRemaining,
       minPrice = minPrice,
       maxPrice = maxPrice

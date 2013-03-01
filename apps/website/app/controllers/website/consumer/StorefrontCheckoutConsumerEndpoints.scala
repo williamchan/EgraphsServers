@@ -13,7 +13,7 @@ import services.payment.Payment
 import play.api.mvc.Results.Redirect
 import play.api.mvc.Result
 import play.api.mvc.Request
-import controllers.WebsiteControllers
+import controllers.{routes, WebsiteControllers}
 import services.blobs.AccessPolicy
 import services.http.filters.HttpFilters
 import play.api.mvc.Action
@@ -44,13 +44,23 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
   //
   // Controllers
   //
+  def getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = Action { req =>
+    Redirect(routes.WebsiteControllers.getPersonalize(celebrityUrlSlug))
+  }
+
+  def postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = Action { req => NotFound }
+
+
+
+
   /** Controller that GETs the checkout page, or Redirects to another form if there was
    *  insufficient data in the user's session to present the checkout page.
    *
    *  @param celebrityUrlSlug identifies the celebrity whose product is being checked out.
    *  @param productUrlSlug identifies the product being checked out.
    **/
-  def getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = { 
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = {
     controllerMethod.withForm() { implicit token =>
       httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
         Action { implicit request =>
@@ -155,7 +165,8 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
    * @param productUrlSlug identifies the product being purchased
    * @return a redirect either to the finalize order page or back to this form to fix errors.
    */
-  def postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _postStorefrontCheckout(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         val forms = purchaseFormFactory.formsForStorefront(celeb.id)(request.session)

@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import com.google.inject.Inject
 import java.sql.Timestamp
 import org.joda.money.{CurrencyUnit, Money}
@@ -10,7 +10,7 @@ import scalaz.Lens
 import services.db.{CanInsertAndUpdateEntityThroughTransientServices, InsertsAndUpdatesAsEntity, HasEntity, Schema}
 import services.MemberLens
 import org.squeryl.Query
-import play.api.libs.json.{Json, JsValue}
+import play.api.libs.json._
 
 /**
  * Represents an actual item or data within a checkout. Has the responsibility of persisting itself,
@@ -67,7 +67,7 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
     desiredCodeType: CheckoutCodeType with OfCheckoutClass[LIT, LI]
   ): Option[LI] = {
     if (codeType != desiredCodeType) None
-    else Some(this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
+    else Some[LI](this.asInstanceOf[LI])  // cast to return as actual type, rather than LineItem[LI]
   }
 
   /** helper for toJson method; optional values are left out of if not defined */
@@ -77,7 +77,6 @@ trait LineItem[+T] extends HasLineItemNature with HasCodeType {
     val emptyMap = Map.empty[String, JsValue]
     val idMap = id map { (anId: Long) => Map("id" -> js(anId)) } getOrElse emptyMap
     val urlMap = imageUrl map { (url: String) => Map("imageUrl" -> js(url)) } getOrElse emptyMap
-
 
     idMap ++ urlMap ++ Map(
       "name" -> js(name),
@@ -168,9 +167,12 @@ trait SubLineItem[T] extends LineItem[T] {
 
   /** doesn't actually transact in when called directly */
   override def transact(checkout: Checkout) = this
+  override def toJson = JsArray(Nil)
 
   /** to be called from the transact method of the item it belongs to */
   def transactAsSubItem(checkout: Checkout): SubLineItem[T]
+
+  def toJsonAsSubItem: JsValue
 }
 
 

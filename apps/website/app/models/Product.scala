@@ -333,7 +333,7 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
   // Public members
   //
 
-  def findActiveProductsByCelebrity(celebrityId: Long): Query[Product] = {
+  def findActiveProductsByCelebrity(celebrityId: Long): Query[(Product, InventoryBatch)] = {
     from(schema.products, schema.inventoryBatchProducts, schema.inventoryBatches)((product, association, inventoryBatch) =>
       where(
         product.celebrityId === celebrityId
@@ -341,7 +341,7 @@ class ProductStore @Inject() (schema: Schema, inventoryBatchQueryFilters: Invent
           and association.inventoryBatchId === inventoryBatch.id
           and (Time.today between(inventoryBatch.startDate, inventoryBatch.endDate))
       )
-        select (product)
+        select ((product, inventoryBatch))
     )
   }
 

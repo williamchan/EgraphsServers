@@ -218,7 +218,8 @@ trait PostCelebrityAdminEndpoint {
               e => BadRequest("No twitter screen name in request."),
               officialScreenName => {
                 val screenName = removeAtSymbol(officialScreenName)
-                celebrity.copy(twitterUsername = Some(screenName)).save()
+                val maybeScreenName = if(screenName.isEmpty) None else Some(screenName) // this lets us unset the value
+                celebrity.copy(twitterUsername = maybeScreenName).save()
                 Ok(screenName)
               })
           }

@@ -42,13 +42,19 @@
 
 	    .nav {
 
-  	    h2 {
-          text-transform: uppercase;
-          font-size: .75em;
-          line-height: 1.25em;
-          font-weight: 600;
-          margin-top: .25em;
-          color: @gray;
+  	    h2 { 
+            text-transform: uppercase;
+            font-size: .75em;
+            line-height: 1.25em;
+            font-weight: 600;
+            margin-top: .25em;
+          a {  
+            color: @gray;
+
+            &:hover {
+              color: @orange;
+            }  
+          }
         }
 
         ol {

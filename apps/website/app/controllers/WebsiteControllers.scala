@@ -1,6 +1,7 @@
 package controllers
 
 import models._
+import checkout.{CheckoutServices, LineItemStore, CheckoutAdapterServices}
 import models.categories._
 import website._
 import play.api.mvc.{Action, Controller}
@@ -67,6 +68,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected def categoryValueStore = instance[CategoryValueStore]
   override protected def celebrityRequestStore = instance[CelebrityRequestStore]
   override protected val celebrityStore = instance[CelebrityStore]
+  override protected val checkoutServices = instance[CheckoutServices]
   override protected val couponStore = instance[CouponStore]
   override protected val customerStore = instance[CustomerStore]
   override protected val egraphStore = instance[EgraphStore]
@@ -74,6 +76,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val inventoryBatchStore = instance[InventoryBatchStore]
   override protected val mastheadStore = instance[MastheadStore]
   override protected val mastheadCategoryValueStore = instance[MastheadCategoryValueStore]
+  override protected val lineItemStore = instance[LineItemStore]
   override protected val orderStore = instance[OrderStore]
   override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]
@@ -87,4 +90,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]
   override protected val printOrderQueryFilters = instance[PrintOrderQueryFilters]
+
+  override protected val checkouts = instance[CheckoutAdapterServices]
 }
