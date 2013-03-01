@@ -11,23 +11,43 @@ import org.joda.money.{CurrencyUnit, Money}
 
 object StorefrontA extends Controller with DefaultImplicitTemplateParameters {
   def personalize = Action { request =>
-    val starName="Sergio Romo"
-    val star = PersonalizeStar(
-      id=1L,
-      name=starName,
-      products=products(starName, 3),
-      pronoun=FemalePersonalPronouns
-    )
+    Ok(views.html.frontend.storefronts.a.personalize(
+      star("Sergio Romo"),
+      "/checkout",
+      maxDesiredTextChars=60,
+      maxMessageToCelebChars=100,
+      testcase=Some("default")
+    ))
+  }
 
-    Ok(views.html.frontend.storefronts.a.personalize(star, "/checkout", Some("default")))
+  def personalizeSoldOut = Action { request =>
+    Ok(views.html.frontend.storefronts.a.personalize(
+      star("Sergio Romo").copy(products=Nil, isSoldOut=true),
+      "/checkout",
+      maxDesiredTextChars=60,
+      maxMessageToCelebChars=100,
+      testcase=Some("default")
+    ))
   }
 
   def checkout(testcase: Option[String]) = Action { request =>
     val request = Form
-    Ok(views.html.frontend.storefronts.a.checkout(testcase=testcase))
+    Ok(views.html.frontend.storefronts.a.checkout(personalizeUrl="/personalize", testcase=testcase))
   }
 
-  def products(star: String, n: Int=3): Seq[PersonalizeProduct] = {
+  def star(starName: String) = {
+    val products = makeProducts(starName, 3)
+    PersonalizeStar(
+      id=1L,
+      name=starName,
+      products=products,
+      pronoun=FemalePersonalPronouns,
+      mastheadUrl = "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg",
+      isSoldOut=products.isEmpty
+    )
+  }
+
+  def makeProducts(star: String, n: Int=3): Seq[PersonalizeProduct] = {
     for ( i <- 1 to n) yield {
       PersonalizeProduct(
         id=i,

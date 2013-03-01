@@ -9,6 +9,7 @@ import models.{ProductStore, Celebrity, Product}
 import services.http.filters.HttpFilters
 import play.api.mvc.Call
 import play.api.mvc.Action
+import controllers.routes
 
 /**
  * Manages GET and POST of celebrity photos in the purchase flow.
@@ -36,6 +37,20 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
   //
   // Controllers
   //
+  def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String, accesskey: String = "") = Action { req =>
+    Redirect(routes.WebsiteControllers.getPersonalize(celebrityUrlSlug, accesskey))
+  }
+
+  def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String, accesskey: String = "") = Action { req =>
+    Redirect(routes.WebsiteControllers.getPersonalize(celebrityUrlSlug, accesskey))
+  }
+
+  def postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug: String) = Action { req => NotFound }
+
+
+
+
+
   /**
    * Controller that serves the "tiled" view of the celebrity storefront's Choose Photo
    * screen.
@@ -43,7 +58,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @param celebrityUrlSlug identifies the celebrity storefront to serve.
    * @return the web page.
    */
-  def getStorefrontChoosePhotoTiled(celebrityUrlSlug: String, accesskey: String = "") = controllerMethod.withForm()
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontChoosePhotoTiled(celebrityUrlSlug: String, accesskey: String = "") = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityUrlSlug(celebrityUrlSlug) { maybeUnpublishedCelebrity =>
       httpFilters.requireAdministratorLogin.inSessionOrUseOtherFilter(maybeUnpublishedCelebrity)(
@@ -88,7 +104,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @param productUrlSlug identifies the first product to display
    * @return the web page.
    */
-  def getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String, accesskey: String = "") = controllerMethod.withForm()
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontChoosePhotoCarousel(celebrityUrlSlug: String, productUrlSlug: String, accesskey: String = "") = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug, accesskey) { (celeb, product) =>
       Action { implicit request =>
@@ -126,7 +143,8 @@ private[consumer] trait StorefrontChoosePhotoConsumerEndpoints
    * @param productUrlSlug identifies the photo being selected.
    * @return
    */
-  def postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _postStorefrontChoosePhoto(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         // Save the purchase forms with the new product ID

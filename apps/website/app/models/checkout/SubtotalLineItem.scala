@@ -1,6 +1,6 @@
 package models.checkout
 
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.{CurrencyUnit, Money}
 

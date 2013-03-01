@@ -38,13 +38,6 @@ case class Address(
     services.accountStore.get(accountId)
   }
 
-  def streetAddressString = {
-    val address = (List(addressLine1) ++  addressLine2.toList) mkString (" ")
-    val stateAndZip = "%s, %s %s".format(city, _state, postalCode)
-    val streetAddressAsList = List(address, city, stateAndZip)
-    streetAddressAsList.mkString("\n")
-  }
-
   //
   // KeyedCaseClass[Long] methods
   //

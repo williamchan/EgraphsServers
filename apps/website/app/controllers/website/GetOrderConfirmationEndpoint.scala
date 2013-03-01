@@ -2,6 +2,7 @@ package controllers.website
 
 import play.api.mvc._
 import models._
+import checkout.{CheckoutServices, LineItemStore}
 import services.http.ControllerMethod
 import services.mvc.{OrderCompleteViewModelFactory, ImplicitHeaderAndFooterData}
 
@@ -16,6 +17,8 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
   // Services
   //
   protected def orderStore: OrderStore
+  protected def lineItemStore: LineItemStore
+  protected def checkoutServices: CheckoutServices
   protected def controllerMethod: ControllerMethod
   protected def orderCompleteViewModelFactory: OrderCompleteViewModelFactory
 
@@ -35,12 +38,27 @@ private[controllers] trait GetOrderConfirmationEndpoint extends ImplicitHeaderAn
         flashOrderId <- maybeOrderIdFromFlash if flashOrderId == orderId;
         order <- orderStore.findById(flashOrderId)
       ) yield {
-        Ok(views.html.frontend.celebrity_storefront_complete(
-          orderCompleteViewModelFactory.fromOrder(order)
-        ))
+        val maybeViewModel = order.lineItemId match {
+          case Some(itemId) => viewModelForCheckoutConfirmation(itemId)
+          case None => Some { orderCompleteViewModelFactory.fromOrder(order) }
+        }
+
+        for (viewModel <- maybeViewModel) yield {
+          Ok(views.html.frontend.celebrity_storefront_complete(viewModel))
+        }
       }
   
-      maybeHtml.getOrElse(NotFound("Order confirmation has expired."))
+      maybeHtml.flatten.getOrElse(NotFound("Order confirmation has expired."))
+    }
+  }
+
+  private def viewModelForCheckoutConfirmation(lineItemId: Long) = {
+    for (
+      itemEntity <- lineItemStore.findEntityById(lineItemId).headOption;
+      checkout <- checkoutServices.findById(itemEntity._checkoutId);
+      viewModel <- orderCompleteViewModelFactory.fromEgraphPurchaseCheckout(checkout)
+    ) yield {
+      viewModel
     }
   }
 }

@@ -2,7 +2,7 @@ package models.checkout
 
 import _root_.exception.InsufficientInventoryException
 import com.google.inject.Inject
-import checkout.Conversions._
+import Conversions._
 import exception.{DomainObjectNotFoundException, ItemTypeNotFoundException, MissingRequiredAddressException}
 import java.sql.{Connection, Timestamp}
 import play.api.libs.json._
@@ -13,6 +13,7 @@ import services.AppConfig
 import services.db._
 import services.payment.Charge
 import services.config.ConfigFileProxy
+import com.stripe.exception.StripeException
 
 //
 // Services
@@ -68,7 +69,7 @@ abstract class Checkout
   def recipientCustomer: Option[Customer]
 
   def payment: Option[CashTransactionLineItemType]
-  def shippingAddress: Option[Address]
+  def shippingAddress: Option[String]
 
   def save(): Checkout
   def zipcode: Option[String]
@@ -83,15 +84,14 @@ abstract class Checkout
    * Needed to update things like taxes and fees, which are dependent on individual elements, when
    * adding new elements (ex: refunding taxes or including taxes on checkout edits).
    */
-  protected lazy val _derivedTypes: LineItemTypes = if (!_dirty) { Nil } else {
-    // TODO(refunds): will probably want to add the refund transaction here
-    // TODO(fees): will want to add any fees we charge here
-
-    // TODO(taxes): remove the if to enable adding taxes based on billing zipcode
-    if (services.config.applicationMode != "dev") Nil else {
-      TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
-    }
-  }
+  protected lazy val _derivedTypes: LineItemTypes = Nil
+//  if (!_dirty) { Nil } else {
+//    // TODO(refunds): will probably want to add the refund transaction here
+//    // TODO(fees): will want to add any fees we charge here
+//
+//    // TODO(taxes): remove the if to enable adding taxes based on billing zipcode
+//    TaxLineItemType.getTaxesByZip(zipcode.getOrElse(TaxLineItemType.noZipcode))
+//  }
 
 
   //
@@ -103,10 +103,18 @@ abstract class Checkout
   /** for services to return a persisted checkout as the correct type */
   def withEntity(savedEntity: CheckoutEntity): Checkout
 
-  def toJson: JsValue = lineItems.foldLeft(JsArray(Nil)) { (acc, nextItem) =>
-    nextItem.toJson match {
-      case jsArray: JsArray => jsArray ++ acc
-      case jsVal: JsValue => jsVal +: acc
+  def toJson: JsValue = {
+    def itemsToJson(items: LineItems) = items.foldLeft(JsArray(Nil)) { (acc, nextItem) =>
+      nextItem.toJson match {
+        case jsArray: JsArray => jsArray ++ acc
+        case jsVal: JsValue => jsVal +: acc
+      }
+    }
+
+    Json.toJson {
+      LineItemNature.values map { nature =>
+        (nature.name.toLowerCase, itemsToJson(lineItems(nature)))
+      } toMap
     }
   }
 
@@ -130,9 +138,9 @@ abstract class Checkout
       val savedCheckout = this.save()
 
       // resolve transaction item and make charge (or return error)
-      val txnItem = resolveCashTransaction(txnType) match {
-        case Some(item) => Some( item.makeCharge(savedCheckout) )
-        case _ => return Left{ CheckoutFailedCashTransactionResolutionError(this, txnType) }
+      val txnItem = savedCheckout.resolveCashTransactionAndCharge(txnType) match {
+        case Right(txnItem) => txnItem
+        case Left(failure) => return Left(failure)
       }
 
       /**
@@ -149,7 +157,7 @@ abstract class Checkout
         // TODO: this could be implemented more elegantly if LineItems return some Left error case directly
         case exc: Exception => Left {
           val refunded = txnItem flatMap (_.abortTransaction())
-           exc match {
+          exc match {
             case e: MissingRequiredAddressException => CheckoutFailedShippingAddressMissing(this, refunded, e.msg)
             case e: InsufficientInventoryException => CheckoutFailedInsufficientInventory(this, txnItem, refunded)
             case e: DomainObjectNotFoundException => CheckoutFailedDomainObjectNotFound(this, refunded, e.msg)
@@ -217,10 +225,11 @@ abstract class Checkout
           val otherTypes = merge(prevAttempted, unattempted)
           val itemsFromCurrent = current.lineItems(prevResolved, otherTypes)
 
-          val resolvedNow = itemsFromCurrent.getOrElse(Nil) ++ prevResolved
-          val attemptedNow =
-            if (itemsFromCurrent isDefined) prevAttempted
-            else current +: prevAttempted.toSeq
+          val resolvedNow = itemsFromCurrent.toSeq.flatten ++ prevResolved
+          val attemptedNow = itemsFromCurrent match {
+            case Some(_) => prevAttempted
+            case None => current +: prevAttempted.toSeq
+          }
 
           unattempted match {
             case next :: rest => iterate(prevResolved = resolvedNow)(
@@ -230,7 +239,7 @@ abstract class Checkout
             )
             case Nil => ResolutionPass(
               resolvedItems = resolvedNow,
-              unresolvedTypes = prevAttempted
+              unresolvedTypes = attemptedNow
             )
           }
         }
@@ -268,13 +277,35 @@ abstract class Checkout
   //
   // helpers
   //
-  /** get the line item of the given `CashTransactionLineItemType` as applied to this checkout */
-  private def resolveCashTransaction(maybeTxnType: Option[CashTransactionLineItemType]): Option[CashTransactionLineItem] = {
-    for (
-      txnType <- maybeTxnType;
-      txnItems <- txnType.lineItems(Seq(balance));
-      txnItem <- txnItems.headOption
-    ) yield txnItem
+  /**
+   * get the line item of the given `CashTransactionLineItemType` as applied to this checkout and charge it
+   *
+   * @return Left(Failure) if it failed to charge the card (likely) or
+   *            failed to resolve the charge LineItem from the CashTransactionLineItemType (unlikely)
+   *         Right(None) if the checkout had 0 balance and thus didn't need to charge anything
+   *         Right(Some(charge)) if a payment was successfully made
+   */
+  private def resolveCashTransactionAndCharge(maybeTxnType: Option[CashTransactionLineItemType])
+  : Either[CheckoutFailed, Option[CashTransactionLineItem]] =
+  {
+
+    if (balance.amount.isZero) Right(None) else {
+
+      val maybeExceptionOrCharged = for (
+        txnType <- maybeTxnType;
+        txnItems <- txnType.lineItems(Seq(balance));
+        txnItem <- txnItems.headOption
+      ) yield txnItem.makeCharge(this)
+
+      maybeExceptionOrCharged map {
+        case Right(item) => Right(Some(item))
+        case Left(se: StripeException) => Left {
+          CheckoutFailedStripeException(this, maybeTxnType, se)
+        }
+      } getOrElse Left {
+        CheckoutFailedCashTransactionResolutionError(this, maybeTxnType)
+      }
+    }
   }
 
   /**
@@ -338,24 +369,20 @@ abstract class Checkout
 object Checkout {
 
   // Create
-  def create(types: LineItemTypes, buyer: Option[Account] = None, zipcode: Option[String] = None): FreshCheckout = {
-    FreshCheckout(0L, types, buyer, zipcode = zipcode)
-  }
-
-  def create(types: LineItemTypes, buyer: Option[Account], address: Address): FreshCheckout = {
-    val zipcode = address.postalCode
-    FreshCheckout(0L, types, buyer, shippingAddress = Some(address), zipcode = Some(zipcode))
-  }
+  def create(types: LineItemTypes) = FreshCheckout(_itemTypes = types)
 
   // Restore
   def restore(id: Long)(implicit services: CheckoutServices = AppConfig.instance[CheckoutServices])
-  : Option[PersistedCheckout] = { services.findById(id) }
+  : Option[PersistedCheckout] = {
+    services.findById(id)
+  }
 
   //
   // Checkout failure cases
   //
   sealed abstract class CheckoutFailed(val failedCheckoutData: FailedCheckoutData)
   protected[checkout] trait FailedCheckoutWithCharge { def charge: Option[Charge] }
+  trait FailedCheckoutWithException { def exception: Exception }
 
   case class CheckoutFailedCustomerMissing(
     checkout: Checkout,
@@ -366,6 +393,14 @@ object Checkout {
     checkout: Checkout,
     cashTransactionType: Option[CashTransactionLineItemType]
   ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
+
+  case class CheckoutFailedStripeException(
+    checkout: Checkout,
+    cashTransactionType: Option[CashTransactionLineItemType],
+    exception: StripeException
+  ) extends CheckoutFailed(FailedCheckoutData(checkout, cashTransactionType))
+    with FailedCheckoutWithException
+
 
   case class CheckoutFailedInsufficientInventory(
     checkout: Checkout,
@@ -402,7 +437,7 @@ object Checkout {
     exception: Exception
   ) extends CheckoutFailed(
     FailedCheckoutData(checkout, canceledTransactionItem.map(_.itemType), canceledTransactionItem, charge)
-  ) with FailedCheckoutWithCharge
+  ) with FailedCheckoutWithCharge with FailedCheckoutWithException
 }
 
 case class FailedCheckoutData(

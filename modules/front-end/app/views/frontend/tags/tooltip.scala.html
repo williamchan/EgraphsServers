@@ -8,4 +8,4 @@
     <strong>Hey Dummy</strong>, it's a tooltip of course!
   }
 *@
-<div class="tooltip-link @classes.mkString(" ")"><a title="@HtmlFormat.escape(body.body)" rel="tooltip" @if(event != ""){event="@event"}>@text</a></div>
+<div class="tooltip-link @classes.mkString(" ")"><a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @if(event != ""){event="@event"} tabindex="-1" >@text</a></div>

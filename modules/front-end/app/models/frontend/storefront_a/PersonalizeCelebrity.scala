@@ -11,7 +11,9 @@ case class PersonalizeStar (
   id: Long,
   name: String,
   products: Seq[PersonalizeProduct],
-  pronoun: PersonalPronouns
+  pronoun: PersonalPronouns,
+  mastheadUrl: String,
+  isSoldOut: Boolean
 )
 
 case class PersonalizeProduct (

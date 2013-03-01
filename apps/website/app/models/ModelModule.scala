@@ -23,6 +23,7 @@ object ModelModule extends AbstractModule with ScalaModule {
     bind[CategoryServices].in[Singleton]
     bind[CelebrityServices].in[Singleton]
     bind[CheckoutServices].in[Singleton]
+    bind[CheckoutAdapterServices].in[Singleton]
     bind[CouponServices].in[Singleton]
     bind[CouponLineItemServices].in[Singleton]
     bind[CouponLineItemTypeServices].in[Singleton]

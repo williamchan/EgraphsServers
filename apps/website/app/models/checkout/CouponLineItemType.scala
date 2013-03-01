@@ -2,7 +2,7 @@ package models.checkout
 
 import com.google.inject.Inject
 import models.{CouponStore, Coupon}
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 import org.joda.money.{Money, CurrencyUnit}
 import services.db.Schema
@@ -70,7 +70,7 @@ case class CouponLineItemType(
     pendingResolution(CheckoutCodeType.Subtotal) match {
       case Nil => resolvedItems(CheckoutCodeType.Subtotal).headOption map { subtotal =>
         val discountAmount = coupon.calculateDiscount(subtotal.amount)
-        Seq{ CouponLineItem(this, discountAmount) }
+        Seq{ CouponLineItem(this, discountAmount.negated) }
       }
       case _ => None
     }

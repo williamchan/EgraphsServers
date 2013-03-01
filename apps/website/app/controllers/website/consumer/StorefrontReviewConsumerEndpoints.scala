@@ -17,6 +17,7 @@ import play.api.mvc.Action
 import controllers.routes.WebsiteControllers.{getStorefrontReview => reverseGetStorefrontReview}
 import org.joda.time.{DateMidnight, DateTimeConstants}
 import models.Order
+import controllers.routes
 
 /**
  * Manages GET and POST of the Review page in the purchase flow.
@@ -40,6 +41,14 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
   //
   // Controllers
   //
+  def getStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = Action { req =>
+    Redirect(routes.WebsiteControllers.getPersonalize(celebrityUrlSlug))
+  }
+
+  def postStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = Action { req => NotFound }
+
+
+
   /**
    * Controller that GETs the "Review" page in the purchase flow.
    *
@@ -48,7 +57,8 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
    * @return the web page, or a Redirect to earlier forms in the flow if their data
    *   was found to be lacking.
    */
-  def getStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm() 
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
   { implicit authToken =>
 
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
@@ -111,7 +121,8 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
    * @return a Redirect to the next step in the purchase flow if successful, otherwise
    *    a Redirect back to the form to handle errors.
    */
-  def postStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _postStorefrontReview(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request => 
         // Get the purchase forms for this celeb's storefront out of the server session

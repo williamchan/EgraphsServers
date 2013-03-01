@@ -1,6 +1,6 @@
 package models.checkout
 
-import checkout.Conversions._
+import Conversions._
 import utils.{DateShouldMatchers, DBTransactionPerTest, EgraphsUnitTest, TestData}
 
 

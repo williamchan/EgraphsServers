@@ -2,7 +2,7 @@ package models.checkout
 
 import utils.{DBTransactionPerTest, EgraphsUnitTest}
 import LineItemMatchers._
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import LineItemTestData._
 
 class SubtotalTests extends EgraphsUnitTest

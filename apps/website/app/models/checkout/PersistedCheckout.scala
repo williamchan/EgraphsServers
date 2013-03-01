@@ -3,7 +3,7 @@ package models.checkout
 import java.sql.{Connection, Timestamp}
 import models._
 import models.enums._
-import checkout.Conversions._
+import Conversions._
 import services.AppConfig
 import services.db.{CanInsertAndUpdateEntityThroughServices, HasTransientServices}
 
@@ -24,16 +24,20 @@ case class PersistedCheckout(
   override lazy val buyerAccount: Account = buyerCustomer.account
 
   // todo: provide real implementation when these are needed after point of transaction
-  override def recipientAccount: Option[Account] = None
-  override def recipientCustomer: Option[Customer] = None
+  override def recipientAccount: Option[Account] = recipientCustomer map (_.account)
+  override def recipientCustomer: Option[Customer] = {
+    lineItems(CheckoutCodeType.EgraphOrder).headOption map { _.domainObject.recipient }
+  }
 
   /** cash transaction to be made if changes are transacted */
   override def payment: Option[CashTransactionLineItemType] = {
     for ( token <- stripeToken; zip <- zipcode) yield
-      CashTransactionLineItemType.create(Some(token), Some(zip))
+      CashTransactionLineItemType.create(token, zip)
   }
 
-  override lazy val shippingAddress = buyerAccount.addresses.headOption
+  override lazy val shippingAddress = {
+    for (print <- lineItems(CheckoutCodeType.PrintOrder).headOption) yield print.domainObject.shippingAddress
+  }
 
 
   //
@@ -51,6 +55,8 @@ case class PersistedCheckout(
   override lazy val pendingItems: LineItems = {
     // resolve added types against existing items, then filter out _lineItems
     val addedTypes = _addedTypes.toSet
+
+    // TODO: coupons currently don't work on `PersistedCheckout`s because they need a subtotal to be applied against
     val addedItems = resolveTypes(_addedTypes, _lineItems) filter (addedTypes contains _.itemType)
 
     // temp summaries needed for some types to resolve...

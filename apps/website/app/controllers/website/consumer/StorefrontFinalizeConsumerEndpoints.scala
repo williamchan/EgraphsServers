@@ -19,6 +19,7 @@ import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 import models.CouponStore
 import services.blobs.AccessPolicy
 import play.api.mvc.Action
+import controllers.routes
 
 /**
  * Manages GET and POST of the Finalize page in the purchase flow.
@@ -45,6 +46,13 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
   //
   // Controllers
   //
+  def getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = Action { req =>
+    Redirect(routes.WebsiteControllers.getPersonalize(celebrityUrlSlug))
+  }
+
+  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = Action { req => NotFound }
+
+
   /**
    * Controller that GETs the "Finalize" page in the purchase flow.
    *
@@ -53,7 +61,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return the web page, or a Redirect to earlier forms in the flow if their data
    *         was found to be lacking.
    */
-  def getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm() 
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
@@ -152,7 +161,8 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
    * @return a Redirect to the order complete page if successful, otherwise
    *         a Redirect back to the form to handle errors.
    */
-  def postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(dbSettings = WithoutDBConnection) {
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _postStorefrontFinalize(celebrityUrlSlug: String, productUrlSlug: String) = postController(dbSettings = WithoutDBConnection) {
     Action { implicit request =>
       // Get all the sweet, sweet purchase form data in a database transaction. We end up with a weird 
       // Either[Result, Either[Result, (The purchase data)], but we'll unpack them later. If you're feeling

@@ -26,14 +26,17 @@ class SocialTests extends EgraphsUnitTest
 
   "Twitter" should "return getEgraphShareLink" in {
     val celebrity = TestData.newSavedCelebrity()
-    val link = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = "myegraph")
+    val customer = TestData.newSavedCustomer()
+    val (order, egraph) = TestData.newFulfilledOrder(customer)
+    val link = Twitter.getEgraphShareLink(celebrity = celebrity, order = order, viewEgraphUrl = "myegraph")
     link should include("url=myegraph")
-    link should include("text=Check out this choice egraph from " + celebrity.publicName)
+    link should include("text=An egraph for " + customer.name + " from " + celebrity.publicName)
 
     val twitterCeleb = celebrity.copy(twitterUsername = Some("egraphceleb")).save()
-    val twitterLink = Twitter.getEgraphShareLink(celebrity = twitterCeleb, viewEgraphUrl = "myegraph")
+    val (order1, egraph1) = TestData.newFulfilledOrder(customer)
+    val twitterLink = Twitter.getEgraphShareLink(celebrity = twitterCeleb, order = order1, viewEgraphUrl = "myegraph")
     twitterLink should include("url=myegraph")
-    twitterLink should include("text=Hey @egraphceleb this is one choice egraph you made.")
+    twitterLink should include("text=An egraph for " + customer.name + " from @" + twitterCeleb.twitterUsername.getOrElse(""))
   }
 
   "Pinterest" should "return url for Pin It button" in {

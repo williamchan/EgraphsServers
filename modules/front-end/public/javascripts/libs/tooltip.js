@@ -6,6 +6,7 @@ define(
   "window"
 ],
 function(analytics, window) {
+  var noop = angular.noop;
 
   return {
     apply: function(config) {
@@ -18,13 +19,15 @@ function(analytics, window) {
       var targets = $( selector ),
         target  = false,
         tooltip = false,
+        remove_current = angular.noop,
         title   = false,
         tip     = false,
         openTooltip = function()
       {
+        if(target) { remove_current(); }
 
-        target  = $( this );
-        tip   = target.attr( 'title' );
+        target = $( this );
+        tip   = target.attr( 'data-tooltip' );
         tooltip = $( '<div id="tooltip"></div>' );
         var analyticsEventName = target.attr("event")? target.attr("event"): target.html();
         var durationEvent = _config.analyticsCategory?
@@ -34,7 +37,7 @@ function(analytics, window) {
         if( !tip || tip == '' )
           return false;
      
-        target.removeAttr( 'title' );
+        target.removeAttr( 'data-tooltip' );
         tooltip.css( 'opacity', 0 )
              .html( tip )
              .appendTo( 'body' );
@@ -87,19 +90,27 @@ function(analytics, window) {
             $( this ).remove();
           });
      
-          target.attr( 'title', tip );
+          target.attr( 'data-tooltip', tip );
           
-          target.unbind('mouseleave', remove_tooltip);
-          tooltip.unbind('click', remove_tooltip);
+          //target.unbind('click', remove_tooltip);
+          //tooltip.unbind('click', remove_tooltip);
+          $('body').unbind('touchstart click', remove_tooltip);
+          target.unbind('click', remove_tooltip);
+          target.bind('click', openTooltip);
 
           durationEvent.track();
+          target = false;
         };
-     
-        target.bind( 'mouseleave', remove_tooltip );
-        tooltip.bind( 'click', remove_tooltip );
+
+        target.unbind('click', openTooltip);
+        target.bind('click', remove_tooltip);
+        $('body').bind( 'touchstart click', remove_tooltip);
+        remove_current = remove_tooltip;
+        // target.bind( 'click', remove_tooltip );
+        // tooltip.bind( 'click', remove_tooltip );
       };
      
-      targets.bind( 'mouseenter', openTooltip);
+      targets.bind('click', openTooltip);
     }
   };
 });
