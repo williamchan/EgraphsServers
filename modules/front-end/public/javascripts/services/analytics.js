@@ -8,9 +8,15 @@ function(window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
   var google = window._gaq;
 
-  var googleEvent = function(args) {
+  var googleTrackEvent = function(args) {
     var gaqArguments = ["_trackEvent"].concat(args);
     log("Google Event: " + args);
+    google.push(gaqArguments);
+  };
+
+  var googleTrackTiming = function(args) {
+    var gaqArguments = ["_trackTiming"].concat(args);
+    log("Google Timing Event: " + args);
     google.push(gaqArguments);
   };
 
@@ -28,12 +34,18 @@ function(window, logging, requireModule) {
     eventCategory: function(categoryName) {
       var self = {
         track: function(actionAndLabel) {
-          googleEvent([categoryName].concat(actionAndLabel));
+          googleTrackEvent([categoryName].concat(actionAndLabel));
         },
 
         startEvent: function(actionAndLabel) {
+          var action = actionAndLabel[0];
+          var label = actionAndLabel[1];
+          
           return startEvent(function(durationMs) {
-            self.track(actionAndLabel.concat(durationMs));
+            var timingSpec = [action, durationMs];
+            if (label) timingSpec.push(label);
+
+            googleTrackTiming([categoryName].concat(timingSpec));
           });
         }
       };
@@ -41,6 +53,6 @@ function(window, logging, requireModule) {
       return self;
     },
 
-    event: googleEvent
+    event: googleTrackEvent
   };
 });
