@@ -64,6 +64,8 @@ function(page, tooltip, window, analytics, logging, requireModule) {
 
         /** Refreshes $scope.cart, which tracks all of the order's line items. */
         $scope.refreshCart = function() {
+          var durationEvent = events.startEvent(["Cart updated"]);
+
           cartApi.get().success(function(cartData) {
             cartData.currentDiscount = {amount: null, status: "notApplied"};
             cartData.products = cartData.product;
@@ -89,6 +91,7 @@ function(page, tooltip, window, analytics, logging, requireModule) {
             }
 
             $scope.cart = cartData;
+            durationEvent.track();
           });
         };
 

@@ -22,7 +22,7 @@ function(page, tooltip, analytics, window, logging, requireModule) {
 
   return {
     ngControllers: {
-      PersonalizeController: ["$scope", "$checkout", function($scope, $checkout) {
+      "PersonalizeController": ["$scope", "$checkout", function($scope, $checkout) {
         var cartApi = $checkout.forStorefront(celebId);
         var productsById = {};
 
