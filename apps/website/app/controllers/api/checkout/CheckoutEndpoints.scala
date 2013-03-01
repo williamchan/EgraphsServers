@@ -115,10 +115,10 @@ trait CheckoutEndpoints { this: Controller =>
           celebrityName = product.celebrity.publicName,
           celebrityGender = product.celebrity.gender,
           productName = product.name,
-          orderDate = order.created.formatDayAsPlainLanguage,
+          orderDate = order.created.formatDayAsPlainLanguage("PST"),
           orderId = order.id.toString,
           pricePaid = order.amountPaid.formatSimply,
-          deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
+          deliveredByDate = order.expectedDate.formatDayAsPlainLanguage("GMT"),
           faqHowLongLink = consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
           maybePrintOrderShippingAddress = maybePrintOrder map (_.shippingAddress)
         )

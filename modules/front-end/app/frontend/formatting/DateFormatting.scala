@@ -2,6 +2,7 @@ package frontend.formatting
 
 import scala.language.implicitConversions
 import java.util
+import java.util.TimeZone
 import java.text.SimpleDateFormat
 
 /**
@@ -19,9 +20,16 @@ import java.text.SimpleDateFormat
 object DateFormatting {
   object Conversions {
     class FormattableDate(date: util.Date) {
-      /** Formats the date thusly: "May 10, 2012." "September 4, 2012." Etc. */
-      def formatDayAsPlainLanguage = {
-        new SimpleDateFormat("MMMM dd, yyyy").format(date)
+
+      /** Formats the date thusly: "May 10, 2012." "September 4, 2012." Etc.
+       *  Pass this the timezone you'd like the date displayed in (i.e. "PST" or "GMT")
+       */
+      def formatDayAsPlainLanguage(timezone: String) = {
+
+        val formatter = new SimpleDateFormat("MMMM dd, yyyy")
+        formatter.setTimeZone(TimeZone.getTimeZone("PST"))
+
+        formatter.format(date)
       }
     }
 
