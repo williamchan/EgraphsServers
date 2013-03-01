@@ -10,7 +10,8 @@ define([
   "bootstrap/bootstrap-button",
   "services/ng/checkout",
   "services/ng/angular-strap",
-  "services/ng/thumbnail-selector"
+  "services/ng/thumbnail-selector",
+  "services/ng/resource-form"
 ],
 function(page, tooltip, analytics, window, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
@@ -21,7 +22,7 @@ function(page, tooltip, analytics, window, logging, requireModule) {
 
   return {
     ngControllers: {
-      PersonalizeController: ["$scope", "$checkout", function($scope, $checkout) {
+      "PersonalizeController": ["$scope", "$checkout", function($scope, $checkout) {
         var cartApi = $checkout.forStorefront(celebId);
         var productsById = {};
 

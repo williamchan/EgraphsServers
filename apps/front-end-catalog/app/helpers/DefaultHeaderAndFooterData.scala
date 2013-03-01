@@ -21,6 +21,7 @@ trait DefaultHeaderAndFooterData {
   implicit val defaultHeaderData = {
     HeaderData(
       loggedInStatus=Left(HeaderNotLoggedIn("/login-link")),
+      sessionId="1",
       insideAnEgraphLink="inside-an-egraph",
       egraphsFacebookLink="http://www.facebook.com/egraphs",
       enableLogging=true,

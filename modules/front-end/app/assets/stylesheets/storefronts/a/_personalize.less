@@ -1,4 +1,12 @@
 .storefront-a-personalize {
+  #top {
+    display:none;
+  }
+
+  #top-relative {
+    display:block;
+    visibility:visible;
+  }
 
   h2 {
     font-size:1.2em;
@@ -14,6 +22,11 @@
     height:0px;
     border-bottom: 1px solid white;
   }
+
+  &.sold-out #bottom .newsletter {
+    display:none;   
+  }
+
 }
 
 // Styles for the masthead of the storefront personalize page
@@ -181,8 +194,8 @@
     line-height: normal;
   }
 
-  border-top:1px solid #333;
   padding-top:0px;
+  padding-bottom:20px;
   top:0px;
 
   #main {
@@ -224,6 +237,9 @@
       padding-right:@gridGutterWidth;
       padding-top:8px;
       padding-bottom:8px;
+      margin-left:auto;
+      margin-right:auto;
+      max-width:600px;
       //background-color:#efefef;
       //border-right:1px solid #ccc;
       //border-top:1px solid #ccc;
@@ -250,6 +266,7 @@
   z-index:0;
   margin-left:auto;
   margin-right:auto;
+  margin-bottom:20px;
 
   @media (max-width:768px) {
     padding:16px 20px 20px 20px;
@@ -304,8 +321,7 @@
       line-height:20px;
     }
 
-
-    &::-ms-placeholder {
+    &::-ms-input-placeholder {
       color: @placeholderColor;
       font-size: @placeholderFontSize;
       font-style: @placeholderFontStyle;
@@ -327,7 +343,6 @@
   .control-label {
     width:170px;
     margin-right:20px;
-    padding-top:0px;
 
     @media(max-width:480px) {
       margin-left:0px;
@@ -419,6 +434,9 @@
     border-color:transparent white;
   }
 
+  .input-append {
+    .celebrity-searchbox-container(@orange, @inputBorder, 270px);
+  }
 
   .btn-group {
     height:50px;
@@ -452,6 +470,10 @@
   }
 
   #make-the-connection {
+    #egraph-messageToCeleb, #egraph-desiredText, #egraph-recipientName {
+      .noAjaxIcons();
+    }
+
     .note-to-star .controls {
       height:50px;
 
@@ -646,6 +668,14 @@
     .preview {
       padding-top:4px;
     }
+  }
+
+  .become-insider {
+    .controls label {
+      font-size:11px;
+      color:@orange;
+      padding-top:3px;
+    }    
   }
 
   .field-tooltip {

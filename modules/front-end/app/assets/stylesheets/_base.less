@@ -146,7 +146,7 @@ ul.credit-cards {
   }
 
   .fields-remaining {
-    color:lighten(@orange, 11%);
+    color:@orange;
 
     .num-remaining {
       color:@orange;
@@ -178,6 +178,11 @@ ul.credit-cards {
   &.ng-submitting {
     background-image: url(~"@{imageBase}/ajax-loader.gif");
   }
+}
+
+.noAjaxIcons() {
+  background-image:none;
+  padding-left:4px;
 }
 
 //
@@ -242,7 +247,10 @@ form.ajax {
   font-size:11px;
   font-style:italic;
 
-  a { cursor: help; }
+  a { 
+    cursor: help; 
+    text-decoration: underline;
+  }
   
   &:hover {
   	text-decoration:underline;

@@ -4,18 +4,21 @@ define([
   "page",
   "libs/tooltip",
   "window",
+  "services/analytics",
   "services/logging",
   "module",
   "services/ng/payment",
   "services/ng/checkout",
+  "services/ng/resource-form",
   "services/responsive-modal",
   "bootstrap/bootstrap-button"
 ],
-function(page, tooltip, window, logging, requireModule) {
+function(page, tooltip, window, analytics, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
   var forEach = angular.forEach;
   var celebId = page.celebId;
   var states = page.states;
+  var events = analytics.eventCategory("Checkout");
 
   return {
     ngControllers: {
@@ -28,7 +31,12 @@ function(page, tooltip, window, logging, requireModule) {
           codeRedeemerVisible: false,
           states: states,
           cartApi: cartApi,
-          analyticsCategory: "Checkout"
+          analyticsCategory: "Checkout",
+          egraph: {}
+        });
+
+        cartApi.egraph().success(function(egraph) {
+          $scope.egraph = egraph;
         });
 
         /** Toggles visibility of the discount redeeming widget */
@@ -36,8 +44,19 @@ function(page, tooltip, window, logging, requireModule) {
           $scope.codeRedeemerVisible = !$scope.codeRedeemerVisible;
           if(!$scope.codeRedeemerVisible) {
             // Toss away any entered codes since we are closing down the code-redeeming widget
-            $scope.coupon.couponCode = "";
+            $scope.coupon = {couponCode:""};
             $scope.couponForm.resource.submit();
+            events.track(["Code Redeemer - Close"]);
+          } else {
+            events.track(["Code Redeemer - Open"]);
+          }
+        };
+
+        $scope.codeRedeemerText = function() {
+          if ($scope.codeRedeemerVisible) {
+            return "remove code";
+          } else {
+            return "redeem code";
           }
         };
 
@@ -45,55 +64,78 @@ function(page, tooltip, window, logging, requireModule) {
 
         /** Refreshes $scope.cart, which tracks all of the order's line items. */
         $scope.refreshCart = function() {
-          cartApi.get().success(function(cartData) {
-            cartData.discount = {amount: null, status: "notApplied"};
+          var durationEvent = events.startEvent(["Cart updated"]);
 
+          cartApi.get().success(function(cartData) {
+            cartData.currentDiscount = {amount: null, status: "notApplied"};
+            cartData.products = cartData.product;
             cartData.requiresShipping = false;
             forEach(cartData.products, function(product) {
-              if (product.type.codeType === "PrintOrderLineItemType" ) {
+              if (product.lineItemType.codeType === "PrintOrderLineItem" ) {
                 cartData.requiresShipping = true;
               }
             });
 
-            forEach(cartData.discounts, function(discount) {
-              cartData.discount = {amount: discount.amount, status:"applied"};
+            forEach(cartData.discount, function(discount) {
+              cartData.currentDiscount = {amount: discount.amount, status:"applied"};
             });
 
             forEach(cartData.summary, function(lineItem) {
-              if (lineItem.type.codeType === "TotalLineItemType") {
+              if (lineItem.lineItemType.codeType === "TotalLineItem") {
                 cartData.total = lineItem.amount;
               }
             });
 
-            if (cartData.discount.amount) {
+            if (cartData.currentDiscount.amount) {
               $scope.codeRedeemerVisible = true;
             }
 
             $scope.cart = cartData;
+            durationEvent.track();
           });
         };
 
         $scope.transactCheckout = function() {
+          $scope.transacting = true;
+
           cartApi.transact().success(function(response) {
             var order = response.order;
             log("Successfully purchased. Order is: ");
             log(order);
             window.location.href = order.confirmationUrl;
           })
-          .error(function(errors) {
-            log("Oh snap I got some errors trying to buy this order");
-            log(errors);
+          .error(function(data, status) {
+            var errors;
+            $scope.transacting = false;
+
+            if (status === 400) {
+              errors = data.errors;
+              if (errors.payment) {
+                $scope.stripeForm.stripe.setErrors(errors.payment.concat("stripe_transaction"));
+              }
+
+              if (errors.egraph) {
+                $scope.errors = {noInventory:true};
+              }
+            } else if (status === 500) {
+              $scope.errors = {serverError:true};
+              log("Server error. Not much we can do about it...");
+            }
           });
         };
 
         /** Returns all forms that are relevant to the user given current cart state */
         $scope.forms = function() {
           var forms = [
-            $scope.recipientForm,
             $scope.buyerForm
           ];
 
-          if ($scope.codeRedeemerVisible) {
+          if ($scope.egraph.isGift === "true") {
+            forms.push($scope.recipientForm);
+          }
+
+          // Only include the coupon form in relevant forms if it's visible and has a value filled.
+          if ($scope.codeRedeemerVisible && ($scope.coupon && $scope.coupon.couponCode !== "")) {
             forms.push($scope.couponForm);
           }
 
@@ -128,6 +170,17 @@ function(page, tooltip, window, logging, requireModule) {
           return controls;
         };
 
+        $scope.submitting = function() {
+          var submitting = false;
+          forEach($scope.forms(), function(form) {
+            if (form.$submitting) {
+              submitting = true;
+            }
+          });
+
+          return submitting;
+        };
+
         /**
          * Returns the number of fields the user still has left to enter before able
          * to validly check out
@@ -152,7 +205,7 @@ function(page, tooltip, window, logging, requireModule) {
          * Otherwise returns "enteringData"
          */
         $scope.orderStatus = function() {
-          if ($scope.fieldsRemaining().length === 0) {
+          if ($scope.fieldsRemaining().length === 0 && !$scope.errors) {
             return "readyForReview";
           } else {
             return "enteringData";
@@ -160,12 +213,17 @@ function(page, tooltip, window, logging, requireModule) {
         };
 
         $scope.orderCompleteIcon = function() {
-          if ($scope.fieldsRemaining().length > 0 ) {
+          if ($scope.fieldsRemaining().length > 0 && !$scope.errors) {
             return "glyphicons-x-circle-orange.png";
           } else {
             return "glyphicons-check-circle-dense-green.png";
           }
         };
+
+        // Submit the payment form whenever the stripe model changes
+        $scope.$watch("stripeToken.id", function(newValue, oldValue) {
+          $scope.paymentForm.resource.submit();
+        });
 
         $scope.refreshCart();
 

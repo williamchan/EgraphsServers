@@ -591,7 +591,7 @@ class Schema @Inject() (
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
       factoryFor(celebrityCategoryValues) is CelebrityCategoryValue(services = injector.instance[CategoryServices]),
-      factoryFor(coupons) is Coupon(services = injector.instance[CouponServices]),
+      factoryFor(coupons) is Coupon(_services = injector.instance[CouponServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),
       factoryFor(egraphs) is Egraph(services = injector.instance[EgraphServices]),
       factoryFor(enrollmentBatches) is EnrollmentBatch(services = injector.instance[EnrollmentBatchServices]),

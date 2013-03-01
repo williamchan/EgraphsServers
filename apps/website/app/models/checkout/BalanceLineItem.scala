@@ -1,7 +1,7 @@
 package models.checkout
 
 import org.joda.money.Money
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums.{CheckoutCodeType, LineItemNature}
 
 /**

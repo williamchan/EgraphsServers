@@ -76,7 +76,7 @@ function(ngApp, logging, module) {
         self.resource = function() {
           var resource = {};
           forEach(self.controls, function(formControl, name) {
-            resource[name] = formControl.$modelValue;
+            if (formControl.$modelValue) resource[name] = formControl.$modelValue;
           });
 
           return resource;

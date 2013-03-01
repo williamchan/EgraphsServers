@@ -1,6 +1,6 @@
 package models.checkout
 
-import models.{OrderStore, PrintOrderStore, PrintOrder}
+import models.{Order, OrderStore, PrintOrderStore, PrintOrder}
 import com.google.inject.Inject
 import services.db.Schema
 import services.AppConfig
@@ -28,7 +28,6 @@ case class PrintOrderLineItem(
   //
   // LineItem members
   //
-  override def toJson = jsonify("High quality print", "Framed print of digital egraph", Some(id))
   override def itemType = (_type orElse typeFromOrder) getOrElse (throw new ItemTypeNotFoundException("PrintOrderLineItemType"))
   override def domainObject = (_printOrder orElse printOrderFromDb) getOrElse (throw new DomainObjectNotFoundException("PrintOrder"))
 
@@ -44,6 +43,13 @@ case class PrintOrderLineItem(
       savedItem.withSavedPrintOrder(checkout)
     }
   }
+
+  override def toJsonAsSubItem = jsonify(
+    name = "High quality print",
+    description = "Framed print of digital egraph",
+    id = Some(id),
+    imageUrl = Some("/assets/images/framed-print.png")
+  )
 
 
   //
@@ -65,13 +71,21 @@ case class PrintOrderLineItem(
 
   /** saves print order */
   private def withSavedPrintOrder(checkout: Checkout) = {
-    // TODO(CE-13): add name to shipping address
-    val address = checkout.shippingAddress getOrElse (throw new MissingRequiredAddressException("PrintOrderLineItemType"))
-    val savedPrint = domainObject.copy(lineItemId = Some(id))
-      .withShippingAddress(address)
-      .save()
+    val address = (givenShippingAddress orElse checkout.shippingAddress) getOrElse {
+      throw new MissingRequiredAddressException("PrintOrderLineItemType")
+    }
+
+    val savedPrint = domainObject.copy(
+      shippingAddress = address,
+      lineItemId = Some(id),
+      amountPaidInCurrency = this.amount.getAmount
+    ).save()
+
     this.copy(_printOrder = Some(savedPrint))
   }
+
+  private def givenShippingAddress = optionIf(!domainObject.shippingAddress.isEmpty) { domainObject.shippingAddress }
+
 }
 
 

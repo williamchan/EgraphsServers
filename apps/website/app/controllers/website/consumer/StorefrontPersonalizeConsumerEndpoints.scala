@@ -5,7 +5,7 @@ import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, ControllerMethod}
 import services.http.forms.purchase.{PurchaseFormChecks, FormReaders, PersonalizeForm, PurchaseFormFactory}
 import services.mvc.FormConversions.personalizeFormToView
-import controllers.WebsiteControllers
+import controllers.{routes, WebsiteControllers}
 import models.frontend.storefront.{PersonalizeForm => PersonalizeFormView, StorefrontOrderSummary}
 import services.Utils
 import services.http.forms.Form.Conversions._
@@ -39,6 +39,14 @@ trait StorefrontPersonalizeConsumerEndpoints
   //
   // Controllers
   //
+  def getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = Action { req =>
+    Redirect(routes.WebsiteControllers.getPersonalize(celebrityUrlSlug))
+  }
+
+  def postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = Action { req => NotFound }
+
+
+
   /**
    * Gets the personalization form page in the purchase flow.
    *
@@ -47,7 +55,8 @@ trait StorefrontPersonalizeConsumerEndpoints
    * @return the web page, or a redirect if the product was not found in the user's server-
    *     side session cache.
    */
-  def getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm() 
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _getStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = controllerMethod.withForm()
   { implicit authToken =>
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
@@ -121,7 +130,8 @@ trait StorefrontPersonalizeConsumerEndpoints
    * @param productUrlSlug identifies the photo being personalized
    * @return a Redirect to the Review page if successful, or back to this form page if unsuccessful.
    */
-  def postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = postController() {    
+  @deprecated("Transitioned to new Checkout", "02/27/2013")
+  def _postStorefrontPersonalize(celebrityUrlSlug: String, productUrlSlug: String) = postController() {
     httpFilters.requireCelebrityAndProductUrlSlugs(celebrityUrlSlug, productUrlSlug) { (celeb, product) =>
       Action { implicit request =>
         implicit val flash = request.flash
