@@ -56,7 +56,7 @@ object Login extends Controller with DefaultImplicitTemplateParameters {
     fbAuthUrl: String = "fbAuthUrl"
   ) {
     def renderLoginForm = {
-      views.html.frontend.login(loginForm, registrationForm, registerTargetUrl, fbAuthUrl, None)
+      views.html.frontend.login(loginForm, registrationForm, registerTargetUrl, fbAuthUrl)
     }
 
     def renderCheckoutAsForm = {

@@ -7,8 +7,6 @@ import play.api.mvc.Results._
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import egraphs.playutils.ResultUtils.RichResult
-import models.AccountStore
-import models.CelebrityStore
 import services.http.forms._
 import services.http.forms.Form.Conversions._
 import services.http.forms.CustomerLoginForm.Fields
@@ -54,7 +52,7 @@ class LoginTests extends EgraphsUnitTest with ClearsCacheBefore with CsrfProtect
 
   it should "add customer ID to session when passwords do match" in new EgraphsTestApplication {
     // Set up
-    val password = "this is teh password"
+    val password = "this is the password"
     val account = db.connected(TransactionSerializable) {
       val customer = TestData.newSavedCustomer()
       customer.account.withPassword(password).right.get.save()
