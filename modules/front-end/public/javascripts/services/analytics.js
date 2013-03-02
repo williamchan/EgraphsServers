@@ -37,13 +37,14 @@ function(window, logging, requireModule) {
           googleTrackEvent([categoryName].concat(actionAndLabel));
         },
 
-        startEvent: function(actionAndLabel) {
-          var action = actionAndLabel[0];
-          var label = actionAndLabel[1];
+        startEvent: function(actionLabelAndSampleRate) {
+          var action = actionLabelAndSampleRate[0];
+          var label = actionLabelAndSampleRate[1];
+          // Default to sample rate of 100
+          var sampleRate = actionLabelAndSampleRate[3] || 100;
           
           return startEvent(function(durationMs) {
-            var timingSpec = [action, durationMs];
-            if (label) timingSpec.push(label);
+            var timingSpec = [action, durationMs, label, sampleRate];
 
             googleTrackTiming([categoryName].concat(timingSpec));
           });
