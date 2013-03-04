@@ -22,12 +22,12 @@ object DateFormatting {
     class FormattableDate(date: util.Date) {
 
       /** Formats the date thusly: "May 10, 2012." "September 4, 2012." Etc.
-       *  Pass this the timezone you'd like the date displayed in (i.e. "PST" or "GMT")
+       *  Pass this the timezone you'd like the date displayed in (i.e. "PST" or "GMT"). Defaults to "PST".
        *
        *  If passed a string that doesn't match the expected syntax of Timezone, "GMT" is used
        *  See: http://docs.oracle.com/javase/1.4.2/docs/api/java/util/TimeZone.html for details.
        */
-      def formatDayAsPlainLanguage(timezone: String) = {
+      def formatDayAsPlainLanguage(timezone: String = "PST") = {
 
         val formatter = new SimpleDateFormat("MMMM dd, yyyy")
         formatter.setTimeZone(TimeZone.getTimeZone(timezone))
