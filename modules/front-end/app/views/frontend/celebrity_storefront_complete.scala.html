@@ -86,10 +86,20 @@
   						</div>
 
   						<div class="span6">
-  						
+
+                <!-- only display the message if the customer has written one -->
+                @if(model.messageToCelebrity.length > 0) {
+                  <h3>Your message to @model.celebName</h3>
+
+                  <p>
+                    @model.messageToCelebrity
+                  </p>
+                }
+
   							<h3>Order Changes</h3>
   							
-  							<p>To make changes to your order, please contact egraphs support at 
+  							<p>
+                  To make changes to your order, please contact egraphs support at
                   <a href="mailto:support@@egraphs.com">support@@egraphs.com</a>
                 </p>
 

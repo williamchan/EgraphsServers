@@ -120,6 +120,7 @@ trait CheckoutEndpoints { this: Controller =>
           pricePaid = order.amountPaid.formatSimply,
           deliveredByDate = order.expectedDate.formatDayAsPlainLanguage("PST"),
           faqHowLongLink = consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
+          messageToCelebrity = order.messageToCelebrity.getOrElse(""),
           maybePrintOrderShippingAddress = maybePrintOrder map (_.shippingAddress)
         )
       ).send()
