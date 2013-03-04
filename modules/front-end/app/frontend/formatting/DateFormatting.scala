@@ -27,7 +27,7 @@ object DateFormatting {
       def formatDayAsPlainLanguage(timezone: String) = {
 
         val formatter = new SimpleDateFormat("MMMM dd, yyyy")
-        formatter.setTimeZone(TimeZone.getTimeZone("PST"))
+        formatter.setTimeZone(TimeZone.getTimeZone(timezone))
 
         formatter.format(date)
       }
