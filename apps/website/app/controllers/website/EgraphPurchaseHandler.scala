@@ -187,7 +187,7 @@ case class EgraphPurchaseHandler(
         orderDate = order.created.formatDayAsPlainLanguage("PST"),
         orderId = order.id.toString,
         pricePaid = totalAmountPaid.formatSimply,
-        deliveredByDate = order.expectedDate.formatDayAsPlainLanguage("GMT"),
+        deliveredByDate = order.expectedDate.formatDayAsPlainLanguage("PST"),
         faqHowLongLink = services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
         maybePrintOrderShippingAddress = maybePrintOrder.map(_.shippingAddress)
       )

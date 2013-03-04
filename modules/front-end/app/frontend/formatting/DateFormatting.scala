@@ -23,6 +23,9 @@ object DateFormatting {
 
       /** Formats the date thusly: "May 10, 2012." "September 4, 2012." Etc.
        *  Pass this the timezone you'd like the date displayed in (i.e. "PST" or "GMT")
+       *
+       *  If passed a string that doesn't match the expected syntax of Timezone, "GMT" is used
+       *  See: http://docs.oracle.com/javase/1.4.2/docs/api/java/util/TimeZone.html for details.
        */
       def formatDayAsPlainLanguage(timezone: String) = {
 
