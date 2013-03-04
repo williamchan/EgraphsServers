@@ -50,7 +50,7 @@ object EgraphView {
       privacySetting = order.privacyStatus.name,
       messageToCelebrity = order.messageToCelebrity,
       productIconUrl = product.iconUrl,
-      signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
+      signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage("PST"),
       thisPageLink = thisPageLink,
       classicPageLink = classicPageLink,
       shareOnPinterestLink = shareOnPinterestLink,
@@ -100,7 +100,7 @@ object EgraphView {
     val story = egraph.story(celebrity, product, order)
 
     // Signed at date
-    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage
+    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage("PST")
 
     // Social links
     val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)

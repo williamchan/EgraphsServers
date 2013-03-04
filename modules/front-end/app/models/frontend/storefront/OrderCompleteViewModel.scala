@@ -41,6 +41,7 @@ case class OrderCompleteViewModel (
   productId: Long,
   expectedDeliveryDate: Date,
   faqHowLongLink: String,
+  messageToCelebrity: String,
   totalPrice: Money,
   discount: Option[Money],
   digitalPrice: Money,
