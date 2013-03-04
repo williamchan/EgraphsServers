@@ -13,14 +13,14 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
    * original constraint.
    * Example usage:
    *
-   * def isUniqueCelebrityEmail: Constraint[String] = {
-   *   isUniqueEmail(constraint = { account: Account => account.celebrityId.isDefined})
+   * def isValidNewCelebrityEmail: Constraint[String] = {
+   *   isValidNewEmail(constraint = { account: Account => account.celebrityId.isDefined})
    * }
    *
    * @param constraint
    * @return
    */
-  def isUniqueEmail(constraint: Account => Boolean = { account => true} ): Constraint[String] = {
+  def isValidNewEmail(constraint: Account => Boolean = { account => true} ): Constraint[String] = {
     Constraint { email: String =>
       accountStore.findByEmail(email) match {
         case Some(preexistingAccount) if constraint(preexistingAccount) => Invalid("Account with e-mail address already exists")
@@ -29,8 +29,8 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
     }
   }
 
-  def isUniqueCustomerEmail: Constraint[String] = {
-    isUniqueEmail(constraint = { account: Account => account.customerId.isDefined })
+  def isValidNewCustomerEmail: Constraint[String] = {
+    isValidNewEmail(constraint = {account: Account => account.customerId.isDefined})
   }
 
   def isPasswordValid: Constraint[String] = {
