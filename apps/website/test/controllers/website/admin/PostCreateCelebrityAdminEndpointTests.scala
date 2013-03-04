@@ -93,6 +93,36 @@ class PostCreateCelebrityAdminEndpointTests extends PostCelebrityAdminEndpointTe
     }
   }
 
+  it should "not allow you to create an account with an email address in use by a customer account" in new EgraphsTestApplication {
+    val (customer, account) = db.connected(TransactionSerializable) {
+      val customer = TestData.newSavedCustomer()
+      (customer, customer.account)
+    }
+
+    val body = createBody(email = account.email)
+
+    db.connected(TransactionSerializable) {
+      val Some(result) = performRequest(body, adminId = admin.id)
+      status(result) should be(SEE_OTHER)
+      redirectLocation(result) should be(Some(controllers.routes.WebsiteControllers.getCreateCelebrityAdmin().url))
+    }
+  }
+
+  it should "not allow you to create an account with an email address in use by an admin account" in new EgraphsTestApplication {
+    val (admin, account) = db.connected(TransactionSerializable) {
+      val admin = TestData.newSavedAdministrator()
+      (admin, admin.account)
+    }
+
+    val body = createBody(email = account.email)
+
+    db.connected(TransactionSerializable) {
+      val Some(result) = performRequest(body, adminId = admin.id)
+      status(result) should be(SEE_OTHER)
+      redirectLocation(result) should be(Some(controllers.routes.WebsiteControllers.getCreateCelebrityAdmin().url))
+    }
+  }
+
   private def performRequest(body: MultipartFormData[TemporaryFile], adminId: Long) : Option[Result] = {
     Some(controllers.WebsiteControllers.postCreateCelebrityAdmin(
       FakeRequest(POST,
