@@ -239,13 +239,14 @@ class Schema @Inject() (
   val celebrityToInventoryBatches = oneToManyRelation(celebrities, inventoryBatches)
     .via((celebrity, inventoryBatch) => celebrity.id === inventoryBatch.celebrityId)
 
-
   val checkoutToLineItem = oneToManyRelation(checkouts, lineItems)
     .via((checkout, lineItem) => checkout.id === lineItem._checkoutId)
 
   val couponToGiftCertificate = oneToManyRelation(coupons, giftCertificates)
     .via((coupon, giftCertificate) => coupon.id === giftCertificate._couponId)
 
+  val customerToCelebrityRequests = oneToManyRelation(customers, celebrityRequests)
+    .via((customer, celebrityRequest) => customer.id === celebrityRequest.customerId)
   val customerToCheckout = oneToManyRelation(customers, checkouts)
     .via((customer, checkout) => customer.id === checkout.customerId)
   val customerToUsernameHistory = oneToManyRelation(customers, usernameHistories)

@@ -10,5 +10,6 @@ create table CelebrityRequest (
     created timestamp not null
   );
 create sequence s_CelebrityRequest_id;
+alter table CelebrityRequest add constraint CelebrityRequestFK22 foreign key (customerId) references Customer(id);
 
 # --- !Downs
