@@ -34,10 +34,10 @@ object JsCelebrityContactInfo extends Function7[Option[Long], Option[Boolean], O
       id = Some(celebrity.id),
       accountSettingsComplete = Some(celebrity.isAccountSettingsComplete(secureInfo)),
       twitterUsername = celebrity.twitterUsername,
-      contactEmail = secureInfo.map(info => info.contactEmail.map(EmailAddress(_))).flatten,
-      smsPhone = secureInfo.map(_.smsPhone).flatten,
-      voicePhone = secureInfo.map(_.voicePhone).flatten,
-      agentEmail = secureInfo.map(info => info.agentEmail.map(EmailAddress(_))).flatten
+      contactEmail = secureInfo.flatMap(info => info.contactEmail.map(EmailAddress(_))),
+      smsPhone = secureInfo.flatMap(_.smsPhone),
+      voicePhone = secureInfo.flatMap(_.voicePhone),
+      agentEmail = secureInfo.flatMap(info => info.agentEmail.map(EmailAddress(_)))
     )
   }
 }
@@ -69,13 +69,13 @@ object JsCelebrityDepositInfo extends Function12[Option[Long], Option[Boolean], 
     JsCelebrityDepositInfo(
       id = Some(celebrity.id),
       accountSettingsComplete = Some(celebrity.isAccountSettingsComplete(secureInfo)),
-      streetAddress = secureInfo.map(_.streetAddress).flatten,
-      city = secureInfo.map(_.city).flatten,
-      postalCode = secureInfo.map(_.postalCode).flatten,
-      country = secureInfo.map(_.country).flatten,
-      depositAccountType = secureInfo.map(info => info.depositAccountType).flatten,
-      anonymousDepositAccountRoutingNumber = secureInfo.map(_.anonymizedDepositAccountRoutingNumber).flatten,
-      anonymousDepositAccountNumber = secureInfo.map(_.anonymizedDepositAccountNumber).flatten
+      streetAddress = secureInfo.flatMap(_.streetAddress),
+      city = secureInfo.flatMap(_.city),
+      postalCode = secureInfo.flatMap(_.postalCode),
+      country = secureInfo.flatMap(_.country),
+      depositAccountType = secureInfo.flatMap(info => info.depositAccountType),
+      anonymousDepositAccountRoutingNumber = secureInfo.flatMap(_.anonymizedDepositAccountRoutingNumber),
+      anonymousDepositAccountNumber = secureInfo.flatMap(_.anonymizedDepositAccountNumber)
     )
   }
 }

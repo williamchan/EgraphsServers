@@ -44,7 +44,7 @@ private[controllers] trait GetCelebrityApiEndpoint { this: Controller =>
   }
 
   /**
-   * Provides a single Celebrity's deposiut info JSON representation for consumption by the API.
+   * Provides a single Celebrity's deposit info JSON representation for consumption by the API.
    *
    * See [[https://egraphs.atlassian.net/wiki/pages/viewpage.action?pageId=21889081]].
    */

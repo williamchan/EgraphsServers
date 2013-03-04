@@ -117,7 +117,12 @@ case class Celebrity(id: Long = 0,
   }
 
   def secureInfo: Option[DecryptedCelebritySecureInfo] = {
-    secureInfoId.map(id => services.celebritySecureInfoStore.findById(id)).flatten.map(_.decrypt)
+    for (
+      id <- secureInfoId;
+      secureInfo <- services.celebritySecureInfoStore.findById(id)
+    ) yield {
+      secureInfo.decrypt
+    }
   }
 
   /**

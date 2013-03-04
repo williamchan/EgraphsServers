@@ -18,7 +18,7 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
         httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
           Action { request =>
             play.api.Logger.info(s"postCelebrityContactInfo attempt for celebrity $celebrity")
-            val maybeContactInfo = request.body.asJson.map(_.asOpt[JsCelebrityContactInfo]).flatten
+            val maybeContactInfo = request.body.asJson.flatMap(_.asOpt[JsCelebrityContactInfo])
             maybeContactInfo match {
               case None => 
                 BadRequest("Could not parse json into JsCelebrityContactInfo.")
@@ -46,7 +46,7 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
         httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
           Action { request =>
             play.api.Logger.info(s"postCelebrityDepositInfo attempt for celebrity $celebrity")
-            val maybeDepositInfo = request.body.asJson.map(_.asOpt[JsCelebrityDepositInfo]).flatten
+            val maybeDepositInfo = request.body.asJson.flatMap(_.asOpt[JsCelebrityDepositInfo])
             maybeDepositInfo match {
               case None =>
                 BadRequest("Could not parse json into JsCelebrityDepositInfo.")
