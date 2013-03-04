@@ -39,146 +39,151 @@ trait PostCelebrityAdminEndpoint {
       Action(parse.multipartFormData) { implicit request =>
         
         val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
-      	
-      	val form = Form(mapping(
-              "celebrityEmail" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
-              "celebrityPassword" -> nonEmptyText.verifying(formConstraints.isPasswordValid),
-              "publicName" -> nonEmptyText(maxLength = 128),
-              "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
-              "bio" -> nonEmptyText,
-              "casualName" -> text,
-              "gender" -> nonEmptyText.verifying(isGender),
-              "organization" -> nonEmptyText(maxLength = 128),
-              "roleDescription" -> nonEmptyText(maxLength = 128),
-              "twitterUsername" -> text
-          )(PostCreateCelebrityForm.apply)(PostCreateCelebrityForm.unapply)
-            .verifying(
-              isUniqueUrlSlug(),
-              profileImageIsValid(profileImageFile),
-              landingPageImageIsValid(landingPageImageOption),
-              logoImageIsValid(logoImageOption)
-      		))
-        
-        form.bindFromRequest.fold(
-            formWithErrors => {
-              val data = formWithErrors.data
-              val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
-              val url = getCreateCelebrityAdmin.url
-              Redirect(url).flashing(
-                ("errors" -> errors.mkString(", ")), 
-		        ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
-		        ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")), 
-		        ("publicName" -> data.get("publicName").getOrElse("")), 
-		        ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
-		        ("bio" -> data.get("casualName").getOrElse("")), 
-		        ("casualName" -> data.get("casualName").getOrElse("")),
-		        ("gender" -> data.get("gender").getOrElse("")),
-		        ("organization" -> data.get("roleDescription").getOrElse("")), 
-		        ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
-		        ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
-              )
-            },
-            validForm => {
-              // Save Celebrity
-              val publishedStatus = PublishedStatus(validForm.publishedStatusString).get // must be valid
-              val gender = Gender(validForm.gender).get // must be valid
-              val savedCelebrity = Celebrity().copy(
-                  publicName = validForm.publicName,
-                  bio = validForm.bio,
-                  casualName = Utils.toOption(validForm.casualName),
-                  organization = validForm.organization,
-                  roleDescription = validForm.roleDescription,
-                  twitterUsername = Utils.toOption(removeAtSymbol(validForm.twitterUsername)))
-                  .withPublishedStatus(publishedStatus)
-                  .withGender(gender).save()
-              
-              // Save Celebrity image assets
-              val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
-              profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
-              
-              // Save Account
-              val acct = accountStore.findByEmail(validForm.celebrityEmail).getOrElse(Account(email = validForm.celebrityEmail))
-              val savedAccount = acct.copy(celebrityId = Some(savedWithImages.id)).withPassword(validForm.celebrityPassword).right.get.save()
-              
-              CelebrityWelcomeEmail(
-                toAddress = savedAccount.email,
-                consumerApp = consumerApp,
-                celebrity = savedWithImages
-              ).send()
 
-              Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
-            }
-          )
+        val form = Form(mapping(
+          "celebrityEmail" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
+          "celebrityPassword" -> nonEmptyText.verifying(formConstraints.isPasswordValid),
+          "publicName" -> nonEmptyText(maxLength = 128),
+          "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
+          "casualName" -> text,
+          "gender" -> nonEmptyText.verifying(isGender),
+          "organization" -> nonEmptyText(maxLength = 128),
+          "roleDescription" -> nonEmptyText(maxLength = 128),
+          "twitterUsername" -> text,
+          "facebookUrl" -> text,
+          "websiteUrl" -> text
+        )(PostCreateCelebrityForm.apply)(PostCreateCelebrityForm.unapply)
+          .verifying(
+          isUniqueUrlSlug(),
+          profileImageIsValid(profileImageFile),
+          landingPageImageIsValid(landingPageImageOption),
+          logoImageIsValid(logoImageOption)
+        ))
+
+        form.bindFromRequest.fold(
+          formWithErrors => {
+            val data = formWithErrors.data
+            val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
+            val url = getCreateCelebrityAdmin.url
+            Redirect(url).flashing(
+              ("errors" -> errors.mkString(", ")),
+              ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")),
+              ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")),
+              ("publicName" -> data.get("publicName").getOrElse("")),
+              ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")),
+              ("casualName" -> data.get("casualName").getOrElse("")),
+              ("gender" -> data.get("gender").getOrElse("")),
+              ("organization" -> data.get("roleDescription").getOrElse("")),
+              ("roleDescription" -> data.get("roleDescription").getOrElse("")),
+              ("twitterUsername" -> data.get("twitterUsername").getOrElse("")),
+              ("facebookUrl" -> data.get("facebookUrl").getOrElse("")),
+              ("websiteUrl" -> data.get("websiteUrl").getOrElse(""))
+            )
+          },
+          validForm => {
+            // Save Celebrity
+            val publishedStatus = PublishedStatus(validForm.publishedStatusString).get // must be valid
+            val gender = Gender(validForm.gender).get // must be valid
+            val savedCelebrity = Celebrity().copy(
+                publicName = validForm.publicName,
+                casualName = Utils.toOption(validForm.casualName),
+                organization = validForm.organization,
+                roleDescription = validForm.roleDescription,
+                twitterUsername = Utils.toOption(removeAtSymbol(validForm.twitterUsername)),
+                facebookUrl = Utils.toOption(validForm.facebookUrl),
+                websiteUrl = Utils.toOption(validForm.websiteUrl))
+                .withPublishedStatus(publishedStatus)
+                .withGender(gender).save()
+
+            // Save Celebrity image assets
+            val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
+            profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
+
+            // Save Account
+            val acct = accountStore.findByEmail(validForm.celebrityEmail).getOrElse(Account(email = validForm.celebrityEmail))
+            val savedAccount = acct.copy(celebrityId = Some(savedWithImages.id)).withPassword(validForm.celebrityPassword).right.get.save()
+
+            CelebrityWelcomeEmail(
+              toAddress = savedAccount.email,
+              consumerApp = consumerApp,
+              celebrity = savedWithImages
+            ).send()
+
+            Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
+          }
+        )
       }
-  	}
+    }
   }
-  
+
   def postCelebrityAdmin(celebrityId: Long) = postController() {
     httpFilters.requireAdministratorLogin.inSession(parser = parse.multipartFormData) { case (admin, adminAccount) =>
       httpFilters.requireCelebrityId(celebrityId, parser = parse.multipartFormData) { (celeb) =>
         Action(parse.multipartFormData) { implicit request =>
-	      
+
           val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
-	      	
-	      val form = Form(mapping(
-	            "publicName" -> nonEmptyText(maxLength = 128),
-	            "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
-	            "bio" -> nonEmptyText,
-	            "casualName" -> text,
-	            "gender" -> nonEmptyText.verifying(isGender),
-	            "organization" -> nonEmptyText(maxLength = 128),
-	            "roleDescription" -> nonEmptyText(maxLength = 128),
-	            "twitterUsername" -> text
-	        )(PostUpdateCelebrityForm.apply)(PostUpdateCelebrityForm.unapply)
-	          .verifying(
-	              isUniqueUrlSlug(Some(celebrityId)),
-	              profileImageIsValid(profileImageFile),
-	              landingPageImageIsValid(landingPageImageOption),
-	              logoImageIsValid(logoImageOption)
-	      	)
-	      )
-	        
-	      form.bindFromRequest.fold(
-	          formWithErrors => {
-	            val data = formWithErrors.data
-	            val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
-	            val url = getCelebrityAdmin(celebrityId = celebrityId).url
-	            Redirect(url).flashing(
-	              ("errors" -> errors.mkString(", ")), 
-			      ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")), 
-			      ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")), 
-			      ("publicName" -> data.get("publicName").getOrElse("")), 
-			      ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")), 
-			      ("bio" -> data.get("casualName").getOrElse("")), 
-			      ("casualName" -> data.get("casualName").getOrElse("")),
-			      ("gender" -> data.get("gender").getOrElse("")),
-			      ("organization" -> data.get("roleDescription").getOrElse("")), 
-			      ("roleDescription" -> data.get("roleDescription").getOrElse("")), 
-			      ("twitterUsername" -> data.get("twitterUsername").getOrElse(""))
-	            )
-	          },
-	          validForm => {
-	            val publishedStatus = PublishedStatus(validForm.publishedStatusString).get // must be valid
-	            val gender = Gender(validForm.gender).get // must be valid
-	            val savedCelebrity = celeb.copy(
-	                publicName = validForm.publicName,
-	                bio = validForm.bio,
-	                casualName = Utils.toOption(validForm.casualName),
-	                organization = validForm.organization,
-	                roleDescription = validForm.roleDescription,
-	                twitterUsername = Utils.toOption(validForm.twitterUsername))
-	                .withPublishedStatus(publishedStatus)
-	                .withGender(gender).save()
-	              
-	            val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
-	            profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
-	              
-	            Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
-	          }
-	        )
-	      }
+
+          val form = Form(mapping(
+            "publicName" -> nonEmptyText(maxLength = 128),
+            "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
+            "casualName" -> text,
+            "gender" -> nonEmptyText.verifying(isGender),
+            "organization" -> nonEmptyText(maxLength = 128),
+            "roleDescription" -> nonEmptyText(maxLength = 128),
+            "twitterUsername" -> text,
+            "facebookUrl" -> text,
+            "websiteUrl" -> text
+          )(PostUpdateCelebrityForm.apply)(PostUpdateCelebrityForm.unapply)
+            .verifying(
+            isUniqueUrlSlug(Some(celebrityId)),
+            profileImageIsValid(profileImageFile),
+            landingPageImageIsValid(landingPageImageOption),
+            logoImageIsValid(logoImageOption)
+          ))
+
+          form.bindFromRequest.fold(
+            formWithErrors => {
+              val data = formWithErrors.data
+              val errors = for (error <- formWithErrors.errors) yield { error.key + ": " + error.message }
+              val url = getCelebrityAdmin(celebrityId = celebrityId).url
+              Redirect(url).flashing(
+                ("errors" -> errors.mkString(", ")),
+                ("celebrityEmail" -> data.get("celebrityEmail").getOrElse("")),
+                ("celebrityPassword" -> data.get("celebrityPassword").getOrElse("")),
+                ("publicName" -> data.get("publicName").getOrElse("")),
+                ("publishedStatusString" -> data.get("publishedStatusString").getOrElse("")),
+                ("casualName" -> data.get("casualName").getOrElse("")),
+                ("gender" -> data.get("gender").getOrElse("")),
+                ("organization" -> data.get("roleDescription").getOrElse("")),
+                ("roleDescription" -> data.get("roleDescription").getOrElse("")),
+                ("twitterUsername" -> data.get("twitterUsername").getOrElse("")),
+                ("facebookUrl" -> data.get("facebookUrl").getOrElse("")),
+                ("websiteUrl" -> data.get("websiteUrl").getOrElse(""))
+              )
+            },
+            validForm => {
+              val publishedStatus = PublishedStatus(validForm.publishedStatusString).get // must be valid
+              val gender = Gender(validForm.gender).get // must be valid
+              val savedCelebrity = celeb.copy(
+                  publicName = validForm.publicName,
+                  casualName = Utils.toOption(validForm.casualName),
+                  organization = validForm.organization,
+                  roleDescription = validForm.roleDescription,
+                  twitterUsername = Utils.toOption(validForm.twitterUsername),
+                  facebookUrl = Utils.toOption(validForm.facebookUrl),
+                  websiteUrl = Utils.toOption(validForm.websiteUrl))
+                  .withPublishedStatus(publishedStatus)
+                  .withGender(gender).save()
+
+              val savedWithImages = savedCelebrity.saveWithImageAssets(landingPageImageOption, logoImageOption)
+              profileImageFile.map(f => savedWithImages.saveWithProfilePhoto(f))
+
+              Redirect(getCelebrityAdmin(celebrityId = savedWithImages.id).url + "?action=preview")
+            }
+          )
+        }
       }
-  	}
+    }
   }
 
   def postExpectedOrderDelay(celebrityId: Long) = postController() {
@@ -186,10 +191,7 @@ trait PostCelebrityAdminEndpoint {
       case (admin, adminAccount) =>
         httpFilters.requireCelebrityId(celebrityId) { celebrity =>
           Action { implicit request =>
-            val expectedOrderDelayInDaysForm = Form(
-              single(
-                "delayInDays" -> number))
-              .bindFromRequest()
+            val expectedOrderDelayInDaysForm = Form(single("delayInDays" -> number)).bindFromRequest()
 
             expectedOrderDelayInDaysForm.fold(
               e => BadRequest("No order delay found in request.")
@@ -209,10 +211,7 @@ trait PostCelebrityAdminEndpoint {
       case (admin, adminAccount) =>
         httpFilters.requireCelebrityId(celebrityId) { celebrity =>
           Action { implicit request =>
-            val officialTwitterScreenNameForm = Form(
-              single(
-                "officialTwitterScreenName" -> text))
-              .bindFromRequest()
+            val officialTwitterScreenNameForm = Form(single("officialTwitterScreenName" -> text)).bindFromRequest()
 
             officialTwitterScreenNameForm.fold(
               e => BadRequest("No twitter screen name in request."),
@@ -238,25 +237,27 @@ trait PostCelebrityAdminEndpoint {
   }
 
   private trait PostCelebrityForm {
-     val publicName: String
-     val publishedStatusString: String
-     val bio: String
-     val casualName: String
-     val gender: String
-     val organization: String
-     val roleDescription: String
-     val twitterUsername: String
+    val publicName: String
+    val publishedStatusString: String
+    val casualName: String
+    val gender: String
+    val organization: String
+    val roleDescription: String
+    val twitterUsername: String
+    val facebookUrl: String
+    val websiteUrl: String
   }
-  
+
   private case class PostUpdateCelebrityForm(
      publicName: String,
      publishedStatusString: String,
-     bio: String,
      casualName: String,
      gender: String,
      organization: String,
      roleDescription: String,
-     twitterUsername: String
+     twitterUsername: String,
+     facebookUrl: String,
+     websiteUrl: String
   ) extends PostCelebrityForm
   
   private case class PostCreateCelebrityForm(
@@ -264,12 +265,13 @@ trait PostCelebrityAdminEndpoint {
      celebrityPassword: String,
      publicName: String,
      publishedStatusString: String,
-     bio: String,
      casualName: String,
      gender: String,
      organization: String,
      roleDescription: String,
-     twitterUsername: String
+     twitterUsername: String,
+     facebookUrl: String,
+     websiteUrl: String
   ) extends PostCelebrityForm
   
   private def getUploadedImages(body: MultipartFormData[play.api.libs.Files.TemporaryFile])

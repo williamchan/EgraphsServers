@@ -54,23 +54,25 @@ case class CelebrityServices @Inject() (
  * our service.
  */
 case class Celebrity(id: Long = 0,
-                     apiKey: Option[String] = None,
-                     publicName: String = "",
-                     casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
-                     organization: String = "",                                     // e.g. "Major League Baseball"
-                     bio: String = "",
-                     roleDescription: String = "",                                  // e.g. "Pitcher, Red Sox"
-                     twitterUsername: Option[String] = None,
-                     profilePhotoUpdated: Option[String] = None, //TODO: rename to _profilePhotoKey
-                     expectedOrderDelayInMinutes: Int = 30 * DateTimeConstants.MINUTES_PER_DAY,
-                     _gender: String = Gender.Male.name,
-                     _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
-                     _publishedStatus: String = PublishedStatus.Unpublished.name,
-                     _landingPageImageKey: Option[String] = None,
-                     _logoImageKey: Option[String] = None,
-                     created: Timestamp = Time.defaultTimestamp,
-                     updated: Timestamp = Time.defaultTimestamp,
-                     services: CelebrityServices = AppConfig.instance[CelebrityServices]
+  apiKey: Option[String] = None,
+  publicName: String = "",
+  casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
+  organization: String = "",                                     // e.g. "Major League Baseball"
+  bio: String = "",
+  roleDescription: String = "",                                  // e.g. "Pitcher, Red Sox"
+  twitterUsername: Option[String] = None,
+  facebookUrl: Option[String] = None,
+  websiteUrl: Option[String] = None,
+  profilePhotoUpdated: Option[String] = None, //TODO: rename to _profilePhotoKey
+  expectedOrderDelayInMinutes: Int = 30 * DateTimeConstants.MINUTES_PER_DAY,
+  _gender: String = Gender.Male.name,
+  _enrollmentStatus: String = EnrollmentStatus.NotEnrolled.name,
+  _publishedStatus: String = PublishedStatus.Unpublished.name,
+  _landingPageImageKey: Option[String] = None,
+  _logoImageKey: Option[String] = None,
+  created: Timestamp = Time.defaultTimestamp,
+  updated: Timestamp = Time.defaultTimestamp,
+  services: CelebrityServices = AppConfig.instance[CelebrityServices]
 ) extends KeyedCaseClass[Long]
   with HasCreatedUpdated
   with HasPublishedStatus[Celebrity]

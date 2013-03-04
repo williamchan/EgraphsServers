@@ -27,17 +27,18 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
             if (request.queryString.get("action").getOrElse("").toString.contains("preview")) {
               Ok(CelebrityLandingConsumerEndpoint.getCelebrityLandingHtml(celebrity))
             } else {
-              implicit val flash = request.flash + 
-              ("celebrityId" -> celebrity.id.toString) + 
-              ("celebrityEmail" -> account.email) + 
-              ("bio" -> celebrity.bio) + 
-              ("casualName" -> celebrity.casualName.getOrElse("")) +
-              ("gender" -> celebrity.gender.name) +
-              ("organization" -> celebrity.organization) + 
-              ("roleDescription" -> celebrity.roleDescription) + 
-              ("twitterUsername" -> celebrity.twitterUsername.getOrElse("")) + 
-              ("publicName" -> celebrity.publicName) + 
-              ("publishedStatusString" -> celebrity.publishedStatus.toString)
+              implicit val flash = request.flash +
+                ("celebrityId" -> celebrity.id.toString) +
+                ("celebrityEmail" -> account.email) +
+                ("casualName" -> celebrity.casualName.getOrElse("")) +
+                ("gender" -> celebrity.gender.name) +
+                ("organization" -> celebrity.organization) +
+                ("roleDescription" -> celebrity.roleDescription) +
+                ("twitterUsername" -> celebrity.twitterUsername.getOrElse("")) +
+                ("facebookUrl" -> celebrity.facebookUrl.getOrElse("")) +
+                ("websiteUrl" -> celebrity.websiteUrl.getOrElse("")) +
+                ("publicName" -> celebrity.publicName) +
+                ("publishedStatusString" -> celebrity.publishedStatus.toString)
               val (errorFields, fieldDefaults) = getCelebrityDetail(celebrity = Some(celebrity))
               val celebCategoryValueIds = (for(filterValue <- celebrity.categoryValues) yield { filterValue.id }).toSet
 
@@ -86,16 +87,17 @@ private[controllers] trait GetCelebrityAdminEndpoint extends ImplicitHeaderAndFo
       (paramName: String) => paramName match {
         case "celebrityId" => flash.get("celebrityId").getOrElse("")
         case "celebrityEmail" => flash.get("celebrityEmail").getOrElse("")
-        case "bio" => (flash.get("bio").getOrElse(""))
         case "casualName" => flash.get("casualName").getOrElse("")
         case "organization" => flash.get("organization").getOrElse("")
         case "publicName" => flash.get("publicName").getOrElse("")
         case "publishedStatusString" => flash.get("publishedStatusString").getOrElse(PublishedStatus.Unpublished.toString)
         case "roleDescription" => flash.get("roleDescription").getOrElse("")
         case "twitterUsername" => flash.get("twitterUsername").getOrElse("")
+        case "facebookUrl" => flash.get("facebookUrl").getOrElse("")
+        case "websiteUrl" => flash.get("websiteUrl").getOrElse("")
         case _ => flash.get(paramName).getOrElse("")
       }
-    } 
+    }
 
     (errorFields, fieldDefaults)
   }
