@@ -8,7 +8,7 @@ import com.google.inject.Inject
 import services.logging.{Logging, LoggingContext}
 import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
-import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore}
+import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore, VideoAssetCelebrityStore}
 import models.enums.EnrollmentStatus
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
@@ -22,6 +22,7 @@ object EnrollmentBatchActor {
 case class EnrollmentBatchActor @Inject()(
   db: DBSession,
   celebrityStore: CelebrityStore,
+  videoAssetCelebrityStore: VideoAssetCelebrityStore,
   enrollmentBatchStore: EnrollmentBatchStore,
   logging: LoggingContext,
   config: ConfigFileProxy
@@ -77,6 +78,8 @@ case class EnrollmentBatchActor @Inject()(
     enrollmentBatch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
 
     val celebrity = celebrityStore.get(enrollmentBatch.celebrityId)
+    val videoAsset = videoAssetCelebrityStore.getVideoAssetByCelebrityId(celebrity.id)
+
     if (isSuccessfulEnrollment) {
       celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
     } else {
