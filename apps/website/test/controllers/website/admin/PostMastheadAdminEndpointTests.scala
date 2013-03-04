@@ -2,15 +2,14 @@ package controllers.website.admin
 
 import play.api.test._
 import play.api.test.Helpers._
-import utils.FunctionalTestUtils.routeName
 import utils.FunctionalTestUtils.Conversions._
 import utils._
 import services.db.{TransactionSerializable, DBSession}
 import services.AppConfig
 import controllers.routes.WebsiteControllers.postMastheadAdmin
 import controllers.routes.WebsiteControllers.getMastheadAdmin
-import models.{Administrator, Masthead, MastheadStore}
-import play.api.mvc.{AnyContent, MultipartFormData}
+import models.MastheadStore
+import play.api.mvc.MultipartFormData
 import play.api.libs.Files.TemporaryFile
 import java.io.File
 import org.apache.commons.io.FileUtils

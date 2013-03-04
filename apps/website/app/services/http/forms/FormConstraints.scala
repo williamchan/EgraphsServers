@@ -10,7 +10,7 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
   def isUniqueEmail: Constraint[String] = {
     Constraint { email: String =>
       accountStore.findByEmail(email) match {
-        case Some(preexistingAccount) if (preexistingAccount.customerId.isDefined) => Invalid("Customer with e-mail address already exists")
+        case Some(preexistingAccount) if (preexistingAccount.customerId.isDefined || preexistingAccount.celebrityId.isDefined) => Invalid("Account with e-mail address already exists")
         case _ => Valid
       }
     }
