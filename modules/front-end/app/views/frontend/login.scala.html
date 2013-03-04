@@ -2,7 +2,7 @@
   registrationForm: Form[models.frontend.login_page.RegisterConsumerViewModel],
   registrationActionUrl: String,
   fbAuthUrl: String,
-  maybeBannerMessage: Option[String] = None
+  maybeBannerMessage: Option[String]
 )(implicit headerData: models.frontend.header.HeaderData, 
   footerData: models.frontend.footer.FooterData,
   authToken: egraphs.authtoken.AuthenticityToken
