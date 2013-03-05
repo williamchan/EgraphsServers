@@ -9,12 +9,13 @@ import services.email._
 import services.logging.{Logging, LoggingContext}
 import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
-import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore, VideoAssetCelebrityStore}
+import models._
 import models.enums.EnrollmentStatus
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
 import services.config.ConfigFileProxy
+import play.api.libs.concurrent.Execution.Implicits._
 
 object EnrollmentBatchActor {
   val actor = Akka.system.actorOf(Props(AppConfig.instance[EnrollmentBatchActor]))
@@ -81,17 +82,20 @@ case class EnrollmentBatchActor @Inject()(
     val celebrity = celebrityStore.get(enrollmentBatch.celebrityId)
     val videoAsset = videoAssetCelebrityStore.getVideoAssetByCelebrityId(celebrity.id)
 
-    if (isSuccessfulEnrollment) {
-      celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+    val enrollmentStatus = if (isSuccessfulEnrollment) {
+      EnrollmentStatus.Enrolled
     } else {
-      celebrity.withEnrollmentStatus(EnrollmentStatus.FailedEnrollment).save()
+      EnrollmentStatus.FailedEnrollment
     }
 
     // send email to celebalert@egraphs.com with enrollment info
     EnrollmentCompleteEmail(
       celebrity,
+      enrollmentStatus.name,
       videoAsset.nonEmpty
     ).send()
+
+    celebrity.withEnrollmentStatus(enrollmentStatus).save()
   }
 }
 
