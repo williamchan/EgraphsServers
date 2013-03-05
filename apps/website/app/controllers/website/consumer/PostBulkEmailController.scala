@@ -1,7 +1,6 @@
 package controllers.website.consumer
 
 import play.api.Logger
-import play.api.libs.json.Json.toJson
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._

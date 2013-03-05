@@ -405,6 +405,7 @@ class Scenarios extends DeclaresScenarios {
           pricePaid = "$50.00",
           deliveredByDate = "Jan 8, 2012",
           faqHowLongLink = "/faq#how-long",
+          messageToCelebrity = "Hey Celebrity Joe, I'm your biggest fan, thanks for being awesome!",
           maybePrintOrderShippingAddress = Some("1234 Cherry Lane New York, NY 12345")
         )
 

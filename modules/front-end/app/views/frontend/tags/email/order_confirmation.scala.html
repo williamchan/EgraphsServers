@@ -124,6 +124,18 @@
   </tr>
 </table>
 
+@if(orderConfirmationEmailStack.messageToCelebrity.length > 0) {
+  <img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-rule-content.gif" width="520" height="42" />
+
+  <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">
+    Your message to @orderConfirmationEmailStack.celebrityName
+  </p>
+
+  <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+    @orderConfirmationEmailStack.messageToCelebrity
+  </p>
+}
+
 <img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-rule-content.gif" width="520" height="42" />
 
 <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">

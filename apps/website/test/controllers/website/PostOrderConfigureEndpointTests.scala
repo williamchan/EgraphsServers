@@ -47,7 +47,7 @@ class PostOrderConfigureEndpointTests extends EgraphsUnitTest with CsrfProtected
 
     status(strangerResult) should be (FORBIDDEN)
     status(visitorResult) should be (SEE_OTHER)
-    redirectLocation(visitorResult) should be (Some(getLogin.url))
+    redirectLocation(visitorResult) should be (Some(getLogin().url))
     orderPrivacy(order.id) should be (PrivacyStatus.Private)
 
     // Try to change as the owner. This should succeed

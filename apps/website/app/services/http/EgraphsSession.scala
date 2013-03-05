@@ -1,9 +1,10 @@
 package services.http
 
-import play.api.mvc.Session
 import egraphs.playutils.Enum
-import java.util.Date
 import org.joda.time.DateTimeConstants
+import play.api.mvc.Session
+import play.api.mvc.Call
+import services.request.PostCelebrityRequestHelper
 
 case class EgraphsSession(session: Session) {
   import EgraphsSession.Key
@@ -49,6 +50,18 @@ case class EgraphsSession(session: Session) {
     session - Key.CustomerId.name
   }
 
+  def requestedStar: Option[String] = {
+    session.get(Key.RequestedStar.name)
+  }
+
+  def withRequestedStar(requestedStar: String): Session = {
+    session + (Key.RequestedStar.name -> requestedStar)
+  }
+
+  def removeRequestedStar: Session = {
+    session - Key.RequestedStar.name
+  }
+
   def withUsernameChanged: Session = {
     session + (Key.UsernameChanged.name -> true.toString)
   }
@@ -63,6 +76,18 @@ case class EgraphsSession(session: Session) {
 
   def getBoolean(key: String): Option[Boolean] = {
     session.get(key).map(value => java.lang.Boolean.valueOf(value))
+  }
+
+  // Convenience method for request a star feature that figures out post-login redirect
+  def requestedStarRedirectOrCall(customerId: Long, otherCall: Call): Call = {
+    val maybeRequestedStar = requestedStar
+    maybeRequestedStar match {
+      case None => otherCall
+      case Some(requestedStar) => {
+        PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId)
+        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
+      }
+    }
   }
 }
 
@@ -84,6 +109,7 @@ object EgraphsSession {
     val MlbpaAccess = new EnumVal("mlbpa") {}
     val UsernameChanged = new EnumVal("username_changed") {}
     val HasSignedUp = new EnumVal("has_signed_up") {}
+    val RequestedStar = new EnumVal("requested_star") {}
     val SignupModalDisplayedRecently = new EnumVal("signup_modal_displayed_recently") {}
   }
 
