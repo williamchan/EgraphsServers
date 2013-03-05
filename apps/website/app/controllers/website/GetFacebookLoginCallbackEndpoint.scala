@@ -15,6 +15,9 @@ import services.ConsumerApplication
 import services.social.Facebook
 import services.logging.Logging
 import services.config.ConfigFileProxy
+import services.http.EgraphsSession
+import services.http.EgraphsSession.Conversions._
+import services.http.EgraphsSession.Key._
 import services.http.EgraphsSession.Conversions._
 import play.api.data._
 import play.api.data.Forms._
@@ -80,9 +83,16 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
               }
             }
 
-            Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
-              session.withCustomerId(customer.id)
-            )
+            // Find out whether the user is logging in via Facebook to complete their celebrity request
+            val redirectCall: Call = dbSession.connected(TransactionSerializable) {
+              request.session.requestedStarRedirectOrCall(
+                customer.id,
+                controllers.routes.WebsiteControllers.getAccountSettings)
+            }
+
+            Redirect(redirectCall).withSession(
+              session.withCustomerId(customer.id).removeRequestedStar
+            ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
           }
 
           maybeRedirectSuccess.getOrElse(redirectAndLogError(fbUserInfo))
@@ -91,7 +101,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           log("Facebook Oauth flow halted. error =  " + error.getOrElse("") +
             ", error_reason = " + error_reason.getOrElse("") +
             ", error_description = " + error_description.getOrElse(""))
-          Redirect(controllers.routes.WebsiteControllers.getLogin)
+          Redirect(controllers.routes.WebsiteControllers.getLogin())
         }
       }
     }
@@ -99,7 +109,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
 
   private def redirectAndLogError(fbUserInfo: JsValue): Result = {
     error("Facebook did not respond with expected user info format: " + Json.stringify(fbUserInfo))
-    Redirect(controllers.routes.WebsiteControllers.getLogin)
+    Redirect(controllers.routes.WebsiteControllers.getLogin())
   }
 
   /**

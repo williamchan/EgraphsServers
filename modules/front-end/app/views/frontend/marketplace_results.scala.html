@@ -4,7 +4,9 @@
   verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
   results: models.frontend.marketplace.ResultSetViewModel,
   sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel],
-  availableOnly: Boolean = false
+  availableOnly: Boolean = false,
+  requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
+  requestStarActionUrl: String
   )(
   implicit
   headerData: models.frontend.header.HeaderData,
@@ -87,7 +89,13 @@
           @if(viewAsList) {
             @tags.marketplace.result_set_list(results)
           } else {
-            @tags.marketplace.result_set(availableOnly)
+            @tags.marketplace.result_set(
+              availableOnly,
+              results,
+              query,
+              requestStarForm,
+              requestStarActionUrl
+            )
           }
         </div>
       </div>
@@ -99,7 +107,6 @@
   </div> <!-- end #main -->
   
 </section>
-
 }
 
 @base_template(title="Stars", jsMain = "pages/marketplace-results", headJs = init, body=baseBody)

@@ -1,0 +1,59 @@
+@(query: String)(implicit authToken: egraphs.authtoken.AuthenticityToken)
+
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.frontend.tags
+@import controllers._
+@import tags.tooltip
+
+@**  
+   Renders a modal that allows a user to request a star.
+*@
+
+@fieldTooltip(link: String)(body: => Html) = {
+  @tooltip(link, Seq("field-tooltip"))(body)
+}
+
+<div class="modal request hide fade" id="requestStarForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-body">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <div>
+      <h2><span class="bold">Let us know</span> who you want on Egraphs</h2>
+      <p>
+        We'll do our best to sign them up!
+      </p>
+    </div>
+    <br>
+    <img src='@EgraphsAssets.at("images/modal-request-star.jpg")'/>
+
+    <form ng-controller="ModalController" ng-submit="requestStar()">
+      <div>
+        <label>
+          Requested Star:
+          @fieldTooltip("Why is this important?") {
+            <strong>These requests</strong> show your star<br>how much their fans want<br>to connect with them!
+          }
+        </label>
+        <input class="input-xlarge" type="text" name="starName" ng-model="starName" ng-init="starName='@query'" value="@query" />
+        <label>
+          Your Email:
+          @fieldTooltip("What for?") {
+            <strong>We'll let you know</strong> when<br>this star becomes available!
+          }
+        </label>
+        <input class="input-xlarge" type="email" name="email" ng-model="email"/>
+      </div>
+      <div>
+        <button id="request-submit-button" type="submit" class="button">
+          <strong><em>Submit</em></strong>
+          <span>&raquo;</span>
+        </button>
+        <br>
+        <a data-dismiss="modal" class="modal-dismissal" aria-hidden="true">Maybe Later</a>
+      </div>
+      <p class="privacy-statement">
+        We won't share your email, ever.
+        <a href="/privacy">Privacy Policy</a>
+      </p>
+    </form>
+  </div>
+</div>
