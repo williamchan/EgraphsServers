@@ -18,6 +18,7 @@ import services.config.ConfigFileProxy
 import services.http.EgraphsSession
 import services.http.EgraphsSession.Conversions._
 import services.http.EgraphsSession.Key._
+import services.http.EgraphsSession.Conversions._
 import play.api.data._
 import play.api.data.Forms._
 import services.email.AccountCreationEmail
@@ -83,14 +84,17 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
             }
 
             // Find out whether the user is logging in via Facebook to complete their celebrity request
-            val redirectCall: Call = request.session.requestedStarRedirectOrCall(
-              customer.id,
-              controllers.routes.WebsiteControllers.getAccountSettings)
+            val redirectCall: Call = dbSession.connected(TransactionSerializable) {
+              request.session.requestedStarRedirectOrCall(
+                customer.id,
+                controllers.routes.WebsiteControllers.getAccountSettings)
+            }
 
             Redirect(redirectCall).withSession(
               session.withCustomerId(customer.id).removeRequestedStar
             ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
           }
+
           maybeRedirectSuccess.getOrElse(redirectAndLogError(fbUserInfo))
         }
         case _ => {
@@ -100,7 +104,6 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           Redirect(controllers.routes.WebsiteControllers.getLogin())
         }
       }
-      Ok
     }
   }
 
