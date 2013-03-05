@@ -187,33 +187,28 @@ case class EgraphCheckoutAdapter (
       def fromDetails = details flatMap { _.name }
       def fromOrder = optionIf(isForMe) { order map (_.recipientName) } flatten
 
-      getOrCreate(fromDetails orElse fromOrder, "")
+      fromDetails orElse fromOrder getOrElse ""
     }
 
-    def customer: Customer = getOrCreate(
-      existing = maybeExistingCustomer,
-      create = account.createCustomer(name)
-    )
+    def customer: Customer = maybeExistingCustomer getOrElse createCustomer
 
-    def account: Account = getOrCreate(
-      existing = maybeExistingAccount,
-      create = Account( email = email.getOrElse("") )
-    )
+    def account: Account = maybeExistingAccount getOrElse createAccount
 
     def savedCustomerAndAccount() = {
-      val savedCustomer = getOrCreate(
-        existing = maybeExistingCustomer,
-        create = account.createCustomer(name).save()
-      )
-      val savedAccount = account.copy(customerId = Some(savedCustomer.id)).save()
+      val savedCustomer = maybeExistingCustomer getOrElse createCustomer.save()
+      val savedAccount = account.copy(
+        customerId = Some(savedCustomer.id)
+      ).save()
 
       (savedCustomer, savedAccount)
     }
 
     private def isForMe = !isGift || isGiftee
-    private def getOrCreate[T](existing: Option[T], create: => T): T = existing getOrElse create
 
     private def maybeExistingAccount = email flatMap { services.accountStore.findByEmail(_) }
-    private def maybeExistingCustomer = email flatMap { services.customerStore.findByEmail(_) }
+    private def maybeExistingCustomer = account.customerId flatMap { services.customerStore.findById(_) }
+    private def createAccount = Account(email = email.getOrElse(""))
+    private def createCustomer = account.createCustomer(name)
+
   }
 }
