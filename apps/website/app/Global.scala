@@ -3,7 +3,6 @@ import java.sql.Connection
 import org.squeryl.{Session, SessionFactory}
 import models.{Account, AccountStore, Administrator}
 import play.api.{Application, Play}
-import play.api.mvc.Results._
 import play.api.mvc.{RequestHeader, Result}
 import play.api.Play.current
 import scala.io.Source
@@ -110,6 +109,7 @@ object Global extends controllers.ToyBox with Logging {
    * Egraphs error page for 404
    */
   override def onHandlerNotFound(request: RequestHeader): Result = {
+    play.api.Logger.info("404 for " + request.method + " " + request.uri)
     NotFound(views.html.frontend.errors.not_found())
   }
 }
