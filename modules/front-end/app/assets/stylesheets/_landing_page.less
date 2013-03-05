@@ -4,30 +4,94 @@
 @import "_landing_masthead.less";
 
 // Styles for the rest of the page
-.landing {
-    .help-block {
-      font-size: 12px;
-      padding-left: 5px;
-    }
+#content.landing {
+  #main {
+    padding-top: 20px;
+  }
+  .help-block {
+    font-size: 12px;
+    padding-left: 5px;
+  }
 
-    .newsletter-signup {
-      display: none;
-    }
+  .newsletter-signup {
+    display: none;
+  }
 
-    .get-started {
-    	margin-left: auto;
-    	margin-right: auto;
-    	width: 163px;
+  .get-started {
+  	margin-left: auto;
+  	margin-right: auto;
+  	width: 163px;
+  }  
+  .search-form {
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+
+    .search-control {
+      .celebrity-searchbox-container();
     }  
-    .search-form {
-      margin-left: auto;
-      margin-right: auto;
-      width: 300px;
+  }
 
-      .search-control {
-        .celebrity-searchbox-container();
-      }  
+  .education {
+    .value-propositions {
+
+      .value-icon-holder {
+        float: left;
+        width: 50px;
+        text-align: center; 
+        margin-right: 7px;
+      }
+    
+      div {
+        padding-bottom:10px;
+        line-height:.9em;
+
+        strong {
+          display:block;
+          color:#333;
+          margin-bottom:4px;
+        }
+        span {
+          font-size:13px;
+        }
+      }
     }
+
+    .value-top {
+      margin-bottom: 10px;
+      h2 {
+        display: inline;
+      } 
+      
+      .learn-more {
+        float: right;
+        font-size: 13px;
+        a {
+          color: @blue;
+          &:hover {
+            color: @orange;
+          }
+        }
+      }
+
+    }
+
+    .value-bottom {
+      display: none;
+      p {
+        float: right;
+      }      
+
+      .leading-text {
+        font-size: 13px;
+        padding-right: 5px;
+        a {
+          color: @orange;
+          border-bottom: 1px dotted @orange;
+        }
+      }
+    }
+  }  
 
   #landing-content {
     .switcher {
@@ -38,7 +102,7 @@
       margin: 0 25% 0 25%;
       position: absolute;
       text-align: center;
-      top: -4.8em;
+      top: -3.55em;
       width: 50%;
 
       > li {
@@ -251,6 +315,7 @@
 
     h2 {
       color: @orange;
+      cursor: default;
       font-size: 20px;
       font-weight: 600;
       line-height: 1.25em;

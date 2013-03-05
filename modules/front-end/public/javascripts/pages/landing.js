@@ -107,7 +107,7 @@ function (page, marketplace, analytics, logging, requireModule) {
           e.preventDefault();
         });
 
-        $("a.helper").click(function() {
+        $("a.helper, #learn-more-link").click(function() {
           $("#learn-switch").click();
         });
         $(".vertical-button").click(verticalFunction);
