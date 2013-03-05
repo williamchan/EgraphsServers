@@ -1,5 +1,5 @@
 /*global angular console mixpanel*/
-define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min"],
+define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min", "libs/jquery-ui"],
 function (Egraphs, marketplace, ngApp, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
 

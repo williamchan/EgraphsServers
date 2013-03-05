@@ -46,7 +46,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
   //
   // Controllers
   //
-  def postRegisterConsumerEndpoint = postController(dbSettings = WithoutDBConnection) {
+  def postRegisterConsumerEndpoint = postController() {
     Action { implicit request =>
       val redirects = for(
         // Get either the account and customer or a redirect back to the sign-in page
@@ -65,13 +65,18 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
           AccountCreationEmail(account = account, verificationNeeded = true).send()
         }
 
-        Redirect(controllers.routes.WebsiteControllers.getAccountSettings).withSession(
+        // Find out whether the user is creating an account to complete their celebrity request
+        val redirectCall: Call = request.session.requestedStarRedirectOrCall(
+          customer.id,
+          controllers.routes.WebsiteControllers.getAccountSettings)
+
+        Redirect(redirectCall).withSession(
           request.session
             .withCustomerId(customer.id)
             .withUsernameChanged
+            .removeRequestedStar
         ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
       }
-
       redirects.merge
     }
   }
@@ -84,7 +89,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
 
       form.bindFromRequest.fold(
         formWithErrors => {
-          Left(Redirect(controllers.routes.WebsiteControllers.getLogin).flashingFormData(formWithErrors))
+          Left(Redirect(controllers.routes.WebsiteControllers.getLogin()).flashingFormData(formWithErrors))
         }
         , validForm => {
           // The form validation already told us we can add this fella to the DB

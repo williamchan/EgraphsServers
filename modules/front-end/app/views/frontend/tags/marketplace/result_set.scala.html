@@ -1,10 +1,21 @@
-@(availableOnly: Boolean = false)
+@(availableOnly: Boolean = false,
+  results: models.frontend.marketplace.ResultSetViewModel,
+  query: String,
+  requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
+  requestStarActionUrl: String
+  )(
+  implicit
+  authToken: egraphs.authtoken.AuthenticityToken
+)
+
+@import views.frontend.Utils.bootstrapFields
+@import egraphs.authtoken.AuthenticityToken.safeForm
 
 <div class="verticals">
   <section class="clearfix" ng-cloak ng-controller="MarketplaceCtrl">
     <section>
       <div class="clearfix">
-        <h1><span>{{results.subtitle}}</span></h1> 
+        <h1><span>{{results.subtitle}}</span></h1>
         <div class="available-only">
             <ol>
               <li>
@@ -15,8 +26,9 @@
               }
               </li>
             </ol>
-        </div>    
+        </div>
       </div>
+      @requestStarContentIfZeroResults
       <div class="clearfix">
         <article ng-repeat="celebrity in celebrities" when-scrolled="loadCelebrities()" class="celebrity-result">
           <figure>
@@ -43,3 +55,34 @@
     </section>
   </section>
 </div>
+
+@requestStarContentIfZeroResults = {
+  @if(results.celebrities.isEmpty) {
+    <section id="request-star-section">
+
+        @safeForm(
+          'id -> "request-star-form",
+          'action -> requestStarActionUrl,
+          'method -> "post",
+          'class -> "login-option"
+        ) {
+
+          <div class="clearfix">
+            <div class="request-star-button">
+              <span>
+                @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
+                  <input type="hidden" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
+                }
+              </span>
+              <button id="request-star-button" type="submit" class="button">
+                <strong><em>Request @query</em></strong>
+                <span>&raquo;</span>
+              </button>
+            </div>
+          </div>
+
+        } <!-- end safe form -->
+
+    </section>
+  }
+}

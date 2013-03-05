@@ -22,6 +22,7 @@ trait AllConsumerEndpoints
   with PostLoginEndpoint
   with PostOrderConfigureEndpoint
   with PostRecoverAccountEndpoint
+  with PostRequestStarEndpoint
   with PostResetPasswordEndpoint
   with GetFacebookLoginCallbackEndpoint
   with CelebrityLandingConsumerEndpoint
