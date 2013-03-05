@@ -1,9 +1,56 @@
 @(enrollmentCompleteEmailStack: models.frontend.email.EnrollmentCompleteEmailViewModel)
 
 <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 18px; line-height: 22px; font-weight: bold; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 10px;">
-  Enrollment is complete.
+  Enrollment Completion
 </p>
 
-<p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-  Hooray!
-</p>
+<table cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <th align="left">
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        Celebrity Name:
+      </p>
+    </th>
+    <td>
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        @enrollmentCompleteEmailStack.celebrityName
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <th align="left">
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        Video Asset Uploaded:
+      </p>
+    </th>
+    <td>
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        @if(enrollmentCompleteEmailStack.videoAssetIsDefined) { Yes } else { No }
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <th align="left">
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        Celebrity Enrollment Status:
+      </p>
+    </th>
+    <td>
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        @enrollmentCompleteEmailStack.celebrityEnrollmentStatus
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <th align="left">
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        Time of Enrollment:
+      </p>
+    </th>
+    <td>
+      <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
+        @enrollmentCompleteEmailStack.timeEnrolled
+      </p>
+    </td>
+  </tr>
+</table>
