@@ -35,6 +35,7 @@ object Complete extends Controller with DefaultImplicitTemplateParameters {
       printPrice=BigDecimal(30.00).toMoney(),
       expectedDeliveryDate=new util.Date(),
       faqHowLongLink = "https://www.egraphs.com/faq#how-long",
+      messageToCelebrity = "Hey {celebrity name}, I'm your biggest fan, thanks for being awesome!",
       printOrderShippingAddress = "1234 Cherry Lane New York, NY 12345",
       hasPrintOrder = true,
       withAffiliateMarketing = false
