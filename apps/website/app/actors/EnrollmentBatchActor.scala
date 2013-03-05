@@ -15,7 +15,6 @@ import play.api.Play.current
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
 import services.config.ConfigFileProxy
-import play.api.libs.concurrent.Execution.Implicits._
 
 object EnrollmentBatchActor {
   val actor = Akka.system.actorOf(Props(AppConfig.instance[EnrollmentBatchActor]))
