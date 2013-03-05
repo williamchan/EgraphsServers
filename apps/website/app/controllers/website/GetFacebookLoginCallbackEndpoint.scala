@@ -18,7 +18,6 @@ import services.config.ConfigFileProxy
 import services.http.EgraphsSession
 import services.http.EgraphsSession.Conversions._
 import services.http.EgraphsSession.Key._
-import services.http.EgraphsSession.Conversions._
 import play.api.data._
 import play.api.data.Forms._
 import services.email.AccountCreationEmail
