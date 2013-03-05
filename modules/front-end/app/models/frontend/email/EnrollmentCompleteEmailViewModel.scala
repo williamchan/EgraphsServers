@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 case class EnrollmentCompleteEmailViewModel(
   celebrityName: String,
-  videoAssetUploaded: Boolean,
+  videoAssetIsDefined: Boolean,
   celebrityEnrollmentStatus: String,
-  timeEnrolled: Timestamp // this will be celebrity updated field
+  timeEnrolled: String // this will be celebrity updated field
 )

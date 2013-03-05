@@ -10,6 +10,37 @@ import egraphs.playutils.Gender
  */
 object Email extends Controller {
 
+  def celebrityWelcome = Action {
+    val publicName = "Rodney Strong"
+    val email = "rstrong@fantastic.com"
+    Ok(views.html.frontend.email.celebrity_welcome(
+      CelebrityWelcomeEmailViewModel(
+        celebrityName = publicName,
+        celebrityEmail = email,
+        appPlistUrl = "//path/to/app"
+      )
+    ))
+  }
+
+  def confirm = Action {
+    Ok(views.html.frontend.email.account_confirmation())
+  }
+
+  def enrollmentComplete = Action {
+    Ok(views.html.frontend.email.enrollment_complete(
+      EnrollmentCompleteEmailViewModel(
+        celebrityName = "Celebrity Jane",
+        videoAssetIsDefined = true,
+        celebrityEnrollmentStatus = "Enrolled",
+        timeEnrolled = "March 4, 2013"
+      )
+    ))
+  }
+
+  def mlbStatic = Action {
+    Redirect(routes.EgraphsAssets.at("html/email_mlb_marketing_static.html"))
+  }
+
   def orderConfirmation = Action {
     Ok(views.html.frontend.email.order_confirmation(
       OrderConfirmationEmailViewModel(
@@ -26,6 +57,17 @@ object Email extends Controller {
         deliveredByDate = "June 19, 2012",
         faqHowLongLink = "https://www.egraphs.com/faq#how-long",
         maybePrintOrderShippingAddress = Some("1234 Cherry Lane New York, NY 12345")
+      )
+    ))
+  }
+
+  def resetPassword = Action {
+    val email = "cooluser@fantastic.com"
+    val resetPasswordUrl = "http://www.egraphs.com/cool"
+    Ok(views.html.frontend.email.reset_password(
+      ResetPasswordEmailViewModel(
+        email = email,
+        resetPasswordUrl = resetPasswordUrl
       )
     ))
   }
@@ -65,37 +107,6 @@ object Email extends Controller {
         discountAmount = 15,
         code = "XXXXXXXX",
         daysUntilExpiration = 7
-      )
-    ))
-  }
-
-  def confirm = Action {
-    Ok(views.html.frontend.email.account_confirmation())
-  }
-
-  def mlbStatic = Action {
-    Redirect(routes.EgraphsAssets.at("html/email_mlb_marketing_static.html"))
-  }
-  
-  def celebrityWelcome = Action {
-    val publicName = "Rodney Strong"
-    val email = "rstrong@fantastic.com"
-    Ok(views.html.frontend.email.celebrity_welcome(
-      CelebrityWelcomeEmailViewModel(
-        celebrityName = publicName,
-        celebrityEmail = email,
-        appPlistUrl = "//path/to/app"
-      )
-    ))
-  }
-
-  def resetPassword = Action {
-    val email = "cooluser@fantastic.com"
-    val resetPasswordUrl = "http://www.egraphs.com/cool"
-    Ok(views.html.frontend.email.reset_password(
-      ResetPasswordEmailViewModel(
-        email = email,
-        resetPasswordUrl = resetPasswordUrl
       )
     ))
   }

@@ -5,6 +5,7 @@ import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
 import com.google.inject.Inject
+import services.email._
 import services.logging.{Logging, LoggingContext}
 import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
@@ -85,6 +86,12 @@ case class EnrollmentBatchActor @Inject()(
     } else {
       celebrity.withEnrollmentStatus(EnrollmentStatus.FailedEnrollment).save()
     }
+
+    // send email to celebalert@egraphs.com with enrollment info
+    EnrollmentCompleteEmail(
+      celebrity,
+      videoAsset.nonEmpty
+    ).send()
   }
 }
 
