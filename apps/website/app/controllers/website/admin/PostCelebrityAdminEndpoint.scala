@@ -41,7 +41,7 @@ trait PostCelebrityAdminEndpoint {
         val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
 
         val form = Form(mapping(
-          "celebrityEmail" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
+          "celebrityEmail" -> email.verifying(nonEmpty, formConstraints.isValidNewEmail()),
           "celebrityPassword" -> nonEmptyText.verifying(formConstraints.isPasswordValid),
           "publicName" -> nonEmptyText(maxLength = 128),
           "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
@@ -54,10 +54,10 @@ trait PostCelebrityAdminEndpoint {
           "websiteUrl" -> text
         )(PostCreateCelebrityForm.apply)(PostCreateCelebrityForm.unapply)
           .verifying(
-          isUniqueUrlSlug(),
-          profileImageIsValid(profileImageFile),
-          landingPageImageIsValid(landingPageImageOption),
-          logoImageIsValid(logoImageOption)
+            isUniqueUrlSlug(),
+            profileImageIsValid(profileImageFile),
+            landingPageImageIsValid(landingPageImageOption),
+            logoImageIsValid(logoImageOption)
         ))
 
         form.bindFromRequest.fold(

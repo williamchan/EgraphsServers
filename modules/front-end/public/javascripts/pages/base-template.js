@@ -4,6 +4,7 @@ define(
  "window",
  "services/logging",
  "module",
+ "libs/tooltip",
  "services/ng/mail-services",
  "services/responsive-modal"],
 function(page, window, logging, requireModule) {

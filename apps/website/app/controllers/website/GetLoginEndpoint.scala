@@ -28,7 +28,7 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
   //
   // Controllers
   //
-  def getLogin = controllerMethod.withForm() { implicit authToken =>
+  def getLogin(maybeBannerMessage: Option[String] = None) = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
       // Save a new FB state ID into the session
       val fbState = UUID.randomUUID().toString
@@ -41,7 +41,8 @@ private[controllers] trait GetLoginEndpoint extends ImplicitHeaderAndFooterData 
         loginForm = makeLoginFormView,
         registrationForm = PostRegisterConsumerEndpoint.form.bindWithFlashData,
         registrationActionUrl = controllers.routes.WebsiteControllers.postRegisterConsumerEndpoint.url,
-        fbAuthUrl = fbOauthUrl
+        fbAuthUrl = fbOauthUrl,
+        maybeBannerMessage = maybeBannerMessage
       )).withSession(request.session + (Facebook._fbState -> fbState))
     }
   }

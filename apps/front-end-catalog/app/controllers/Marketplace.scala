@@ -1,5 +1,9 @@
 package controllers
 
+import play.api.data._
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.data.validation.Constraints._
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import models.frontend.marketplace._
@@ -21,10 +25,25 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       verticalSet,
       resultSet,
       sortOptions,
-      availableOnly = false))
+      availableOnly = false,
+      requestStarForm = defaultRequestStarForm,
+      requestStarActionUrl = "this-is-the-action-url"))
   }
 
-  def results_list() = Action {
+  def zeroResults() = Action {
+    Ok(views.html.frontend.marketplace_results(
+      query = "",
+      viewAsList = false,
+      marketplaceRoute = controllers.routes.Marketplace.results.url,
+      verticalViewModels = verticalSet,
+      results = zeroResultSet,
+      sortOptions = sortOptions,
+      availableOnly = false,
+      requestStarForm = defaultRequestStarForm,
+      requestStarActionUrl = "this-is-the-action-url"))
+  }
+
+  def resultsList() = Action {
     Ok(views.html.frontend.marketplace_results(
       "",
       true,
@@ -32,7 +51,9 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       verticalSet,
       resultSet,
       sortOptions,
-      availableOnly = coinflip.nextBoolean))
+      availableOnly = coinflip.nextBoolean,
+      requestStarForm = defaultRequestStarForm,
+      requestStarActionUrl = "this-is-the-action-url"))
   }
 
   def landing() = Action {
@@ -85,7 +106,11 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   }
 
   private def resultSet: ResultSetViewModel = {
-      ResultSetViewModel(subtitle = Option("Showing 36 Results"), celebrities = celebViewModels(36))
+    ResultSetViewModel(subtitle = Option("Showing 36 Results"), celebrities = celebViewModels(36))
+  }
+
+  private def zeroResultSet: ResultSetViewModel = {
+    ResultSetViewModel(subtitle = Option("Showing 0 Results"), celebrities = celebViewModels(0))
   }
 
   private def landingResults: List[ResultSetViewModel] = {
@@ -193,5 +218,9 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       )
     }
   }
+
+  private def defaultRequestStarForm: Form[RequestStarViewModel] = Form(mapping(
+    "starName" -> text.verifying(nonEmpty)
+    )(RequestStarViewModel.apply)(RequestStarViewModel.unapply))
 }
 

@@ -1,7 +1,6 @@
 package models
 
 import java.awt.image.BufferedImage
-import java.util.Date
 import java.sql.Timestamp
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.io.IOUtils
@@ -13,7 +12,6 @@ import anorm._
 import play.api.Play.current
 import play.api.libs.concurrent._
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import enums.{HasEnrollmentStatus, EnrollmentStatus, PublishedStatus, HasPublishedStatus}
 import categories._
 import services.blobs.AccessPolicy
@@ -22,12 +20,10 @@ import services._
 import services.mail.TransactionalMail
 import services.Dimensions
 import services.mvc.celebrity.CelebrityViewConversions
-import services.mail.MailUtils
 import services.db.DBSession
 import models.frontend.landing.CatalogStar
 import models.frontend.marketplace.MarketplaceCelebrity
 import models.Celebrity.CelebrityWithImage
-import models.enums.EmailType
 import services.mvc.celebrity.CatalogStarsQuery
 import egraphs.playutils.{Gender, HasGender}
 
@@ -53,7 +49,8 @@ case class CelebrityServices @Inject() (
  * Persistent entity representing the Celebrities who provide products on
  * our service.
  */
-case class Celebrity(id: Long = 0,
+case class Celebrity(
+  id: Long = 0,
   apiKey: Option[String] = None,
   publicName: String = "",
   casualName: Option[String] = None,                             // e.g. "David" instead of "David Price"
