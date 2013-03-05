@@ -94,7 +94,6 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
           Redirect(controllers.routes.WebsiteControllers.getLogin)
         }
       }
-      Ok
     }
   }
 
