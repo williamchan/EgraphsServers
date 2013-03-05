@@ -218,6 +218,13 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
           }
         );
 
+        $(".show-all").click(function(e){
+          $(this).parent().siblings().children().each(function() {
+            $(this).removeClass("condensed");
+          });
+          $(this).addClass("condensed");
+        });
+
         $(".clear-all").click(function(e) {
           marketplace.clearCategoryByKey("c" + $(this).attr("data-category"));
           marketplace.reloadPage();

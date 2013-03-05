@@ -114,6 +114,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       productId = product.id,
       expectedDeliveryDate = Order.expectedDeliveryDate(celebrity),
       faqHowLongLink = faqHowLongLink,
+      messageToCelebrity = order.messageToCelebrity.getOrElse(""),
       totalPrice = totalAmountPaid,
       discount = None,
       digitalPrice = product.price,

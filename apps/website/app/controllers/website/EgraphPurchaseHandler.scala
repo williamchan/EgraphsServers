@@ -184,11 +184,12 @@ case class EgraphPurchaseHandler(
         celebrityName = celebrity.publicName,
         celebrityGender = celebrity.gender,
         productName = product.name,
-        orderDate = order.created.formatDayAsPlainLanguage,
+        orderDate = order.created.formatDayAsPlainLanguage("PST"),
         orderId = order.id.toString,
         pricePaid = totalAmountPaid.formatSimply,
-        deliveredByDate = order.expectedDate.formatDayAsPlainLanguage,
+        deliveredByDate = order.expectedDate.formatDayAsPlainLanguage("PST"),
         faqHowLongLink = services.consumerApp.absoluteUrl(getFAQ().url + "#how-long"),
+        messageToCelebrity = order.messageToCelebrity.getOrElse(""),
         maybePrintOrderShippingAddress = maybePrintOrder.map(_.shippingAddress)
       )
     ).send()

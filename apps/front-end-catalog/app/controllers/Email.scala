@@ -56,6 +56,7 @@ object Email extends Controller {
         pricePaid = "$50.00",
         deliveredByDate = "June 19, 2012",
         faqHowLongLink = "https://www.egraphs.com/faq#how-long",
+        messageToCelebrity = "Hey David Price, I'm your biggest fan, thanks for being awesome!",
         maybePrintOrderShippingAddress = Some("1234 Cherry Lane New York, NY 12345")
       )
     ))
