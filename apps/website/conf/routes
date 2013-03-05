@@ -143,7 +143,7 @@ GET      /admin/videoassets/:status                                       contro
 POST     /admin/videoassets/$id<[0-9]+>                                   controllers.WebsiteControllers.postProcessVideoAdmin(action: String, id: Long)                      
 
 ##
-## The MLBPA reviews each MLB egraph per our agreement.
+## The MLBPA reviews each MLB egraph per agreement terms.
 ##
 GET     /mlbpa                                                      controllers.WebsiteControllers.getMlbpaLogin
 POST    /mlbpa                                                      controllers.WebsiteControllers.postMlbpaLogin
