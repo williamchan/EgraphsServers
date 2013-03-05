@@ -12,7 +12,7 @@ object EmailAddress {
   }
 
   /**
-   * This will let you more easily write Dates to your json objects
+   * This will let you more easily write email addresses to your json objects
    * using the api formatting.
    */
   implicit object EmailAddressFormat extends Format[EmailAddress] {

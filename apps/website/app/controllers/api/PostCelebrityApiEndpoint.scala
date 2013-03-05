@@ -7,8 +7,11 @@ import services.http.POSTApiControllerMethod
 import models.JsCelebrityContactInfo
 import models.JsCelebrityDepositInfo
 import models.DecryptedCelebritySecureInfo
+import services.logging.Logging
 
-private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
+private[controllers] trait PostCelebrityApiEndpoint 
+  extends Logging
+{ this: Controller =>
   protected def postApiController: POSTApiControllerMethod
   protected def httpFilters: HttpFilters
 
@@ -17,13 +20,12 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
       httpFilters.requireAuthenticatedAccount.inRequest() { account =>
         httpFilters.requireCelebrityId.inAccount(account) { celebrity =>
           Action { request =>
-            play.api.Logger.info(s"postCelebrityContactInfo attempt for celebrity $celebrity")
+            log(s"postCelebrityContactInfo attempt for celebrity $celebrity")
             val maybeContactInfo = request.body.asJson.flatMap(_.asOpt[JsCelebrityContactInfo])
             maybeContactInfo match {
               case None => 
                 BadRequest("Could not parse json into JsCelebrityContactInfo.")
               case Some(contactInfo) =>
-                contactInfo.twitterUsername.map(twitter => celebrity.copy(twitterUsername = Some(twitter)).save())
                 val existingSecureInfo = celebrity.secureInfo.getOrElse(DecryptedCelebritySecureInfo())
                 val secureInfo = existingSecureInfo.copy(
                   contactEmail = contactInfo.contactEmail.map(_.value),
@@ -31,7 +33,8 @@ private[controllers] trait PostCelebrityApiEndpoint { this: Controller =>
                   voicePhone = contactInfo.voicePhone,
                   agentEmail = contactInfo.agentEmail.map(_.value)
                 ).encrypt.save()
-                celebrity.copy(secureInfoId = Some(secureInfo.id)).save()
+                val twitter = contactInfo.twitterUsername.fold(celebrity.twitterUsername)(username => if(username.isEmpty) None else Some(username))
+                celebrity.copy(twitterUsername = twitter, secureInfoId = Some(secureInfo.id)).save()
                 Ok
             }
           }

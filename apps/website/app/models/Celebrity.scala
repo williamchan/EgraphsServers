@@ -117,10 +117,10 @@ case class Celebrity(id: Long = 0,
   }
 
   def secureInfo: Option[DecryptedCelebritySecureInfo] = {
-    for (
-      id <- secureInfoId;
+    for {
+      id <- secureInfoId
       secureInfo <- services.celebritySecureInfoStore.findById(id)
-    ) yield {
+    } yield {
       secureInfo.decrypt
     }
   }

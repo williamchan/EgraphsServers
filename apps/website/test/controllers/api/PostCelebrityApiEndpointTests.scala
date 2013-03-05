@@ -1,5 +1,7 @@
 package controllers.api
 
+import scala.util.Random
+import org.apache.commons.lang3.RandomStringUtils
 import play.api.libs.json._
 import play.api.test.Helpers._
 import play.api.test.FakeRequest
@@ -11,8 +13,6 @@ import enums.OrderReviewStatus
 import services.db.TransactionSerializable
 import services.AppConfig
 import services.db.DBSession
-import org.apache.commons.lang3.RandomStringUtils
-import scala.util.Random
 
 class PostCelebrityApiEndpointTests
   extends EgraphsUnitTest
@@ -52,12 +52,13 @@ class PostCelebrityApiEndpointTests
   it should "update a celebrity contact info if one exists" in new EgraphsTestApplication {
     // Set up the scenario
     val (celebrity, celebrityAccount, secureInfo) = db.connected(TransactionSerializable) {
-      val celebrity = TestData.newSavedCelebrity()
+      val celebrity = TestData.newSavedCelebrity().copy(twitterUsername = Some(RandomStringUtils.randomAlphanumeric(10))).save
       (celebrity, celebrity.account, celebrity.secureInfo)
     }
 
+    val newTwitterUsername = RandomStringUtils.randomAlphanumeric(10)
     val newContactInfo = secureInfo.get.copy(contactEmail = Some(TestData.generateEmail("clown", "face.com")))
-    val requestJson = Json.toJson(JsCelebrityContactInfo.from(celebrity, Some(newContactInfo)))
+    val requestJson = Json.toJson(JsCelebrityContactInfo.from(celebrity, Some(newContactInfo)).copy(twitterUsername = Some(newTwitterUsername)))
 
     // Execute the request
     val url = controllers.routes.ApiControllers.postCelebrityContactInfo.url
@@ -68,7 +69,9 @@ class PostCelebrityApiEndpointTests
     status(result) should be(OK)
 
     db.connected(TransactionSerializable) {
-      val maybeSavedContactInfo = celebrityStore.findById(celebrity.id).get.secureInfo
+      val Some(savedCelebrity) = celebrityStore.findById(celebrity.id)
+      savedCelebrity.twitterUsername should be (Some(newTwitterUsername))
+      val maybeSavedContactInfo = savedCelebrity.secureInfo
       maybeSavedContactInfo.isDefined should be(true)
       val Some(savedContactInfo) = maybeSavedContactInfo
       savedContactInfo.contactEmail should be(newContactInfo.contactEmail)
