@@ -87,14 +87,15 @@ case class EnrollmentBatchActor @Inject()(
       EnrollmentStatus.FailedEnrollment
     }
 
+    val updatedCelebrity = celebrity.withEnrollmentStatus(enrollmentStatus).save()
+
     // send email to celebalert@egraphs.com with enrollment info
     EnrollmentCompleteEmail(
-      celebrity,
-      enrollmentStatus.name,
+      updatedCelebrity,
       videoAsset.nonEmpty
     ).send()
 
-    celebrity.withEnrollmentStatus(enrollmentStatus).save()
+    updatedCelebrity
   }
 }
 

@@ -11,7 +11,6 @@ import services.mail.TransactionalMail
 
 case class EnrollmentCompleteEmail(
   celebrity: Celebrity,
-  enrollmentStatus: String,
   videoAssetIsDefined: Boolean,
   mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
 ) {
@@ -32,11 +31,11 @@ case class EnrollmentCompleteEmail(
     val enrollmentCompleteEmailStack = EnrollmentCompleteEmailViewModel(
       celebrityName = celebrity.publicName,
       videoAssetIsDefined = videoAssetIsDefined,
-      celebrityEnrollmentStatus = enrollmentStatus,
+      celebrityEnrollmentStatus = celebrity.enrollmentStatus.name,
       timeEnrolled = celebrity.updated.formatDayAsPlainLanguage("PST")
     )
 
-    log("Sending enrollment complete mail to : celebalert@egraphs.com")
+    log("Sending enrollment complete mail for celebrity : " + celebrity.publicName + " to : celebalert@egraphs.com")
     mailService.send(emailStack, MailUtils.getEnrollmentCompleteTemplateContentParts(EmailType.EnrollmentComplete, enrollmentCompleteEmailStack))
   }
 }
