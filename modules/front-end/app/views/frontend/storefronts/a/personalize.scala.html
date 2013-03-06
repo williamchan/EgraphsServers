@@ -42,7 +42,8 @@
     config: {},
     celebId: @star.id,
     products: @Html(Json.stringify(JsArray(star.products.map(_.toJson)))),
-    checkoutUrl: "@checkoutUrl"
+    checkoutUrl: "@checkoutUrl",
+    celebName: "@star.name"
   });
 
   @if(!testcase.isEmpty) {
@@ -116,7 +117,7 @@
               <span>or your money back, no questions asked</span>
             </div>
           </div>
-          </div> <!-- end value-propositions -->
+        </div> <!-- end value-propositions -->
         <section id="buy-an-egraph">
           <h2 class="callout">
             <img src='@EgraphsAssets.at("images/glyphicons-circle-arrow-down-orange.png")'></img>          
