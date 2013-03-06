@@ -42,7 +42,8 @@
     config: {},
     celebId: @star.id,
     products: @Html(Json.stringify(JsArray(star.products.map(_.toJson)))),
-    checkoutUrl: "@checkoutUrl"
+    checkoutUrl: "@checkoutUrl",
+    celebName: "@star.name"
   });
 
   @if(!testcase.isEmpty) {
