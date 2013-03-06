@@ -9,10 +9,6 @@
   authToken: egraphs.authtoken.AuthenticityToken
 )
 
-@**   Consumer landing page variant A. Intended to replace the default landing page. 
-      stars - the list of all featured stars celebrities.
-*@
-
 @import models.frontend.landing.CatalogStar
 @import views.html.frontend.tags
 @import play.api.libs.json._
@@ -30,7 +26,7 @@
         @if(clearFix) {<div class="clearfix">}
 
         @for(star <- starRow) {
-          <article class="span3">
+          <article  id="@star.name" class="span3">
             <figure>
               @if(!star.hasInventoryRemaining) {
                 <div class="ribbon simple">
@@ -38,13 +34,13 @@
                   </a>
                 </div>
               }
-              <a class="glowborder" href="@star.storefrontUrl" >
+              <a class="glowborder" href="@star.storefrontUrl" data-name="@star.name">
                 <img src="@star.imageUrl" title="Purchase an egraph from @star.name" alt="@star.name"/>              
               </a>
             </figure>
             <hgroup>
               <p class="price">$@if(star.minPrice > 0 && star.minPrice != star.maxPrice){@star.minPrice - @star.maxPrice} else { @star.maxPrice }</p>
-              <h4><a href="@star.storefrontUrl">@star.name</a></h4>
+              <h4><a href="@star.storefrontUrl" data-name="@star.name">@star.name</a></h4>
               <h5>@star.secondaryText</h5>
             </hgroup>
           </article>        
@@ -56,41 +52,89 @@
   </div>  
 }
 
+
+@valueProp = {
+  <div class="module education">
+    <div class="value-propositions row">
+      <div class="span3 clearfix">
+        <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/pencil.png")'></img></div>
+        <div class="description">
+          <strong>You write a note</strong>
+          <span>for favorite star's eyes only</span>
+        </div>
+      </div>
+      <div class="span3 clearfix">
+        <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-microphone.png")'></img></div>
+        <div class="description">
+          <strong>Your star replies</strong>
+          <span>through their iPad microphone, just for you</span>
+        </div>
+      </div>
+      <div class="span3 clearfix">
+        <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-verified.png")'></img></div>
+        <div class="description">
+          <strong>Authenticity verified</strong>
+          <span>by signature and voice analysis</span>
+        </div>
+      </div>
+      <div class="span3 clearfix">
+        <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-heart.png")'></img></div>
+        <div class="description">
+          <strong>Love your egraph</strong>
+          <span>or your money back, no questions asked</span>
+        </div>
+      </div>
+    </div>
+    <div class="value-top row clearfix">    
+        <span class="learn-more">  
+          <strong>Want to know more about Egraphs?</strong>
+          <br>
+          <span class="actions">
+            <a id="play-video-link" href="#top-relative"> Watch the video </a> 
+            or 
+            <a id="learn-more-link">read more here</a>
+          </span>  
+        </span>
+    </div>  
+  </div> <!-- end value-propositions -->
+}
+
 @verticalAndTeams = {
   <div class="module" id="browse">
     <h2>Find your team on Egraphs</h2>
-      <div class="row">
-        <div class="clearfix">
-          @for(vertical <- verticalViewModels;
-               iconUrl <- vertical.iconUrl
-            ) {
+    <div class="row">
+      <div class="clearfix">
+        @for(vertical <- verticalViewModels;
+             iconUrl <- vertical.iconUrl
+          ) {
 
-            <article class="span6">
-              <a id="@vertical.shortName" class="vertical-button" name="@vertical.shortName" data-vertical="@vertical.urlSlug"><img src="@EgraphsAssets.at(iconUrl)"/>
-                <h3>@vertical.shortName</h3>
-              </a>
-              <ul>
-              @for(category <- vertical.categoryViewModels;
-                   categoryValue <- category.categoryValues.sorted) {
-                <li>
-                  <a data-vertical="@vertical.urlSlug" data-category="@category.id" data-categoryvalue="@categoryValue.id" class="cv-link">
-                    @categoryValue.publicName&nbsp;
-                  </a>
-                </li>
+          <article class="span6">
+            <a id="@vertical.shortName" class="vertical-button" name="@vertical.shortName" data-vertical="@vertical.urlSlug"><img src="@EgraphsAssets.at(iconUrl)"/>
+              <h3>@vertical.shortName</h3>
+            </a>
+            <ul>
+            @for(category <- vertical.categoryViewModels;
+                 categoryValue <- category.categoryValues.sorted) {
+              <li>
+                <a data-vertical="@vertical.urlSlug" data-category="@category.id" data-categoryvalue="@categoryValue.id" class="cv-link">
+                  @categoryValue.publicName&nbsp;
+                </a>
+              </li>
 
-                }
-                <li>
-                  <a data-vertical="@vertical.urlSlug" name="@vertical.shortName" class="all-teams">See all @vertical.shortName stars &raquo;</a>
-                </li>
-              </ul>
-            </article>
-          }
-          </div>
+              }
+              <li>
+                <a data-vertical="@vertical.urlSlug" name="@vertical.shortName" class="all-teams">See all @vertical.shortName stars &raquo;</a>
+              </li>
+            </ul>
+          </article>
+        }
         </div>
+      </div>
     </div>
 }
 @verticalsRow(verticals: Iterable[models.frontend.marketplace.VerticalViewModel])= {
   <div id="verticals" class="module">
+    <h2>Find your star</h2>
     <div class="row">
       <div class="clearfix">
         @for(vertical <- verticals;
@@ -118,25 +162,6 @@
     </div>
 }
 
-@testimonials = {
-   <div id="testimonials" class="module">
-    @loremIpsum
-    <div class="row">
-      <div class="clearfix">
-      @for(i <- 0 until 3){
-        <div class="span4">
-        <blockquote class=".pull-right">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula magna dui, mattis eleifend sapien. Proin imperdiet, odio id tincidunt venenatis, risus enim auctor nisl, vel malesuada libero sapien in urna.
-          </p>
-          <small>Aphrodite, <cite title="Mt Olympus, WA 11/18/1941">Mt. Olympus, WA</cite></small>
-        </blockquote>
-        </div>
-      }  
-      </div>
-    </div>  
-  </div>
-}
 
 @headJs = {
   @if(signup) {
@@ -162,8 +187,8 @@
       <div id ="landing-content" class="container">
         
         <ul id="tabs" data-tab="tabs" class="switcher">
-          <li class="active left-tab"><a class="switcher-tab" href="#shop">Shop</a></li>
-          <li class="right-tab"><a id="learn-switch" class="switcher-tab" href="#learn">Learn</a></li>
+          <li class="active left-tab" id="shop-tab"><a class="switcher-tab" href="#shop">Shop</a></li>
+          <li class="right-tab" id="learn-tab"><a class="switcher-tab" href="#learn">Learn</a></li>
         </ul>
         
         <div id="learn" class="tab" style="display: none">
@@ -176,8 +201,10 @@
           @tags.landing.landing_more(None, Some(marketplaceRoute))
         </div>        
         <div id="shop" class="tab">
-          @verticalsRow(verticalViewModels)
-          
+
+          @valueProp
+
+          @verticalsRow(verticalViewModels)          
           @starsBlock(stars, clearFix=true)
 
           @verticalAndTeams
