@@ -113,7 +113,8 @@
               <h3>@vertical.shortName</h3>
             </a>
             <ul>
-            @for(category <- vertical.categoryViewModels;
+            @**The if statement below is a HACK. Will remove this along, with the rest of the code when we move to a many vertical friendly page. **@
+            @for(category <- vertical.categoryViewModels if(category.publicName != "MLB Prospects");
                  categoryValue <- category.categoryValues.sorted) {
               <li>
                 <a data-vertical="@vertical.urlSlug" data-category="@category.id" data-categoryvalue="@categoryValue.id" class="cv-link">
