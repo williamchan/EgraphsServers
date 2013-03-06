@@ -1,0 +1,7 @@
+@(enrollmentCompleteEmailStack: models.frontend.email.EnrollmentCompleteEmailViewModel)
+
+@import views.html.frontend.tags
+
+@tags.email.header("Egraphs | Enrollment Complete")
+@tags.email.enrollment_complete(enrollmentCompleteEmailStack)
+@tags.email.footer()

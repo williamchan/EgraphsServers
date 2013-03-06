@@ -5,10 +5,11 @@ import Actor._
 import services.db.{DBSession, TransactionSerializable}
 import services.AppConfig
 import com.google.inject.Inject
+import services.email._
 import services.logging.{Logging, LoggingContext}
 import services.signature.SignatureBiometricsError
 import services.voice.VoiceBiometricsError
-import models.{CelebrityStore, EnrollmentBatch, EnrollmentBatchStore}
+import models._
 import models.enums.EnrollmentStatus
 import play.api.Play.current
 import play.api.libs.concurrent.Akka
@@ -22,6 +23,7 @@ object EnrollmentBatchActor {
 case class EnrollmentBatchActor @Inject()(
   db: DBSession,
   celebrityStore: CelebrityStore,
+  videoAssetCelebrityStore: VideoAssetCelebrityStore,
   enrollmentBatchStore: EnrollmentBatchStore,
   logging: LoggingContext,
   config: ConfigFileProxy
@@ -77,11 +79,23 @@ case class EnrollmentBatchActor @Inject()(
     enrollmentBatch.copy(isSuccessfulEnrollment = Some(isSuccessfulEnrollment)).save()
 
     val celebrity = celebrityStore.get(enrollmentBatch.celebrityId)
-    if (isSuccessfulEnrollment) {
-      celebrity.withEnrollmentStatus(EnrollmentStatus.Enrolled).save()
+    val videoAsset = videoAssetCelebrityStore.getVideoAssetByCelebrityId(celebrity.id)
+
+    val enrollmentStatus = if (isSuccessfulEnrollment) {
+      EnrollmentStatus.Enrolled
     } else {
-      celebrity.withEnrollmentStatus(EnrollmentStatus.FailedEnrollment).save()
+      EnrollmentStatus.FailedEnrollment
     }
+
+    val updatedCelebrity = celebrity.withEnrollmentStatus(enrollmentStatus).save()
+
+    // send email to celebalert@egraphs.com with enrollment info
+    EnrollmentCompleteEmail(
+      updatedCelebrity,
+      videoAsset.nonEmpty
+    ).send()
+
+    updatedCelebrity
   }
 }
 
