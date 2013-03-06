@@ -12,6 +12,7 @@ import models.checkout.EgraphCheckoutAdapter
 import scala.Some
 import com.google.inject.Inject
 import services.logging.Logging
+import play.api.http.HeaderNames.CACHE_CONTROL
 
 class CheckoutResourceControllerFactory @Inject() (services: CheckoutResourceControllerServices) {
   /**
@@ -81,7 +82,9 @@ class CheckoutResourceController[T] (
           val formJson = Json.toJson(cachedForm.data)
           log(s"OK: Found previously submitted form for ${resourceForm.getClass.getSimpleName}")
           log(Json.stringify(formJson))
-          Ok(formJson)
+
+          Ok(formJson).withHeaders(CACHE_CONTROL -> "no-cache")
+
         }.getOrElse {
           log(s"NOT_FOUND: No cached form found for ${resourceForm.getClass.getSimpleName}")
           NotFound
