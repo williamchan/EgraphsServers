@@ -74,8 +74,12 @@ GET     /Finalize/portrait                                        controllers.Fi
 
 GET     /GiftCertificateCheckout/index                            controllers.GiftCertificateCheckout.index
 GET     /Storefront-A/personalize                                 controllers.StorefrontA.personalize
+GET     /Storefront-A/personalizeSoldOut                          controllers.StorefrontA.personalizeSoldOut
 GET     /Storefront-A/checkout                                    controllers.StorefrontA.checkout(testcase: Option[String] ?= None)
 
+GET     /Landing/video                                            controllers.Landing.videoMasthead
+GET     /Landing/searchbox                                        controllers.Landing.searchboxMasthead
+GET     /Landing/link                                             controllers.Landing.simpleLinkMasthead
 GET     /Landing/featuredStars                                    controllers.Landing.featuredStars(count:Int)
 GET     /Landing/featuredStarsWithNoInventory                     controllers.Landing.featuredStarsWithNoInventory
 GET     /Landing/giftMessaging                                    controllers.Landing.giftMessaging
@@ -87,8 +91,9 @@ GET     /Login/allErrorsStorefront                                controllers.Lo
 GET     /Login/index                                              controllers.Login.index
 GET     /Login/storefront                                         controllers.Login.storefront(recipient:Option[String])
 
-GET     /Marketplace/results/list                                 controllers.Marketplace.results_list  
-GET     /Marketplace/results                                      controllers.Marketplace.results 
+GET     /Marketplace/results/list                                 controllers.Marketplace.resultsList
+GET     /Marketplace/results                                      controllers.Marketplace.results
+GET     /Marketplace/results/zero                                 controllers.Marketplace.zeroResults
 GET     /Marketplace/landing                                      controllers.Marketplace.landing
 
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors

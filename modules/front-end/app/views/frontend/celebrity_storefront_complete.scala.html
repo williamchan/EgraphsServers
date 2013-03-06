@@ -37,7 +37,7 @@
   					
   						<h2>Now it's @model.celebName's Turn</h2>
   					
-  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as @subjectPronoun(model.celebrityGender) @irregularToBe(model.celebrityGender) done creating your egraph, so look forward to hearing from @objectPronoun(model.celebrityGender)!</p>
+  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as @subjectPronoun(model.celebrityGender) @irregularToBe(model.celebrityGender) done creating your egraph, so look forward to hearing from @objectPronoun(model.celebrityGender)!</p>
   						
   						<p><small><a href="/faq#create" class="tip">What happens now?</a></small></p>
   						  				
@@ -51,18 +51,18 @@
   								<caption>Order Details</caption>
 									<tr>
 										<th>Egraph Order Date:</th>
-										<td>@model.orderDate.formatDayAsPlainLanguage</td>
+										<td>@model.orderDate.formatDayAsPlainLanguage("PST")</td>
 									</tr>
 									<tr>
 										<th>Egraph Purchased by:</th>
-										<td>@model.buyerName</td>
+										<td>@model.buyerEmail</td>
 									</tr>
 									<tr>
-										<th>Egraph Owner:</th>
+										<th>Egraph Recipient:</th>
 										<td>@model.ownerName</td>
 									</tr>
 									<tr>
-										<th>Owner's Email:</th>
+										<th>Recipient Email:</th>
 										<td>@model.ownerEmail</td>
 									</tr>
 									<tr>
@@ -77,23 +77,37 @@
 										<th>Price:</th>
 										<td>@model.totalPrice.formatPrecisely</td>
 									</tr>
-									<tr>
-                    <th><a href="@model.faqHowLongLink">Expected Digital Delivery:</a></th>
-										<td>@model.expectedDeliveryDate.formatDayAsPlainLanguage</td>
-									</tr>
   							</table>
                 @if(model.hasPrintOrder) {
-                  <p>Your framed print is expected to arrive 3 weeks after your digital delivery.</p>
+                  <p>Your framed print is expected to arrive 3 weeks after<br>your digital delivery. It will be shipped to:</p>
+                  <p>@model.printOrderShippingAddress</p>
                 }
   						
   						</div>
 
   						<div class="span6">
-  						
+
+                <!-- only display the message if the customer has written one -->
+                @if(model.messageToCelebrity.length > 0) {
+                  <h3>Your message to @model.celebName</h3>
+
+                  <p>
+                    @model.messageToCelebrity
+                  </p>
+                }
+
   							<h3>Order Changes</h3>
   							
-  							<p>To make changes to your order, please contact egraphs support at 
+  							<p>
+                  To make changes to your order, please contact egraphs support at
                   <a href="mailto:support@@egraphs.com">support@@egraphs.com</a>
+                </p>
+
+                <h3>When will you get the egraph?</h3>
+
+                <p>
+                  @model.celebName will create it as soon as @subjectPronoun(model.celebrityGender) can -- on average it takes 2 weeks.
+                  It's depends on @possessivePronoun(model.celebrityGender) schedule, so it may be much faster, or it may be slower!
                 </p>
   							
   							<ul>
@@ -177,7 +191,7 @@
 	  			</figure>
 	  			
 	  			<div>
-	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
+	  				<p>Are you sure you want to cancel your order for @model.celebName's Egraph?</p>
             @**   Un-Comment when we support cancelling.
             @safeForm('method -> "POST", 'action -> model.cancelOrderUrl) {
 	  				  <button class="btn" data-toggle="button">Cancel Order</button>

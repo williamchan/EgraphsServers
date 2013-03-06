@@ -21,12 +21,15 @@ trait AllAdminEndpoints
   with GetCelebrityInventoryBatchesAdminEndpoint
   with GetCelebrityOrdersAdminEndpoint
   with GetCelebrityProductsAdminEndpoint
+  with GetCelebrityRequestAdminEndpoint
   with GetCreateCelebrityInventoryBatchAdminEndpoint
   with GetCreateCelebrityProductAdminEndpoint
   with GetEgraphAdminEndpoint
   with GetEgraphsAdminEndpoint
   with GetInventoryBatchAdminEndpoint
   with GetLoginAdminEndpoint
+  with GetMastheadsAdminEndpoint
+  with GetMastheadAdminEndpoint
   with GetOrderAdminEndpoint
   with GetOrdersAdminEndpoint
   with GetPrintOrderAdminEndpoint
@@ -48,6 +51,8 @@ trait AllAdminEndpoints
   with PostFreegraphAdminEndpoint
   with PostInventoryBatchAdminEndpoint
   with PostLoginAdminEndpoint
+  with PostMastheadAdminEndpoint
+  with PostFeaturedMastheadsAdminEndpoint
   with PostOrderAdminEndpoint
   with PostPrintOrderAdminEndpoint
   with PostProcessVideoAdminEndpoint

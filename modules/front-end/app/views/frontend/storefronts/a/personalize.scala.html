@@ -1,4 +1,9 @@
-@(star: models.frontend.storefront_a.PersonalizeStar, checkoutUrl: String, testcase: Option[String])(
+@(star: models.frontend.storefront_a.PersonalizeStar, 
+  checkoutUrl: String,
+  maxDesiredTextChars: Int,
+  maxMessageToCelebChars: Int,
+  testcase: Option[String]=None
+)(
   implicit
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData,
@@ -15,9 +20,6 @@
 @import models.frontend.NgField.withField
 @import play.api.libs.json._
 @import models.frontend.forms.Field
-
-@maxNoteToStarChars = {150}
-@maxWrittenMessageChars = {60}
 
 @fieldTooltip(link: String, event: String="")(body: => Html) = {
   @tooltip(link, Seq("field-tooltip"), event)(body)
@@ -57,10 +59,6 @@
   <strong>Lorem tipsum dolor</strong> sit amet consectipiscent elit
 }
 
-@mastheadImageUrl = {https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/landing_20121119003405102/master.jpg}
-
-@profileImageUrl = {https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png}
-
 @baseBody = {
   <div id="content" role="main" ng-controller="PersonalizeController" ng-cloak>
     <div id="main">
@@ -70,7 +68,7 @@
           @* <img class="video-preview" src='@EgraphsAssets.at("images/egraph-video-preview.png")'> *@
         </div>
         <hr class="masthead-highlight" />
-        <img src="@mastheadImageUrl"></img>
+        <img src="@star.mastheadUrl"></img>
       </section> <!-- end #masthead-home -->        
       <div class="container">
         <section id="testimonials">
@@ -82,6 +80,9 @@
               <div class="attribution">
                 - Carla Hord
                 <span class="source">via Email</span>
+              </div>
+              <div style="margin-top:3px">
+                <a href="https://www.egraphs.com/3086" style="font-weight:400"><i class="icon-volume-up icon-white" style="position:relative;top:1px"></i> Hear Carla's egraph</a>
               </div>
             </div>
           </div>
@@ -118,14 +119,19 @@
           </div> <!-- end value-propositions -->
         <section id="buy-an-egraph">
           <h2 class="callout">
-            <img src='@EgraphsAssets.at("images/glyphicons-circle-arrow-down-orange.png")'></img>
-            Follow these steps to personally connect with @star.name for <span class="money">{{selectedProduct().currencySymbol}}{{selectedProduct().price}}</span>
+            <img src='@EgraphsAssets.at("images/glyphicons-circle-arrow-down-orange.png")'></img>          
+            @if(!star.isSoldOut) {          
+              Follow these steps to personally connect with @star.name for <span class="money">{{selectedProduct().currencySymbol}}{{selectedProduct().price}}</span>
+            } else {
+              <strong>Aw snap</strong>, @star.name has too many egraph orders queued up already! Sign up for our mailing list to be informed as soon as @star.pronoun.subject and your other favorite stars become available.
+            }
           </h2>
         </section>
       </div> <!-- end container -->
     </div> <!-- end main -->
 
     <div class="main-like">
+      @if(!star.isSoldOut) {
         <form name="egraphForm"
               remote-resource="{{cartApi.url}}/egraph"
               local-resource="egraph"
@@ -146,21 +152,20 @@
                     <div class="visitor-profile">
                       <img src='@EgraphsAssets.at("images/glyphish-user.png")' />
                     </div>
-                    <div class="triangle-border left">
+                    <div @*class="triangle-border left"*@>
                       <textarea @field.identityAttributes
                                 cols="1"
                                 resource-property
-                                maxlength="@maxNoteToStarChars"
+                                maxlength="@maxMessageToCelebChars"
                                 monitor-user-attention
                                 placeholder="Type your note to @star.name..."></textarea>
                       @field.standardErrorDiv
                     </div>
-                    @*<img src='@profileImageUrl' class="star-profile-image">*@
                     <div>
                       @fieldTooltip("Not sure what to say? Here are some tips.", event="Not sure what to say?") {
                         <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.pronoun.obj in person. Ask a question you've always wanted to know the answer to, or request that @star.pronoun.subject say something specific.
                       }
-                      <div class="explanatory-text char-remaining">{{@maxNoteToStarChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxMessageToCelebChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->
@@ -178,13 +183,13 @@
                       <textarea @field.identityAttributes
                                 cols="1"
                                 resource-property
-                                maxlength="@maxWrittenMessageChars"
+                                maxlength="@maxDesiredTextChars"
                                 monitor-user-attention
-                                placeholder="Leave it blank and @star.name will write whatever @star.pronoun.subject wants. Or give @star.pronoun.obj a short message like &quot;Happy 16th Birthday Bobby!&quot; and @star.pronoun.subject'll write that."></textarea>
+                                placeholder="Want @star.name to write something specific, e.g. &quot;Happy birthday&quot;? Leave this blank and @star.pronoun.subject'll write what @star.pronoun.subject wants."></textarea>
                     </div>
                     @field.standardErrorDiv
                     <div>
-                      <div class="explanatory-text char-remaining">{{@maxWrittenMessageChars - @{field.ngModel}.length}} left</div>
+                      <div class="explanatory-text char-remaining">{{@maxDesiredTextChars - @{field.ngModel}.length}} left</div>
                     </div>
                   </div>
                 </div> <!-- End .control-group.note-to-star -->
@@ -195,7 +200,7 @@
                   <label class="control-label" for="@field.id">
                     Who is this egraph for?
                     @fieldTooltip("How does gifting work?", event="How does gifting work?") {
-                      <strong>Egraphs make a great gift for a friend or family member.</strong> Just select the <em>This is a gift</em> and enter the recipient's name (this is who @star.name will address their message to).
+                      <strong>Egraphs make a great gift for a friend or family member.</strong> Just select the <em>This is a gift</em> and enter the recipient's name (this is who @star.name will address @star.pronoun.possessiveAdjective message to).
                     }
                     @fieldTooltip("How will they receive the gift?", event="How will they receive the gift?") {
                       On the next screen you can enter an email address for the recipient. When @star.name creates the egraph, an email will be sent to both yourself and the recipient with information on how to view and hear the graph.
@@ -217,9 +222,6 @@
                               class="btn btn-primary btn-custom-radio">
                         This is a gift
                       </button>
-                    </div>
-                    <div class="explanatory-text" ng-show="@field.ngModel == 'true'">
-                      Nice choice! An egraph makes a stellar gift.
                     </div>
                   </div>
                 </div> <!-- End .control-group.recipientOption -->
@@ -342,7 +344,7 @@
           <section id="egraph-arrival">
             <h2 class="clearfix callout">
               <img src='@EgraphsAssets.at("images/glyphish-stopwatch.png")'>
-              When will {{recipientNominative()}} get the egraph? @star.name will create it as soon as @star.pronoun.subject can -- on average it takes 2 weeks. It's depends on @star.pronoun.possessiveAdjective schedule, so it may be much faster, or it may be slower!
+              When will {{recipientNominative()}} get the egraph? @star.name will create it as soon as @star.pronoun.subject can -- on average it takes 2 weeks. It depends on @star.pronoun.possessiveAdjective schedule, so it may be much faster, or it may be slower!
               @fieldTooltip("Need it delivered on a specific date?", event="Need it delivered on a specific date?") {
                 If this is for a special occasion (like a birthday) and you'd like it sent to {{recipientNominative()}} on a specific date, email support@@egraphs.com after placing your order to let us know.
               }
@@ -359,7 +361,7 @@
                 <img src="@EgraphsAssets.at("images/glyphicons-check-circle-green.png")"> All required fields complete!
               </div>
               <div class="no-fields-remaining" ng-show="egraphForm.$submitting">
-                <img src="@EgraphsAssets.at("images/ajax-loader.gif")"> Validating...
+                <img src="@EgraphsAssets.at("images/ajax-loader.gif")"> Updating...
               </div>              
             </div>          
             <button id="review-button" 
@@ -381,15 +383,37 @@
             </div>
           </section>
         </form>
+      } else {
+        @headerIcon("Become an egraphs insider", "glyphicons-envelope-orange.png")
+        <div class="form-horizontal">
+          <form class="control-group become-insider" ng-controller="MailerController" class="newsletter-signup" ng-cloak ng-submit="subscribe()" ng-init="message=''">
+            <label class="control-label" for="email">
+              Your email:
+                @fieldTooltip("Why should I sign up?", event="Why sign up?") {
+                  <strong>Be informed and receive discounts.</strong> Joining our newsletter will keep you on top of your favorite stars and their availability. You'll also receive choice discounts available only to members.
+                }
+            </label>
+            <div class="controls">
+              <div class="input-append">
+                <input name="email" type="email"  ng-model="email"></input>
+                <button type="submit" class="btn"><i class="icon-envelope icon-white"></i></button>
+              </div>
+              <label>
+                {{ message }}
+              </label>
+            </div>
+          </form> <!-- End .control-group -->
+        </div>
+      }
     </div>
   </div>
 }
 
 
 @base_template(
-  title=star.name + " | Personalize",
+  title=star.name + " | Connect",
   headJs = headJs,
   jsMain = "pages/storefronts/a/personalize",
   body=baseBody,
-  bodyClasses=Seq("storefront-a-personalize")
+  bodyClasses=Seq("storefront-a-personalize") ++ {if(star.isSoldOut) Seq("sold-out") else Nil}
 )

@@ -108,7 +108,7 @@ object Facebook {
     val order = fulfilledOrder.order
     val egraph = fulfilledOrder.egraph
     val celebName = order.product.celebrity.publicName
-    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage
+    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage("PST")
     views.frontend.Utils.getFacebookShareLink(
       appId = fbAppId,
       picUrl = thumbnailUrl,

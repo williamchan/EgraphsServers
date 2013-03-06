@@ -36,7 +36,9 @@
       @landingEntry(controllerName: String) = {
         @catalogEntry(href="Landing/" + controllerName, description=controllerName)
       }
-
+      @catalogEntry("Landing/video", "Video masthead")
+      @catalogEntry("Landing/searchbox", "Searchbox masthead")
+      @catalogEntry("Landing/link", "Simple link")
       @for(number <- 0 until 9) {
         @landingEntry("featuredStars?count=" + number)
       }
@@ -175,6 +177,7 @@
     <ol>
       @catalogEntry("Marketplace/results", "Marketplace Results - Grid")
       @catalogEntry("Marketplace/results/list", "Marketplace Results - List")
+      @catalogEntry("Marketplace/results/zero", "Marketplace Results - Zero")
       @catalogEntry("Marketplace/landing", "Marketplace Landing")
     </ol>
     <h2>Celebrity Landing Page</h2>
@@ -209,6 +212,7 @@
     <h2>Storefront Variations</h2>
     <ol>
       @catalogEntry("Storefront-A/personalize", "Storefront reset personalize, default")
+      @catalogEntry("Storefront-A/personalizeSoldOut", "Storefront reset personalize, sold out")
       @catalogEntry("Storefront-A/checkout?testcase=default", "Storefront reset checkout, default")
     </ol>
     <h2>Error Pages</h2>

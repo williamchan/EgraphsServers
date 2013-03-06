@@ -8,7 +8,7 @@ import org.joda.money.{CurrencyUnit, Money}
 import org.joda.time.DateMidnight
 import org.squeryl.Query
 import services.{AppConfig, Time}
-import services.db.{FilterOneTable, KeyedCaseClass, Schema, SavesWithLongKey}
+import services.db._
 import services.Finance.TypeConversions._
 import util.Random
 
@@ -29,12 +29,13 @@ case class Coupon(
   lineItemTypeId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
-  services: CouponServices = AppConfig.instance[CouponServices]
+  @transient _services: CouponServices = AppConfig.instance[CouponServices]
 ) extends KeyedCaseClass[Long]
   with HasCreatedUpdated 
   with HasCouponType[Coupon]
   with HasCouponDiscountType[Coupon]
   with HasCouponUsageType[Coupon]
+  with HasTransientServices[CouponServices]
 {
   
   /**

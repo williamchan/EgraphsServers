@@ -10,7 +10,7 @@ package models.frontend.header
  */
 case class HeaderData(
   loggedInStatus: Either[HeaderNotLoggedIn, HeaderLoggedIn] = Left(HeaderNotLoggedIn("/")),
-  sessionId: String = "1",
+  sessionId: String,
   insideAnEgraphLink: String = "/inside-an-egraph",
   egraphsTwitterLink: String = "http://www.twitter.com/egraphs",
   egraphsFacebookLink: String = "http://www.facebook.com/egraphs",

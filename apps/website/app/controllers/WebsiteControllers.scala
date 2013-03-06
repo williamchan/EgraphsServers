@@ -1,6 +1,7 @@
 package controllers
 
 import models._
+import checkout.{CheckoutServices, LineItemStore, CheckoutAdapterServices}
 import models.categories._
 import website._
 import play.api.mvc.{Action, Controller}
@@ -21,6 +22,7 @@ import services.mvc.marketplace._
 import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.config.ConfigFileProxy
 import services.db.Schema
+import services.mvc.landing.LandingMastheadsQuery
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -39,6 +41,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val accountRecoverForms = instance[AccountRecoverFormFactory]
 
   override protected val catalogStarsQuery: CatalogStarsQuery = instance[CatalogStarsQuery]
+  override protected val landingMastheadsQuery: LandingMastheadsQuery = instance[LandingMastheadsQuery]
   override protected val orderCompleteViewModelFactory: OrderCompleteViewModelFactory = instance[OrderCompleteViewModelFactory]
 
   override protected val checkPurchaseField: PurchaseFormChecksFactory = instance[PurchaseFormChecksFactory]
@@ -63,12 +66,17 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val administratorStore = instance[AdministratorStore]
   override protected def categoryStore = instance[CategoryStore]
   override protected def categoryValueStore = instance[CategoryValueStore]
+  override protected def celebrityRequestStore = instance[CelebrityRequestStore]
   override protected val celebrityStore = instance[CelebrityStore]
+  override protected val checkoutServices = instance[CheckoutServices]
   override protected val couponStore = instance[CouponStore]
   override protected val customerStore = instance[CustomerStore]
   override protected val egraphStore = instance[EgraphStore]
   override protected val enrollmentBatchStore = instance[EnrollmentBatchStore]
   override protected val inventoryBatchStore = instance[InventoryBatchStore]
+  override protected val mastheadStore = instance[MastheadStore]
+  override protected val mastheadCategoryValueStore = instance[MastheadCategoryValueStore]
+  override protected val lineItemStore = instance[LineItemStore]
   override protected val orderStore = instance[OrderStore]
   override protected val printOrderStore = instance[PrintOrderStore]
   override protected val productStore = instance[ProductStore]
@@ -82,4 +90,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val inventoryBatchQueryFilters = instance[InventoryBatchQueryFilters]
   override protected val orderQueryFilters = instance[OrderQueryFilters]
   override protected val printOrderQueryFilters = instance[PrintOrderQueryFilters]
+
+  override protected val checkouts = instance[CheckoutAdapterServices]
 }

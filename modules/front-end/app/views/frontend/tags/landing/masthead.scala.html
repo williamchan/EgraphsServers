@@ -1,0 +1,86 @@
+@(masthead: models.frontend.landing.LandingMasthead,
+  active: Boolean = false,
+  ngBindings: Boolean = false
+)
+
+@import models.frontend.masthead._
+
+@ngHeadline = {
+  @if(ngBindings) {
+    <h1 ng-bind-html-unsafe="masthead.headline"></h1>
+  } else {
+    <h1>@Html(masthead.headline)</h1>
+  }
+}
+
+@ngSubtitle = {
+  @if(ngBindings) {
+    <h2 ng-bind-html-unsafe="masthead.subtitle"></h2>
+  } else {
+    @masthead.subtitle.map { subtitle =>
+      <h2>@Html(subtitle)</h2>
+    }
+  }
+}
+
+@ngText = {
+  @if(ngBindings) {
+    <span class="binding" ng-bind-html-unsafe="masthead.callToActionText"></span>
+  } else {
+    @Html(masthead.callToActionViewModel.text)
+  }
+}
+
+@ngTarget = {
+  @if(ngBindings) {
+    {{masthead.callToActionTarget}}
+  } else {
+    @masthead.callToActionViewModel.target
+  }
+}
+
+@video = {
+  @ngHeadline
+  @ngSubtitle
+  <p class="play-egraph">
+    <a id="masthead-video-button" class="button">
+      <strong>@ngText<i class="icon-facetime-video icon-white"></i></strong> <span>&raquo;</span>
+    </a>
+  </p>
+}
+
+@simpleLink = {
+  @ngHeadline
+  @ngSubtitle
+  <p class="get-started">
+    <a href="@ngTarget" class="button">
+      <strong>@ngText</strong> <span>&raquo;</span>
+    </a>
+  </p>
+}
+
+@search = {
+  @ngHeadline
+  @searchbox("/stars", helper=false)
+}
+
+
+<section class="masthead-home item @if(active){active} flyout-pull-right" role="banner" style="background-image: url('@masthead.landingPageImageUrl');">
+  <div class="banner-gradient">
+    <div class="container">
+      <div class="row">
+        <div class="span6 header-parent">
+
+        @{
+          masthead.callToActionViewModel match {
+            case v: VideoPlayerViewModel => video
+            case l: SimpleLinkViewModel => simpleLink
+            case s: SearchBoxViewModel => search
+            case _ =>  video
+          }
+        }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>  

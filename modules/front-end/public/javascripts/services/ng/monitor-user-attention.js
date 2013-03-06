@@ -25,18 +25,24 @@ function(ngApp, analytics, window, logging, module) {
   ngApp.directive("monitorUserAttention", [function() {
     return {
       restrict: 'A',
-      scope: true,
       controller: ["$scope", function($scope) {
+        var self = this;
+
         this.listeners = [];
         this.attended = false;
+        
+        this.setElement = function(element) {
+          self.element = element;
+        };
+
         this.setAttended = function(hasAttended) {
-          var element = $scope.element;
+          var element = self.element;
           var isFirstAttention = !this.$attended && hasAttended;
 
-          this.attended = hasAttended;
+          self.attended = hasAttended;
 
           if (isFirstAttention) {
-            forEach(this.listeners, function(listener) {
+            forEach(self.listeners, function(listener) {
               listener();
             });
           }
@@ -48,10 +54,12 @@ function(ngApp, analytics, window, logging, module) {
       link: function(scope, element, attrs, requisites) {
         var inputControl = requisites[0];
         var userAttention = requisites[1];
-        var analyticsCategory = scope.$parent.analyticsCategory?
-          scope.$parent.analyticsCategory:
+        var analyticsCategory = scope.analyticsCategory?
+          scope.analyticsCategory:
           window.location.href;
         var events = analytics.eventCategory(analyticsCategory);
+
+        userAttention.setElement(element);
 
         inputControl.userAttention = userAttention;
 

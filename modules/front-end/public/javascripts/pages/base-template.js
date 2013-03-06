@@ -4,6 +4,7 @@ define(
  "window",
  "services/logging",
  "module",
+ "libs/tooltip",
  "services/ng/mail-services",
  "services/responsive-modal"],
 function(page, window, logging, requireModule) {
@@ -19,7 +20,7 @@ function(page, window, logging, requireModule) {
         $scope.message = "Join our mailing list.";
         $scope.subscribe = function() {
           $subscribe($scope.email,
-            function() { $scope.message = "Thanks!";},
+            function() { $scope.message = "Aaaand you're signed up. Welcome to the club!";},
             function() { $scope.message = "Sorry, there was an error. Try again later.";}
           );
         };

@@ -713,7 +713,7 @@ object GalleryOrderFactory {
         fulfilledOrder = FulfilledOrder(order = order, egraph = egraph),
         thumbnailUrl = thumbnailUrl,
         viewEgraphUrl = viewEgraphUrl)
-      val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = viewEgraphUrl)
+      val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, order = order, viewEgraphUrl = viewEgraphUrl)
 
       new FulfilledEgraphViewModel(
         buyerId = order.buyerId,

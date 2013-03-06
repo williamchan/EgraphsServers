@@ -42,6 +42,10 @@ object TestData {
     RandomStringUtils.randomAlphabetic(10) + " " + RandomStringUtils.randomAlphabetic(10)
   }
 
+  def generateSessionId(): String = {
+    RandomStringUtils.randomAlphabetic(10)
+  }
+
   def makeTestCacheKey: String = {
     "this_is_a_test_case_key_" + new java.util.Date().getTime
   }
@@ -133,6 +137,10 @@ object TestData {
 
   private def newProduct(celebrity: Celebrity): Product = {
     celebrity.newProduct.copy(name = "prod" + random.nextLong(), description = "some prod").withPublishedStatus(PublishedStatus.Published)
+  }
+
+  def newSavedMasthead: Masthead = {
+    Masthead(name = generateUsername(), headline = generateUsername() ).save()
   }
 
   def newSavedProduct(celebrity: Option[Celebrity] = None): Product = {

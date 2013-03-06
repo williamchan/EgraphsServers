@@ -41,7 +41,7 @@ trait PostCelebrityAdminEndpoint {
         val (profileImageFile, landingPageImageFile, logoImageFile, profileImageOption, landingPageImageOption, logoImageOption) = getUploadedImages(request.body)
       	
       	val form = Form(mapping(
-              "celebrityEmail" -> email.verifying(nonEmpty, formConstraints.isUniqueEmail),
+              "celebrityEmail" -> email.verifying(nonEmpty, formConstraints.isValidNewEmail()),
               "celebrityPassword" -> nonEmptyText.verifying(formConstraints.isPasswordValid),
               "publicName" -> nonEmptyText(maxLength = 128),
               "publishedStatusString" -> nonEmptyText.verifying(isCelebrityPublishedStatus),
@@ -53,12 +53,11 @@ trait PostCelebrityAdminEndpoint {
               "twitterUsername" -> text
           )(PostCreateCelebrityForm.apply)(PostCreateCelebrityForm.unapply)
             .verifying(
-                isUniqueUrlSlug(),
-                profileImageIsValid(profileImageFile),
-                landingPageImageIsValid(landingPageImageOption),
-                logoImageIsValid(logoImageOption)
-      		)
-          )
+              isUniqueUrlSlug(),
+              profileImageIsValid(profileImageFile),
+              landingPageImageIsValid(landingPageImageOption),
+              logoImageIsValid(logoImageOption)
+      		))
         
         form.bindFromRequest.fold(
             formWithErrors => {
@@ -219,7 +218,8 @@ trait PostCelebrityAdminEndpoint {
               e => BadRequest("No twitter screen name in request."),
               officialScreenName => {
                 val screenName = removeAtSymbol(officialScreenName)
-                celebrity.copy(twitterUsername = Some(screenName)).save()
+                val maybeScreenName = if(screenName.isEmpty) None else Some(screenName) // this lets us unset the value
+                celebrity.copy(twitterUsername = maybeScreenName).save()
                 Ok(screenName)
               })
           }
@@ -311,10 +311,10 @@ trait PostCelebrityAdminEndpoint {
     Constraint { form: PostCelebrityForm =>
       landingPageImageOption.map { landingPageImage =>
         val (width, height) = (landingPageImage.getWidth, landingPageImage.getHeight)
-        if (width >= Celebrity.minLandingPageImageWidth && height >= Celebrity.minLandingPageImageHeight) {
+        if (width >= LandingPageImage.minImageWidth && height >= LandingPageImage.minImageHeight) {
           Valid
         } else {
-          Invalid("Landing Page Image must be at least " + Celebrity.minLandingPageImageWidth + " in width and " + Celebrity.minLandingPageImageHeight + " in height - resolution was " + width + "x" + height)
+          Invalid("Landing Page Image must be at least " + LandingPageImage.minImageWidth + " in width and " + LandingPageImage.minImageHeight + " in height - resolution was " + width + "x" + height)
         }
       }.getOrElse(Valid)
     }

@@ -22,6 +22,7 @@ trait AllConsumerEndpoints
   with PostLoginEndpoint
   with PostOrderConfigureEndpoint
   with PostRecoverAccountEndpoint
+  with PostRequestStarEndpoint
   with PostResetPasswordEndpoint
   with GetFacebookLoginCallbackEndpoint
   with CelebrityLandingConsumerEndpoint
@@ -32,4 +33,5 @@ trait AllConsumerEndpoints
   with StorefrontCheckoutConsumerEndpoints
   with StorefrontFinalizeConsumerEndpoints
   with StorefrontFailedConsumerEndpoints
+  with PurchaseFlowEndpoints
 { this: Controller => }

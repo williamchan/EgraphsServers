@@ -17,8 +17,8 @@ import services.db.TransactionSerializable
 @RunWith(classOf[JUnitRunner])
 class StorefrontChoosePhotoConsumerEndpointsTests extends EgraphsUnitTest {
    private def db = AppConfig.instance[DBSession]
-    
-  "postStorefrontChoosePhoto" should "provide a redirect when things work" in new EgraphsTestApplication {
+
+  "postStorefrontChoosePhoto" should "provide a redirect when things work" ignore new EgraphsTestApplication {
     val (celebrity, product) = db.connected(TransactionSerializable) {
       val celebrity = TestData.newSavedCelebrity()
       val product = TestData.newSavedProduct(Some(celebrity))

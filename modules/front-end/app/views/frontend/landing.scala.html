@@ -1,4 +1,5 @@
 @(stars:Iterable[models.frontend.landing.CatalogStar],
+  mastheadOption: Option[models.frontend.landing.LandingMasthead],
   verticalViewModels: List[models.frontend.marketplace.VerticalViewModel],
   signup:Boolean = false,
   marketplaceRoute : String = "/stars"
@@ -16,6 +17,7 @@
 @import views.html.frontend.tags
 @import play.api.libs.json._
 @import egraphs.playutils.Gender
+@import org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript
 
 @loremIpsum = {
   <h2> Lorem ipsum dolor sit amet</h2>
@@ -146,19 +148,14 @@
         (a, b) => a ++ b.asActiveMap)
     }.toMap).toString());
   Egraphs.page.queryUrl = "@marketplaceRoute";
+  Egraphs.page.mastheadName = "@escapeEcmaScript(mastheadOption.getOrElse(models.frontend.landing.DefaultLanding.masthead).name)";
 }
 
 @baseBody = {
   @headerData.giftCertificateLink.map { link =>
     @tags.landing.announcement_bar()
   }
-  @tags.landing.masthead_section(
-    celebrityPublicName=None,
-    mastheadMessage=None,
-    mastheadImageUrl=EgraphsAssets.at("images/landing-masthead.jpg").url,
-    getStartedUrl=Some("/stars")
-  )
-
+  @tags.landing.masthead_section(mastheadOption)
   <section id="content" role="main" class="landing">
 
     <div id="main">

@@ -26,7 +26,10 @@ object RepeatableScenarios {
     val celebrity = TestData.newSavedCelebrity()
 
     celebrity.saveWithProfilePhoto(Play.getFile("test/resources/will_chan_celebrity_profile.jpg"))
-    celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg")).save()
+    val (celeb, image) = celebrity.withLandingPageImage(Play.getFile("test/resources/ortiz_masthead.jpg"))
+    image.save()
+    celeb.save()
+
 
     if (isFeatured) {
       featured.updateFeaturedCelebrities(List(celebrity.id))

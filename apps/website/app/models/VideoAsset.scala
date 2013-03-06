@@ -79,13 +79,13 @@ class VideoAssetStore @Inject() (schema: Schema)
   }
 
   //
-  // SavesWithLongKey[Address] methods
+  // SavesWithLongKey[VideoAsset] methods
   //
   override val table = schema.videoAssets
 
 
   //
-  // SavesCreatedUpdated[Address] methods
+  // SavesCreatedUpdated[VideoAsset] methods
   //
   override def withCreatedUpdated(toUpdate: VideoAsset, created: Timestamp, updated: Timestamp) = {
     toUpdate.copy(created = created, updated = updated)

@@ -24,5 +24,7 @@ class HttpFilters @Inject()(
   val requireProductId: RequireProductId,
   val requireProductPublishedAccess: RequireProductPublishedAccess,
   val requireProductUrlSlug: RequireProductUrlSlug,
-  val requireSessionId: RequireSessionId
+  val requireSessionId: RequireSessionId,
+  val requireSessionAndCelebrityUrlSlugs: RequireSessionAndCelebrityUrlSlugs,
+  val requireSessionUrlSlug: RequireSessionUrlSlug
 )

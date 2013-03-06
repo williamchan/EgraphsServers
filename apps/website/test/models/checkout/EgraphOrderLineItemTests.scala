@@ -1,7 +1,7 @@
 package models.checkout
 
 import utils.{DBTransactionPerTest, DateShouldMatchers, EgraphsUnitTest}
-import models.checkout.checkout.Conversions._
+import models.checkout.Conversions._
 import models.enums._
 import models.checkout.Checkout.CheckoutFailedShippingAddressMissing
 import LineItemTestData._

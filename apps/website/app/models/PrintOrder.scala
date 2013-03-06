@@ -84,8 +84,6 @@ case class PrintOrder(id: Long = 0,
     }
   }
 
-  def withShippingAddress(address: Address) = { this.copy(shippingAddress = address.streetAddressString) }
-
   //
   // KeyedCaseClass[Long] methods
   //

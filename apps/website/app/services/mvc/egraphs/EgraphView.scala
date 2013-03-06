@@ -36,11 +36,7 @@ object EgraphView {
     val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
     val iframeUrl = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphPlayerEmbed(order.id).url)
     val classicPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraphClassic(order.id).url)
-    val celebrityNameForTweet = celebrity.twitterUsername match {
-      case Some(username) => "@" + username
-      case None => celebrity.publicName
-    }
-    val tweetText = "An egraph for " + order.recipientName + " from " + celebrityNameForTweet
+    val tweetText = Twitter.getTweetText(celebrity, order)
     val shareOnPinterestLink = Pinterest.getPinterestShareLink(
       url = thisPageLink,
       media = egraphStillUrl,
@@ -54,7 +50,7 @@ object EgraphView {
       privacySetting = order.privacyStatus.name,
       messageToCelebrity = order.messageToCelebrity,
       productIconUrl = product.iconUrl,
-      signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage,
+      signedOnDate = egraph.getSignedAt.formatDayAsPlainLanguage("PST"),
       thisPageLink = thisPageLink,
       classicPageLink = classicPageLink,
       shareOnPinterestLink = shareOnPinterestLink,
@@ -104,7 +100,7 @@ object EgraphView {
     val story = egraph.story(celebrity, product, order)
 
     // Signed at date
-    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage
+    val formattedSigningDate = egraph.getSignedAt.formatDayAsPlainLanguage("PST")
 
     // Social links
     val thisPageLink = consumerApp.absoluteUrl(controllers.routes.WebsiteControllers.getEgraph(order.id).url)
@@ -114,7 +110,7 @@ object EgraphView {
       thumbnailUrl = pngImageUrl,
       viewEgraphUrl = thisPageLink)
 
-    val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, viewEgraphUrl = thisPageLink)
+    val twitterShareLink = Twitter.getEgraphShareLink(celebrity = celebrity, order = order, viewEgraphUrl = thisPageLink)
 
     views.html.frontend.egraph_classic(
       signerName = celebrity.publicName,

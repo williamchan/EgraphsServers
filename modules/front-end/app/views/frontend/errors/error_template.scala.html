@@ -13,7 +13,7 @@
 }
 
 @base_template(title=title, body=body, jsMain="")(
-  headerData = models.frontend.header.HeaderData(),
+  headerData = models.frontend.header.HeaderData(sessionId="0"),
   footerData = models.frontend.footer.FooterData(),
   authToken = new egraphs.authtoken.AuthenticityToken("")
 )

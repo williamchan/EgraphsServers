@@ -11,6 +11,17 @@ body.storefront-a-checkout {
     display:block;
   }
 
+  .general-errors {
+    margin-top:10px;
+    @color: darken(@orange, 10%);
+    border:1px solid @color;
+    padding:10px;
+    border-radius:10px;
+    background-color:lighten(@orange, 42%);
+    color:@color;
+    font-style:normal;
+  }
+
   // The funny shopping-cart navbar
   .top {
     text-align:center;
@@ -55,7 +66,9 @@ body.storefront-a-checkout {
         display: inline-block;
         vertical-align:top;
         text-transform: uppercase;
-                
+        a {
+          color: @orange;
+        }
         label {
           line-height: normal;
           font-size:13px;
@@ -331,7 +344,7 @@ body.storefront-a-checkout {
           }
 
           // All non-total .moneys get de-emphasized
-          &:not(.TotalLineItemType) .money {
+          &:not(.TotalLineItem) .money {
             color:@orange;
             background-color:inherit;
           }
@@ -355,20 +368,22 @@ body.storefront-a-checkout {
           // (see https://egraphs.atlassian.net/wiki/display/DEV/API+Endpoints for list of
           //      code types)
           //
-          &.EgraphOrderLineItemType {
+          &.EgraphOrderLineItem {
             img {
               border:1px solid #ddd;
               background-color:white;
+              width:60px;
+              min-height:35px;
             }
           }
 
-          &.PrintOrderLineItemType {
+          &.PrintOrderLineItem {
             img {
               background-color:white;
             }
           }
 
-          &.TotalLineItemType {
+          &.TotalLineItem {
             text-transform:uppercase;
             background-color:transparent;
 
@@ -400,6 +415,11 @@ body.storefront-a-checkout {
       &.ng-valid:not(.ng-submitting) {
         background-image: url("/assets/images/glyphicons-circle-gray.png");
       }
+
+      &.ng-invalid-remote_validated_on_server:not(.ng-submitting) {
+        background-image: url("/assets/images/glyphicons-circle-gray.png");
+      }
+
     }
 
     // For coupon code, only show the green check mark when everything is valid 
@@ -511,7 +531,7 @@ body.storefront-a-checkout {
       
       // The purchase button and associated text
       .submission {
-        max-width:200px;
+        max-width:205px;
         margin-left:auto;
         margin-right:auto;
       }

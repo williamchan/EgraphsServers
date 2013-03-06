@@ -8,6 +8,7 @@ import services.{Utils, Time}
 import play.api.mvc.Action
 import controllers.routes
 import services.crypto.Crypto
+import services.http.EgraphsSession.Conversions._
 
 /**
  * Allows functions to be performed within a logging "Context", where
@@ -33,7 +34,7 @@ class LoggingContext {
    * request can be traced back to this IP address and request. It identifies the user and request
    * using [[services.http.RequestInfo]]
    *
-   * @param operation block of code that should execute within the request logging context
+   * @param action block of code that should execute within the request logging context
    * @return the result of the operation
    **/
   def withRequestContext[A](action: Action[A]): Action[A] = {
@@ -106,14 +107,16 @@ class LoggingContext {
         .append(" ")
         .append(request.uri)
         .append("\" ")
-        .append("to IP ")
-        .append(request.remoteAddress)
+        .append("to session ")
+        .append(request.session.id.getOrElse("(no session ID)"))
         .append(" (id=")
         .append(requestInfo.clientId)
         .append(", ")
         .append("requestId=")
         .append(requestInfo.requestId)
         .append(")")
+        .append("  User-Agent: ")
+        .append(request.headers.get("User-Agent").getOrElse("Not provided"))
       
       info(requestHeader.toString())
     }

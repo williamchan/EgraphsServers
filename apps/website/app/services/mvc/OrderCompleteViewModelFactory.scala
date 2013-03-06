@@ -1,8 +1,10 @@
 package services.mvc
 
 import models._
+import checkout.Checkout
 import com.google.inject.Inject
 import controllers.routes.WebsiteControllers.getFAQ
+import enums.CheckoutCodeType
 import frontend.storefront.OrderCompleteViewModel
 import org.joda.money.{CurrencyUnit, Money}
 import services.config.ConfigFileProxy
@@ -35,6 +37,30 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       cashTransaction,
       maybePrintOrder
     )
+  }
+
+  /** from new purchase flow for egraph purchases */
+  def fromEgraphPurchaseCheckout(checkout: Checkout): Option[OrderCompleteViewModel] = {
+    import models.checkout.Conversions._
+    import CheckoutCodeType._
+
+    for ( orderItem <- checkout.lineItems(EgraphOrder).headOption) yield {
+      val order = orderItem.domainObject
+      val product = order.product
+      val buyer = checkout.buyerCustomer
+
+      this.fromModels(
+        celebrity = product.celebrity,
+        product = product,
+        buyer = buyer,
+        buyerAccount = buyer.account,
+        recipientAccount = order.recipient.account,
+        order = order,
+        inventoryBatch = order.inventoryBatch,
+        cashTransaction = checkout.lineItems(CashTransaction).headOption map (_.domainObject),
+        maybePrintOrder = checkout.lineItems(PrintOrder).headOption map (_.domainObject)
+      )
+    }
   }
 
   //
@@ -73,6 +99,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
     val totalAmountPaid = cashTransaction.map(_.cash).getOrElse(Money.zero(CurrencyUnit.USD))
     val isLiveConsumerSite = (config.applicationBaseUrl == "https://www.egraphs.com/")
     val printPrice = maybePrintOrder.map(_.amountPaid).getOrElse(Money.zero(CurrencyUnit.USD))
+    val printOrderShippingAddress = maybePrintOrder.map(_.shippingAddress).getOrElse("")
     
     OrderCompleteViewModel (
       orderDate = order.created,
@@ -87,10 +114,12 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       productId = product.id,
       expectedDeliveryDate = Order.expectedDeliveryDate(celebrity),
       faqHowLongLink = faqHowLongLink,
+      messageToCelebrity = order.messageToCelebrity.getOrElse(""),
       totalPrice = totalAmountPaid,
       discount = None,
       digitalPrice = product.price,
       printPrice = printPrice,
+      printOrderShippingAddress = printOrderShippingAddress,
       hasPrintOrder = maybePrintOrder.isDefined,
       withAffiliateMarketing = isLiveConsumerSite
     )

@@ -13,37 +13,37 @@ function(mockBackend, logging, module, ngApp) {
   var BAD_REQUEST = 400;
   var newCheckout = function() {
     return {
-      products: [],
-      discounts: [],
-      fees: [],
+      product: [],
+      discount: [],
+      fee: [],
       summary: [{
         id: idSequence++,
         name: "Total",
         amount: 0,
-        type: {
-          codeType: "TotalLineItemType"
+        lineItemType: {
+          codeType: "TotalLineItem"
         }
       }],
 
       _addProduct: function(product) {
-        this.products.push(product);
+        this.product.push(product);
         this.summary[0].amount += product.amount;
       },
 
       _setDiscount: function(amount) {
-        if (this.discounts.length > 0) {
-          this.summary[0].amount += this.discounts[0].amount;
-          this.discounts = [];
+        if (this.discount.length > 0) {
+          this.summary[0].amount += this.discount[0].amount;
+          this.discount = [];
         }
         if (amount) {
           this.summary[0].amount -= amount;
-          this.discounts.push({
+          this.discount.push({
             id: idSequence++,
             name: amount + " off",
             description: amount + " off",
             amount: amount,
-            type: {
-              codeType: "DiscountLineItemType"
+            lineItemType: {
+              codeType: "DiscountLineItem"
             }
           });
         }
@@ -56,17 +56,21 @@ function(mockBackend, logging, module, ngApp) {
     coupon: {},
     recipient: {},
     shippingAddress: {},
-    payment: {}
+    payment: {},
+    egraph: {
+      isGift: "false"
+    }
   };
+
   var digitalEgraphLineItem = function() {
     return {
       id: idSequence++,
       name: "Sergio Romo egraph",
       description: "For Herp Derpson with note I'm your biggest fan!. He will sign the photo Heart of a Warrior.",
       amount: 50,
-      imageUrl: "https://d3kp0rxeqzwisk.cloudfront.net/celebrity/172/profile_20120823053553898/w80.png",
-      type: {
-        codeType: "EgraphOrderLineItemType"
+      imageUrl: "https://d3kp0rxeqzwisk.cloudfront.net/product/416/20120823100121825/w340.jpg",
+      lineItemType: {
+        codeType: "EgraphOrderLineItem"
       }
     };
   };
@@ -78,22 +82,30 @@ function(mockBackend, logging, module, ngApp) {
       description: "A framed print of your digital egraph.",
       amount: 45,
       imageUrl: "/assets/images/framed-print.png",
-      type: {
-        codeType: "PrintOrderLineItemType"
+      lineItemType: {
+        codeType: "PrintOrderLineItem"
       }
     };
   };
 
-  var checkoutApiShouldReturn = function(checkout) {
+  var checkoutApiShouldReturn = function(checkout, post) {
+    var _post = post || function() {
+      return [
+        200,
+        {
+          "order": {
+            "id": 1,
+            "confirmationUrl": "/orders/1/confirm"
+          }
+        },
+        {}
+      ];
+    };
+
     mockBackend.setBehavior(function($httpBackend) {
       var checkoutRegex = /checkouts\/[0-9]+$/;
       $httpBackend.whenGET(checkoutRegex).respond(checkout);
-      $httpBackend.whenPOST(checkoutRegex).respond({
-        "order": {
-          "id": 1,
-          "confirmationUrl": "/orders/1/confirm"
-        }
-      });
+      $httpBackend.whenPOST(checkoutRegex).respond(_post);
     });
   };
 
@@ -156,7 +168,17 @@ function(mockBackend, logging, module, ngApp) {
   var stubApi = function(path, propName) {
     mockBackend.stubResource({
       path: path,
-      get: function(data) { return [200, mockApi[propName], {}]; },
+      get: function(data) {
+
+        var hasProps = false;
+        var returnCode = 400;
+
+        angular.forEach(mockApi[propName], function(prop, propName) {
+          returnCode = 200;
+        });
+
+        return [returnCode, mockApi[propName], {}];
+      },
       post: function(data) {
         mockApi[propName] = data;
         return [200, "", {}];
@@ -182,6 +204,7 @@ function(mockBackend, logging, module, ngApp) {
   var configureDefaultCheckoutApi = function() {
     checkoutApiShouldReturn(checkout);
     stubApi(/coupon/, 'coupon');
+    stubApi(/egraph/, 'egraph');
     stubApi(/recipient/, 'recipient');
     stubApi(/buyer/, 'buyer');
     stubApi(/shipping-address/, 'shippingAddress');
@@ -257,6 +280,66 @@ function(mockBackend, logging, module, ngApp) {
         checkout._addProduct(framedPrintLineItem());
 
         populateForms();
+        configureDefaultCheckoutApi();
+      }
+    },
+
+    "gift-recipient": {
+      bootstrap: function() {
+        checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
+
+        mockApi.egraph = {
+          isGift: "true",
+          recipientName: "Joe Recipient"
+        };
+        configureDefaultCheckoutApi();
+      }
+    },
+
+    "transact-errors": {
+      bootstrap: function() {
+        checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
+
+        checkoutApiShouldReturn(checkout, function() {
+          return [
+            400,
+            {
+              errors: {
+                payment: [
+                  "stripe_incorrect_number",
+                  "stripe_invalid_number",
+                  "stripe_invalid_expiry_month",
+                  "stripe_invalid_expiiry_year",
+                  "stripe_invalid_cvc",
+                  "stripe_expired_card",
+                  "stripe_incorrect_cvc",
+                  "stripe_card_declined",
+                  "stripe_processing_error"
+                ],
+                egraph: ["no_inventory"]
+              }
+            },
+            {}
+          ];
+        });
+        populateForms();
+
+        configureDefaultCheckoutApi();
+      }
+    },
+
+    "transact-server-error": {
+      bootstrap: function() {
+        checkout._addProduct(digitalEgraphLineItem());
+        checkout._addProduct(framedPrintLineItem());
+
+        checkoutApiShouldReturn(checkout, function() {
+          return [500, undefined, {}];
+        });
+        populateForms();
+
         configureDefaultCheckoutApi();
       }
     },

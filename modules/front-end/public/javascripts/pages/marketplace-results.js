@@ -1,5 +1,5 @@
 /*global angular console mixpanel*/
-define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min"],
+define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min", "libs/jquery-ui"],
 function (Egraphs, marketplace, ngApp, logging, requireModule) {
   var log = logging.namespace(requireModule.id);
 
@@ -217,6 +217,13 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
             marketplace.reloadPage();
           }
         );
+
+        $(".show-all").click(function(e){
+          $(this).parent().siblings().children().each(function() {
+            $(this).removeClass("condensed");
+          });
+          $(this).addClass("condensed");
+        });
 
         $(".clear-all").click(function(e) {
           marketplace.clearCategoryByKey("c" + $(this).attr("data-category"));
