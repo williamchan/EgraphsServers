@@ -33,8 +33,11 @@
   }
 
   .education {
+    strong {
+      color:#333;
+    }
+    
     .value-propositions {
-
       .value-icon-holder {
         float: left;
         width: 50px;
@@ -48,7 +51,6 @@
 
         strong {
           display:block;
-          color:#333;
           margin-bottom:4px;
         }
         span {
@@ -58,38 +60,27 @@
     }
 
     .value-top {
-      margin-bottom: 10px;
-      h2 {
-        display: inline;
-      } 
+      margin-left: auto;
+      margin-right: auto;
+      width: auto;
+      text-align: center;
       
       .learn-more {
-        float: right;
-        font-size: 13px;
-        a {
-          color: @blue;
-          &:hover {
-            color: @orange;
+        strong {
+          font-size: 16px;
+        }
+
+        .actions {
+          font-size: 13px;
+          a {
+              color: @blue;
+            &:hover {
+              color: @orange;
+            }
           }
         }
       }
 
-    }
-
-    .value-bottom {
-      display: none;
-      p {
-        float: right;
-      }      
-
-      .leading-text {
-        font-size: 13px;
-        padding-right: 5px;
-        a {
-          color: @orange;
-          border-bottom: 1px dotted @orange;
-        }
-      }
     }
   }  
 

@@ -16,7 +16,7 @@ function(page, window, logging, requireModule) {
       /** Controller for mail signup at bottom-right of site template */
       MailerController: ['$scope', '$subscribe', function($scope, $subscribe) {
         $scope.email = "";
-        $scope.message = "Join our mailing list.";
+        $scope.message = "Join our mailing list for great deals and updates.";
         $scope.subscribe = function() {
           $subscribe($scope.email,
             function() { $scope.message = "Aaaand you're signed up. Welcome to the club!";},
@@ -76,9 +76,10 @@ function(page, window, logging, requireModule) {
         });
 
         var mobileNavOut = false;
-        // use the .flyout-pull-right class to specify any items outside of the
-        // the normal #top, #bottom, #content heirarchy that must slide out from the
-        // mobile navigation menu.
+        // Use the .flyout-pull-right class to select any elements outside of the
+        // the standard #top, #bottom, #content containers that must slide out and away
+        // from the mobile navigation menu affectionately referred to as the "burger bar."
+
         var pushedElements = $("#top, #bottom, #content, .flyout-pull-right");
         var mobileMenu = $("#left-flyout");
         log("Binding things");

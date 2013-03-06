@@ -26,7 +26,7 @@
         @if(clearFix) {<div class="clearfix">}
 
         @for(star <- starRow) {
-          <article class="span3">
+          <article  id="@star.name" class="span3">
             <figure>
               @if(!star.hasInventoryRemaining) {
                 <div class="ribbon simple">
@@ -34,13 +34,13 @@
                   </a>
                 </div>
               }
-              <a class="glowborder" href="@star.storefrontUrl" >
+              <a class="glowborder" href="@star.storefrontUrl" data-name="@star.name">
                 <img src="@star.imageUrl" title="Purchase an egraph from @star.name" alt="@star.name"/>              
               </a>
             </figure>
             <hgroup>
               <p class="price">$@if(star.minPrice > 0 && star.minPrice != star.maxPrice){@star.minPrice - @star.maxPrice} else { @star.maxPrice }</p>
-              <h4><a href="@star.storefrontUrl">@star.name</a></h4>
+              <h4><a href="@star.storefrontUrl" data-name="@star.name">@star.name</a></h4>
               <h5>@star.secondaryText</h5>
             </hgroup>
           </article>        
@@ -55,17 +55,6 @@
 
 @valueProp = {
   <div class="module education">
-    <div class="value-top row clearfix">    
-    <div class="span9">
-      <h2>How It Works</h2>
-    </div>
-    <div class="span3">
-      <span  class="learn-more">  
-      Want to know more? <a id="learn-more-link">Click here</a>
-      </span>
-    </div>
-
-    </div>
     <div class="value-propositions row">
       <div class="span3 clearfix">
         <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/pencil.png")'></img></div>
@@ -77,7 +66,7 @@
       <div class="span3 clearfix">
         <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-microphone.png")'></img></div>
         <div class="description">
-          <strong>They'll respond back</strong>
+          <strong>Your star replies</strong>
           <span>through their iPad microphone, just for you</span>
         </div>
       </div>
@@ -96,11 +85,17 @@
         </div>
       </div>
     </div>
-    <div class="value-bottom clearfix">
-      <p class="leading-text">
-      Want to learn more? <a href="#">Click here</a>
-      </p>
-    </div>
+    <div class="value-top row clearfix">    
+        <span class="learn-more">  
+          <strong>Want to know more about Egraphs?</strong>
+          <br>
+          <span class="actions">
+            <a id="play-video-link" href="#top-relative"> Watch the video </a> 
+            or 
+            <a id="learn-more-link">read more here</a>
+          </span>  
+        </span>
+    </div>  
   </div> <!-- end value-propositions -->
 }
 
@@ -192,8 +187,8 @@
       <div id ="landing-content" class="container">
         
         <ul id="tabs" data-tab="tabs" class="switcher">
-          <li class="active left-tab"><a class="switcher-tab" href="#shop">Shop</a></li>
-          <li class="right-tab"><a id="learn-switch" class="switcher-tab" href="#learn">Learn</a></li>
+          <li class="active left-tab" id="shop-tab"><a class="switcher-tab" href="#shop">Shop</a></li>
+          <li class="right-tab" id="learn-tab"><a class="switcher-tab" href="#learn">Learn</a></li>
         </ul>
         
         <div id="learn" class="tab" style="display: none">
