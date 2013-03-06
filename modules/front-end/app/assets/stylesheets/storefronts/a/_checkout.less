@@ -299,6 +299,8 @@ body.storefront-a-checkout {
             20%,
             rgba(0,0,0,.02)
           );
+          // Manually specifying the filter fixes breakage on specifying rgb or rgba in IE9.
+          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#fefefe', GradientType=0);
           text-shadow:0px 1px 0px white;
 
           .image-and-description {
@@ -311,7 +313,6 @@ body.storefront-a-checkout {
             font-size:13px;
             font-weight:600;
             line-height:normal;
-            margin-bottom:4px;
           }
 
           // The optional line-item photo image
@@ -369,6 +370,7 @@ body.storefront-a-checkout {
           //      code types)
           //
           &.EgraphOrderLineItem {
+            h3 { margin-bottom:4px; }
             img {
               border:1px solid #ddd;
               background-color:white;
@@ -378,6 +380,7 @@ body.storefront-a-checkout {
           }
 
           &.PrintOrderLineItem {
+            h3 { margin-bottom:4px; }
             img {
               background-color:white;
             }
