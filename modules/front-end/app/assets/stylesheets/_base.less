@@ -402,9 +402,14 @@ button  {
 		
 		padding-left: 22px;
 		background-image: url(/assets/images/bg-button-left-facebook.png);
+
+    &:hover {
+      background-position: 0 100%;
+      strong, span { background-position: 0 100%; }
+    }
 		
 		strong {
-			background-image: url(/assets/images/bg-button-mid-facebook.png);	
+			background-image: url(/assets/images/bg-button-mid-facebook.png);
 			em {
 				display: block;
 				width: 65px;
@@ -413,11 +418,10 @@ button  {
 				text-indent: -9999px;
 				overflow: hidden;
 				background: url(/assets/images/logotype-facebook.png) no-repeat 0 50%;
-			}		
+			}
 		}
-		
+
 		span { background-image: url(/assets/images/bg-button-right-facebook.png); }	
-		
 	}
 }
 
