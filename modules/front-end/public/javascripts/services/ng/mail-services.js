@@ -22,11 +22,13 @@
   </form>
 **/
 /*global angular, mixpanel*/
-define(["page", "ngApp", "services/logging", "module"],
-  function(page, ngApp, logging, requireModule) {
+define(["page", "ngApp", "services/logging", "services/analytics", "module"],
+  function(page, ngApp, logging, analytics, requireModule) {
     var log = logging.namespace(requireModule.id);
+    var events = analytics.eventCategory("Mail");
     var mail = page.mail;
     var authToken = page.authenticityToken;
+
     var subscribeFactory = function($http) {
       return function(email, successCallback, errorCallback) {
         log(email);
@@ -36,7 +38,7 @@ define(["page", "ngApp", "services/logging", "module"],
           data: {"email" : email, "authenticityToken" : authToken}
         }).success( function(data) {
           log("Subscribed!");
-          mixpanel.track('Subscribed to newsletter');
+          events.track(['Subscribed to newsletter']);
           (successCallback || angular.noop)(data);
         }).error( function(data) {
           (errorCallback || angular.noop)(data);
