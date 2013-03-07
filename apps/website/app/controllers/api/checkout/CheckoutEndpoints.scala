@@ -16,6 +16,7 @@ import services.logging.Logging
 import services.email.OrderConfirmationEmail
 import models.frontend.email.OrderConfirmationEmailViewModel
 import services.ConsumerApplication
+import play.api.http.HeaderNames.CACHE_CONTROL
 
 /**
  * Should this be CheckoutAdapterEndpoints, maybe?
@@ -43,8 +44,10 @@ trait CheckoutEndpoints { this: Controller =>
     controllerMethod(WithDBConnection(TransactionSerializable, readOnly=false)) {
       httpFilters.requireSessionAndCelebrityUrlSlugs(sessionIdSlug, checkoutIdSlug) { (sessionId, celebrity) =>
         Action { implicit request =>
-          val maybeCheckout = checkoutAdapters.decache(celebrity.id)
-          maybeCheckout map { checkout => Ok(checkout.summary) } getOrElse NotFound
+          checkoutAdapters.decache(celebrity.id) match {
+            case Some(checkout) => Ok(checkout.summary).withHeaders(CACHE_CONTROL -> "no-cache")
+            case None => NotFound 
+          }
         }
       }
     }
