@@ -27,6 +27,7 @@ class CelebritySecureInfoTests extends EgraphsUnitTest
       agentEmail = Some(TestData.generateEmail("bezosAgent", "clamazon.com")),
       streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
+      state = Some("QC"),
       postalCode = Some("ABC 123"),
       country = Some("CA")
     ).withDepositAccountType(Some(BankAccountType.Checking))
@@ -63,6 +64,7 @@ class CelebritySecureInfoTests extends EgraphsUnitTest
     val allFilledIn = DecryptedCelebritySecureInfo(
       streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
+      state = Some("QC"),
       postalCode = Some("ABC 123"),
       country = Some("CA")
     ).withDepositAccountType(Some(BankAccountType.Checking))
@@ -110,6 +112,7 @@ class CelebritySecureInfoTests extends EgraphsUnitTest
       agentEmail = Some(TestData.generateEmail("myyksAgent", "clamazon.com")),
       streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
+      state = Some("QC"),
       postalCode = Some("ABC 123"),
       country = Some("CA")
     ).withDepositAccountType(Some(BankAccountType.Checking))
