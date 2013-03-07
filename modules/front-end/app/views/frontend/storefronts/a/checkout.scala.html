@@ -449,13 +449,13 @@
               <img src="@EgraphsAssets.at("images/ajax-loader.gif")"> Updating...
             </div>
             <div class="payment-errors general-errors" ng-show="stripeForm.$error.remote_transaction">
-              We failed to successfully charge this card. Correct the payment form or try another card?
+              We failed to successfully charge the provided card. Maybe you made an error or have another card to try?
             </div>
             <div class="general-errors" ng-show="errors.noInventory">
-              Sorry, but this star's queue <em>just</em> filled up with orders! Sign up for our newsletter at the bottom of this page to be informed when your favorite stars will be available again.
+              Sorry, but this star's queue <em>just</em> filled up with orders, but don't worry - we didn't charge your card! Sign up for our newsletter at the bottom of this page to be informed when your favorite stars will be available again.
             </div>
             <div class="general-errors" ng-show="errors.serverError">
-              Sorry, but it looks like we're having server difficulties. Try again later and hopefully things will go more smoothly...
+              Sorry, but it looks like we're having server difficulties. Don't worry, we didn't charge your card though. Try again later and hopefully things will go more smoothly...
             </div >           
           </div>
         </div>
