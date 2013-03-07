@@ -218,18 +218,6 @@ function(ngApp, logging, module) {
         var inputControl = requisites[1];
         var userAttention = requisites[2];
 
-        var hasLocalErrors = function(inputControl) {
-          var foundLocalError = false;
-          
-          forEach(inputControl.$error, function(isError, errorName) {
-            if (errorName.indexOf("remote_") === -1) {
-              foundLocalError = true;
-            }
-          });
-
-          return foundLocalError;
-        };
-
         var submitFormWithDelay = function(delayMs) {
           inputControl.setSubmitting(true);
           remoteResource.submit({
@@ -246,14 +234,6 @@ function(ngApp, logging, module) {
             element.removeClass("ng-submitting");
           }
         };
-        userAttention.listeners.push(function() {
-          // Only submit if there are no local errors to take care of.
-          // This happens implicitly when submission is triggered by $viewChangeListeners
-          // below.
-          if (!hasLocalErrors(inputControl) && attrs.noSubmitOnBlur === undefined) {
-            submitFormWithDelay(0);
-          }
-        });
         
         remoteResource.addControl(inputControl);
         inputControl.$viewChangeListeners.push(function() {
