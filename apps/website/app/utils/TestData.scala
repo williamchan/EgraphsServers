@@ -86,11 +86,11 @@ object TestData {
     customer
   }
 
-  def newSavedCelebrity(): Celebrity = {
+  def newSavedCelebrity(secureInfo: Option[CelebritySecureInfo] = Some(newSavedSecureInfo())): Celebrity = {
     val fullName = generateFullname()
     val email = generateEmail(fullName.replaceAll(" ", "."))
     val acct = Account(email = email).withPassword(defaultPassword).right.get.save()
-    val celeb = Celebrity(publicName = fullName)
+    val celeb = Celebrity(publicName = fullName, secureInfoId = secureInfo.map(_.id))
     	.withPublishedStatus(PublishedStatus.Published)
     	.withEnrollmentStatus(EnrollmentStatus.Enrolled)
     	.save()
@@ -98,6 +98,22 @@ object TestData {
     acct.copy(celebrityId = Some(celeb.id)).save()
 
     celeb
+  }
+
+  def newSavedSecureInfo(): DecryptedCelebritySecureInfo = {
+    val encrypted = DecryptedCelebritySecureInfo(
+      contactEmail = Some(TestData.generateEmail("bezos", "clamazon.com")),
+      smsPhone = Some(RandomStringUtils.randomNumeric(10)),
+      voicePhone = Some(RandomStringUtils.randomNumeric(10)),
+      agentEmail = Some(TestData.generateEmail("bezosAgent", "clamazon.com")),
+      streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
+      city = Some(RandomStringUtils.randomAlphanumeric(40)),
+      postalCode = Some("ABC 123"),
+      country = Some("CA")
+    ).withDepositAccountType(Some(BankAccountType.Checking))
+    .withDepositAccountRoutingNumber(Some(RandomStringUtils.randomNumeric(9).toInt))
+    .withDepositAccountNumber(Some(Random.nextLong.abs)).encrypt.save()
+    encrypted.decrypt
   }
 
   def newSavedCategory: Category = {
