@@ -1,13 +1,12 @@
 package models.checkout
 
-import org.joda.money.{Money, CurrencyUnit}
-import models.{PrintOrderStore, PrintOrder, Order, OrderStore}
-import services.db.{Schema, CanInsertAndUpdateEntityThroughTransientServices, InsertsAndUpdatesAsEntity, HasTransientServices}
+import org.joda.money.Money
+import models.{Order, OrderStore}
+import services.db.Schema
 import services.AppConfig
 import com.google.inject.Inject
-import scalaz.Lens
 import models.enums.PaymentStatus
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 import services.blobs.AccessPolicy
 import models.ImageAsset.Jpeg
 
@@ -92,16 +91,22 @@ case class EgraphOrderLineItem(
 
   /** saves the order and optionally the print order if chosen */
   private def withSavedOrder(checkout: Checkout): EgraphOrderLineItem = {
-    val buyerId = checkout.buyerCustomer.id
-    val recipientId = checkout.recipientCustomer map (_.id) getOrElse buyerId
+    val buyer = checkout.buyerCustomer
+    val recipient = checkout.recipientCustomer getOrElse buyer
 
-    // save order
-    val savedOrder = domainObject.copy(
-      lineItemId = Some(id),
-      buyerId = buyerId,
-      recipientId = recipientId,
-      amountPaidInCurrency = this.amount.getAmount
-    ).withPaymentStatus(PaymentStatus.Charged).save()
+    // buyer "buys" order
+    val savedOrder = buyer.buy(
+      product = itemType.product,
+      recipient = recipient,
+      recipientName = itemType.recipientName,
+      messageToCelebrity = itemType.messageToCeleb,
+      requestedMessage = itemType.desiredText
+    ) match {
+      case Left(error) => throw error                         // hacky, TODO: refactor transact to use Either
+      case Right(order) => order.copy(
+        lineItemId = Some(id)
+      ).withPaymentStatus(PaymentStatus.Charged).save()
+    }
 
     // save print if necessary
     if (itemType.framedPrint) {

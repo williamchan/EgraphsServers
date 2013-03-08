@@ -1,22 +1,16 @@
 package models
 
+import com.google.inject.{Provider, Inject}
+import enums.OrderReviewStatus
+import exception.InsufficientInventoryException
 import java.sql.Timestamp
 import org.apache.commons.mail.HtmlEmail
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import play.api.templates.Html
-import play.api.mvc.RequestHeader
-
-import enums.OrderReviewStatus
-import services.{Time, AppConfig}
-import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
-import com.google.inject.{Provider, Inject}
-import exception.InsufficientInventoryException
-import org.apache.commons.mail.HtmlEmail
-import services.mail._
-import controllers.routes.WebsiteControllers.getVerifyAccount
-import services.ConsumerApplication
+import play.api.libs.json._
 import services.config.ConfigFileProxy
+import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
+import services.mail._
+import services.{Time, AppConfig}
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -176,7 +170,7 @@ class CustomerStore @Inject() (
 
   def findByEmail(email: String) = {
     join (table, schema.accounts) ( (customer, account) =>
-      where (account.email === email)
+      where (lower(account.email) === lower(email))
       select (customer) on (customer.id === account.customerId)
     ).headOption
   }

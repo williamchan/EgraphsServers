@@ -130,6 +130,19 @@ class CustomerTests extends EgraphsUnitTest
     (TestData.newSavedCustomer(), TestData.newSavedCustomer(), TestData.newSavedProduct())
   }
 
+  "findByEmail" should "find as appropriate" in new EgraphsTestApplication {
+    val (customer, email) = createCustomerForEmail
+
+    customerStore.findByEmail(email) should be (Some(customer))
+  }
+
+  it should "be case insensitive" in new EgraphsTestApplication {
+    val (customer, email) = createCustomerForEmail
+
+    customerStore.findByEmail(email.toUpperCase) should be (Some(customer))
+    customerStore.findByEmail(email.toLowerCase) should be (Some(customer))
+  }
+
   "findOrCreateByEmail" should "find or create as appropriate" in new EgraphsTestApplication {
     val (customer, account) = createCustomerWithFindOrCreateByEmail()
 
@@ -153,5 +166,12 @@ class CustomerTests extends EgraphsUnitTest
     account.customerId should be(None)
     val customer = customerStore.findOrCreateByEmail(account.email, "joe fan")
     (customer, account)
+  }
+
+  private def createCustomerForEmail = {
+    val email = TestData.generateEmail()
+    val account = TestData.newSavedAccount(Some(email))
+    val customer = TestData.newSavedCustomer(Some(account))
+    (customer, email)
   }
 }
