@@ -79,6 +79,8 @@ class Schema @Inject() (
   on(celebrities)(celebrity =>
     declare(
       celebrity.urlSlug is unique,
+      celebrity.facebookUrl is dbType("varchar(255)"),
+      celebrity.websiteUrl is dbType("varchar(255)"),
       celebrity.bio is dbType("text")))
 
   val encryptedCelebritySecureInfos = table[EncryptedCelebritySecureInfo]

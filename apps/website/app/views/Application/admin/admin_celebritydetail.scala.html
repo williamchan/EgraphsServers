@@ -98,17 +98,10 @@
           </div>
         </div>      
         <div class="row-fluid">
-          <div class="span12">    
-              <div class="clearfix">
-                <label for="bio">Short Bio</label>
-                <div class="input">
-                  <textarea class="xlarge" id="bio" name="bio" rows="3">@fields("bio")</textarea>
-                </div>
-              </div>
-
-              @formField(id="twitterUsername", label="Twitter Username", inputType="text", width="span4", fields=fields)
-
-            </fieldset>
+          <div class="span12">
+            @formField(id="twitterUsername", label="Twitter Username", inputType="text", width="span4", fields=fields)
+            @formField(id="facebookUrl", label="Facebook page Url", inputType="text", width="span4", fields=fields)
+            @formField(id="websiteUrl", label="Personal website Url", inputType="text", width="span4", fields=fields)
           </div>
         </div>
         <div class="row-fluid">
