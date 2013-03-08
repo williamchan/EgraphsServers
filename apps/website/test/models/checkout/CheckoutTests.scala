@@ -12,6 +12,8 @@ import services.Finance.TypeConversions._
 import models.checkout.LineItemMatchers._
 import models.checkout.Conversions._
 import LineItemTestData._
+import models.enums.CouponDiscountType
+import models.Coupon
 
 @RunWith(classOf[JUnitRunner])
 class CheckoutTests extends EgraphsUnitTest
@@ -83,6 +85,10 @@ class CheckoutTests extends EgraphsUnitTest
 
   "Checkout#toJson" should "match the api endpoint spec" in (pending)
 
+  "A checkout with zero balance" should "not need payment" in eachScenario { implicit scenario =>
+    withZeroBalance(initialCheckout).transact(None) should be ('right)
+  }
+
   //
   // Helpers
   //
@@ -100,7 +106,7 @@ class CheckoutTests extends EgraphsUnitTest
   //
   // Checkout Matchers
   //
-  def notHaveDuplicateSummaries = Matcher { checkout: Checkout =>
+  private def notHaveDuplicateSummaries = Matcher { checkout: Checkout =>
     val numSubtotals = checkout.itemTypes.filter(SubtotalLineItemType eq _).size
     val numTotals = checkout.itemTypes.filter(TotalLineItemType eq _).size
 
@@ -109,4 +115,13 @@ class CheckoutTests extends EgraphsUnitTest
       "%d and %d subtotals and totals found.".format(numSubtotals, numTotals)
     )
   }
+
+  private def withZeroBalance(checkout: Checkout) = {
+    val couponTypeServices = AppConfig.instance[CouponLineItemTypeServices]
+    val coupon = Coupon(discountAmount = checkout.subtotal.amount.getAmount)
+      .withDiscountType(CouponDiscountType.Flat).save()
+    val couponType = couponTypeServices.findByCouponCode(coupon.code).toSeq
+    checkout.withAdditionalTypes(couponType)
+  }
+
 }

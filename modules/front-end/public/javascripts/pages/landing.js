@@ -36,10 +36,13 @@ function (page, marketplace, analytics, logging, requireModule) {
   return {
     go: function() {
       $(document).ready(function() {
-        
-        $(".play-egraph a").click(function() {
+        // Set up to enable the video modal. Add a selector here if you need a different
+        // link to activate the modal.
+        $(".play-egraph a, #play-video-link").click(function() {
+          $("html, body").animate({ scrollTop: 0 }, "slow");
           $("#video-modal").responsivemodal('toggle');
         });
+
         var apiLoaded = false;
 
         var createPlayer = function(playerReadyCallback) {
@@ -63,7 +66,6 @@ function (page, marketplace, analytics, logging, requireModule) {
         // Initialize the YouTube video and start playing.
         // See this YouTube Iframe API reference
         // https://developers.google.com/youtube/iframe_api_reference
-        //
 
         $("#video-modal").on('shown', function() {
           var player;
@@ -86,34 +88,41 @@ function (page, marketplace, analytics, logging, requireModule) {
 
         $(".soldout-tooltip").tooltip({placement:"top"});
 
-        // Mixpanel events
+        // Tracking events
         mixpanel.track('Home page viewed', {'query': window.location.search });
-        mixpanel.track_links('#get-started-button', 'Get Started clicked');
-        $(".celebrities figure>a").click(function() {
-          mixpanel.track("Celebrity clicked");
-        });
-        $(".celebrities h4>a").click(function() {
-          mixpanel.track("Celebrity clicked");
+
+        $(".celebrities figure>a, .celebrities h4>a").click(function() {
+          events.track(["Featured star clicked", $(this).attr("data-name")]);
         });
         
-        $(".switcher-tab").click(function(e){
-          var tab = $(this);
-          var parent = tab.parent();
-          parent.addClass("active");
-          parent.siblings().removeClass("active");
-
+        // Configure learn/shop tab
+        var selectTab = function(tabId) {
+          var newTab = $(tabId + "-tab");
+          newTab.addClass("active");
+          newTab.siblings().removeClass("active");
           $(".tab").hide();
-          $(tab.attr("href")).fadeIn();
+          $(tabId).fadeIn();
+          events.track(["Tab selected", tabId]);
+        };
+
+        $(".switcher-tab").click(function(e){
+          var tabId = $(this).attr("href");
+          selectTab(tabId);
           e.preventDefault();
         });
 
-        $("a.helper").click(function() {
-          $("#learn-switch").click();
+        $("#learn-more-link").click(function(e) {
+          $("html, body").animate({ scrollTop: 0 });
+          selectTab("#learn");
+          e.preventDefault();
         });
+        
+        // Configure shopping links
         $(".vertical-button").click(verticalFunction);
         $(".all-teams").click(verticalFunction);
         $(".vertical-tile").click(verticalFunction);
         $(".cv-link").click(categoryFunction);
+
          events.track(['Masthead viewed', page.mastheadName || "blank"]);
 
       });

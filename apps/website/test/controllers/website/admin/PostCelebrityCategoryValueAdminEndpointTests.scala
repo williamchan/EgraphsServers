@@ -41,7 +41,7 @@ class PostCelebrityCategoryValueAdminEndpointTests extends EgraphsUnitTest with 
   
   private def newCategoryValueCeleb: (CategoryValue, Celebrity)  = {
      db.connected(TransactionSerializable) {
-       (TestData.newSavedCategoryValue(TestData.newSavedCategory.id), TestData.newSavedCelebrity)
+       (TestData.newSavedCategoryValue(TestData.newSavedCategory.id), TestData.newSavedCelebrity())
      }
   }
 }
