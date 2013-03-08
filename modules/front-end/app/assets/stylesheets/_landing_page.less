@@ -156,6 +156,8 @@
             color: @white;
             font-size: 32px;
             margin-left: 10px;
+            margin-bottom: 0;
+            margin-top: 0;
             position: absolute;
             text-shadow: 0 3px 3px rgba(0, 0, 0, .5);
             i {
@@ -224,7 +226,7 @@
     }
 
     #browse {
-      a.vertical-button {            
+      .vertical-button {            
 
         .border-radius(2px);
         .box-shadow(0px 0px 0px @orange);
@@ -247,6 +249,8 @@
         h3 {
           display: inline-block;
           font-size: .875em;
+          line-height: 36px;
+          margin: 0;
           text-shadow: 0 1px 0 #fff;
         }
 
@@ -325,7 +329,6 @@
 
       }
 
-
       p.stars-link {
         position: absolute;
         right: 0;
@@ -385,15 +388,18 @@
           }
 
           hgroup {
-            h4 {
-              font-weight: 600;
+            h4, h5 {
+              font-size: 14px;
               line-height: 1.25em;
               margin-bottom: 0;
+              margin-top: 0;
+            }
+
+            h4 {
+              font-weight: 600;
             }
             
             h5 {
-              font-size: 14px;
-              line-height: 1.25em;
               margin-bottom: 0;
 
             }
