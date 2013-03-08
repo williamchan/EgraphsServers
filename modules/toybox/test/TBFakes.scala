@@ -22,6 +22,7 @@ object TBFakes {
 
   val fakeApp = new FakeApplication(
     additionalConfiguration = Map(
+      "application.secret" -> "foobar",
       userKey -> correctUsername,
       passwordKey -> correctPassword,
       initRequestKey -> "toybox-initialRequest",
