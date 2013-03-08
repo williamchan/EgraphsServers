@@ -27,7 +27,10 @@
   <link href="https://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
   <script src="https://vjs.zencdn.net/c/video.js"></script>
 
-  @** Open Graph property to specify what image from this page should be shown in Facebook likes *@
+  @** Open Graph properties to specify what shows up in Facebook likes and comments, https://developers.facebook.com/tools/debug *@
+  <meta property="og:url" content="@thisPageLink"/>
+  <meta property="og:title" content="A message for @recipientName from @celebrityName"/>
+  <meta property="og:description" content="An egraph from @celebrityName, @celebrityTagline"/>
   <meta property="og:image" content="@videoPosterUrl"/>
 
   @** Twitter card for embedded player - https://dev.twitter.com/docs/cards *@

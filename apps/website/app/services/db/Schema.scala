@@ -81,6 +81,11 @@ class Schema @Inject() (
       celebrity.urlSlug is unique,
       celebrity.bio is dbType("text")))
 
+  val encryptedCelebritySecureInfos = table[EncryptedCelebritySecureInfo]
+  on(encryptedCelebritySecureInfos)(encryptedCelebritySecureInfo =>
+    declare(
+      encryptedCelebritySecureInfo.contactEmail is unique))
+
   val celebrityRequests = table[CelebrityRequest]
 
   val checkouts = table[CheckoutEntity]("Checkout")
@@ -231,6 +236,11 @@ class Schema @Inject() (
 
   val categoryToCategoryValue = oneToManyRelation(categories, categoryValues)
     .via((category, categoryValue) => category.id === categoryValue.categoryId)
+
+  val celebrityToCelebritySecureInfos = oneToManyRelation(encryptedCelebritySecureInfos, celebrities)
+    .via((encryptedCelebritySecureInfo, celebrity) => encryptedCelebritySecureInfo.id === celebrity.secureInfoId)
+  on(celebrities)(celebrity => declare(celebrity.secureInfoId is (unique)))
+  celebrityToCelebritySecureInfos.foreignKeyDeclaration.constrainReference(onDelete setNull)
 
   val celebrityToEnrollmentBatches = oneToManyRelation(celebrities, enrollmentBatches)
     .via((celebrity, enrollmentBatch) => celebrity.id === enrollmentBatch.celebrityId)
@@ -593,6 +603,7 @@ class Schema @Inject() (
       factoryFor(blobKeys) is BlobKey(services = injector.instance[BlobKeyServices]),
       factoryFor(cashTransactions) is CashTransaction(services = injector.instance[CashTransactionServices]),
       factoryFor(celebrities) is Celebrity(services = injector.instance[CelebrityServices]),
+      factoryFor(encryptedCelebritySecureInfos) is EncryptedCelebritySecureInfo(services = injector.instance[CelebritySecureInfoServices]),
       factoryFor(celebrityCategoryValues) is CelebrityCategoryValue(services = injector.instance[CategoryServices]),
       factoryFor(coupons) is Coupon(_services = injector.instance[CouponServices]),
       factoryFor(customers) is Customer(services = injector.instance[CustomerServices]),

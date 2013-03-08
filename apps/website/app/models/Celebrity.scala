@@ -35,6 +35,7 @@ case class CelebrityServices @Inject() (
   accountStore: AccountStore,
   consumerApp: ConsumerApplication,
   categoryServices: CategoryServices,
+  celebritySecureInfoStore: CelebritySecureInfoStore,
   productStore: ProductStore,
   orderStore: OrderStore,
   inventoryBatchStore: InventoryBatchStore,
@@ -65,6 +66,7 @@ case class Celebrity(
   _publishedStatus: String = PublishedStatus.Unpublished.name,
   _landingPageImageKey: Option[String] = None,
   _logoImageKey: Option[String] = None,
+  secureInfoId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CelebrityServices = AppConfig.instance[CelebrityServices]
@@ -83,13 +85,13 @@ case class Celebrity(
   //
   // Additional DB columns
   //
-  /**The slug used to access this Celebrity's page on the main site. */
+  /** The slug used to access this Celebrity's page on the main site. */
   val urlSlug: String = Utils.slugify(publicName, false) // Slugify without lower-casing
 
   //
   // Public members
   //
-  /**Persists by conveniently delegating to companion object's save method. */
+  /** Persists by conveniently delegating to companion object's save method. */
   override def save(): Celebrity = {
     require(!publicName.isEmpty, "A celebrity without a publicName is hardly a celebrity at all.")
     services.store.save(this)
@@ -99,7 +101,7 @@ case class Celebrity(
     services.accountStore.findByCelebrityId(id).get
   }
 
-  /**Returns all of the celebrity's Products */
+  /** Returns all of the celebrity's Products */
   def products(filters: FilterOneTable[Product]*): Query[Product] = {
     services.productStore.findByCelebrity(id, filters: _*)
   }
@@ -110,6 +112,15 @@ case class Celebrity(
 
   def activeProductsAndInventoryBatches: Seq[(Product, InventoryBatch)] = {
     services.productStore.findActiveProductsByCelebrity(id).toSeq
+  }
+
+  def secureInfo: Option[DecryptedCelebritySecureInfo] = {
+    for {
+      id <- secureInfoId
+      secureInfo <- services.celebritySecureInfoStore.findById(id)
+    } yield {
+      secureInfo.decrypt
+    }
   }
 
   /**
@@ -123,8 +134,22 @@ case class Celebrity(
    * If twitterUsername is not set, they might have a twitter account.
    * But if it is set to "none", we have checked, and they don't have one.
    */
-  def doesNotHaveTwitter = {
+  def doesNotHaveTwitter: Boolean = {
     twitterUsername.map(name => name.toLowerCase) == Some("none")
+  }
+
+  def isAccountSettingsComplete: Boolean = {
+    isAccountSettingsComplete(secureInfo)
+  }
+
+  // This method allows efficient reuse of code with CelebritySecureInfo
+  private[models] def isAccountSettingsComplete(maybeSecureInfo: Option[CelebritySecureInfo]): Boolean = {
+    maybeSecureInfo match {
+      case None => false
+      case Some(info) =>
+        def numberOfContactMethods = info.numberOfContactMethods + (if (twitterUsername.isDefined) 1 else 0)
+        info.hasAllDepositInformation && (numberOfContactMethods >= 3)
+    }
   }
 
   /**
@@ -303,12 +328,13 @@ case class JsCelebrity(
   publicName: String,
   enrollmentStatus: String,
   urlSlug: String,
+  accountSettingsComplete: Boolean,
   created: Timestamp,
   updated: Timestamp
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrity extends Function6[Long, String, String, String, Timestamp, Timestamp, JsCelebrity] {
+object JsCelebrity extends Function7[Long, String, String, String, Boolean, Timestamp, Timestamp, JsCelebrity] {
   import services.Time.ApiDateFormat
   implicit val celebrityFormats = Json.format[JsCelebrity]
 
@@ -317,6 +343,7 @@ object JsCelebrity extends Function6[Long, String, String, String, Timestamp, Ti
       id = celebrity.id,
       publicName = celebrity.publicName,
       enrollmentStatus = celebrity.enrollmentStatus.name,
+      accountSettingsComplete = celebrity.isAccountSettingsComplete,
       urlSlug = celebrity.urlSlug,
       created = celebrity.created,
       updated = celebrity.updated
