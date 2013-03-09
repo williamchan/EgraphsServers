@@ -608,8 +608,14 @@ class OrderQueryFilters @Inject() (schema: Schema) {
   private def actionableEgraphs: FilterOneTable[Order] = {
     new FilterOneTable[Order] {
       override def test(order: Order) = {
-        val nonActionableStates = Seq(EgraphState.Published.name, EgraphState.ApprovedByAdmin.name,
-          EgraphState.AwaitingVerification.name, EgraphState.PassedBiometrics.name, EgraphState.FailedBiometrics.name)
+        val nonActionableStates = Seq(
+          EgraphState.Published.name,
+          EgraphState.ApprovedByAdmin.name,
+          EgraphState.AwaitingVerification.name,
+          EgraphState.PassedBiometrics.name,
+          EgraphState.FailedBiometrics.name,
+          EgraphState.PendingMlbReview.name
+        )
 
         notExists(
           from(schema.egraphs)(egraph =>

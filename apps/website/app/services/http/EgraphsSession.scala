@@ -1,15 +1,10 @@
 package services.http
 
-import com.google.inject.Inject
 import egraphs.playutils.Enum
-import java.util.Date
 import org.joda.time.DateTimeConstants
-import play.api.mvc.AnyContent
 import play.api.mvc.Session
 import play.api.mvc.Call
-import play.api.mvc.Request
 import services.request.PostCelebrityRequestHelper
-import services.Utils
 
 case class EgraphsSession(session: Session) {
   import EgraphsSession.Key
@@ -31,8 +26,16 @@ case class EgraphsSession(session: Session) {
     session + (Key.AdminId.name -> id.toString)
   }
 
-  def removedAdminId: Session = {
+  def removeAdminId(): Session = {
     session - Key.AdminId.name
+  }
+
+  def withMlbpaAccess(): Session = {
+    session + (Key.MlbpaAccess.name -> "1")
+  }
+
+  def removeMlbpaAccess(): Session = {
+    session - Key.MlbpaAccess.name
   }
 
   def customerId: Option[Long] = {
@@ -43,7 +46,7 @@ case class EgraphsSession(session: Session) {
     session + (Key.CustomerId.name -> id.toString)
   }
 
-  def removedCustomerId: Session = {
+  def removeCustomerId(): Session = {
     session - Key.CustomerId.name
   }
 
@@ -103,6 +106,7 @@ object EgraphsSession {
 
     val AdminId = new EnumVal("admin") {}
     val CustomerId = new EnumVal("customer") {}
+    val MlbpaAccess = new EnumVal("mlbpa") {}
     val UsernameChanged = new EnumVal("username_changed") {}
     val HasSignedUp = new EnumVal("has_signed_up") {}
     val RequestedStar = new EnumVal("requested_star") {}

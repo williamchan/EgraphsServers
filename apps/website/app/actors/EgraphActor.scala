@@ -44,7 +44,7 @@ case class EgraphActor @Inject() (
    * Run biometrics on the Egraph and updates the EgraphState based on the result.
    * Also, initializes the mp3 and mp4 assets for the egraph, and stores them to the blobstore.
    *
-   * If the application config paramter "adminreview.skip" is turned on, then the Egraph is immediately published.
+   * If the application config parameter "adminreview.skip" is turned on, then the Egraph is immediately published.
    *
    * @param egraphId id of the Egraph to process
    */

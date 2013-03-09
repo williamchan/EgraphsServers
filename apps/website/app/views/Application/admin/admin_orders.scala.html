@@ -1,6 +1,6 @@
 @(orderResults: Iterable[(models.Order, models.Celebrity)], celebrity: Option[models.Celebrity] = None
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
-  paginationInfo: controllers.PaginationInfo, 
+  paginationInfo: models.frontend.PaginationInfo,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
 
@@ -9,7 +9,7 @@
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
 @import views.html.frontend.base_template
-@import views.html.Application.tags.pagination
+@import views.html.frontend.tags.pagination
 
 @head = {
 	<script src='@EgraphsAssets.at("twitter-bootstrap-1.4.0/js/bootstrap-alerts.js")' type="text/javascript"></script>

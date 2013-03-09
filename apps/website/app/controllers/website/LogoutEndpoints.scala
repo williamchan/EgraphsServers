@@ -28,6 +28,6 @@ private[controllers] trait LogoutEndpoints {
 
   private def logout[A]()(implicit request: Request[A]): Result = {
     Redirect(controllers.routes.WebsiteControllers.getRootConsumerEndpoint)
-      .withSession(request.session.removedCustomerId.removedAdminId)
+      .withSession(request.session.removeCustomerId().removeAdminId().removeMlbpaAccess())
   }
 }

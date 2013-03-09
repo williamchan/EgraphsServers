@@ -1,13 +1,13 @@
 @(celebrityAccounts: Iterable[(models.Celebrity, models.Account)],
   allCelebrities: Iterable[models.frontend.admin.CelebrityAdminViewModel]
 )(implicit authToken: egraphs.authtoken.AuthenticityToken,
-  paginationInfo: controllers.PaginationInfo, 
+  paginationInfo: models.frontend.PaginationInfo,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
 
 @import controllers.WebsiteControllers
 @import egraphs.authtoken.AuthenticityToken.safeForm
-@import views.html.Application.tags.pagination
+@import views.html.frontend.tags.pagination
 @import views.html.frontend.tags
 @import views.html.frontend.tags.ng
 @import views.html.frontend.base_template

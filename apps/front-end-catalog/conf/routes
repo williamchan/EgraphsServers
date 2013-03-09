@@ -97,6 +97,8 @@ GET     /Marketplace/results                                      controllers.Ma
 GET     /Marketplace/results/zero                                 controllers.Marketplace.zeroResults
 GET     /Marketplace/landing                                      controllers.Marketplace.landing
 
+GET     /Mlbpa/egraphs                                            controllers.Mlbpa.egraphs
+
 GET     /Personalize/allErrors                                    controllers.Personalize.allErrors
 GET     /Personalize/index                                        controllers.Personalize.index
 GET     /Personalize/portrait                                     controllers.Personalize.portrait

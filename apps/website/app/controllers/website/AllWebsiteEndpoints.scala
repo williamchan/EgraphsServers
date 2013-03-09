@@ -1,5 +1,6 @@
 package controllers.website
 
+import mlbpa.MlbpaEndpoints
 import play.api.mvc.Controller
 import admin.AllAdminEndpoints
 import consumer.{GetRootConsumerEndpoint, AllConsumerEndpoints}
@@ -13,4 +14,5 @@ trait AllWebsiteEndpoints
   with AllConsumerEndpoints
   with PostBuyDemoProductEndpoint
   with AllAdminEndpoints
+  with MlbpaEndpoints
 { this: Controller =>}

@@ -1,0 +1,43 @@
+@(errorFields: Option[List[String]] = None
+)(implicit authToken: egraphs.authtoken.AuthenticityToken)
+
+@import controllers.WebsiteControllers
+@import egraphs.authtoken.AuthenticityToken.safeForm
+@import views.html.Application.content_base
+@import views.html.Application.tags.errorMessage
+
+@content_base(title="MLBPA - Login", body=body)
+
+@postMlbpaLogin = @{
+  routes.WebsiteControllers.postMlbpaLogin
+}
+
+@body = {
+<div class="admin-content">
+  <div class="form row">
+    <div class="span12 form-column">
+      @safeForm('id -> "postMlbpaLogin-form", 'method -> "POST", 'action -> postMlbpaLogin.url) {
+      <fieldset>
+        <legend>MLBPA Login</legend>
+        <div class="clearfix">
+          <label for="username">Username</label>
+          <div class="input">
+            <input class="span4" id="username" name="username" type="text">
+          </div>
+        </div>
+        <div class="clearfix">
+          <label for="password">Password</label>
+          <div class="input">
+            <input class="span4" id="password" name="password" type="password">
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" id="submit-button" class="btn large primary fade in">Login</button>
+          @errorMessage(errorFields)
+        </div>
+      </fieldset>
+      }
+    </div>
+  </div>
+</div>
+}

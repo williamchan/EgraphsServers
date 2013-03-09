@@ -230,7 +230,15 @@ object TestData {
     val celebrityId = newSavedCelebrity().id
     VideoAssetCelebrity(videoId = videoAssetId, celebrityId = celebrityId).save()
   }
-   
+
+  def assignToMlbCategoryValue(celebrity: Celebrity): CategoryValue = {
+    val mlb = celebrity.services.categoryServices.categoryValueStore.findByName("MLB").getOrElse{
+      TestData.newSavedCategoryValue(TestData.newSavedCategory.id).copy(name = "MLB").save()
+    }
+    celebrity.services.store.updateCategoryValues(celebrity = celebrity, categoryValueIds = List(mlb.id))
+    mlb
+  }
+
   /**
    *  Convert an iterable and key into a map with the same key for every value.
    *  Helpful when writing functional tests. 

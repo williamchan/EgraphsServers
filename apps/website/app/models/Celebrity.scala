@@ -248,6 +248,13 @@ case class Celebrity(
     product.saveWithImageAssets(image, icon)
   }
 
+  /**
+   * @return whether this celebrity is in the MLB vertical, ie has a Category Value of name "MLB"
+   */
+  def isMlb: Boolean = {
+    categoryValues.exists(_.name == "MLB")
+  }
+
   //
   // KeyedCaseClass[Long] methods
   //
@@ -386,8 +393,8 @@ object CelebrityAccesskey {
    * @param accesskey the accesskey
    * @return the url with the accesskey as a query parameter. If no accesskey was provided, then the original url is returned.
    */
-  def urlWithAccesskey(urlBase: String, accesskey: String): String = {
-    if (accesskey.isEmpty) urlBase else urlBase + "?accesskey=" + accesskey
+  def urlWithAccesskey(url: String, accesskey: String): String = {
+    if (accesskey.isEmpty) url else url + "?accesskey=" + accesskey
   }
 }
 

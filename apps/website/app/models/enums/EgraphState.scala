@@ -23,6 +23,14 @@ object EgraphState extends Enum {
   val RejectedByAdmin = new EnumVal {
     val name = "RejectedByAdmin"
   }
+
+  /* The following states are required for MLB egraphs per agreement with the MLB Players Association. */
+  val PendingMlbReview = new EnumVal {
+    val name = "PendingMlbReview"
+  }
+  val RejectedByMlb = new EnumVal {
+    val name = "RejectedByMlb"
+  }
 }
 
 trait HasEgraphState[T] {

@@ -151,4 +151,12 @@ class CelebrityTests extends EgraphsUnitTest
     CelebrityAccesskey.matchesAccesskey("notmyaccesskey", 1) should be(false)
     CelebrityAccesskey.matchesAccesskey(accesskey, 2) should be(false)
   }
+
+  "isMlb" should "be true if celebrity is associated with MLB CategoryValue" in {
+    val celebrity = TestData.newSavedCelebrity()
+    celebrity.isMlb should be(false)
+
+    TestData.assignToMlbCategoryValue(celebrity)
+    celebrity.isMlb should be(true)
+  }
 }
