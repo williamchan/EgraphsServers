@@ -186,6 +186,16 @@ function(page, tooltip, window, analytics, logging, requireModule) {
          * to validly check out
          */
         $scope.fieldsRemaining = function() {
+
+          /**
+           * Hacky fix to remaining field count being wrong. Difficult, with my limited knowledge, to otherwise set the
+           * state of the name field of the buyer form to a valid state in a more legit way. If this is not done, the
+           * remaining fields count is one higher than it should be until the buyer form is submitted with a valid email.
+           */
+          if ($scope.egraph.isGift == "false") {
+            $scope.buyerForm.name.$valid = true;
+          }
+
           var controls = $scope.userControls();
           var remaining = [];
           // log("Remaining:");
