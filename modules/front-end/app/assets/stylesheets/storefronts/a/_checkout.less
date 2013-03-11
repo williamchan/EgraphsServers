@@ -428,7 +428,7 @@ body.storefront-a-checkout {
     // For coupon code, only show the green check mark when everything is valid 
     // AND the coupon is also applied. This avoids showing the check mark when
     // no code (empty code) has been applied, leaving the form valid but useless.
-    .discount.applied #coupon-couponCode.ng-dirty.ng-valid:not(.ng-submitting) {
+    .discount.applied #coupon-couponCode.ng-valid:not(.ng-submitting) {
       &.ng-user-has-attended.ng-valid:not(.ng-submitting) {
         background-image: url("@{checkMarkIcon}");
       }
