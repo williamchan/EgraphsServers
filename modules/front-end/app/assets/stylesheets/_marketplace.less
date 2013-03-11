@@ -703,44 +703,40 @@
 
             em {
 
-              display: block;
-              width: 143px;
-              margin: 0 auto;
-              color: @grayLight;
-              text-shadow: 0 1px 0 @white;
-              font-style: normal;
-              font-size: .8125em;
               background: @offWhite;
+              display: block;
+              font-size: .8125em;
+              font-style: normal;
+              margin: 0 auto;
+              width: 143px;
 
               a {   
                 display: block;
-                width: 143px;
                 margin: 0 auto;
-                color: @grayLight;
+                width: 143px;
 
-                &:hover { color: @orange; }
-
-                b {
-                  font-weight: 400;
-                  display: block;
-                  width: 100px;
-                  padding: 0 21px;
-                  .gradientBar(#efefef, #ccc);
+                > b {
                   .border-radius(10px 10px 10px 10px);
+                  .gradientBar(#efefef, #ccc);
                   border: 1px solid @grayLighter;
-                  text-align: center;
+                  color: @grayLight;
+                  display: block;
+                  font-weight: 400;
+                  padding: 0 21px;
+                  text-align: center;              
+                  text-shadow: 0 1px 0 @white;
+                  width: 100px;
                 }
 
 
                 &:hover {
+                  color: @orange; 
 
-                  b {
-                    border-color: #c5c5c5;
+                  > b {
                     .gradientBar(#efefef, lighten(#ccc, 5%));                
-                  }
-
-                  b {
+                    border-color: #c5c5c5;
                     color: @orange;
+                    text-shadow: 0 1px 0 @white;
                   }
 
                 }
