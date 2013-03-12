@@ -400,9 +400,8 @@ button  {
 	background: url(/assets/images/bg-button-left.png) no-repeat 0 0;
 	height: 35px;
 	overflow: hidden;
-
+  color: @white;
 	strong {
-    color: @white;
 		display: block;
 		float: left;
 		font-weight: 600;
@@ -417,7 +416,6 @@ button  {
 		
 	 em { 
       font-style: normal;
-      color: @white;
     }	
 	}
 
@@ -432,21 +430,19 @@ button  {
 	}
 
 	&:hover {
-	
-		background-position: 0 50%;
+    background-position: 0 50%;
+    color: @white;
 		
 		strong, span { background-position: 0 50%; }
 	}
 
   &:disabled {
+    color: @white;
     cursor:default;
     background-position: 0 100%;
     
     strong, span { 
       background-position: 0 100%;
-        > em {
-          color: @white;
-        }
      }
   }
 	
