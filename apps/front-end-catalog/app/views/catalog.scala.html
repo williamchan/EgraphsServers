@@ -46,7 +46,6 @@
       @catalogEntry(routes.Landing.giftMessaging.url, "Gift Certificate Landing")  
       @catalogEntry("Landing/featuredStarsWithNoInventory", "Featured stars -- no inventory")
       @catalogEntry(href="Landing/signupOn", description="Landing page with modal")
-
     </ol>
     <h2>Account Settings</h2>
     <ol>
@@ -81,97 +80,16 @@
       @catalogEntry("Static/privacy", "Privacy")
       @catalogEntry("Static/terms", "Terms")
     </ol>
-    <h2>Storefront: Choose Photo Page (Celebrity info)</h2>
-    <ol>
-      @catalogEntry("ChoosePhoto/longBio", "Expected state")
-      @catalogEntry("ChoosePhoto/withRecentEgraphs?num=0", "0 recent egraphs")
-      @catalogEntry("ChoosePhoto/withRecentEgraphs?num=1", "1 recent egraph")
-      @catalogEntry("ChoosePhoto/withRecentEgraphs?num=6", "6 recent egraphs")
-      @catalogEntry("ChoosePhoto/withPartnerIcons?num=0", "0 partner icons")
-      @catalogEntry("ChoosePhoto/withPartnerIcons?num=1", "1 partner icon")
-      @catalogEntry("ChoosePhoto/withPartnerIcons?num=6", "6 partner icons")
-      @catalogEntry("ChoosePhoto/longBio", "Super long bio")
-    </ol>
-    <h2>Storefront template (focus on the breadcrumbs)</h2>
-    <ol>
-      @catalogEntry("StorefrontTemplate/noneActiveOrComplete", "No crumb active or complete")
-
-      @for(crumbIndex <- 1 to 5) {
-        @catalogEntry(
-          "StorefrontTemplate/active?crumbIndex=" + crumbIndex,
-          "crumb " + crumbIndex + " active"
-        )
-      }
-
-      @catalogEntry("StorefrontTemplate/allCompleteMiddleOneActive", "All complete one active")
-    </ol>
     <h2>Log-in</h2>
     <ol>
-      @catalogEntry("Login/index", "Normal view")
-      @catalogEntry("Login/allErrorsLogin", "All errors")      
-    </ol>
-    <h2>Storefront: Choose Photo Page (tiles)</h2>
-    <ol>
-      @catalogEntry("ChoosePhoto/withProducts?num=0", "0 portrait products")
-      @catalogEntry("ChoosePhoto/withProducts?num=1", "1 portrait product")
-      @catalogEntry("ChoosePhoto/withProducts?num=6", "6 portrait products")
-      @catalogEntry("ChoosePhoto/landscape", "1 landscape product")
-      @catalogEntry("ChoosePhoto/tilesWithSoldOut", "1 sold out product")      
-    </ol>
-
-    <h2>Storefront: Choose Photo Page (carousel)</h2>
-    <ol>
-      @catalogEntry("ChoosePhoto/carousel?num=3&focus=1", "1st product in focus")
-      @catalogEntry("ChoosePhoto/carousel?num=3&focus=2", "2nd product in focus")
-      @catalogEntry("ChoosePhoto/carousel?num=3&focus=3", "3rd product in focus")
-      @catalogEntry("ChoosePhoto/withProducts?num=0", "0 products")
-      @catalogEntry("ChoosePhoto/withProducts?num=1", "1 product")
-      @catalogEntry("ChoosePhoto/withProducts?num=2", "2 products")
-      @catalogEntry("ChoosePhoto/carouselWithSoldOut", "1 sold out product")
-    </ol>
-    <h2>Storefront: Personalize</h2>
-    <ol>
-      @catalogEntry("Personalize/index", "Basic")
-      @catalogEntry("Personalize/portrait", "Portrait")
-      @catalogEntry("Personalize/allErrors", "All fields have errors")
-      @catalogEntry("Personalize/allErrors", "All fields are populated")
+        @catalogEntry("Login/index", "Normal view")
+        @catalogEntry("Login/allErrorsLogin", "All errors")
     </ol>
     <h2>Login</h2>
     <ol>
-      @catalogEntry("Login/storefront", "No recipient")
-      @catalogEntry("Login/storefront?recipient=Will%20Chan", "Recipient named Will Chan")      
-      @catalogEntry("Login/allErrorsStorefront", "All fields were erroneous")
-    </ol>    
-    <h2>Storefront: Checkout</h2>
-    <ol>
-      @catalogEntry("Checkout/index", "Basic")
-      @catalogEntry("Checkout/portrait", "Portrait")
-      @catalogEntry("Checkout/allErrors", "All server-generated errors")
-      @catalogEntry("Checkout/noShipping", "No shipping information")
-      @catalogEntry("Checkout/partialDiscount", "Partially discounted")
-      @catalogEntry("Checkout/fullDiscount", "Fully discounted")
-    </ol>
-    <h2>Storefront: Finalize</h2>
-    <ol>
-      @catalogEntry("Finalize/index", "Basic")
-      @catalogEntry("Finalize/portrait", "Portrait")
-    </ol>    
-    <h2>Storefront: Review</h2>
-    <ol>
-      @catalogEntry("Review/index", "Basic")
-      @catalogEntry("Review/portrait", "Portrait")
-    </ol>        
-    <h2>Original Storefront: All</h2>
-    <ol>
-      @catalogEntry("Personalize/index", "Personalize")
-      @catalogEntry("Review/index", "Review")
-      @catalogEntry("Login/index", "Login")
-      @catalogEntry("Checkout/index", "Checkout")
-      @catalogEntry("Finalize/index", "Finalize Order")
-      @catalogEntry("Complete/index", "Order Complete")
-      @catalogEntry("Failed/no_inventory", "Order Failed - No Inventory")
-      @catalogEntry("Failed/creditcard_error", "Order Failed - Credit Card Error")
-      @catalogEntry("Failed/purchase_error", "Order Failed - Some Other Error")
+        @catalogEntry("Login/storefront", "No recipient")
+        @catalogEntry("Login/storefront?recipient=Will%20Chan", "Recipient named Will Chan")
+        @catalogEntry("Login/allErrorsStorefront", "All fields were erroneous")
     </ol>
     <h2>Marketplace</h2>
     <ol>
@@ -209,12 +127,6 @@
     <h2>Gift Certificates</h2>
     <ol>
      @catalogEntry("GiftCertificateCheckout/index", "Gift certificate checkout, default")
-    </ol>
-    <h2>Storefront Variations</h2>
-    <ol>
-      @catalogEntry("Storefront-A/personalize", "Storefront reset personalize, default")
-      @catalogEntry("Storefront-A/personalizeSoldOut", "Storefront reset personalize, sold out")
-      @catalogEntry("Storefront-A/checkout?testcase=default", "Storefront reset checkout, default")
     </ol>
     <h2>Error Pages</h2>
     <ol>
