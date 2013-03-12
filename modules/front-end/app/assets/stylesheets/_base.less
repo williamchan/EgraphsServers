@@ -131,6 +131,20 @@ ul.credit-cards {
   }
 }
 
+/* !Forms */
+// Removes webkit number spinner from number inputs
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+// Restores an older look from Bootsrap 2.1 that is gone in 2.3
+label {
+  color: @grayDark;
+}
+
 //
 // Provides attractive orange field errors that are punctuated with a finger-pointing hand.
 // Decorate any div outside of your .errors div to apply the styles.
@@ -394,15 +408,16 @@ button  {
 		font-size: 16px;
 		letter-spacing: .1em;
 		line-height: 32px;
-		color: @white;
 		text-shadow: 0 -1px -1px @grayDark; 
 		height: 35px;
 		background: url(/assets/images/bg-button-mid.png) repeat-x 0 0;
 		padding-left: 25px;
 		padding-right: 25px;
 		
-		em { font-style: normal; }
-		
+		> em { 
+      font-style: normal;
+      color: @white;
+    }	
 	}
 
 	span {
@@ -426,7 +441,12 @@ button  {
     cursor:default;
     background-position: 0 100%;
     
-    strong, span { background-position: 0 100%; }
+    strong, span { 
+      background-position: 0 100%;
+        > em {
+          color: @white;
+        }
+     }
   }
 	
 	&.facebook {
@@ -457,7 +477,7 @@ button  {
 }
 
 /* Nice orange button groups */
-.btn-custom-radio {
+ .btn.btn-custom-radio {
 	.defaultTextColorAndShadow() {
 		color: lighten(@gray, 10%);
 		text-shadow: 0px 1px 0px white;
@@ -465,7 +485,7 @@ button  {
 
   .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
   text-transform:uppercase;
-  font-size:0.75em;
+  font-size: 12px;
   line-height:1.3em;
   padding-top:5px;
   padding-bottom:5px;

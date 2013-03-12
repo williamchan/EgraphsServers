@@ -261,7 +261,8 @@
                     <input @field.identityAttributes
                            monitor-user-attention
                            resource-property 
-                           required>
+                           required
+                           type="text">
                     @field.standardErrorDiv
                   </div>
                 </div>
@@ -274,7 +275,8 @@
                     <input @field.identityAttributes
                            monitor-user-attention
                            resource-property
-                           required>
+                           required
+                           type="text">
                     @field.standardErrorDiv
                   </div>
                 </div>
@@ -285,7 +287,8 @@
                   <div class="controls">
                     <input @field.identityAttributes
                            monitor-user-attention
-                           resource-property>
+                           resource-property
+                           type="text">
                            
                     @field.standardErrorDiv
                   </div>
@@ -299,7 +302,8 @@
                     <input @field.identityAttributes
                            monitor-user-attention
                            resource-property
-                           required />
+                           required 
+                           type="text"/>
                     @field.standardErrorDiv
                 }
                 @withField("shipping", "state") { field =>
@@ -319,7 +323,7 @@
                 <div class="control-group">
                   <label class="control-label" for="@field.id">Postal code@requiredStar:</label>
                   <div class="controls">
-                    <input @field.identityAttributes monitor-user-attention resource-property class="half" required />
+                    <input @field.identityAttributes monitor-user-attention resource-property class="half" required type="text"/>
                     @field.standardErrorDiv
                   </div>
                 </div>
@@ -335,7 +339,7 @@
               <div class="control-group">
                 <label class="control-label" for="@field.id">Card Number@requiredStar:</label>
                 <div class="controls">
-                  <input @field.identityAttributes monitor-user-attention resource-property required credit-card-number />
+                  <input @field.identityAttributes monitor-user-attention resource-property required credit-card-number type="number"/>
                   @field.errorDiv {
                     @field.ifError("required") {required}
                     @field.ifError("remote_card_declined") {card declined}
@@ -400,7 +404,8 @@
                          resource-property
                          class="half"
                          required 
-                         credit-card-cvc />
+                         credit-card-cvc 
+                         type="number"/>
                   @field.errorDiv {
                     @field.ifError("required") {required}
                     @field.ifError(
@@ -422,7 +427,7 @@
               <div class="control-group">
                 <label class="control-label" for="@field.id">Postal code@requiredStar:</label>
                 <div class="controls">
-                  <input @field.identityAttributes class="half"  monitor-user-attention required resource-property>
+                  <input @field.identityAttributes class="half"  monitor-user-attention required resource-property type="number">
                   @field.standardErrorDiv
                 </div>
               </div>
