@@ -114,7 +114,7 @@ class PostCelebrityApiEndpointTests
       (celebrity, celebrity.account)
     }
 
-    val depositInfo = DecryptedCelebritySecureInfo(streetAddress = Some(RandomStringUtils.randomAlphanumeric(30)))
+    val depositInfo = DecryptedCelebritySecureInfo(addressLine1 = Some(RandomStringUtils.randomAlphanumeric(30)))
     val requestJson = Json.toJson(JsCelebrityDepositInfo.from(celebrity, Some(depositInfo)).copy(isDepositAccountChange = Some(false)))
 
     // Execute the request
@@ -129,7 +129,7 @@ class PostCelebrityApiEndpointTests
       val maybeSavedDepositInfo = celebrityStore.findById(celebrity.id).get.secureInfo
       maybeSavedDepositInfo.isDefined should be(true)
       val Some(savedDepositInfo) = maybeSavedDepositInfo
-      savedDepositInfo.streetAddress should be(depositInfo.streetAddress)
+      savedDepositInfo.addressLine1 should be(depositInfo.addressLine1)
     }
   }
 
@@ -140,7 +140,7 @@ class PostCelebrityApiEndpointTests
       (celebrity, celebrity.account, celebrity.secureInfo)
     }
 
-    val newDepositInfo = secureInfo.get.copy(streetAddress = Some(RandomStringUtils.randomAlphanumeric(30)))
+    val newDepositInfo = secureInfo.get.copy(addressLine1 = Some(RandomStringUtils.randomAlphanumeric(30)))
     val requestJson = Json.toJson(JsCelebrityDepositInfo.from(celebrity, Some(newDepositInfo)).copy(isDepositAccountChange = Some(false)))
     // Execute the request
     val url = controllers.routes.ApiControllers.postCelebrityDepositInfo.url
@@ -154,7 +154,7 @@ class PostCelebrityApiEndpointTests
       val maybeSavedDepositInfo = celebrityStore.findById(celebrity.id).get.secureInfo
       maybeSavedDepositInfo.isDefined should be(true)
       val Some(savedDepositInfo) = maybeSavedDepositInfo
-      savedDepositInfo.streetAddress should be(newDepositInfo.streetAddress)
+      savedDepositInfo.addressLine1 should be(newDepositInfo.addressLine1)
       savedDepositInfo.depositAccountNumber should be(secureInfo.get.depositAccountNumber)
     }
   }

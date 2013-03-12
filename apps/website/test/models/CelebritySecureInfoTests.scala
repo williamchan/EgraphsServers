@@ -25,11 +25,12 @@ class CelebritySecureInfoTests extends EgraphsUnitTest
       smsPhone = Some(RandomStringUtils.randomNumeric(10)),
       voicePhone = Some(RandomStringUtils.randomNumeric(10)),
       agentEmail = Some(TestData.generateEmail("bezosAgent", "clamazon.com")),
-      streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
+      addressLine1 = Some(RandomStringUtils.randomAlphanumeric(40)),
+      addressLine2 = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
       state = Some("QC"),
       postalCode = Some("ABC 123"),
-      country = Some("CA")
+      countryCode = Some("CA")
     ).withDepositAccountType(Some(BankAccountType.Checking))
     .withDepositAccountRoutingNumber(Some(RandomStringUtils.randomNumeric(9).toInt))
     .withDepositAccountNumber(Some(Random.nextLong.abs))
@@ -62,11 +63,11 @@ class CelebritySecureInfoTests extends EgraphsUnitTest
 
   "hasAllDepositInformation" should "return true only if all information for a direct deposit is filled in" in {
     val allFilledIn = DecryptedCelebritySecureInfo(
-      streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
+      addressLine1 = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
       state = Some("QC"),
       postalCode = Some("ABC 123"),
-      country = Some("CA")
+      countryCode = Some("CA")
     ).withDepositAccountType(Some(BankAccountType.Checking))
     .withDepositAccountRoutingNumber(Some(RandomStringUtils.randomNumeric(9).toInt))
     .withDepositAccountNumber(Some(Random.nextLong.abs))
@@ -106,15 +107,16 @@ class CelebritySecureInfoTests extends EgraphsUnitTest
 
   override def transformEntity(toTransform: EncryptedCelebritySecureInfo) = {
     toTransform.decrypt.copy(
-      contactEmail = Some(TestData.generateEmail("myyk", "clamazon.com")),
+      contactEmail = Some(TestData.generateEmail("bezos", "clamazon.com")),
       smsPhone = Some(RandomStringUtils.randomNumeric(10)),
       voicePhone = Some(RandomStringUtils.randomNumeric(10)),
-      agentEmail = Some(TestData.generateEmail("myyksAgent", "clamazon.com")),
-      streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
+      agentEmail = Some(TestData.generateEmail("bezosAgent", "clamazon.com")),
+      addressLine1 = Some(RandomStringUtils.randomAlphanumeric(40)),
+      addressLine2 = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
       state = Some("QC"),
       postalCode = Some("ABC 123"),
-      country = Some("CA")
+      countryCode = Some("CA")
     ).withDepositAccountType(Some(BankAccountType.Checking))
     .withDepositAccountRoutingNumber(Some(RandomStringUtils.randomNumeric(9).toInt))
     .withDepositAccountNumber(Some(Random.nextLong.abs))
