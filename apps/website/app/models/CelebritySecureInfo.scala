@@ -45,11 +45,12 @@ object JsCelebrityContactInfo extends Function7[Option[Long], Option[Boolean], O
 case class JsCelebrityDepositInfo(
   id: Option[Long],
   accountSettingsComplete: Option[Boolean],
-  streetAddress: Option[String],
+  addressLine1: Option[String],
+  addressLine2: Option[String],
   city: Option[String],
   state: Option[String],
   postalCode: Option[String],
-  country: Option[String],
+  countryCode: Option[String],
   depositAccountType: Option[BankAccountType.EnumVal],
   depositAccountRoutingNumber: Option[Int] = None,
   depositAccountNumber: Option[Long] = None,
@@ -59,7 +60,7 @@ case class JsCelebrityDepositInfo(
 )
 
 // TODO: After Play 2.1.1+ delete the extends FunctionX, for more info see https://groups.google.com/forum/#!topic/play-framework/ENlcpDzLZo8/discussion and https://groups.google.com/forum/?fromgroups=#!topic/play-framework/1u6IKEmSRqY
-object JsCelebrityDepositInfo extends Function13[Option[Long], Option[Boolean], Option[String], Option[String], Option[String], Option[String], Option[String], Option[BankAccountType.EnumVal], Option[Int], Option[Long], Option[Boolean], Option[String], Option[String], JsCelebrityDepositInfo] {
+object JsCelebrityDepositInfo extends Function14[Option[Long], Option[Boolean], Option[String], Option[String], Option[String], Option[String], Option[String], Option[String], Option[BankAccountType.EnumVal], Option[Int], Option[Long], Option[Boolean], Option[String], Option[String], JsCelebrityDepositInfo] {
   implicit val celebrityDepositInfoFormats = Json.format[JsCelebrityDepositInfo]
 
   def from(celebrity: Celebrity): JsCelebrityDepositInfo = {
@@ -70,11 +71,12 @@ object JsCelebrityDepositInfo extends Function13[Option[Long], Option[Boolean], 
     JsCelebrityDepositInfo(
       id = Some(celebrity.id),
       accountSettingsComplete = Some(celebrity.isAccountSettingsComplete(secureInfo)),
-      streetAddress = secureInfo.flatMap(_.streetAddress),
+      addressLine1 = secureInfo.flatMap(_.addressLine1),
+      addressLine2 = secureInfo.flatMap(_.addressLine2),
       city = secureInfo.flatMap(_.city),
       state = secureInfo.flatMap(_.state),
       postalCode = secureInfo.flatMap(_.postalCode),
-      country = secureInfo.flatMap(_.country),
+      countryCode = secureInfo.flatMap(_.countryCode),
       depositAccountType = secureInfo.flatMap(info => info.depositAccountType),
       anonymousDepositAccountRoutingNumber = secureInfo.flatMap(_.anonymizedDepositAccountRoutingNumber),
       anonymousDepositAccountNumber = secureInfo.flatMap(_.anonymizedDepositAccountNumber)
@@ -96,11 +98,12 @@ case class DecryptedCelebritySecureInfo(
   smsPhone: Option[String] = None,
   voicePhone: Option[String] = None,
   agentEmail: Option[String] = None,
-  streetAddress: Option[String] = None,
+  addressLine1: Option[String] = None,
+  addressLine2: Option[String] = None,
   city: Option[String] = None,
   state: Option[String] = None,
   postalCode: Option[String] = None,
-  country: Option[String] = None,
+  countryCode: Option[String] = None,
   _depositAccountType: Option[String] = None,
   _depositAccountRoutingNumber: Option[String] = None,
   _depositAccountNumber: Option[String] = None,
@@ -126,17 +129,44 @@ case class DecryptedCelebritySecureInfo(
     smsPhone = smsPhone.map(encryptAES(_)),
     voicePhone = voicePhone.map(encryptAES(_)),
     agentEmail = agentEmail.map(encryptAES(_)),
-    streetAddress = streetAddress.map(encryptAES(_)),
+    addressLine1 = addressLine1.map(encryptAES(_)),
+    addressLine2 = addressLine2.map(encryptAES(_)),
     city = city.map(encryptAES(_)),
     state = state.map(encryptAES(_)),
     postalCode = postalCode.map(encryptAES(_)),
-    country = country.map(encryptAES(_)),
+    countryCode = countryCode.map(encryptAES(_)),
     _depositAccountType = _depositAccountType,
     _depositAccountRoutingNumber = _depositAccountRoutingNumber.map(encryptAES(_)),
     _depositAccountNumber = _depositAccountNumber.map(encryptAES(_)),
     created = created,
     updated = updated
   )
+
+  def updateFromContactInfo(contactInfo: JsCelebrityContactInfo): DecryptedCelebritySecureInfo = {
+    copy(
+      contactEmail = contactInfo.contactEmail.map(_.value),
+      smsPhone = contactInfo.smsPhone,
+      voicePhone = contactInfo.voicePhone,
+      agentEmail = contactInfo.agentEmail.map(_.value)
+    )
+  }
+
+  def updateFromDepositInfo(depositInfo: JsCelebrityDepositInfo): DecryptedCelebritySecureInfo = {
+    val partialSecureInfo = copy(
+      addressLine1 = depositInfo.addressLine1,
+      addressLine2 = depositInfo.addressLine2,
+      city = depositInfo.city,
+      postalCode = depositInfo.postalCode,
+      state = depositInfo.state,
+      countryCode = depositInfo.countryCode
+    )
+
+    if (depositInfo.isDepositAccountChange.get) {
+      partialSecureInfo.withDepositAccountType(depositInfo.depositAccountType)
+        .withDepositAccountRoutingNumber(depositInfo.depositAccountRoutingNumber)
+        .withDepositAccountNumber(depositInfo.depositAccountNumber)
+    } else partialSecureInfo
+  }
 
   override def withDepositAccountType(maybeDepositAccountType: Option[BankAccountType.EnumVal]) = {
     this.copy(_depositAccountType = maybeDepositAccountType.map(_.name))
@@ -149,11 +179,12 @@ case class EncryptedCelebritySecureInfo(
   smsPhone: Option[String] = None,
   voicePhone: Option[String] = None,
   agentEmail: Option[String] = None,
-  streetAddress: Option[String] = None,
+  addressLine1: Option[String] = None,
+  addressLine2: Option[String] = None,
   city: Option[String] = None,
   state: Option[String] = None,
   postalCode: Option[String] = None,
-  country: Option[String] = None,
+  countryCode: Option[String] = None,
   _depositAccountType: Option[String] = None,
   _depositAccountRoutingNumber: Option[String] = None,
   _depositAccountNumber: Option[String] = None,
@@ -175,11 +206,12 @@ case class EncryptedCelebritySecureInfo(
     smsPhone = smsPhone.map(decryptAES(_)),
     voicePhone = voicePhone.map(decryptAES(_)),
     agentEmail = agentEmail.map(decryptAES(_)),
-    streetAddress = streetAddress.map(decryptAES(_)),
+    addressLine1 = addressLine1.map(decryptAES(_)),
+    addressLine2 = addressLine2.map(decryptAES(_)),
     city = city.map(decryptAES(_)),
     state = state.map(decryptAES(_)),
     postalCode = postalCode.map(decryptAES(_)),
-    country = country.map(decryptAES(_)),
+    countryCode = countryCode.map(decryptAES(_)),
     _depositAccountType = _depositAccountType,
     _depositAccountRoutingNumber = _depositAccountRoutingNumber.map(decryptAES(_).toInt.toString), // this tests the string is really an int.
     _depositAccountNumber = _depositAccountNumber.map(decryptAES(_).toLong.toString), // this tests the string is really a long.
@@ -203,11 +235,12 @@ abstract class CelebritySecureInfo {
   def smsPhone: Option[String]
   def voicePhone: Option[String]
   def agentEmail: Option[String]
-  def streetAddress: Option[String]
+  def addressLine1: Option[String]
+  def addressLine2: Option[String]
   def city: Option[String]
   def state: Option[String]
   def postalCode: Option[String]
-  def country: Option[String]
+  def countryCode: Option[String]
   def _depositAccountType: Option[String]
   def _depositAccountRoutingNumber: Option[String]
   def _depositAccountNumber: Option[String]
@@ -221,11 +254,11 @@ abstract class CelebritySecureInfo {
 
   def hasAllDepositInformation: Boolean = {
     val maybeAllDepositInfo = Set(
-      streetAddress,
+      addressLine1,
       city,
       state,
       postalCode,
-      country,
+      countryCode,
       _depositAccountType,
       _depositAccountRoutingNumber,
       _depositAccountNumber
