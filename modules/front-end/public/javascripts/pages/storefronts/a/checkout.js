@@ -90,8 +90,17 @@ function(page, tooltip, window, analytics, logging, requireModule) {
               $scope.codeRedeemerVisible = true;
             }
 
-            $scope.cart = cartData;
-            durationEvent.track();
+            
+            if (cartData.products.length) {
+              $scope.cart = cartData;
+              durationEvent.track();
+            } else {
+              /** 
+               * Cannot be on checkout page unless there is something in the cart; normally,
+               * protected by getCheckout endpoint, but forward button can subvert it.
+               */
+              window.location.href = page.personalizeUrl;
+            }
           });
         };
 

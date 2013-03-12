@@ -72,7 +72,9 @@
 
     years: @Html({ (13 to 25).map("\"%d\"".format(_)).mkString("[", ",", "]") }),
 
-    states: @tags.geo.usstates(formatStr="json")
+    states: @tags.geo.usstates(formatStr="json"),
+
+    personalizeUrl: "@personalizeUrl"
 
     //scenarios: {
     //  module: "test/pages/checkout-scenarios",
