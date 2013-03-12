@@ -263,7 +263,7 @@ abstract class CelebritySecureInfo {
       _depositAccountRoutingNumber,
       _depositAccountNumber
     )
-    maybeAllDepositInfo.filter(_.isDefined) == maybeAllDepositInfo
+    maybeAllDepositInfo.forall(_.isDefined)
   }
 }
 
