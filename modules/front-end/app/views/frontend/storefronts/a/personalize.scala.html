@@ -294,6 +294,15 @@
                       Don't you want to say something to @star.name?
                     </div>
                   </div>
+                  <div>
+                    @fieldTooltip("Don't see a photo you like?", event="Don't see a photo you like?") {
+                      @defining(<a href="mailto:photos@egraphs.com">photos@egraphs.com</a>) { photosEmail =>
+                        <strong>We're listening!</strong>
+                        We can't accommodate all requests, but let us know what you're looking for in the perfect photo
+                        at @photosEmail and we'll do our best to get it for you!
+                      }
+                    }
+                  </div>
                 </div>
               </div> <!-- End .control-group.photoChoice -->
 
