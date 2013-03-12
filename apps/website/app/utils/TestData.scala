@@ -106,10 +106,12 @@ object TestData {
       smsPhone = Some(RandomStringUtils.randomNumeric(10)),
       voicePhone = Some(RandomStringUtils.randomNumeric(10)),
       agentEmail = Some(TestData.generateEmail("bezosAgent", "clamazon.com")),
-      streetAddress = Some(RandomStringUtils.randomAlphanumeric(40)),
+      addressLine1 = Some(RandomStringUtils.randomAlphanumeric(40)),
+      addressLine2 = Some(RandomStringUtils.randomAlphanumeric(40)),
       city = Some(RandomStringUtils.randomAlphanumeric(40)),
       postalCode = Some("ABC 123"),
-      country = Some("CA")
+      state = Some("QC"),
+      countryCode = Some("CA")
     ).withDepositAccountType(Some(BankAccountType.Checking))
     .withDepositAccountRoutingNumber(Some(RandomStringUtils.randomNumeric(9).toInt))
     .withDepositAccountNumber(Some(Random.nextLong.abs)).encrypt.save()

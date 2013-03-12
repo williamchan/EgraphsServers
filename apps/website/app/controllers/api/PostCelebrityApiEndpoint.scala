@@ -27,12 +27,7 @@ private[controllers] trait PostCelebrityApiEndpoint
                 BadRequest("Could not parse json into JsCelebrityContactInfo.")
               case Some(contactInfo) =>
                 val existingSecureInfo = celebrity.secureInfo.getOrElse(DecryptedCelebritySecureInfo())
-                val secureInfo = existingSecureInfo.copy(
-                  contactEmail = contactInfo.contactEmail.map(_.value),
-                  smsPhone = contactInfo.smsPhone,
-                  voicePhone = contactInfo.voicePhone,
-                  agentEmail = contactInfo.agentEmail.map(_.value)
-                ).encrypt.save()
+                val secureInfo = existingSecureInfo.updateFromContactInfo(contactInfo).encrypt.save()
                 val twitter = contactInfo.twitterUsername.fold(celebrity.twitterUsername)(username => if(username.isEmpty) None else Some(username))
                 celebrity.copy(twitterUsername = twitter, secureInfoId = Some(secureInfo.id)).save()
                 Ok
@@ -58,17 +53,7 @@ private[controllers] trait PostCelebrityApiEndpoint
                   BadRequest("Must have value isDepositAccountChange.")
                 } else {
                   val existingSecureInfo = celebrity.secureInfo.getOrElse(DecryptedCelebritySecureInfo())
-                  val partialSecureInfo = existingSecureInfo.copy(
-                    streetAddress = depositInfo.streetAddress,
-                    city = depositInfo.city,
-                    postalCode = depositInfo.postalCode,
-                    country = depositInfo.country)
-
-                  val updatedSecureInfo = if (depositInfo.isDepositAccountChange.get) {
-                    partialSecureInfo.withDepositAccountType(depositInfo.depositAccountType)
-                      .withDepositAccountRoutingNumber(depositInfo.depositAccountRoutingNumber)
-                      .withDepositAccountNumber(depositInfo.depositAccountNumber)
-                  } else partialSecureInfo
+                  val updatedSecureInfo = existingSecureInfo.updateFromDepositInfo(depositInfo)
                   val savedSecureInfo = updatedSecureInfo.encrypt.save()
                   celebrity.copy(secureInfoId = Some(savedSecureInfo.id)).save()
                   Ok
