@@ -52,7 +52,9 @@ trait PostCelebrityAdminEndpointTests
         "gender" -> Seq(gender),
         "organization" -> Seq(organization),
         "roleDescription" -> Seq(roleDescription),
-        "twitterUsername" -> Seq(twitterUsername)
+        "twitterUsername" -> Seq(twitterUsername),
+        "facebookUrl" -> Seq(""),
+        "websiteUrl" -> Seq("")
       ),
       fakeImageFile,
       badParts = Seq())
@@ -74,7 +76,6 @@ class PostCreateCelebrityAdminEndpointTests extends PostCelebrityAdminEndpointTe
       val Some(result) = performRequest(body, adminId = admin.id)
       status(result) should be(SEE_OTHER)
       redirectLocation(result).getOrElse("").contains("?action=preview") should be(true)
-
     }
   }
 
