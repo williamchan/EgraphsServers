@@ -86,7 +86,11 @@ class Schema @Inject() (
   val encryptedCelebritySecureInfos = table[EncryptedCelebritySecureInfo]
   on(encryptedCelebritySecureInfos)(encryptedCelebritySecureInfo =>
     declare(
-      encryptedCelebritySecureInfo.contactEmail is unique))
+      encryptedCelebritySecureInfo.contactEmail is unique,
+      encryptedCelebritySecureInfo.contactEmail is dbType("text"), // has to be pretty long to fit encrypted long email address
+      encryptedCelebritySecureInfo.agentEmail is dbType("text"),
+      encryptedCelebritySecureInfo.addressLine1 is dbType("text"),
+      encryptedCelebritySecureInfo.addressLine2 is dbType("text")))
 
   val celebrityRequests = table[CelebrityRequest]
 
