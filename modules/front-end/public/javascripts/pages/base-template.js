@@ -17,7 +17,7 @@ function(page, window, logging, requireModule) {
       /** Controller for mail signup at bottom-right of site template */
       MailerController: ['$scope', '$subscribe', function($scope, $subscribe) {
         $scope.email = "";
-        $scope.message = "Join our mailing list for great deals and updates.";
+        $scope.message = "Join our mailing list for great deals and news.";
         $scope.subscribe = function() {
           $subscribe($scope.email,
             function() { $scope.message = "Aaaand you're signed up. Welcome to the club!";},

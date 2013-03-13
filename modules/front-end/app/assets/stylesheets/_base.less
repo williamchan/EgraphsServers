@@ -6,6 +6,37 @@
 /* !Globals */
 @standardContentMaxWidth: 1020px;
 
+/* !Type */
+// Some bootstrap overrides cause they decided to add margins all over town. 
+p {
+  font-family: @baseFontFamily;
+  font-size: @baseFontSize;      
+  line-height: @baseLineHeight;
+  small {
+    font-size: @baseFontSize - 2;
+    color: @grayLight;
+  }
+}
+
+h1, h2, h3 {
+  margin: 0;
+}
+
+h1 {
+  font-size: 30px;
+  margin: 0;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 18px;
+  line-height: 36px;
+}
+
+
 /* !Links */
 a, a:link, a:visited {
 	.transitions(color 0.25s ease);
@@ -98,6 +129,20 @@ ul.credit-cards {
   @media (max-width:480px) {
     padding-left:0px;
   }
+}
+
+/* !Forms */
+// Removes webkit number spinner from number inputs
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+ 
+// Restores an older look from Bootsrap 2.1 that is gone in 2.3
+label {
+  color: @grayDark;
 }
 
 //
@@ -355,7 +400,7 @@ button  {
 	background: url(/assets/images/bg-button-left.png) no-repeat 0 0;
 	height: 35px;
 	overflow: hidden;
-
+  color: @white;
 	strong {
 		display: block;
 		float: left;
@@ -363,15 +408,15 @@ button  {
 		font-size: 16px;
 		letter-spacing: .1em;
 		line-height: 32px;
-		color: @white;
 		text-shadow: 0 -1px -1px @grayDark; 
 		height: 35px;
 		background: url(/assets/images/bg-button-mid.png) repeat-x 0 0;
 		padding-left: 25px;
 		padding-right: 25px;
 		
-		em { font-style: normal; }
-		
+	 em { 
+      font-style: normal;
+    }	
 	}
 
 	span {
@@ -385,17 +430,20 @@ button  {
 	}
 
 	&:hover {
-	
-		background-position: 0 50%;
+    background-position: 0 50%;
+    color: @white;
 		
 		strong, span { background-position: 0 50%; }
 	}
 
   &:disabled {
+    color: @white;
     cursor:default;
     background-position: 0 100%;
     
-    strong, span { background-position: 0 100%; }
+    strong, span { 
+      background-position: 0 100%;
+     }
   }
 	
 	&.facebook {
@@ -426,7 +474,7 @@ button  {
 }
 
 /* Nice orange button groups */
-.btn-custom-radio {
+ .btn.btn-custom-radio {
 	.defaultTextColorAndShadow() {
 		color: lighten(@gray, 10%);
 		text-shadow: 0px 1px 0px white;
@@ -434,7 +482,7 @@ button  {
 
   .buttonBackground(lighten(@gray, 45%), lighten(@gray, 60%));
   text-transform:uppercase;
-  font-size:0.75em;
+  font-size: 12px;
   line-height:1.3em;
   padding-top:5px;
   padding-bottom:5px;

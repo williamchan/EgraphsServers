@@ -1,5 +1,4 @@
-/*!
- * Bootstrap v2.1.1
+/* * Bootstrap v2.3.1
  *
  * Copyright 2012 Twitter, Inc
  * Licensed under the Apache License v2.0
@@ -10,14 +9,14 @@
  * Myyk: Copied from ../../../bootstrap/less/bootstrap.less, modified imports to reference that directory
  * since there is a bug in the less compiler that won't allow us to do this in a more straight 
  * forward manner.
- */
-
-// CSS Reset
-@import "../../../bootstrap/less/reset.less";
+*/
 
 // Core variables and mixins
 @import "_bootstrap-variables.less"; // Modify this for custom colors, font-sizes, etc
 @import "../../../bootstrap/less/mixins.less";
+
+// CSS Reset
+@import "../../../bootstrap/less/reset.less";
 
 // Grid system and page structure
 @import "../../../bootstrap/less/scaffolding.less";
@@ -56,6 +55,7 @@
 
 // Components: Misc
 @import "../../../bootstrap/less/thumbnails.less";
+@import "../../../bootstrap/less/media.less";
 @import "../../../bootstrap/less/labels-badges.less";
 @import "../../../bootstrap/less/progress-bars.less";
 @import "../../../bootstrap/less/accordion.less";
@@ -64,3 +64,9 @@
 
 // Utility classes
 @import "../../../bootstrap/less/utilities.less"; // Has to be last to override when necessary
+
+// Import bootstrap responsive
+@import "_bootstrap-responsive.less";
+
+// Responsive Overrides
+@import "_responsive-overrides.less";

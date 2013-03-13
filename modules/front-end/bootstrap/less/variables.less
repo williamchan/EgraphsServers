@@ -1,27 +1,20 @@
-// Variables.less
-// Variables to customize the look and feel of Bootstrap.
 //
-// We at Egraphs have configured bootstrap to automatically import this file
-// at the right point in its compilation.
-// -----------------------------------------------------
-
-@grayGreen: rgb(103, 120, 127);
+// Variables
+// --------------------------------------------------
 
 
-// GLOBAL VALUES
+// Global values
 // --------------------------------------------------
 
 
 // Grays
 // -------------------------
 @black:                 #000;
-@grayDarker:            #1a1a1a;
+@grayDarker:            #222;
 @grayDark:              #333;
-@gray:                  #666;
-@grayLight:             #808080;
-@grayLighter:           #b3b3b3;
-@grayVeryLight:         #f2f2f2;
-@offWhite:              #fafafa;
+@gray:                  #555;
+@grayLight:             #999;
+@grayLighter:           #eee;
 @white:                 #fff;
 
 
@@ -32,38 +25,37 @@
 @green:                 #46a546;
 @red:                   #9d261d;
 @yellow:                #ffc40d;
-@orange:                #ff5124;
+@orange:                #f89406;
 @pink:                  #c3325f;
 @purple:                #7a43b6;
 
 
 // Scaffolding
 // -------------------------
-@bodyBackground:        @offWhite;
-@contentBackground:     #ededed;
-@textColor:             @grayLight;
+@bodyBackground:        @white;
+@textColor:             @grayDark;
 
 
 // Links
 // -------------------------
-@linkColor:             #29abe2;
-@linkColorHover:        @orange; // darken(@linkColor, 15%);
+@linkColor:             #08c;
+@linkColorHover:        darken(@linkColor, 15%);
 
 
 // Typography
 // -------------------------
-@sansFontFamily:        "proxima-nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@sansFontFamily:        "Helvetica Neue", Helvetica, Arial, sans-serif;
 @serifFontFamily:       Georgia, "Times New Roman", Times, serif;
-@monoFontFamily:        Menlo, Monaco, Consolas, "Courier New", monospace;
+@monoFontFamily:        Monaco, Menlo, Consolas, "Courier New", monospace;
 
-@baseFontSize:          16px;
+@baseFontSize:          14px;
 @baseFontFamily:        @sansFontFamily;
-@baseLineHeight:        24px;
+@baseLineHeight:        20px;
 @altFontFamily:         @serifFontFamily;
 
 @headingsFontFamily:    inherit; // empty to use BS default, @baseFontFamily
-@headingsFontWeight:    400;    // instead of browser default, bold
-@headingsColor:         @grayDark; 
+@headingsFontWeight:    bold;    // instead of browser default, bold
+@headingsColor:         inherit; // empty to use BS default, @textColor
 
 
 // Component sizing
@@ -78,7 +70,7 @@
 @paddingSmall:          2px 10px;  // 26px
 @paddingMini:           0 6px;   // 22px
 
-@baseBorderRadius:      3px;
+@baseBorderRadius:      4px;
 @borderRadiusLarge:     6px;
 @borderRadiusSmall:     3px;
 
@@ -94,10 +86,10 @@
 // -------------------------
 @btnBackground:                     @white;
 @btnBackgroundHighlight:            darken(@white, 10%);
-@btnBorder:                         @grayLight;
+@btnBorder:                         #ccc;
 
 @btnPrimaryBackground:              @linkColor;
-@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 15%);
+@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 20%);
 
 @btnInfoBackground:                 #5bc0de;
 @btnInfoBackgroundHighlight:        #2f96b4;
@@ -111,7 +103,7 @@
 @btnDangerBackground:               #ee5f5b;
 @btnDangerBackgroundHighlight:      #bd362f;
 
-@btnInverseBackground:              @gray;
+@btnInverseBackground:              #444;
 @btnInverseBackgroundHighlight:     @grayDarker;
 
 
@@ -151,7 +143,7 @@
 // Try to avoid customizing these :)
 @zindexDropdown:          1000;
 @zindexPopover:           1010;
-@zindexTooltip:           1020;
+@zindexTooltip:           1030;
 @zindexFixedNavbar:       1030;
 @zindexModalBackdrop:     1040;
 @zindexModal:             1050;
@@ -159,8 +151,8 @@
 
 // Sprite icons path
 // -------------------------
-@iconSpritePath:          "/assets/bootstrap/img/glyphicons-halflings.png";
-@iconWhiteSpritePath:     "/assets/bootstrap/img/glyphicons-halflings-white.png";
+@iconSpritePath:          "../img/glyphicons-halflings.png";
+@iconWhiteSpritePath:     "../img/glyphicons-halflings-white.png";
 
 
 // Input placeholder text color
@@ -189,15 +181,14 @@
 @navbarCollapseDesktopWidth:      @navbarCollapseWidth + 1;
 
 @navbarHeight:                    40px;
-@navbarBackgroundHighlight:       @grayDark;
+@navbarBackgroundHighlight:       #ffffff;
 @navbarBackground:                darken(@navbarBackgroundHighlight, 5%);
 @navbarBorder:                    darken(@navbarBackground, 12%);
 
-
-@navbarText:                      @grayLight;
-@navbarLinkColor:                 @grayLight;
-@navbarLinkColorHover:            @white;
-@navbarLinkColorActive:           @navbarLinkColorHover;
+@navbarText:                      #777;
+@navbarLinkColor:                 #777;
+@navbarLinkColorHover:            @grayDark;
+@navbarLinkColorActive:           @gray;
 @navbarLinkBackgroundHover:       transparent;
 @navbarLinkBackgroundActive:      darken(@navbarBackground, 5%);
 
