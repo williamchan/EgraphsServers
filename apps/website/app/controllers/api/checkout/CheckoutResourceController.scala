@@ -16,7 +16,10 @@ import play.api.http.HeaderNames.CACHE_CONTROL
 
 class CheckoutResourceControllerFactory @Inject() (services: CheckoutResourceControllerServices) {
   /**
-   * Creates controller instances for checkout subresources (e.g. payment, egraph, recipient, buyer)
+   * Creates controller instances for checkout subresources (e.g. payment, egraph, recipient, buyer).
+   *
+   * These are members of the [[models.checkout.EgraphCheckoutAdapter]] that will be used to create and transact
+   * a Checkout when the user makes the purchase.
    *
    * @param resourceForm the [[models.checkout.forms.CheckoutForm]] for the resource of interest,
    *                     e.g. [[models.checkout.forms.CouponForm]]
@@ -51,6 +54,13 @@ class CheckoutResourceController[T] (
   import services._
   import CheckoutResourceController._
 
+  /**
+   * Caches the form submitted and updates the [[models.checkout.EgraphCheckoutAdapter]]
+   *
+   * @param sessionIdSlug identifies the session in which the checkout is namespaced
+   * @param checkoutIdSlug identifies the exact storefront within the given session
+   * @return 200 OK if form binds to a valid resource, otherwise 400 BAD REQUEST
+   */
   def post(sessionIdSlug: UrlSlug, checkoutIdSlug: Long): Action[AnyContent] = {
     postApiController() {
       httpFilters.requireSessionAndCelebrityUrlSlugs(sessionIdSlug, checkoutIdSlug) { (sessionId, celeb) =>
@@ -70,6 +80,9 @@ class CheckoutResourceController[T] (
     }
   }
 
+  /**
+   * @return 200 OK with Json representation of cached form, or 404 NOT FOUND
+   */
   def get[FormT <: Form[T]](
     sessionIdSlug: UrlSlug,
     checkoutIdSlug: Long

@@ -26,17 +26,21 @@ case class CheckoutAdapterServices @Inject() (
 }
 
 /**
- * Basically, a cacheable form of the Checkout that makes it easy to add, replace, and remove specific components of
+ * Basically, a cacheable form of the [[Checkout]] that makes it easy to add, replace, and remove specific components of
  * the checkout.
  *
- * The actual checkout is not serializable currently and manipulating its contents is more verbose due to its
- * generalized nature. This class may be extended to cover other purchase scenarios or just ditched if Checkouts are
+ * Checkouts are not serializable currently and manipulating their contents is more verbose due to thei
+ * generalized nature. This class may be extended to cover other purchase scenarios, including shopping cart usage, or
+ * just ditched if Checkouts are patched to be cacheable somehow
  *
+ * This intermediate form of a checkout could be further utilized to separate concerns of state management from the
+ * actual Checkout. It is easy here to store data in pieces and then form the actual types needed to build the Checkout,
+ * based on the use.
  *
- * @param order - to be transacted, required
+ * @param order - to be transacted, required until other products are live
  * @param coupon - to be applied to checkout
  * @param payment - to be charged if balance is nonZero
- * @param buyerDetails - email of buyer, required
+ * @param buyerDetails - buyer email and maybe name, required
  * @param recipientEmail - email of giftee, required if order is a gift
  * @param shippingAddress - shipping address for print, required if order is physical
  * @param _services
@@ -180,6 +184,13 @@ case class EgraphCheckoutAdapter (
   protected class CheckoutBuyer(details: Option[BuyerDetails]) extends CheckoutCustomer(details, isGiftee = false)
   protected class CheckoutRecipient(email: Option[String]) extends CheckoutCustomer(email map (BuyerDetails(None, _)), isGiftee = true)
 
+  /**
+   * Since we want to reduce repeated input in the checkout flow, we want to reuse data if we can. So, this type handles
+   * the logic of trying to use the most reasonable data for the person of interests email, name, Customer, Account, etc.
+   *
+   * @param details email and maybe name
+   * @param isGiftee true only for recipient
+   */
   protected abstract class CheckoutCustomer(details: Option[BuyerDetails], isGiftee: Boolean) {
     def email = details map (_.email)
 
