@@ -163,9 +163,6 @@ class CelebrityTests extends EgraphsUnitTest
     val celebrity = TestData.newSavedCelebrity()
     celebrity.isAccountSettingsComplete should be (true)
 
-    celebrity.secureInfo.get.copy(agentEmail = None, smsPhone = None, voicePhone = None).encrypt.save()
-    celebrity.isAccountSettingsComplete should be (false)
-
     // min contact methods required with twitter
     val celebrity2 = TestData.newSavedCelebrity().copy(twitterUsername = Some("mj")).save()
     celebrity2.secureInfo.get.copy(smsPhone = None, voicePhone = None).encrypt.save()
@@ -173,9 +170,30 @@ class CelebrityTests extends EgraphsUnitTest
     celebrity2.isAccountSettingsComplete should be (true)
 
     // min contact methods required without twitter
-    val celebrity3 = TestData.newSavedCelebrity().copy(twitterUsername = None).save()
+    val celebrity3 = TestData.newSavedCelebrity().copy(twitterUsername = Some("none")).save()
     celebrity3.secureInfo.get.copy(agentEmail = None).encrypt.save()
     celebrity3.secureInfo.get.numberOfContactMethods should be (3)
     celebrity3.isAccountSettingsComplete should be (true)
+  }
+
+  it should "not be complete if there isn't enough contact info set" in {
+    val celebrity = TestData.newSavedCelebrity()
+    celebrity.secureInfo.get.copy(agentEmail = None, smsPhone = None, voicePhone = None).encrypt.save()
+    celebrity.isAccountSettingsComplete should be (false)
+  }
+
+  "hasTwitter" should "be true if they do have twitter" in {
+    val celebrity = Celebrity(twitterUsername = Some("someduder"))
+    celebrity.hasTwitter should be (true)
+  }
+
+  it should "be false if they have been checked to not have it" in {
+    val celebrity = Celebrity(twitterUsername = Some("none"))
+    celebrity.hasTwitter should be (false)
+  }
+
+  it should "be false if they have not set their twitter" in {
+    val celebrity = Celebrity(twitterUsername = None)
+    celebrity.hasTwitter should be (false)
   }
 }
