@@ -19,7 +19,43 @@ class CelebrityTests extends EgraphsUnitTest
   with LandingPageImageTests[Celebrity]
 {
   def store = AppConfig.instance[CelebrityStore]
-  
+
+  //
+  //  HasPublishedStatus[Celebrity] methods
+  //
+  override def newPublishableEntity = {
+    Celebrity(publicName = TestData.generateFullname())
+  }
+
+  override def newEntityWithLandingPageImage = {
+    Celebrity(publicName = TestData.generateFullname()).save()
+  }
+
+  //
+  // SavingEntityTests[Celebrity] methods
+  //
+  override def newEntity = {
+    Celebrity(publicName = TestData.generateFullname())
+  }
+
+  override def saveEntity(toSave: Celebrity) = {
+    toSave.save()
+  }
+
+  override def restoreEntity(id: Long) = {
+    store.findById(id)
+  }
+
+  override def transformEntity(toTransform: Celebrity) = {
+    toTransform.copy(
+      apiKey = Some("apiKey"),
+      publicName = TestData.generateFullname(),
+      roleDescription = "Pitcher, Tampa Bay Rays",
+      profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now)),
+      expectedOrderDelayInMinutes = 5 * DateTimeConstants.MINUTES_PER_DAY
+    ).withPublishedStatus(PublishedStatus.Published)
+  }
+
   //
   // Test cases
   //
@@ -92,43 +128,6 @@ class CelebrityTests extends EgraphsUnitTest
     
     pairs.size should be(2)
   }
-  
-
-  //
-  //  HasPublishedStatus[Celebrity] methods
-  //
-  override def newPublishableEntity = {
-    Celebrity(publicName = TestData.generateFullname())
-  }
-
-  override def newEntityWithLandingPageImage = {
-    Celebrity(publicName = TestData.generateFullname()).save()
-  }
-
-  //
-  // SavingEntityTests[Celebrity] methods
-  //
-  override def newEntity = {
-    Celebrity(publicName = TestData.generateFullname())
-  }
-
-  override def saveEntity(toSave: Celebrity) = {
-    toSave.save()
-  }
-
-  override def restoreEntity(id: Long) = {
-    store.findById(id)
-  }
-
-  override def transformEntity(toTransform: Celebrity) = {
-    toTransform.copy(
-      apiKey = Some("apiKey"),
-      publicName = TestData.generateFullname(),
-      roleDescription = "Pitcher, Tampa Bay Rays",
-      profilePhotoUpdated = Some(Time.toBlobstoreFormat(Time.now)),
-      expectedOrderDelayInMinutes = 5 * DateTimeConstants.MINUTES_PER_DAY
-    ).withPublishedStatus(PublishedStatus.Published)
-  }
 
   it should "return all associated CategoryValues" in {
     val celeb = TestData.newSavedCelebrity()
@@ -158,5 +157,43 @@ class CelebrityTests extends EgraphsUnitTest
 
     TestData.assignToMlbCategoryValue(celebrity)
     celebrity.isMlb should be(true)
+  }
+
+  "isAccountSettingsComplete" should "be complete if there is all account settings necessary to contact and deposit" in {
+    val celebrity = TestData.newSavedCelebrity()
+    celebrity.isAccountSettingsComplete should be (true)
+
+    // min contact methods required with twitter
+    val celebrity2 = TestData.newSavedCelebrity().copy(twitterUsername = Some("mj")).save()
+    celebrity2.secureInfo.get.copy(smsPhone = None, voicePhone = None).encrypt.save()
+    celebrity2.secureInfo.get.numberOfContactMethods should be (2)
+    celebrity2.isAccountSettingsComplete should be (true)
+
+    // min contact methods required without twitter
+    val celebrity3 = TestData.newSavedCelebrity().copy(twitterUsername = Some("none")).save()
+    celebrity3.secureInfo.get.copy(agentEmail = None).encrypt.save()
+    celebrity3.secureInfo.get.numberOfContactMethods should be (3)
+    celebrity3.isAccountSettingsComplete should be (true)
+  }
+
+  it should "not be complete if there isn't enough contact info set" in {
+    val celebrity = TestData.newSavedCelebrity()
+    celebrity.secureInfo.get.copy(agentEmail = None, smsPhone = None, voicePhone = None).encrypt.save()
+    celebrity.isAccountSettingsComplete should be (false)
+  }
+
+  "hasTwitter" should "be true if they do have twitter" in {
+    val celebrity = Celebrity(twitterUsername = Some("someduder"))
+    celebrity.hasTwitter should be (true)
+  }
+
+  it should "be false if they have been checked to not have it" in {
+    val celebrity = Celebrity(twitterUsername = Some("none"))
+    celebrity.hasTwitter should be (false)
+  }
+
+  it should "be false if they have not set their twitter" in {
+    val celebrity = Celebrity(twitterUsername = None)
+    celebrity.hasTwitter should be (false)
   }
 }

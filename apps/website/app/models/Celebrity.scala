@@ -140,6 +140,10 @@ case class Celebrity(
     twitterUsername.map(name => name.toLowerCase) == Some("none")
   }
 
+  def hasTwitter: Boolean = {
+    twitterUsername.isDefined && !doesNotHaveTwitter
+  }
+
   def isAccountSettingsComplete: Boolean = {
     isAccountSettingsComplete(secureInfo)
   }
@@ -149,7 +153,7 @@ case class Celebrity(
     maybeSecureInfo match {
       case None => false
       case Some(info) =>
-        def numberOfContactMethods = info.numberOfContactMethods + (if (twitterUsername.isDefined) 1 else 0)
+        def numberOfContactMethods = info.numberOfContactMethods + (if (hasTwitter) 1 else 0)
         info.hasAllDepositInformation && (numberOfContactMethods >= 3)
     }
   }

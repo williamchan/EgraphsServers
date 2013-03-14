@@ -248,7 +248,7 @@ abstract class CelebritySecureInfo {
   def updated: Timestamp
 
   def numberOfContactMethods: Int = {
-    val maybeContactMethods = Set(contactEmail, smsPhone, voicePhone, agentEmail)
+    val maybeContactMethods = List(contactEmail, smsPhone, voicePhone, agentEmail)
     maybeContactMethods.flatten.size
   }
 
