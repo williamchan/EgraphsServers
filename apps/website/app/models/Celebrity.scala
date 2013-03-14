@@ -149,7 +149,7 @@ case class Celebrity(
     maybeSecureInfo match {
       case None => false
       case Some(info) =>
-        def numberOfContactMethods = info.numberOfContactMethods + (if (twitterUsername.isDefined) 1 else 0)
+        def numberOfContactMethods = info.numberOfContactMethods + (if (twitterUsername.isDefined && !doesNotHaveTwitter) 1 else 0)
         info.hasAllDepositInformation && (numberOfContactMethods >= 3)
     }
   }
