@@ -24,3 +24,11 @@ object FemalePersonalPronouns extends PersonalPronouns (
   possessivePronoun="hers",
   reflexive="herself"
 )
+
+object NeutralPersonalPronouns extends PersonalPronouns (
+  subject="they",
+  obj="them",
+  possessiveAdjective="their",
+  possessivePronoun="theirs",
+  reflexive="themselves"
+ )
