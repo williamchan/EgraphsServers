@@ -1,16 +1,23 @@
 /* Scripting for the video assets page */
-define(["Egraphs"], function() {
+define(["Egraphs", "ngApp", "libs/angular"],
+function (Egraphs, ngApp) {
 
   return {
-    /**
-     * Executes all the scripts for the admin-video assets page.
 
-     * @return nothing
-     */
+    ngControllers: {
+
+      VideoAssetCtrl: ["$scope", function ($scope) {
+        $scope.videos = angular.copy(Egraphs.page.videos);
+        alert("there are " + $scope.videos.length + " videos!");
+      }]
+    },
+
     go: function () {
-      
-      $("#see-unprocessed-button").click(function(e) {
-        alert("ouch, you clicked me");
+      $(document).ready(function() {
+
+        $("#see-unprocessed-button").click(function(e) {
+          alert("ouch, you clicked me");
+        });
       });
     }
   };

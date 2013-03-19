@@ -9,6 +9,11 @@
 @import controllers.WebsiteControllers
 @import models.website.video.VideoAssetViewModel
 
+@init = {
+
+  Egraphs.page.videos = @videoAssetViewModels
+}
+
 @videoButton(formId: String, videoType: String, buttonId: String, buttonTitle: String) = {
   <td>
     @safeForm('id -> formId, 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(videoType)).url) {
@@ -78,4 +83,4 @@
 </section>
 }
 
-@base_template(title="Admin - Unprocessed Videos", body=body, jsMain="pages/admin/video-assets")
+@base_template(title = "Admin - Unprocessed Videos", body = body, headJs = init, jsMain = "pages/admin/video-assets")
