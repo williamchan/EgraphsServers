@@ -67,8 +67,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
   def verticalSet: List[VerticalViewModel] = {
     List(
       VerticalViewModel(id = 1, urlSlug="major-league-baseball",verticalName = "mlb", publicName = "Major League Baseball", shortName = "MLB", iconUrl = Some("images/icon-logo-mlb.png"), active = true, categoryViewModels = mlbCategories()),
-      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = Some("images/icon-logo-nba.png"), categoryViewModels = nbaCategories()),
-      VerticalViewModel(id = 3, urlSlug="racing", verticalName = "racing", publicName = "Racing", shortName = "Racing", categoryViewModels = racingCategories() )
+      VerticalViewModel(id = 2, urlSlug="national-basketball-association", verticalName = "nba", publicName = "National Basketball Association", shortName = "NBA", iconUrl = Some("images/icon-logo-nba.png"), active = false, categoryViewModels = nbaCategories()),
+      VerticalViewModel(id = 3, urlSlug="racing", verticalName = "racing", publicName = "Racing", active = false, shortName = "Racing", categoryViewModels = racingCategories() )
     )
   }
 
@@ -184,12 +184,12 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         id = 2,
         publicName = "Team",
         categoryValues = List(
-          CategoryValueViewModel(id = 2, publicName = "Boston Celtics", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 3, publicName = "Miami Heat", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 4, publicName = "San Antonio Spurs", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 5, publicName = "Los Angeles Clippers", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 6, publicName = "Golden State Warriors", active = active.getOrElse(coinflip.nextBoolean)),
-          CategoryValueViewModel(id = 7, publicName = "New York Knicks", active = active.getOrElse(coinflip.nextBoolean))
+          CategoryValueViewModel(id = 2, publicName = "Boston Celtics", active = false),
+          CategoryValueViewModel(id = 3, publicName = "Miami Heat", active = false),
+          CategoryValueViewModel(id = 4, publicName = "San Antonio Spurs", active = false),
+          CategoryValueViewModel(id = 5, publicName = "Los Angeles Clippers", active = false),
+          CategoryValueViewModel(id = 6, publicName = "Golden State Warriors", active = false),
+          CategoryValueViewModel(id = 7, publicName = "New York Knicks", active = false)
         )
       )
     )
@@ -201,7 +201,7 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
         id = 3,
         publicName = "League",
         categoryValues = List(
-          CategoryValueViewModel(id = 8, publicName = "Nascar", active = active.getOrElse(coinflip.nextBoolean))
+          CategoryValueViewModel(id = 8, publicName = "Nascar", active = false)
         )
       )
     )
