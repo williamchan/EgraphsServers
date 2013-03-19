@@ -73,7 +73,7 @@
 
         <aside class="nav span3">
           @tags.marketplace.category_picker(verticalViewModels,
-            !verticalViewModels.exists(v => v.active))
+            !verticalViewModels.exists(v => v.active), !verticalViewModels.exists(v => v.active))
         </aside>
 
         <div class="main span9">
