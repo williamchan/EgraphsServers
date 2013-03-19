@@ -1,36 +1,41 @@
-@(verticalViewModels: List[models.frontend.marketplace.VerticalViewModel], condense: Boolean = false)
+@(verticalViewModels: List[models.frontend.marketplace.VerticalViewModel], condenseValues: Boolean = false, expandVerticals: Boolean = true)
 
 @displayVerticals(verticals: List[models.frontend.marketplace.VerticalViewModel]) = {
+
   @for(vertical <- verticals) {
   <h2><a href="/stars/@vertical.urlSlug">@vertical.publicName</a></h2>
     <ol>
       @for(category <- vertical.categoryViewModels) {
+        @** Show the categories of a vertical if it is active or otherwise forced **@
+        @if(expandVerticals || category.active) {
         <li>
          <a class="category" data-category="@category.id">@category.publicName</a>
+       
           @if(category.active){<a data-category="@category.id" class="clear-all">(Clear All)</a>}
+            
             <ol>
               @for((categoryValue, idx) <- category.categoryValues.sorted.zipWithIndex) {
                 <li>
-                  <a class="cv-link @if(categoryValue.active){active} else{ @if(condense && idx > 3){condensed}}" title="" data-category="@category.id" data-categoryvalue="@categoryValue.id" data-vertical="@vertical.urlSlug">
+                  <a class="cv-link @if(categoryValue.active){active} else{ @if(condenseValues && idx > 3){condensed}}" title="" data-category="@category.id" data-categoryvalue="@categoryValue.id" data-vertical="@vertical.urlSlug">
                   @if(categoryValue.active){<i>&times;</i> <span>@categoryValue.publicName</span> } else {
                     @categoryValue.publicName
                   }
                   </a>
                 </li>
               }
-              @if(condense && category.categoryValues.size > 4){
+              @if(condenseValues && category.categoryValues.size > 4){
                 <li><a class="show-all">Show all&hellip;</a></li>
               }
             </ol>
+          
         </li>
+        }
       }
     </ol>
   }
 }
-
-@{val verticalsFilteredOption = verticalViewModels.filter(v => v.active).headOption
-  displayVerticals(verticalsFilteredOption match {
-    case None => verticalViewModels
-    case Some(vertical) => List(vertical)
-  })
+@{
+  val activeVerticals = verticalViewModels.filter(v => v.active)
+  val inactiveVerticals = verticalViewModels.filter(v => !v.active)
+  displayVerticals(activeVerticals ++ inactiveVerticals)
 }
