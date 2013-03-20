@@ -1,6 +1,7 @@
 /*global angular console mixpanel*/
-define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min", "libs/jquery-ui"],
-function (Egraphs, marketplace, ngApp, logging, requireModule) {
+define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "services/analytics", "module", "libs/angular", "libs/waypoints.min", "libs/jquery-ui"],
+function (Egraphs, marketplace, ngApp, logging, analytics, requireModule) {
+  var events = analytics.eventCategory("Marketplace");
   var log = logging.namespace(requireModule.id);
 
   /**
@@ -45,8 +46,8 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
       }, {offset: 'bottom-in-view', continuous: false, triggerOnce : false});
     };
   });
-  
-  return {
+
+   return {
     ngControllers: {
      /**
       * Define controller for marketplace
@@ -82,9 +83,9 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
             count += incr;
             atBottom = false;
             log("Loading celebrities");
-            mixpanel.track("Loaded more results");
+            events.track(["Loaded more results"]);
             if(count >= $scope.total) {
-              mixpanel.track("Loaded all results");
+              events.track(["Loaded all results"]);
               $(".see-more").addClass("hidden");
             }
           }
@@ -116,7 +117,7 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
          * Reconstructs url from any changes to data model.
          * Used to retain state across reloads.
          **/
-        
+
         $("#remove-query").click( function(e) {
           marketplace.clearQuery();
           marketplace.reloadPage();
@@ -178,7 +179,7 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
           marketplace.selectVertical(slug, id);
           marketplace.reloadPage();
        });
-        
+
         /**
          * Binds apply filters link to processing the multiple select widget visible on resolutions < 720px.
          * Unlike the categories on the larger view, a user can select more than one at a time.
@@ -195,7 +196,7 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
               marketplace.updateCategories(catVal, categoryValues);
             }
           );
-          
+
           marketplace.reloadPage();
         });
 
