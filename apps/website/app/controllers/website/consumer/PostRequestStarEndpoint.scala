@@ -43,7 +43,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
             case Right((customer, account)) => {
               val customerId = customer.id
 
-              PostCelebrityRequestHelper.completeRequestStar(starName, customerId)
+              PostCelebrityRequestHelper.completeRequestStar(starName, customerId, account.email)
               Redirect(request.session.requestStarTargetUrl.get)
             }
             case Left(result) => {

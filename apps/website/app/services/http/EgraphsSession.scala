@@ -91,12 +91,12 @@ case class EgraphsSession(session: Session) {
   }
 
   // Convenience method for request a star feature that figures out post-login redirect
-  def requestedStarRedirectOrCall(customerId: Long, otherCall: Call): Call = {
+  def requestedStarRedirectOrCall(customerId: Long, email: String, otherCall: Call): Call = {
     val maybeRequestedStar = requestedStar
     maybeRequestedStar match {
       case None => otherCall
       case Some(requestedStar) => {
-        PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId)
+        PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId, email)
         controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "", requestedStar)
       }
     }

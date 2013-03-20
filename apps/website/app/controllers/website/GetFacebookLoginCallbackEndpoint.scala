@@ -86,6 +86,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
             val redirectCall: Call = dbSession.connected(TransactionSerializable) {
               request.session.requestedStarRedirectOrCall(
                 customer.id,
+                customer.account.email,
                 controllers.routes.WebsiteControllers.getAccountSettings)
             }
 

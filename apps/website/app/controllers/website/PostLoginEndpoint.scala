@@ -32,6 +32,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
           // Find out whether the user is logging in to complete their celebrity request
           val redirectCall: Call = request.session.requestedStarRedirectOrCall(
             validForm.customerId,
+            validForm.email,
             controllers.routes.WebsiteControllers.getCustomerGalleryById(validForm.customerId))
 
           Redirect(redirectCall).withSession(

@@ -68,6 +68,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         // Find out whether the user is creating an account to complete their celebrity request
         val redirectCall: Call = request.session.requestedStarRedirectOrCall(
           customer.id,
+          account.email,
           controllers.routes.WebsiteControllers.getAccountSettings)
 
         Redirect(redirectCall).withSession(
