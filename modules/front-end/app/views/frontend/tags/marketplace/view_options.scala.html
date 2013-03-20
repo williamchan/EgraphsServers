@@ -10,7 +10,7 @@
     
     <ol>
     @for(sortOption <- sortOptions) {
-      <li><a class="sort-link @if(sortOption.active){active}" data-value="@sortOption.name">@sortOption.display</a></li>
+      <li><a @Utils.idAttribution(sortOption.name, "sort-link") class="sort-link @if(sortOption.active){active}" data-value="@sortOption.name">@sortOption.display</a></li>
     }
     </ol>
     
