@@ -18,10 +18,10 @@
 }
 
 @defining( if (event != "") event else text ) { idUnstripped =>
-@defining( idUnstripped.filter(_ != ' ') ) { id =>
+@defining( idUnstripped.filter(_ != ' ') + "_tooltip" ) { id =>
 @defining( classes.mkString(" ") ) { classString =>
-  <div class="tooltip-link @classString" @idTag(id) >
-    <a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @eventTag(event) tabindex="-1" >
+  <div class="tooltip-link @classString">
+    <a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @idTag(id) @eventTag(event) tabindex="-1">
       @text
     </a>
   </div>
