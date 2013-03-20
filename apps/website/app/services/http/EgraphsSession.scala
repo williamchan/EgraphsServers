@@ -62,6 +62,18 @@ case class EgraphsSession(session: Session) {
     session - Key.RequestedStar.name
   }
 
+  def requestStarTargetUrl: Option[String] = {
+    session.get(Key.RequestStarTargetUrl.name)
+  }
+
+  def withRequestStarTargetUrl(url: String): Session = {
+    session + (Key.RequestStarTargetUrl.name -> url)
+  }
+
+  def removeRequestStarTargetUrl: Session = {
+    session - Key.RequestStarTargetUrl.name
+  }
+
   def withUsernameChanged: Session = {
     session + (Key.UsernameChanged.name -> true.toString)
   }
@@ -85,7 +97,7 @@ case class EgraphsSession(session: Session) {
       case None => otherCall
       case Some(requestedStar) => {
         PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId)
-        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
+        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "", requestedStar)
       }
     }
   }
@@ -109,6 +121,7 @@ object EgraphsSession {
     val MlbpaAccess = new EnumVal("mlbpa") {}
     val UsernameChanged = new EnumVal("username_changed") {}
     val HasSignedUp = new EnumVal("has_signed_up") {}
+    val RequestStarTargetUrl = new EnumVal("request_star_target_url") {}
     val RequestedStar = new EnumVal("requested_star") {}
     val SignupModalDisplayedRecently = new EnumVal("signup_modal_displayed_recently") {}
   }

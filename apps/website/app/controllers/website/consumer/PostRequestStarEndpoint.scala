@@ -44,7 +44,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
               val customerId = customer.id
 
               PostCelebrityRequestHelper.completeRequestStar(starName, customerId)
-              Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = ""))
+              Redirect(request.session.requestStarTargetUrl.get)
             }
             case Left(result) => {
               // redirect to login page, add requested star name to session for post-login lookup

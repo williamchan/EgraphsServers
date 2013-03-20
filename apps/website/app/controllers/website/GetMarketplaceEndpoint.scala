@@ -9,6 +9,8 @@ import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 import services.mvc.marketplace.MarketplaceServices
 import services.http.ControllerMethod
+import services.http.EgraphsSession._
+import services.http.EgraphsSession.Conversions._
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
 import services.db.TransactionSerializable
@@ -98,7 +100,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
    * @param vertical The slug of a marketplace search if it is scoped by vertical
    * @return A results page or landing page.
    */
-  def getMarketplaceResultPage(vertical : String = "") = controllerMethod.withForm() { implicit AuthToken =>
+  def getMarketplaceResultPage(vertical: String = "", query: String = "") = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
@@ -156,10 +158,13 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
         val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
+        val queryToSend = queryOption.getOrElse("")
+        val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", queryToSend).url
+
         Ok(views.html.frontend.marketplace_results(
-          query = queryOption.getOrElse(""),
+          query = queryToSend,
           viewAsList = viewAsList,
-          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url,
+          marketplaceRoute = marketplaceTargetUrl,
           verticalViewModels = verticalViewModels,
           results = ResultSetViewModel(subtitle = Option(subtitle), verticalUrl = Option("/"), celebrities = celebrities),
           sortOptions = sortOptionViewModels(maybeSortType),
@@ -167,6 +172,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           requestStarForm = PostRequestStarEndpoint.form.bindWithFlashData,
           requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url
         ))
+        .withSession(request.session.withRequestStarTargetUrl(marketplaceTargetUrl))
+
       } else {
         // No search options so serve the landing page. If a vertical has a category value which feature stars, it is
         // displayed via this query.  Limit to three results to keep verticals above the fold.
@@ -181,7 +188,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         }
         // Serve the landing page.
         Ok(views.html.frontend.marketplace_landing(
-          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url,
+          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", "").url,
           verticalViewModels = verticalViewModels,
           resultSets = resultSets.toList
         ))

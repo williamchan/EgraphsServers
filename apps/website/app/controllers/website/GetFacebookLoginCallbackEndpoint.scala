@@ -90,7 +90,10 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
             }
 
             Redirect(redirectCall).withSession(
-              session.withCustomerId(customer.id).removeRequestedStar
+              session
+                .withCustomerId(customer.id)
+                .removeRequestedStar
+                .removeRequestStarTargetUrl
             ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
           }
 

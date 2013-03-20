@@ -75,6 +75,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
             .withCustomerId(customer.id)
             .withUsernameChanged
             .removeRequestedStar
+            .removeRequestStarTargetUrl
         ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
       }
       redirects.merge

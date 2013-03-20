@@ -35,7 +35,10 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
             controllers.routes.WebsiteControllers.getCustomerGalleryById(validForm.customerId))
 
           Redirect(redirectCall).withSession(
-            request.session.withCustomerId(validForm.customerId).removeRequestedStar
+            request.session
+              .withCustomerId(validForm.customerId)
+              .removeRequestedStar
+              .removeRequestStarTargetUrl
           ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
         }
       }
