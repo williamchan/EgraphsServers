@@ -14,6 +14,10 @@ object EmailType extends Enum {
     val name = "Account Verification"
   }
 
+  val CelebrityRequest = new EnumVal {
+    val name = "Celebrity Request"
+  }
+
   val CelebrityWelcome = new EnumVal {
     val name = "Celebrity Welcome"
   }
