@@ -11,8 +11,9 @@ import play.api.mvc.RequestHeader
 import play.api.http.Status
 import _root_.frontend.formatting.DateFormatting.Conversions._
 import models.FulfilledOrder
+import services.logging.Logging
 
-object Facebook {
+object Facebook extends Logging {
 
   // Facebook user properties
   lazy val _id = "id"
