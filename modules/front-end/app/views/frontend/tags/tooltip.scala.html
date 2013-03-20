@@ -8,4 +8,21 @@
     <strong>Hey Dummy</strong>, it's a tooltip of course!
   }
 *@
-<div class="tooltip-link @classes.mkString(" ")"><a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @if(event != ""){event="@event"} tabindex="-1" >@text</a></div>
+
+@idTag(id: String) = {
+  @if(id != "") { id="@id" }
+}
+
+@eventTag(event: String) = {
+  @if(event != "") { event="@event" }
+}
+
+@defining( if (event != "") event else text ) { idUnstripped =>
+@defining( idUnstripped.filter(_ != ' ') ) { id =>
+@defining( classes.mkString(" ") ) { classString =>
+  <div class="tooltip-link @classString" @idTag(id) >
+    <a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @eventTag(event) tabindex="-1" >
+      @text
+    </a>
+  </div>
+}}}
