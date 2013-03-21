@@ -1,4 +1,6 @@
 @(text: String, classes: Seq[String]=Seq.empty[String], event: String="")(body: => Html)
+@import views.frontend.Utils.idAttribution
+
 @** 
   Tooltip library adapted from http://osvaldas.info/elegant-css-and-jquery-tooltip-responsive-mobile-friendly 
   
@@ -11,19 +13,15 @@
   }
 *@
 
-@idTag(id: String) = {
-  @if(id != "") { id="@id" }
-}
-
 @eventTag(event: String) = {
   @if(event != "") { event="@event" }
 }
 
 @defining( if (event != "") event else text ) { idUnstripped =>
-  @defining( idUnstripped.filter(_ != ' ') + "_tooltip" ) { id =>
+  @defining( idAttribution(idUnstripped, "tooltip") ) { id =>
     @defining( classes.mkString(" ") ) { classString =>
       <div class="tooltip-link @classString">
-        <a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @idTag(id) @eventTag(event) tabindex="-1">
+        <a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @id @eventTag(event) tabindex="-1">
           @text
         </a>
       </div>
