@@ -96,6 +96,7 @@ GET     /Login/storefront                                         controllers.Lo
 GET     /Marketplace/results/list                                 controllers.Marketplace.resultsList
 GET     /Marketplace/results                                      controllers.Marketplace.results
 GET     /Marketplace/results/zero                                 controllers.Marketplace.zeroResults
+GET     /Marketplace/results/zero/requested                       controllers.Marketplace.zeroResultsAlreadyRequested
 GET     /Marketplace/landing                                      controllers.Marketplace.landing
 
 GET     /Mlbpa/egraphs                                            controllers.Mlbpa.egraphs

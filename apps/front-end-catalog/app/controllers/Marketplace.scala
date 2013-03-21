@@ -27,12 +27,13 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       sortOptions,
       availableOnly = false,
       requestStarForm = defaultRequestStarForm,
-      requestStarActionUrl = "this-is-the-action-url"))
+      requestStarActionUrl = "this-is-the-action-url",
+      hasAlreadyRequested = false))
   }
 
   def zeroResults() = Action {
     Ok(views.html.frontend.marketplace_results(
-      query = "",
+      query = "Jack Johnson",
       viewAsList = false,
       marketplaceRoute = controllers.routes.Marketplace.results.url,
       verticalViewModels = verticalSet,
@@ -40,7 +41,22 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       sortOptions = sortOptions,
       availableOnly = false,
       requestStarForm = defaultRequestStarForm,
-      requestStarActionUrl = "this-is-the-action-url"))
+      requestStarActionUrl = "this-is-the-action-url",
+      hasAlreadyRequested = false))
+  }
+
+  def zeroResultsAlreadyRequested() = Action {
+    Ok(views.html.frontend.marketplace_results(
+      query = "Jack Johnson",
+      viewAsList = false,
+      marketplaceRoute = controllers.routes.Marketplace.results.url,
+      verticalViewModels = verticalSet,
+      results = zeroResultSet,
+      sortOptions = sortOptions,
+      availableOnly = false,
+      requestStarForm = defaultRequestStarForm,
+      requestStarActionUrl = "this-is-the-action-url",
+      hasAlreadyRequested = true))
   }
 
   def resultsList() = Action {
@@ -53,7 +69,8 @@ object Marketplace extends Controller with DefaultImplicitTemplateParameters {
       sortOptions,
       availableOnly = coinflip.nextBoolean,
       requestStarForm = defaultRequestStarForm,
-      requestStarActionUrl = "this-is-the-action-url"))
+      requestStarActionUrl = "this-is-the-action-url",
+      hasAlreadyRequested = false))
   }
 
   def landing() = Action {
