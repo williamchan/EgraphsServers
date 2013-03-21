@@ -2,7 +2,8 @@
   results: models.frontend.marketplace.ResultSetViewModel,
   query: String,
   requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
-  requestStarActionUrl: String
+  requestStarActionUrl: String,
+  hasAlreadyRequested: Boolean
   )(
   implicit
   authToken: egraphs.authtoken.AuthenticityToken
@@ -68,23 +69,31 @@
         ) {
 
           <div class="clearfix">
-            <div id="request-star-explanation">
-              <p>
-                Don't see what you're looking for? Click the button below to register an Egraphs account, and we'll do our best to 
-                sign them up and let you know as soon as they're available!
-              </p>
-            </div>
-            <div class="request-star-button">
-              <span>
-                @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
-                  <input type="hidden" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
-                }
-              </span>
-              <button id="request-star-button" type="submit" class="button">
-                <strong><em>Request @query</em></strong>
-                <span>&raquo;</span>
-              </button>
-            </div>
+            @if(!hasAlreadyRequested) {
+              <div id="request-star-explanation">
+                <p>
+                  Don't see what you're looking for? Click the button below to register an Egraphs account, and we'll do our best to
+                  sign them up and let you know as soon as they're available!
+                </p>
+              </div>
+              <div class="request-star-button">
+                <span>
+                  @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
+                    <input type="hidden" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
+                  }
+                </span>
+                <button id="request-star-button" type="submit" class="button">
+                  <strong><em>Request @query</em></strong>
+                  <span>&raquo;</span>
+                </button>
+              </div>
+            } else {
+              <div id="thank-you-message">
+                <p>
+                  Thank you for your interest in @query. We'll let you know when your star becomes available!
+                </p>
+              </div>
+            }
           </div>
 
         } <!-- end safe form -->

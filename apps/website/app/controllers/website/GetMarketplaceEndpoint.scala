@@ -27,15 +27,16 @@ import egraphs.playutils.FlashableForm._
  * Controller for serving the celebrity marketplace
  */
 private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
-  protected def controllerMethod : ControllerMethod
-  protected def celebrityStore : CelebrityStore  
-  protected def categoryValueStore: CategoryValueStore
   protected def catalogStarsQuery: CatalogStarsQuery
+  protected def categoryValueStore: CategoryValueStore
+  protected def celebrityRequestStore: CelebrityRequestStore
+  protected def celebrityStore : CelebrityStore
+  protected def controllerMethod : ControllerMethod
   protected def dbSession: DBSession
   protected def featured: Featured
   protected def httpFilters: HttpFilters
-  protected def verticalStore: VerticalStore
   protected def marketplaceServices: MarketplaceServices
+  protected def verticalStore: VerticalStore
 
   val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
@@ -163,8 +164,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         val queryToSend = queryOption.getOrElse("")
         val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", queryToSend).url
 
-        // this should really see if there's a celebrity request
-        val isLoggedIn = getMaybeCelebrityRequest
+        // true if customer is logged in and has already requested this same celebrity
+        val hasAlreadyRequested = getHasAlreadyRequested(queryToSend)
 
         Ok(views.html.frontend.marketplace_results(
           query = queryToSend,
@@ -175,7 +176,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           sortOptions = sortOptionViewModels(maybeSortType),
           availableOnly = availableOnly,
           requestStarForm = PostRequestStarEndpoint.form.bindWithFlashData,
-          requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url
+          requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url,
+          hasAlreadyRequested
         ))
         .withSession(request.session.withRequestStarTargetUrl(marketplaceTargetUrl))
 
@@ -201,10 +203,15 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
     }
   }
 
-  private def getMaybeCelebrityRequest(implicit request: Request[AnyContent]): Boolean = {
+  private def getHasAlreadyRequested(query: String)(implicit request: Request[AnyContent]): Boolean = {
     val eitherCustomerAndAccountOrResult = httpFilters.requireCustomerLogin.filterInSession()
     val isLoggedIn = eitherCustomerAndAccountOrResult match {
-      case Right((customer, account)) => true
+      case Right((customer, account)) => {
+        val maybeCelebrityRequest = celebrityRequestStore.getCelebrityRequestByCustomerIdAndCelebrityName(
+          customer.id, query)
+
+        maybeCelebrityRequest.isDefined
+      }
       case Left(result) => false
     }
     isLoggedIn
