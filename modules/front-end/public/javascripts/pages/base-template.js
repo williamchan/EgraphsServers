@@ -110,11 +110,11 @@ function(page, window, logging, analytics, requireModule) {
         }
 
         signupModal.on('shown', function() {
-          events.track(['Modal shown']);
+          events.track(['Newsletter modal shown']);
         });
 
         signupModal.on('hidden', function() {
-          events.track(['Modal hidden']);
+          events.track(['Newsletter modal hidden']);
         });
 
         // Populate social links asynchronously
