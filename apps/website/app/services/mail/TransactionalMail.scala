@@ -48,8 +48,6 @@ private[mail] class StubTransactionalMail extends TransactionalMail {
     mailStack.toAddresses.foreach(emailNamePair => play.Logger.info("TO EMAIL: " +
         emailNamePair._1 + ", TO NAME: " + emailNamePair._2.getOrElse("none")))
 
-    play.Logger.info("BCC: " + mailStack.bccAddress.getOrElse("none"))
-
     // this won't include the header and footer, which are shared across all transactional mail;
     // look at the General template from the Mandrill console to see header/footer html
     templateContentParts.foreach{ case (name, htmlContent) => play.Logger.info("HTML BODY: " + htmlContent) }
