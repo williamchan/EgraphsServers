@@ -11,6 +11,7 @@ import services.mvc.marketplace.MarketplaceServices
 import services.http.ControllerMethod
 import services.http.EgraphsSession._
 import services.http.EgraphsSession.Conversions._
+import services.http.filters._
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
 import services.db.TransactionSerializable
@@ -32,6 +33,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def catalogStarsQuery: CatalogStarsQuery
   protected def dbSession: DBSession
   protected def featured: Featured
+  protected def httpFilters: HttpFilters
   protected def verticalStore: VerticalStore
   protected def marketplaceServices: MarketplaceServices
 
@@ -161,6 +163,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         val queryToSend = queryOption.getOrElse("")
         val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", queryToSend).url
 
+        // this should really see if there's a celebrity request
+        val isLoggedIn = getMaybeCelebrityRequest
+
         Ok(views.html.frontend.marketplace_results(
           query = queryToSend,
           viewAsList = viewAsList,
@@ -194,5 +199,14 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         ))
       }
     }
+  }
+
+  private def getMaybeCelebrityRequest(implicit request: Request[AnyContent]): Boolean = {
+    val eitherCustomerAndAccountOrResult = httpFilters.requireCustomerLogin.filterInSession()
+    val isLoggedIn = eitherCustomerAndAccountOrResult match {
+      case Right((customer, account)) => true
+      case Left(result) => false
+    }
+    isLoggedIn
   }
 }

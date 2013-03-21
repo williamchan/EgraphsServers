@@ -40,12 +40,15 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
           val eitherCustomerAndAccountOrResult = httpFilters.requireCustomerLogin.filterInSession()
           eitherCustomerAndAccountOrResult match {
 
+            // Logged in case
             case Right((customer, account)) => {
               val customerId = customer.id
 
               PostCelebrityRequestHelper.completeRequestStar(starName, customerId, account.email)
               Redirect(request.session.requestStarTargetUrl.get)
             }
+
+            // Not logged in case
             case Left(result) => {
               // redirect to login page, add requested star name to session for post-login lookup
               Redirect(controllers.routes.WebsiteControllers.getLogin(
