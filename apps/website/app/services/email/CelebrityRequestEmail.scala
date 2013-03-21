@@ -17,14 +17,15 @@ case class CelebrityRequestEmail(
   def send() {
     val emailStack = EmailViewModel(
       subject = "Request Star Success",
-      fromEmail = "webserver@egraphs.com",
-      fromName = "Egraphs",
+      fromEmail = EmailUtils.generalFromEmail,
+      fromName = EmailUtils.generalFromName,
       toAddresses = List((celebrityRequestEmailStack.requesterEmail, None))
     )    
 
-    val celebrityRequestTemplateContentParts = MailUtils.getCelebrityRequestTemplateContentParts(EmailType.CelebrityRequest, celebrityRequestEmailStack)
+    val celebrityRequestTemplateContentParts = MailUtils.getCelebrityRequestTemplateContentParts(
+      EmailType.CelebrityRequest, celebrityRequestEmailStack)
 
-    log("Sending celebrity request mail to: " + celebrityRequestEmailStack.requesterEmail + " for star: " + celebrityRequestEmailStack.requestedStar)
+    log(s"Sending celebrity request mail to: ${celebrityRequestEmailStack.requesterEmail} for star: ${celebrityRequestEmailStack.requestedStar}")
     mailService.send(emailStack, celebrityRequestTemplateContentParts) 
   }
 }

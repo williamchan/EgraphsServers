@@ -39,7 +39,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
             request.session
               .withCustomerId(validForm.customerId)
               .removeRequestedStar
-              .removeRequestStarTargetUrl
+              .removeAfterLoginRedirectUrl
           ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
         }
       }

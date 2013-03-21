@@ -17,6 +17,7 @@ import services.http.forms.FormConstraints
 import services.http.{POSTControllerMethod, WithDBConnection}
 import services.mvc.ImplicitHeaderAndFooterData
 import services.request.PostCelebrityRequestHelper
+import controllers.routes
 
 private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -45,7 +46,11 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
               val customerId = customer.id
 
               PostCelebrityRequestHelper.completeRequestStar(starName, customerId, account.email)
-              Redirect(request.session.requestStarTargetUrl.get)
+
+              request.session.afterLoginRedirectUrl match {
+                case Some(afterLoginRedirectUrl) => Redirect(afterLoginRedirectUrl)
+                case None => Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage("", ""))
+              }
             }
 
             // Not logged in case

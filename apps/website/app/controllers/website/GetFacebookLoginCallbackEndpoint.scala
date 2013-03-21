@@ -94,7 +94,7 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
               session
                 .withCustomerId(customer.id)
                 .removeRequestedStar
-                .removeRequestStarTargetUrl
+                .removeAfterLoginRedirectUrl
             ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
           }
 

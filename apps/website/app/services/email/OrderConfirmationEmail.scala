@@ -17,14 +17,15 @@ case class OrderConfirmationEmail(
   def send() {
     val emailStack = EmailViewModel(
       subject = "Order Confirmation",
-      fromEmail = "webserver@egraphs.com",
-      fromName = "Egraphs",
+      fromEmail = EmailUtils.generalFromEmail,
+      fromName = EmailUtils.generalFromName,
       toAddresses = List((orderConfirmationEmailStack.buyerEmail, Some(orderConfirmationEmailStack.buyerName)))
     )
 
-    val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(EmailType.OrderConfirmation, orderConfirmationEmailStack)
+    val orderConfirmationTemplateContentParts = MailUtils.getOrderConfirmationTemplateContentParts(
+      EmailType.OrderConfirmation, orderConfirmationEmailStack)
 
-    log("Sending order confirmation mail to: " + orderConfirmationEmailStack.buyerEmail + " for order ID: " + orderConfirmationEmailStack.orderId)
+    log(s"Sending order confirmation mail to: ${orderConfirmationEmailStack.buyerEmail} for order ID: ${orderConfirmationEmailStack.orderId}")
     mailService.send(emailStack, orderConfirmationTemplateContentParts)
   }
 }

@@ -229,7 +229,6 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
           marketplace.clearCategoryByKey("c" + $(this).attr("data-category"));
           marketplace.reloadPage();
         });
-
       });
     }
   };

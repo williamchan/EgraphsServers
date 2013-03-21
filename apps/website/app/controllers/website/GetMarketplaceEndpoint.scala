@@ -30,8 +30,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def catalogStarsQuery: CatalogStarsQuery
   protected def categoryValueStore: CategoryValueStore
   protected def celebrityRequestStore: CelebrityRequestStore
-  protected def celebrityStore : CelebrityStore
-  protected def controllerMethod : ControllerMethod
+  protected def celebrityStore: CelebrityStore
+  protected def controllerMethod: ControllerMethod
   protected def dbSession: DBSession
   protected def featured: Featured
   protected def httpFilters: HttpFilters
@@ -179,7 +179,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url,
           hasAlreadyRequested
         ))
-        .withSession(request.session.withRequestStarTargetUrl(marketplaceTargetUrl))
+        .withSession(request.session.withAfterLoginRedirectUrl(marketplaceTargetUrl))
 
       } else {
         // No search options so serve the landing page. If a vertical has a category value which feature stars, it is
@@ -205,7 +205,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
   private def getHasAlreadyRequested(query: String)(implicit request: Request[AnyContent]): Boolean = {
     val eitherCustomerAndAccountOrResult = httpFilters.requireCustomerLogin.filterInSession()
-    val isLoggedIn = eitherCustomerAndAccountOrResult match {
+    eitherCustomerAndAccountOrResult match {
       case Right((customer, account)) => {
         val maybeCelebrityRequest = celebrityRequestStore.getCelebrityRequestByCustomerIdAndCelebrityName(
           customer.id, query)
@@ -214,6 +214,5 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       }
       case Left(result) => false
     }
-    isLoggedIn
   }
 }
