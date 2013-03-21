@@ -14,8 +14,7 @@ case class CelebrityWelcomeEmail(
   toAddress: String,
   consumerApp: ConsumerApplication,
   celebrity: Celebrity,
-  mailService: TransactionalMail = AppConfig.instance[TransactionalMail],
-  bccEmail: Option[String] = None  
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
 ) {
 
   import CelebrityWelcomeEmail.log
@@ -30,8 +29,7 @@ case class CelebrityWelcomeEmail(
       subject = "Welcome to Egraphs!",
       fromEmail = "webserver@egraphs.com",
       fromName = "Egraphs",
-      toAddresses = List((toAddress, Some(celebrity.publicName))),
-      bccAddress = bccEmail
+      toAddresses = List((toAddress, Some(celebrity.publicName)))
     )
 
     val appDownloadLink = consumerApp.getIOSClient(redirectToItmsLink=true).url
