@@ -7,7 +7,7 @@
     <ol>
       @for(category <- vertical.categoryViewModels) {
         @** Show the categories of a vertical if it is active or otherwise forced **@
-        @if(expandVerticals || category.active) {
+        @if(expandVerticals || vertical.active) {
         <li>
          <a class="category" data-category="@category.id">@category.publicName</a>
        

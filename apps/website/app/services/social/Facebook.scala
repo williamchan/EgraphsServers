@@ -10,10 +10,10 @@ import play.api.libs.json.JsValue
 import play.api.mvc.RequestHeader
 import play.api.http.Status
 import _root_.frontend.formatting.DateFormatting.Conversions._
-import controllers.routes.WebsiteControllers.getFacebookLoginCallback
 import models.FulfilledOrder
+import services.logging.Logging
 
-object Facebook {
+object Facebook extends Logging {
 
   // Facebook user properties
   lazy val _id = "id"
@@ -63,7 +63,11 @@ object Facebook {
           // expected String format is: "access_token=USER_ACESS_TOKEN&expires=NUMBER_OF_SECONDS_UNTIL_TOKEN_EXPIRES"
           val responseStr = response.body
           val prefix = "access_token="
-          responseStr.substring(responseStr.indexOf(prefix) + prefix.length, responseStr.indexOf("&"))
+          val indexOfPrefix = responseStr.indexOf(prefix)
+          if (indexOfPrefix < 0) {
+            error("Facebook access token expected but not found. Request body = " + responseStr)
+          }
+          responseStr.substring(indexOfPrefix + prefix.length, responseStr.indexOf("&"))
 
         case _ => throw new RuntimeException("Facebook authentication error encountered: " + response.body)
       }
