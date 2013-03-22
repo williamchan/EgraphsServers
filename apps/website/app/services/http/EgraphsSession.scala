@@ -97,7 +97,7 @@ case class EgraphsSession(session: Session) {
       case None => otherCall
       case Some(requestedStar) => {
         PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId, email)
-        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "", requestedStar)
+        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "", Some(requestedStar))
       }
     }
   }

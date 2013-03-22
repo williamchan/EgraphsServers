@@ -201,8 +201,8 @@ GET     /orders/$orderId<[0-9]+>/egraph-gift-explanation                  contro
 GET     /privacy                                                          controllers.WebsiteControllers.getPrivacy
 POST    /register                                                         controllers.WebsiteControllers.postRegisterConsumerEndpoint
 POST    /requestStar                                                      controllers.WebsiteControllers.postRequestStar
-GET     /stars                                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "", query ?= "")
-GET     /stars/:vertical                                                  controllers.WebsiteControllers.getMarketplaceResultPage(vertical, query ?= "")
+GET     /stars                                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "", query: Option[String] ?= None)
+GET     /stars/:vertical                                                  controllers.WebsiteControllers.getMarketplaceResultPage(vertical, query: Option[String] ?= None)
 POST    /subscribe                                                        controllers.WebsiteControllers.postSubscribeEmail
 GET     /sweepstakes/insider                                              controllers.WebsiteControllers.getInsiderSweepstakes
 GET     /terms                                                            controllers.WebsiteControllers.getTerms

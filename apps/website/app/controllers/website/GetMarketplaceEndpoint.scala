@@ -103,7 +103,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
    * @param vertical The slug of a marketplace search if it is scoped by vertical
    * @return A results page or landing page.
    */
-  def getMarketplaceResultPage(vertical: String = "", query: String = "") = controllerMethod.withForm() { implicit AuthToken =>
+  def getMarketplaceResultPage(vertical: String = "", query: Option[String] = None) = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
       
       println("the query right inside marketplace results method is " + query)
@@ -148,10 +148,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val verticalViewModels = marketplaceServices.getVerticalViewModels(maybeSelectedVertical, activeCategoryValues)
 
       // Check if any search options have been defined
-      if(queryOption.isDefined || !verticalAndCategoryValues.isEmpty) {
+      if(!query.isEmpty || !verticalAndCategoryValues.isEmpty) {
         // Serve results according to the query
         val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
-          celebrityStore.marketplaceSearch(queryOption, verticalAndCategoryValues)
+          celebrityStore.marketplaceSearch(query, verticalAndCategoryValues)
         }
 
         val sortedCelebrities = sortCelebrities(maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant), unsortedCelebrities)
@@ -162,21 +162,20 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           sortedCelebrities
         }
 
-        val subtitle = buildSubtitle(queryOption, celebrities)
+        val subtitle = buildSubtitle(query, celebrities)
 
         val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
-        val queryToSend = queryOption.getOrElse("")
-        val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", queryToSend).url
-        
+        val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", query).url
+
         println("markeptlace target url is " + marketplaceTargetUrl)
-        println("subtitle, which appears to be getting fuxed, is " + subtitle)
+        println("subtitle is " + subtitle)
 
         // true if customer is logged in and has already requested this same celebrity
-        val hasAlreadyRequested = getHasAlreadyRequested(queryToSend)
+        val hasAlreadyRequested = getHasAlreadyRequested(query.getOrElse(""))
 
         Ok(views.html.frontend.marketplace_results(
-          query = queryToSend,
+          query = query.getOrElse(""),
           viewAsList = viewAsList,
           marketplaceRoute = marketplaceTargetUrl,
           verticalViewModels = verticalViewModels,
@@ -203,7 +202,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         }
         // Serve the landing page.
         Ok(views.html.frontend.marketplace_landing(
-          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", "").url,
+          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", None).url,
           verticalViewModels = verticalViewModels,
           resultSets = resultSets.toList
         ))
