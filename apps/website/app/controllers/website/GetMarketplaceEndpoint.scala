@@ -38,7 +38,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def marketplaceServices: MarketplaceServices
   protected def verticalStore: VerticalStore
 
-  val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
 
   private def sortOptionViewModels(selectedSortingType: Option[CelebritySortingTypes.EnumVal] = None) : Iterable[SortOptionViewModel] = {
@@ -105,9 +104,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
    */
   def getMarketplaceResultPage(vertical: String = "", query: Option[String] = None) = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
-      
-      println("the query right inside marketplace results method is " + query)
-      
+
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
         tuple(
@@ -119,15 +116,13 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       )
       // Process the form
       val maybeSelectedVertical =  verticalStore.verticals.filter(v => v.urlSlug == vertical).headOption
-      val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.fold(
+      val (_, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.fold(
         errors => (None, None, None, None),
         formOptions => formOptions
       )
       val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
       val availableOnly = availableOnlyOption.getOrElse(false)
       val categoryAndCategoryValues = parseCategoryValues
-      
-      println("the query from the form is " + queryOption)
 
       // Refinements to pass to the search function
       val categoryValuesRefinements = for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
@@ -167,9 +162,6 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
         val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", query).url
-
-        println("markeptlace target url is " + marketplaceTargetUrl)
-        println("subtitle is " + subtitle)
 
         // true if customer is logged in and has already requested this same celebrity
         val hasAlreadyRequested = getHasAlreadyRequested(query.getOrElse(""))

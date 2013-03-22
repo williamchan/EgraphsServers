@@ -1,12 +1,12 @@
 package services.request
 
-import models.CelebrityRequest
-import models.CelebrityStore
+import models.{CelebrityRequest, CelebrityRequestStore}
 import models.frontend.email.CelebrityRequestEmailViewModel
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import services.AppConfig
 import services.db.DBSession
 import services.db.TransactionSerializable
 import services.email.CelebrityRequestEmail
@@ -19,10 +19,17 @@ object PostCelebrityRequestHelper {
 
     play.Logger.info("Request a Star: starName is " + requestedStar + ", customerId is " + customerId)
 
-    // add row to celebrityRequests table
-    CelebrityRequest(
-      celebrityName = requestedStar,
-      customerId = customerId).save()
+    // Only add a row if there's NOT already a request for given star by given customer
+    val celebrityStore = AppConfig.instance[CelebrityRequestStore]
+    val maybeCelebrityRequest = celebrityStore.getCelebrityRequestByCustomerIdAndCelebrityName(customerId, requestedStar)
+
+    if (!maybeCelebrityRequest.isDefined) {
+      // Add row to celebrityRequests table
+      CelebrityRequest(
+        celebrityName = requestedStar,
+        customerId = customerId
+      ).save()
+    }
 
     CelebrityRequestEmail(
       CelebrityRequestEmailViewModel(
