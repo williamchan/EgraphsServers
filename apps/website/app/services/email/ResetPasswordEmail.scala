@@ -24,8 +24,8 @@ case class ResetPasswordEmail(
   def send() = {
     val emailStack = EmailViewModel(
       subject = "Egraphs Password Recovery",
-      fromEmail = EmailUtils.supportFromEmail,
-      fromName = EmailUtils.supportFromName,
+      fromEmail = EmailConstants.supportFromEmail,
+      fromName = EmailConstants.supportFromName,
       toAddresses = List((account.email, None))
     )
 

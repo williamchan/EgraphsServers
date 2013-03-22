@@ -23,9 +23,9 @@ case class EnrollmentCompleteEmail(
   def send() = {
     val emailStack = EmailViewModel(
       subject = "Enrollment by " + celebrity.publicName,
-      fromEmail = EmailUtils.generalFromEmail,
-      fromName = EmailUtils.generalFromName,
-      toAddresses = List((EmailUtils.celebEnrolledEmail, None))
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
+      toAddresses = List((EmailConstants.celebEnrolledEmail, None))
     )
 
     val enrollmentCompleteEmailStack = EnrollmentCompleteEmailViewModel(

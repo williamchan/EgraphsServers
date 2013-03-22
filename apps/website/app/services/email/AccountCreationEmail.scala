@@ -22,8 +22,8 @@ case class AccountCreationEmail(
   def send() {  
     val emailStack = EmailViewModel(
       subject = "Welcome to Egraphs!",
-      fromEmail = EmailUtils.generalFromEmail,
-      fromName = EmailUtils.generalFromName,
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
       toAddresses = List((account.email, None))
     )
 

@@ -17,8 +17,8 @@ case class OrderConfirmationEmail(
   def send() {
     val emailStack = EmailViewModel(
       subject = "Order Confirmation",
-      fromEmail = EmailUtils.generalFromEmail,
-      fromName = EmailUtils.generalFromName,
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
       toAddresses = List((orderConfirmationEmailStack.buyerEmail, Some(orderConfirmationEmailStack.buyerName)))
     )
 

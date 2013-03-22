@@ -1,6 +1,6 @@
 package services.email
 
-object EmailUtils {
+object EmailConstants {
   val celebEnrolledEmail = "celebalert@egraphs.com"  
   val generalFromEmail = "webserver@egraphs.com"
   val generalFromName = "Egraphs"

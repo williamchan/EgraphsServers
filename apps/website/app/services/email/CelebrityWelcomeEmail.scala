@@ -27,8 +27,8 @@ case class CelebrityWelcomeEmail(
   def send() = {
     val emailStack = EmailViewModel(
       subject = "Welcome to Egraphs!",
-      fromEmail = EmailUtils.generalFromEmail,
-      fromName = EmailUtils.generalFromName,
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
       toAddresses = List((toAddress, Some(celebrity.publicName)))
     )
 

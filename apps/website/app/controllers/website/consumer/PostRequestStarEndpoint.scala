@@ -49,7 +49,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
 
               request.session.afterLoginRedirectUrl match {
                 case Some(afterLoginRedirectUrl) => Redirect(afterLoginRedirectUrl)
-                case None => Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage("", None))
+                case None => Redirect(controllers.routes.WebsiteControllers.getMarketplaceResultPage(""))
               }
             }
 

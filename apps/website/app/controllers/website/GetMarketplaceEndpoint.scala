@@ -194,7 +194,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         }
         // Serve the landing page.
         Ok(views.html.frontend.marketplace_landing(
-          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", None).url,
+          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url,
           verticalViewModels = verticalViewModels,
           resultSets = resultSets.toList
         ))

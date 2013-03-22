@@ -17,8 +17,8 @@ case class CelebrityRequestEmail(
   def send() {
     val emailStack = EmailViewModel(
       subject = "Request Star Success",
-      fromEmail = EmailUtils.generalFromEmail,
-      fromName = EmailUtils.generalFromName,
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
       toAddresses = List((celebrityRequestEmailStack.requesterEmail, None))
     )    
 
