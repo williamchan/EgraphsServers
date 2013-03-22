@@ -105,6 +105,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
    */
   def getMarketplaceResultPage(vertical: String = "", query: String = "") = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
+      
+      println("the query right inside marketplace results method is " + query)
+      
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
         tuple(
@@ -123,6 +126,8 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val maybeSortType = sortOption.flatMap(sort => CelebritySortingTypes(sort))
       val availableOnly = availableOnlyOption.getOrElse(false)
       val categoryAndCategoryValues = parseCategoryValues
+      
+      println("the query from the form is " + queryOption)
 
       // Refinements to pass to the search function
       val categoryValuesRefinements = for ((category, categoryValues) <- categoryAndCategoryValues) yield categoryValues
@@ -163,6 +168,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
 
         val queryToSend = queryOption.getOrElse("")
         val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", queryToSend).url
+        
+        println("markeptlace target url is " + marketplaceTargetUrl)
+        println("subtitle, which appears to be getting fuxed, is " + subtitle)
 
         // true if customer is logged in and has already requested this same celebrity
         val hasAlreadyRequested = getHasAlreadyRequested(queryToSend)

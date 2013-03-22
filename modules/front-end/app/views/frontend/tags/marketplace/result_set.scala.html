@@ -17,17 +17,7 @@
     <section>
       <div class="clearfix">
         <h1><span>{{results.subtitle}}</span></h1>
-        <div class="available-only">
-            <ol>
-              <li>
-              @if(!availableOnly){
-                <a data-value="true">Hide Sold Out Stars</a>
-              } else {
-                <a data-value="false"> Show Sold Out Stars</a>
-              }
-              </li>
-            </ol>
-        </div>
+        @soldOutStarsSection
       </div>
       @requestStarContentIfZeroResults
       <div class="clearfix">
@@ -56,6 +46,22 @@
     </section>
   </section>
 </div>
+
+@soldOutStarsSection = {
+  @if(!results.celebrities.isEmpty) {
+    <div class="available-only">
+      <ol>
+        <li>
+          @if(!availableOnly){
+            <a data-value="true">Hide Sold Out Stars</a>
+          } else {
+            <a data-value="false">Show Sold Out Stars</a>
+          }
+        </li>
+      </ol>
+    </div>
+  }
+}
 
 @requestStarContentIfZeroResults = {
   @if(results.celebrities.isEmpty) {
@@ -90,7 +96,7 @@
             } else {
               <div id="thank-you-message">
                 <p>
-                  Thank you for your interest in @query. We'll let you know when your star becomes available!
+                  We have received your request for @query. Thanks!
                 </p>
               </div>
             }
