@@ -30,10 +30,11 @@ import play.api.mvc.SimpleResult
  */
 case class FlashableForm[A](form: Form[A]) {
   import FlashableForm.CONTAINS_FLASHED_FORM
+  import FlashableForm.FORM_NAME
 
-  def bindWithFlashData(implicit request: Request[_]): Form[A] = {
+  def bindWithFlashData(formName: String)(implicit request: Request[_]): Form[A] = {
     val flashData = Flash.serialize(request.flash)
-    if (flashData.contains(CONTAINS_FLASHED_FORM) && java.lang.Boolean.valueOf(flashData(CONTAINS_FLASHED_FORM))) {
+    if (flashData.contains(CONTAINS_FLASHED_FORM) && java.lang.Boolean.valueOf(flashData(CONTAINS_FLASHED_FORM)) && formName.equals(flashData.get(FORM_NAME).getOrElse(""))) {
       val boundForm = form.bind(flashData)
       boundForm
     } else {
@@ -44,19 +45,23 @@ case class FlashableForm[A](form: Form[A]) {
 
 case class SimpleResultWithFlashedForm[R](result: SimpleResult[R]) {
   import FlashableForm.CONTAINS_FLASHED_FORM
+  import FlashableForm.FORM_NAME
 
   /**
    * USER WARNING: If there are two or more forms with fields with the same name that were stored in
    * the flash this will not work as intended.  Make sure form field names are unique on a page.
    */
-  def flashingFormData(form: Form[_]) = {
-    val flash = form.data + (CONTAINS_FLASHED_FORM -> true.toString)
+  def flashingFormData(form: Form[_], formName: String = "") = {
+    val flash = form.data +
+      (CONTAINS_FLASHED_FORM -> true.toString) +
+      (FORM_NAME -> formName)
     result.flashing(flash.toSeq: _*)
   }
 }
 
 object FlashableForm {
   val CONTAINS_FLASHED_FORM = "contains-form-data"
+  val FORM_NAME = "form-name"
   implicit def form2FlashableForm[A](form: Form[A]) = FlashableForm(form)
   implicit def result2SimpleResultWithFlashedForm(result: SimpleResult[_]) = SimpleResultWithFlashedForm(result)
 }

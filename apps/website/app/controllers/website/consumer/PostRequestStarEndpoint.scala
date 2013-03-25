@@ -68,6 +68,7 @@ private[controllers] trait PostRequestStarEndpoint extends ImplicitHeaderAndFoot
 }
 
 object PostRequestStarEndpoint {
+  def formName = "request-star-form"
   def formConstraints = AppConfig.instance[FormConstraints]
 
   def form: Form[RequestStarViewModel] = Form(

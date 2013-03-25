@@ -174,7 +174,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           results = ResultSetViewModel(subtitle = Option(subtitle), verticalUrl = Option("/"), celebrities = celebrities),
           sortOptions = sortOptionViewModels(maybeSortType),
           availableOnly = availableOnly,
-          requestStarForm = PostRequestStarEndpoint.form.bindWithFlashData,
+          requestStarForm = PostRequestStarEndpoint.form.bindWithFlashData(PostRequestStarEndpoint.formName),
           requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url,
           hasAlreadyRequested
         ))
