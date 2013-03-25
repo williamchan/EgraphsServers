@@ -44,7 +44,7 @@ private[controllers] trait PostLoginEndpoint { this: Controller =>
 
           Redirect(redirectCall).withSession(
             request.session
-              .withCustomerId(validForm.customerId)
+              .withCustomerId(customerId)
               .removeRequestedStar
               .removeAfterLoginRedirectUrl
           ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))

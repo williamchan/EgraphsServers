@@ -89,9 +89,7 @@ GET     /Landing/signupOn                                         controllers.La
 GET     /Landing/singleCelebrity                                  controllers.Landing.singleCelebrity(publicName:String ?= "David Price", casualName:String ?= "David", isMale: Boolean ?= true)
 
 GET     /Login/allErrorsLogin                                     controllers.Login.allErrorsLogin
-GET     /Login/allErrorsStorefront                                controllers.Login.allErrorsStorefront
 GET     /Login/index                                              controllers.Login.index
-GET     /Login/storefront                                         controllers.Login.storefront(recipient:Option[String])
 
 GET     /Marketplace/results/list                                 controllers.Marketplace.resultsList
 GET     /Marketplace/results                                      controllers.Marketplace.results
