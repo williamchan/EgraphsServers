@@ -119,11 +119,11 @@ object EgraphsSession {
     val AdminId = new EnumVal("admin") {}
     val AfterLoginRedirectUrl = new EnumVal("after_login_redirect_url") {}
     val CustomerId = new EnumVal("customer") {}
-    val MlbpaAccess = new EnumVal("mlbpa") {}
-    val UsernameChanged = new EnumVal("username_changed") {}
     val HasSignedUp = new EnumVal("has_signed_up") {}
+    val MlbpaAccess = new EnumVal("mlbpa") {}
     val RequestedStar = new EnumVal("requested_star") {}
     val SignupModalDisplayedRecently = new EnumVal("signup_modal_displayed_recently") {}
+    val UsernameChanged = new EnumVal("username_changed") {}
   }
 
   object Conversions {

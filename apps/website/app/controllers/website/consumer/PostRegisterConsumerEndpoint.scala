@@ -28,7 +28,7 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
         val (account, customer) = accountAndCustomer
         newCustomerTasks(account, customer)
 
-        // Find out whether the user is logging in to complete their celebrity request
+        // Find out whether the user is creating an account to complete their celebrity request
         val redirectCall: Call = request.session.requestedStarRedirectOrCall(
           customer.id,
           account.email,

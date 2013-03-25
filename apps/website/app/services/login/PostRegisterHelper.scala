@@ -35,18 +35,18 @@ trait PostRegisterHelper {
   }
 
   protected def newAccountAndCustomerFromEmailAndPassword(email: String, password: String, bulkEmail: Boolean): (Account, Customer) = {
-	// The form validation already told us we can add this fella to the DB
-	val passwordErrorOrAccount = Account(email = email).withPassword(password)
-	val unsavedAccount = passwordErrorOrAccount.right.getOrElse(
-	  throw new RuntimeException("The password provided by registering user " +
-	    email + "somehow passed validation but failed while setting onto the account"))
+    // The form validation already told us we can add this fella to the DB
+    val passwordErrorOrAccount = Account(email = email).withPassword(password)
+    val unsavedAccount = passwordErrorOrAccount.right.getOrElse(
+      throw new RuntimeException("The password provided by registering user " +
+      email + "somehow passed validation but failed while setting onto the account"))
 
-	// We don't require a name to register so...screw it his name is the first part of his email.
-	val customerName = email.split("@").head
-	val savedCustomer = unsavedAccount.createCustomer(customerName).copy(notice_stars = bulkEmail).save()
-	val savedAccount = unsavedAccount.copy(customerId = Some(savedCustomer.id)).withResetPasswordKey.save()
+    // We don't require a name to register so...screw it his name is the first part of his email.
+    val customerName = email.split("@").head
+    val savedCustomer = unsavedAccount.createCustomer(customerName).copy(notice_stars = bulkEmail).save()
+    val savedAccount = unsavedAccount.copy(customerId = Some(savedCustomer.id)).withResetPasswordKey.save()
 
-	(savedAccount, savedCustomer)
+    (savedAccount, savedCustomer)
   }
 
   protected def newCustomerTasks(account: Account, customer: Customer) = {
