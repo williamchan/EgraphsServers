@@ -3,76 +3,48 @@ package egraphs.playutils
 object Grammar {
 
   def subjectPronoun(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    (gender, capitalize) match {
-      case (Gender.Male, false) => "he"
-      case (Gender.Male, true) => "He"
-      case (Gender.Female, false) => "she"
-      case (Gender.Female, true) => "She"
-      case (Gender.Neutral, false) => "they"
-      case (Gender.Neutral, true) => "They"
-      case _ => throw new IllegalStateException("You are a very rare gender")
-    }
+    genderAppropriateWord(gender, capitalize, "he", "she", "they")
   }
 
   def objectPronoun(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    (gender, capitalize) match {
-      case (Gender.Male, false) => "him"
-      case (Gender.Male, true) => "Him"
-      case (Gender.Female, false) => "her"
-      case (Gender.Female, true) => "Her"
-      case (Gender.Neutral, false) => "them"
-      case (Gender.Neutral, true) => "Them"
-      case _ => throw new IllegalStateException("You are a very rare gender")
-    }
+    genderAppropriateWord(gender, capitalize, "him", "her", "them")
   }
 
   def possessivePronoun(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    (gender, capitalize) match {
-      case (Gender.Male, false) => "his"
-      case (Gender.Male, true) => "His"
-      case (Gender.Female, false) => "her"
-      case (Gender.Female, true) => "Her"
-      case (Gender.Neutral, false) => "their"
-      case (Gender.Neutral, true) => "Their"
-      case _ => throw new IllegalStateException("You are a very rare gender")
-    }
+    genderAppropriateWord(gender, capitalize, "his", "her", "their")
   }
   
   def irregularToHave(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    (gender, capitalize) match {
-      case (Gender.Male, false) => "has"
-      case (Gender.Male, true) => "Has"
-      case (Gender.Female, false) => "has"
-      case (Gender.Female, true) => "Has"
-      case (Gender.Neutral, false) => "have"
-      case (Gender.Neutral, true) => "Have"
-      case _ => throw new IllegalStateException("You are a very rare gender")
-    }
+    genderAppropriateWord(gender, capitalize, "has", "has", "have")
   }
 
   def irregularToBe(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    (gender, capitalize) match {
-      case (Gender.Male, false) => "is"
-      case (Gender.Male, true) => "Is"
-      case (Gender.Female, false) => "is"
-      case (Gender.Female, true) => "Is"
-      case (Gender.Neutral, false) => "are"
-      case (Gender.Neutral, true) => "Are"
-      case _ => throw new IllegalStateException("You are a very rare gender")
-    }
+    genderAppropriateWord(gender, capitalize, "is", "is", "are")
   }
 
-  def regularVerb(verb: String, gender: Gender.EnumVal): String = {
-    gender match {
-      case Gender.Male => verb + "s"
-      case Gender.Female => verb + "s"
-      case Gender.Neutral => verb
-      case _ => throw new IllegalStateException("You are a very rare gender")
-    }
+  def regularVerb(verb: String, gender: Gender.EnumVal, capitalize: Boolean = false): String = {
+    genderAppropriateWord(gender, capitalize, verb + "s", verb + "s", verb)
   }
 
   def egraphOrEgraphs(numberOfEgraphs: Int): String = {
     if (numberOfEgraphs == 1) "Egraph"
     else "Egraphs"
+  }
+
+  private def genderAppropriateWord(gender: Gender.EnumVal, capitalize: Boolean,
+    maleWord: String, femaleWord: String, neutralWord: String): String = {
+
+    val lowercaseWord = gender match {
+      case (Gender.Male) => maleWord
+      case (Gender.Female) => femaleWord
+      case (Gender.Neutral) => neutralWord
+      case _ => throw new IllegalStateException("You are a very rare gender")
+    }
+    capitalizeOrNo(lowercaseWord, capitalize)
+  }
+
+  private def capitalizeOrNo(word: String, capitalize: Boolean): String = {
+    if (capitalize) word.capitalize
+    else word
   }
 }
