@@ -12,7 +12,7 @@ import services.http.EgraphsSession
 /**
  * The POST target for creating a new account at Egraphs.
  */
-private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAndFooterData with PostRegisterHelper {
+private[controllers] trait PostRegisterConsumerEndpoint extends PostRegisterHelper with ImplicitHeaderAndFooterData {
   this: Controller =>
 
   protected def postController: POSTControllerMethod
@@ -26,6 +26,8 @@ private[controllers] trait PostRegisterConsumerEndpoint extends ImplicitHeaderAn
       ) yield {
         // OK We made it! The user is created. Unpack account and customer
         val (account, customer) = accountAndCustomer
+
+        // Send welcome email and perform any other necessary new account tasks
         newCustomerTasks(account, customer)
 
         // Find out whether the user is creating an account to complete their celebrity request
