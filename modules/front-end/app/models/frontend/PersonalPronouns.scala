@@ -9,26 +9,26 @@ abstract class PersonalPronouns (
 )
 
 object MalePersonalPronouns extends PersonalPronouns (
-  subject="he",
-  obj="him",
-  possessiveAdjective="his",
-  possessivePronoun="his",
-  reflexive="himself"
+  subject = "he",
+  obj = "him",
+  possessiveAdjective = "his",
+  possessivePronoun = "his",
+  reflexive = "himself"
 )
 
 
 object FemalePersonalPronouns extends PersonalPronouns (
-  subject="she",
-  obj="her",
-  possessiveAdjective="her",
-  possessivePronoun="hers",
-  reflexive="herself"
+  subject = "she",
+  obj = "her",
+  possessiveAdjective = "her",
+  possessivePronoun = "hers",
+  reflexive = "herself"
 )
 
 object NeutralPersonalPronouns extends PersonalPronouns (
-  subject="they",
-  obj="them",
-  possessiveAdjective="their",
-  possessivePronoun="theirs",
-  reflexive="themselves"
+  subject = "they",
+  obj = "them",
+  possessiveAdjective = "their",
+  possessivePronoun = "theirs",
+  reflexive = "themselves"
  )
