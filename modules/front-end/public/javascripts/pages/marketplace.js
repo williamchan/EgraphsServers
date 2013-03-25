@@ -12,10 +12,8 @@ define(["Egraphs"], function (Egraphs) {
   var marketplace = {};
 
   marketplace.reloadPage = function() {
-    window.location.href =
-      Egraphs.page.queryUrl + Egraphs.page.verticalSlug + "?" +
+    window.location.href = Egraphs.page.queryUrl + Egraphs.page.verticalSlug + "&" +
       $.param({
-        "query" : Egraphs.page.query || "",
         "sort" : Egraphs.page.sort || "",
         "view" : Egraphs.page.view || "",
         "availableOnly" : Egraphs.page.availableOnly || false

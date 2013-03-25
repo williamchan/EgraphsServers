@@ -20,6 +20,11 @@ object MailUtils {
     List(("account_confirmation", views.html.frontend.tags.email.account_confirmation().body))
   }
 
+  def getCelebrityRequestTemplateContentParts(emailType: EmailType.EnumVal, celebrityRequestEmailStack: CelebrityRequestEmailViewModel): List[(String, String)] = {
+    baseList(emailType.name) :::
+    List(("celebrity_request", views.html.frontend.tags.email.celebrity_request(celebrityRequestEmailStack).body))
+  }
+
   def getCelebrityWelcomeTemplateContentParts(emailType: EmailType.EnumVal, celebrityWelcomeEmailStack: CelebrityWelcomeEmailViewModel): List[(String, String)] = {
     baseList(emailType.name) :::
     List(("celebrity_welcome", views.html.frontend.tags.email.celebrity_welcome(celebrityWelcomeEmailStack).body))

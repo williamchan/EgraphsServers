@@ -23,17 +23,17 @@ case class ViewEgraphEmail(
     val (emailStack, viewEgraphEmailStack, maybeGiftEmailStack) = prepareViewEgraphEmail
 
     if (order.buyerId == order.recipientId) {
-      log("Sending view egraph mail to: " + order.buyer.account.email)
+      log(s"Sending view egraph mail to: ${order.buyer.account.email}")
       mailService.send(emailStack, MailUtils.getViewEgraphTemplateContentParts(
-          EmailType.ViewEgraph, viewEgraphEmailStack))
+        EmailType.ViewEgraph, viewEgraphEmailStack))
     } else {
-      log("Sending view gift egraph mail to: " + order.recipient.account.email)
+      log(s"Sending view gift egraph mail to: ${order.recipient.account.email}")
       mailService.send(emailStack, MailUtils.getViewGiftReceivedEgraphTemplateContentParts(
-          EmailType.ViewEgraph, viewEgraphEmailStack))
+        EmailType.ViewEgraph, viewEgraphEmailStack))
 
-      log("Sending gift given mail to: " + order.buyer.account.email)
+      log(s"Sending gift given mail to: ${order.buyer.account.email}")
       mailService.send(maybeGiftEmailStack.get, MailUtils.getViewGiftGivenEgraphTemplateContentParts(
-          EmailType.ViewEgraph, viewEgraphEmailStack))
+        EmailType.ViewEgraph, viewEgraphEmailStack))
     }    
   }
   

@@ -22,19 +22,20 @@ case class AccountCreationEmail(
   def send() {  
     val emailStack = EmailViewModel(
       subject = "Welcome to Egraphs!",
-      fromEmail = "webserver@egraphs.com",
-      fromName = "Egraphs",
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
       toAddresses = List((account.email, None))
     )
 
     val templateContentParts = if (verificationNeeded) {
       val verifyPasswordUrl = consumerApp.absoluteUrl(getVerifyAccount(account.email, account.resetPasswordKey.get).url)
-      MailUtils.getAccountVerificationTemplateContentParts(EmailType.AccountVerification, AccountVerificationEmailViewModel(verifyPasswordUrl))
+      MailUtils.getAccountVerificationTemplateContentParts(
+        EmailType.AccountVerification, AccountVerificationEmailViewModel(verifyPasswordUrl))
     } else {
       MailUtils.getAccountConfirmationTemplateContentParts(EmailType.AccountConfirmation)
     }
 
-    log("Sending account creation mail to : " + account.email)    
+    log(s"Sending account creation mail to: ${account.email}")
     mailService.send(emailStack, templateContentParts)  
   }
 }

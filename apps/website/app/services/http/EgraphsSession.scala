@@ -62,6 +62,18 @@ case class EgraphsSession(session: Session) {
     session - Key.RequestedStar.name
   }
 
+  def afterLoginRedirectUrl: Option[String] = {
+    session.get(Key.AfterLoginRedirectUrl.name)
+  }
+
+  def withAfterLoginRedirectUrl(url: String): Session = {
+    session + (Key.AfterLoginRedirectUrl.name -> url)
+  }
+
+  def removeAfterLoginRedirectUrl: Session = {
+    session - Key.AfterLoginRedirectUrl.name
+  }
+
   def withUsernameChanged: Session = {
     session + (Key.UsernameChanged.name -> true.toString)
   }
@@ -79,13 +91,13 @@ case class EgraphsSession(session: Session) {
   }
 
   // Convenience method for request a star feature that figures out post-login redirect
-  def requestedStarRedirectOrCall(customerId: Long, otherCall: Call): Call = {
+  def requestedStarRedirectOrCall(customerId: Long, email: String, otherCall: Call): Call = {
     val maybeRequestedStar = requestedStar
     maybeRequestedStar match {
       case None => otherCall
       case Some(requestedStar) => {
-        PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId)
-        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "")
+        PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId, email)
+        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "", Some(requestedStar))
       }
     }
   }
@@ -105,6 +117,7 @@ object EgraphsSession {
     abstract class EnumVal(val name: String) extends Key with Value
 
     val AdminId = new EnumVal("admin") {}
+    val AfterLoginRedirectUrl = new EnumVal("after_login_redirect_url") {}
     val CustomerId = new EnumVal("customer") {}
     val MlbpaAccess = new EnumVal("mlbpa") {}
     val UsernameChanged = new EnumVal("username_changed") {}
