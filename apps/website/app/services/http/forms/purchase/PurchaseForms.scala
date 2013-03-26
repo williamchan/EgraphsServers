@@ -444,7 +444,7 @@ object PurchaseForms {
   : String = {
     messageRequest match {
       case WrittenMessageRequest.SignatureOnly => celebrityGrammar.possessiveAdjective + " signature only."
-      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever " + celebrityGrammar.subjectPronoun + " wants."
+      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever " + celebrityGrammar.subjectPronoun + " " + celebrityGrammar.regularVerb("want") + "."
       case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
       case other => throw new IllegalStateException("models.enums.WrittenMessageRequest cannot have value = " + other)
     }
