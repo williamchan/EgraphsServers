@@ -45,11 +45,48 @@ function (page, marketplace, analytics, logging, requireModule) {
 
         var apiLoaded = false;
 
-        var createPlayer = function(playerReadyCallback) {
+        var createPlayer = function(playerReadyCallback, playerStateChangeCallback) {
           return new YT.Player('egraph-video', {
             videoId: 'BfU_cE6HxDw',
-            events: {'onReady': playerReadyCallback}
+            events: {
+              'onReady': playerReadyCallback,
+              'onStateChange' : playerStateChangeCallback
+            }
           });
+        };
+
+        var onStateChange = function(event) {
+          states = {
+            UNSTARTED: -1,
+            ENDED : 0,
+            PLAYING : 1,
+            PAUSED : 2,
+            BUFFERING : 3,
+            CUED : 5
+          };
+          switch (event.data) {
+            case states.UNSTARTED:
+              events.track(['Video Loading']);
+              break;
+            case states.ENDED:
+              events.track(['Video Ended']);
+              break;
+            case states.PLAYING:
+              events.track(['Video Playing']);
+              break;
+            case states.PAUSED:
+              events.track(['Video Paused']);
+              break;
+            case states.BUFFERING:
+              events.track(['Video Buffering']);
+              break;
+            case states.CUED :
+              events.track(['Video Cued']);
+              break;
+            default:
+              events.track((['Video Error']));
+              break;
+          }
         };
 
         var onPlayerReady = function(event) {
@@ -60,7 +97,6 @@ function (page, marketplace, analytics, logging, requireModule) {
 
           event.target.seekTo(7.0);
           event.target.playVideo();
-          events.track(['Watched Video']);
         };
 
         // Initialize the YouTube video and start playing.
@@ -79,10 +115,10 @@ function (page, marketplace, analytics, logging, requireModule) {
             window.onYouTubeIframeAPIReady = function() {
               apiLoaded = true;
               log("API ready");
-              player = createPlayer(onPlayerReady);
+              player = createPlayer(onPlayerReady, onStateChange);
             };
           } else {
-            player = createPlayer(onPlayerReady);
+            player = createPlayer(onPlayerReady, onStateChange);
           }
         });
 
@@ -94,7 +130,7 @@ function (page, marketplace, analytics, logging, requireModule) {
         $(".celebrities figure>a, .celebrities h4>a").click(function() {
           events.track(["Featured star clicked", $(this).attr("data-name")]);
         });
-        
+
         // Configure learn/shop tab
         var selectTab = function(tabId) {
           var newTab = $(tabId + "-tab");
@@ -116,7 +152,7 @@ function (page, marketplace, analytics, logging, requireModule) {
           selectTab("#learn");
           e.preventDefault();
         });
-        
+
         // Configure shopping links
         $(".vertical-button").click(verticalFunction);
         $(".all-teams").click(verticalFunction);

@@ -10,6 +10,15 @@ import egraphs.playutils.Gender
  */
 object Email extends Controller {
 
+  def celebrityRequest = Action {
+    Ok(views.html.frontend.email.celebrity_request(
+      CelebrityRequestEmailViewModel(
+        requesterEmail = "awesomeemail@gmail.com",
+        requestedStar = "Celebrity Jane"
+      )
+    ))
+  }
+
   def celebrityWelcome = Action {
     val publicName = "Rodney Strong"
     val email = "rstrong@fantastic.com"

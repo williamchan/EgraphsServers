@@ -86,11 +86,15 @@ private[controllers] trait GetFacebookLoginCallbackEndpoint extends Logging { th
             val redirectCall: Call = dbSession.connected(TransactionSerializable) {
               request.session.requestedStarRedirectOrCall(
                 customer.id,
+                customer.account.email,
                 controllers.routes.WebsiteControllers.getAccountSettings)
             }
 
             Redirect(redirectCall).withSession(
-              session.withCustomerId(customer.id).removeRequestedStar
+              session
+                .withCustomerId(customer.id)
+                .removeRequestedStar
+                .removeAfterLoginRedirectUrl
             ).withCookies(Cookie(HasSignedUp.name, true.toString, maxAge = Some(EgraphsSession.COOKIE_MAX_AGE)))
           }
 

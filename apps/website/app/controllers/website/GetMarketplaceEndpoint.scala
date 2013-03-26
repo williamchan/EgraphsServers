@@ -9,6 +9,9 @@ import models.categories._
 import services.mvc.{celebrity, ImplicitHeaderAndFooterData}
 import services.mvc.marketplace.MarketplaceServices
 import services.http.ControllerMethod
+import services.http.EgraphsSession._
+import services.http.EgraphsSession.Conversions._
+import services.http.filters._
 import models.frontend.marketplace._
 import models.frontend.marketplace.CelebritySortingTypes
 import services.db.TransactionSerializable
@@ -24,16 +27,17 @@ import egraphs.playutils.FlashableForm._
  * Controller for serving the celebrity marketplace
  */
 private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
-  protected def controllerMethod : ControllerMethod
-  protected def celebrityStore : CelebrityStore  
-  protected def categoryValueStore: CategoryValueStore
   protected def catalogStarsQuery: CatalogStarsQuery
+  protected def categoryValueStore: CategoryValueStore
+  protected def celebrityRequestStore: CelebrityRequestStore
+  protected def celebrityStore: CelebrityStore
+  protected def controllerMethod: ControllerMethod
   protected def dbSession: DBSession
   protected def featured: Featured
-  protected def verticalStore: VerticalStore
+  protected def httpFilters: HttpFilters
   protected def marketplaceServices: MarketplaceServices
+  protected def verticalStore: VerticalStore
 
-  val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
 
   private def sortOptionViewModels(selectedSortingType: Option[CelebritySortingTypes.EnumVal] = None) : Iterable[SortOptionViewModel] = {
@@ -98,8 +102,9 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
    * @param vertical The slug of a marketplace search if it is scoped by vertical
    * @return A results page or landing page.
    */
-  def getMarketplaceResultPage(vertical : String = "") = controllerMethod.withForm() { implicit AuthToken =>
+  def getMarketplaceResultPage(vertical: String = "", query: Option[String] = None) = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
+
       // Determine what search options, if any, have been appended
       val marketplaceResultPageForm = Form(
         tuple(
@@ -111,7 +116,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       )
       // Process the form
       val maybeSelectedVertical =  verticalStore.verticals.filter(v => v.urlSlug == vertical).headOption
-      val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.fold(
+      val (_, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.fold(
         errors => (None, None, None, None),
         formOptions => formOptions
       )
@@ -138,10 +143,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val verticalViewModels = marketplaceServices.getVerticalViewModels(maybeSelectedVertical, activeCategoryValues)
 
       // Check if any search options have been defined
-      if(queryOption.isDefined || !verticalAndCategoryValues.isEmpty) {
+      if(!query.isEmpty || !verticalAndCategoryValues.isEmpty) {
         // Serve results according to the query
         val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
-          celebrityStore.marketplaceSearch(queryOption, verticalAndCategoryValues)
+          celebrityStore.marketplaceSearch(query, verticalAndCategoryValues)
         }
 
         val sortedCelebrities = sortCelebrities(maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant), unsortedCelebrities)
@@ -152,21 +157,29 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           sortedCelebrities
         }
 
-        val subtitle = buildSubtitle(queryOption, celebrities)
+        val subtitle = buildSubtitle(query, celebrities)
 
         val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
+        val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", query).url
+
+        // true if customer is logged in and has already requested this same celebrity
+        val hasAlreadyRequested = getHasAlreadyRequested(query.getOrElse(""))
+
         Ok(views.html.frontend.marketplace_results(
-          query = queryOption.getOrElse(""),
+          query = query.getOrElse(""),
           viewAsList = viewAsList,
-          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url,
+          marketplaceRoute = marketplaceTargetUrl,
           verticalViewModels = verticalViewModels,
           results = ResultSetViewModel(subtitle = Option(subtitle), verticalUrl = Option("/"), celebrities = celebrities),
           sortOptions = sortOptionViewModels(maybeSortType),
           availableOnly = availableOnly,
           requestStarForm = PostRequestStarEndpoint.form.bindWithFlashData,
-          requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url
+          requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url,
+          hasAlreadyRequested
         ))
+        .withSession(request.session.withAfterLoginRedirectUrl(marketplaceTargetUrl))
+
       } else {
         // No search options so serve the landing page. If a vertical has a category value which feature stars, it is
         // displayed via this query.  Limit to three results to keep verticals above the fold.
@@ -186,6 +199,19 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           resultSets = resultSets.toList
         ))
       }
+    }
+  }
+
+  private def getHasAlreadyRequested(query: String)(implicit request: Request[AnyContent]): Boolean = {
+    val eitherCustomerAndAccountOrResult = httpFilters.requireCustomerLogin.filterInSession()
+    eitherCustomerAndAccountOrResult match {
+      case Right((customer, account)) => {
+        val maybeCelebrityRequest = celebrityRequestStore.getCelebrityRequestByCustomerIdAndCelebrityName(
+          customer.id, query)
+
+        maybeCelebrityRequest.isDefined
+      }
+      case Left(result) => false
     }
   }
 }

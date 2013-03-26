@@ -68,7 +68,7 @@ class CustomerLoginForm(val paramsMap: Form.Readable, check: FormChecks)
   //
   protected def formAssumingValid: CustomerLoginForm.Validated = {
     // Safely access the account value in here
-    CustomerLoginForm.Validated(customerId.value.get)
+    CustomerLoginForm.Validated(customerId.value.get, email.value.get)
   }
 }
 
@@ -82,7 +82,7 @@ object CustomerLoginForm {
   }
 
   /** Class to which the fully validated CustomerLoginForm resolves */
-  case class Validated(customerId: Long)
+  case class Validated(customerId: Long, email: String)
 }
 
 

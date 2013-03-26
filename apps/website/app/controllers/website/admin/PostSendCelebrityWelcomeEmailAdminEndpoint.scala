@@ -39,8 +39,7 @@ trait PostSendCelebrityWelcomeEmailAdminEndpoint {
                 CelebrityWelcomeEmail(
                   toAddress = emailAddress,
                   consumerApp = consumerApp,
-                  celebrity = celebrity,
-                  bccEmail = Some(adminAccount.email)
+                  celebrity = celebrity
                 ).send()
 
                 Redirect(controllers.routes.WebsiteControllers.getCelebrityAdmin(celebrityId = celebrityId))

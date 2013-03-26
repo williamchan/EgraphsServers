@@ -3,13 +3,15 @@ define(
 ["page",
  "window",
  "services/logging",
+ "services/analytics",
  "module",
  "libs/tooltip",
  "services/ng/mail-services",
  "services/responsive-modal"],
-function(page, window, logging, requireModule) {
+function(page, window, logging, analytics, requireModule) {
   var menuStatus = "closed";
   var log = logging.namespace(requireModule.id);
+  var events = analytics.eventCategory("Base");
 
   return {
     ngControllers: {
@@ -73,6 +75,7 @@ function(page, window, logging, requireModule) {
         $("#email-link").click(function(e) {
           signupModal.modal('toggle');
           $('html,body').animate({scrollTop: $($(this).attr('href')).offset().top},'slow');
+          //show modal
           e.preventDefault();
         });
 
@@ -105,6 +108,14 @@ function(page, window, logging, requireModule) {
             signupModal.modal({});
           });
         }
+
+        signupModal.on('shown', function() {
+          events.track(['Newsletter modal shown']);
+        });
+
+        signupModal.on('hidden', function() {
+          events.track(['Newsletter modal hidden']);
+        });
 
         // Populate social links asynchronously
         require(["services/social-links"], function(links) {

@@ -5,7 +5,9 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 
 object JsonEmailBuilder {
-  
+
+  val bccAddress = "email-records@egraphs.com"
+
   def sendTemplateJson(mailStack: EmailViewModel, templateContentParts: List[(String, String)], key: String): JsValue = {
     Json.toJson(Map(
       "key" -> Json.toJson(key),
@@ -25,7 +27,7 @@ object JsonEmailBuilder {
           "track_opens" -> Json.toJson(true),
           "track_clicks" -> Json.toJson(true),
           "auto_text" -> Json.toJson(true),
-          "bcc_address" -> Json.toJson(mailStack.bccAddress.getOrElse(""))
+          "bcc_address" -> Json.toJson(bccAddress)
         )
       ),
       "async" -> Json.toJson(true)
