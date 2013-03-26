@@ -1,5 +1,6 @@
 package services.http.forms.purchase
 
+import egraphs.playutils.Grammar
 import services.http.{ServerSessionFactory, ServerSession}
 import com.google.inject.Inject
 import frontend.formatting.MoneyFormatting.Conversions._
@@ -12,8 +13,6 @@ import models.enums.{WrittenMessageRequest, PrintingOption}
 import services.http.forms.{Form, ReadsForm}
 import services.http.forms.purchase.PurchaseForms.AllPurchaseForms
 import play.api.mvc.Flash
-import egraphs.playutils.Gender
-import egraphs.playutils.Grammar
 
 /**
  * Represents the cache-persisted forms in the purchase flow.
@@ -441,11 +440,11 @@ object PurchaseForms {
    *
    * @return a user-presentable string.
    */
-  def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String], celebrityGender: Gender.EnumVal)
+  def makeTextForCelebToWrite(messageRequest: WrittenMessageRequest, messageText: Option[String], celebrityGrammar: Grammar)
   : String = {
     messageRequest match {
-      case WrittenMessageRequest.SignatureOnly => Grammar.possessivePronoun(celebrityGender, true) + " signature only."
-      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever " + Grammar.subjectPronoun(celebrityGender) + " wants."
+      case WrittenMessageRequest.SignatureOnly => celebrityGrammar.possessiveAdjective + " signature only."
+      case WrittenMessageRequest.CelebrityChoosesMessage => "Whatever " + celebrityGrammar.subjectPronoun + " wants."
       case WrittenMessageRequest.SpecificMessage => messageText.getOrElse("")
       case other => throw new IllegalStateException("models.enums.WrittenMessageRequest cannot have value = " + other)
     }

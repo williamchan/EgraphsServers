@@ -1,8 +1,8 @@
-@(celebrityPublicName: Option[String] = None, celebrityCasualName: Option[String] = None, celebrityGender: egraphs.playutils.Gender.EnumVal = egraphs.playutils.Gender.Male)
+@(celebrityPublicName: Option[String] = None,
+  celebrityCasualName: Option[String] = None,
+  celebrityGrammar: egraphs.playutils.Grammar = egraphs.playutils.MaleGrammar)
 
 @import controllers._
-@import egraphs.playutils.Grammar._
-
 
 <section id="landing-steps">
 
@@ -36,10 +36,10 @@
 
       <div class="instructions">
 
-        <h2><strong>2.</strong> Write @objectPronoun(celebrityGender) a note</h2>
+        <h2><strong>2.</strong> Write @celebrityGrammar.objectPronoun a note</h2>
 
         <p>
-          Tell @celebrityPublicName.getOrElse("your favorite star") whatever you want @objectPronoun(celebrityGender) to know — maybe @subjectPronoun(celebrityGender) @irregularToHave(celebrityGender) inspired you, or perhaps you like the same band.  Ask @objectPronoun(celebrityGender) to write a memorable note on your egraph. Maybe it’s for you or maybe you’re sending it as a gift for a friend. Either way, you’re guaranteed that @celebrityCasualName.getOrElse("your star") will read and respond to your message personally.
+          Tell @celebrityPublicName.getOrElse("your favorite star") whatever you want @celebrityGrammar.objectPronoun to know — maybe @celebrityGrammar.subjectPronoun @celebrityGrammar.toHave inspired you, or perhaps you like the same band.  Ask @celebrityGrammar.objectPronoun to write a memorable note on your egraph. Maybe it’s for you or maybe you’re sending it as a gift for a friend. Either way, you’re guaranteed that @celebrityCasualName.getOrElse("your star") will read and respond to your message personally.
         </p>
 
       </div> <!-- end .instructions -->
@@ -55,7 +55,7 @@
         <h2><strong>3.</strong> Hear back directly from @celebrityCasualName.getOrElse("your favorite star")</h2>
 
         <p>
-          The next time @subjectPronoun(celebrityGender) @regularVerb("log", celebrityGender) into @possessivePronoun(celebrityGender) Egraphs app, @celebrityCasualName.getOrElse("your star") will take the time to hand-write a response and record a personalized audio message just for you.  @possessivePronoun(celebrityGender, true) signature and voice are verified by our technology so you know it’s really @objectPronoun(celebrityGender).
+          The next time @celebrityGrammar.subjectPronoun @celebrityGrammar.regularVerb("log") into @celebrityGrammar.possessiveAdjective Egraphs app, @celebrityCasualName.getOrElse("your star") will take the time to hand-write a response and record a personalized audio message just for you.  @celebrityGrammar.possessiveAdjective.capitalize signature and voice are verified by our technology so you know it’s really @celebrityGrammar.objectPronoun.
         </p>
 
         <p><small><a href="/inside-an-egraph#biometric">Learn more about Egraphs’ biometric authentication process &raquo;</a></small></p>

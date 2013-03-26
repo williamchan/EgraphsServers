@@ -7,6 +7,7 @@ import controllers.routes.WebsiteControllers.getFAQ
 import enums.CheckoutCodeType
 import frontend.storefront.OrderCompleteViewModel
 import org.joda.money.{CurrencyUnit, Money}
+import _root_.egraphs.playutils.GrammarUtils
 import services.config.ConfigFileProxy
 
 /**
@@ -100,6 +101,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
     val isLiveConsumerSite = (config.applicationBaseUrl == "https://www.egraphs.com/")
     val printPrice = maybePrintOrder.map(_.amountPaid).getOrElse(Money.zero(CurrencyUnit.USD))
     val printOrderShippingAddress = maybePrintOrder.map(_.shippingAddress).getOrElse("")
+    val grammar = GrammarUtils.getGrammarByGender(celebrity.gender)
     
     OrderCompleteViewModel (
       orderDate = order.created,
@@ -109,7 +111,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       ownerName = order.recipientName,
       ownerEmail = recipientAccount.email,
       celebName = celebrity.publicName,
-      celebrityGender = celebrity.gender,
+      celebrityGrammar = grammar,
       productName = product.name,
       productId = product.id,
       expectedDeliveryDate = Order.expectedDeliveryDate(celebrity),

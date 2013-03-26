@@ -20,6 +20,7 @@ import services._
 import models.frontend.email.OrderConfirmationEmailViewModel
 import services.http.EgraphsSession.Conversions._
 import services.Finance.TypeConversions._
+import _root_.egraphs.playutils.GrammarUtils
 import _root_.frontend.formatting.DateFormatting.Conversions._
 
 case class EgraphPurchaseHandlerServices @Inject() (
@@ -174,6 +175,8 @@ case class EgraphPurchaseHandler(
       }
     }
 
+    val grammar = GrammarUtils.getGrammarByGender(celebrity.gender)
+
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
     OrderConfirmationEmail(
       OrderConfirmationEmailViewModel(
@@ -182,7 +185,7 @@ case class EgraphPurchaseHandler(
         recipientName = recipientName,
         recipientEmail = recipientEmail,
         celebrityName = celebrity.publicName,
-        celebrityGender = celebrity.gender,
+        celebrityGrammar = grammar,
         productName = product.name,
         orderDate = order.created.formatDayAsPlainLanguage("PST"),
         orderId = order.id.toString,

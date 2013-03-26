@@ -1,5 +1,6 @@
 package controllers.website.consumer
 
+import egraphs.playutils.GrammarUtils
 import services.http.{POSTControllerMethod, ControllerMethod}
 import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
@@ -112,6 +113,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
             val maybeCoupon = forms.coupon
             val subtotal = forms.subtotal(product.price)
             val discount = forms.discount(subtotal = subtotal, maybeCoupon)
+            val grammar = GrammarUtils.getGrammarByGender(celeb.gender)
             
             val orderSummary = CheckoutOrderSummary(
               celebrityName=celeb.publicName,
@@ -120,7 +122,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
               messageText=PurchaseForms.makeTextForCelebToWrite(
                 validPersonalizeForm.writtenMessageRequest,
                 validPersonalizeForm.writtenMessageText,
-                celebrityGender = celeb.gender
+                celebrityGrammar = grammar
               ),
               basePrice=product.price,
               shipping=forms.shippingPrice,

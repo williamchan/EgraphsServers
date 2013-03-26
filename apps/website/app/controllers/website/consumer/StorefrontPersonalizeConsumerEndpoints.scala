@@ -1,5 +1,6 @@
 package controllers.website.consumer
 
+import egraphs.playutils.GrammarUtils
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, ControllerMethod}
@@ -105,6 +106,7 @@ trait StorefrontPersonalizeConsumerEndpoints
           )
 
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)
+          val grammar = GrammarUtils.getGrammarByGender(celeb.gender)
 
           Ok(views.html.frontend.celebrity_storefront_personalize(
             form = formView,
@@ -112,7 +114,7 @@ trait StorefrontPersonalizeConsumerEndpoints
             writtenMessageCharacterLimit = PurchaseFormChecks.maxWrittenMessageChars,
             messageToCelebrityCharacterLimit = PurchaseFormChecks.maxNoteToCelebChars,
             orderSummary = orderSummary,
-            celebrityGender = celeb.gender,
+            celebrityGrammar = grammar,
             productPreviewUrl = product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
             orientation = product.frame.previewCssClass)
           )

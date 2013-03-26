@@ -9,8 +9,7 @@ footerData: models.frontend.footer.FooterData
 @import views.html.frontend.tags.physical_preview_modal
 @import models.frontend.contents._
 @import controllers._
-@import egraphs.playutils.Grammar._
-@import egraphs.playutils.Gender
+@import egraphs.playutils.NeutralGrammar
 
 @baseBody = {
 
@@ -62,7 +61,7 @@ footerData: models.frontend.footer.FooterData
               </h2>
               <div>
                 <p>
-                  An egraph is a shared moment between you and your favorite star. It is immortalized forever with a beautiful high resolution photograph, handwritten note, signature, and personalized voice message. It's @possessivePronoun(Gender.Neutral) voice, @possessivePronoun(Gender.Neutral) handwriting, @possessivePronoun(Gender.Neutral) time — every egraph is one-of-a-kind.
+                  An egraph is a shared moment between you and your favorite star. It is immortalized forever with a beautiful high resolution photograph, handwritten note, signature, and personalized voice message. It's @NeutralGrammar.possessiveAdjective voice, @NeutralGrammar.possessiveAdjective handwriting, @NeutralGrammar.possessiveAdjective time — every egraph is one-of-a-kind.
                 </p>
               </div>
               <div>
@@ -94,7 +93,7 @@ footerData: models.frontend.footer.FooterData
               <div class="callout">
                 <h3>Voiceprint</h3>
                 <p>
-                  We collect audio samples from each star to create his voiceprint. Our technology extracts pitch, tone, cadence and other voice patterns that get turned into mathematical representations and statistical models. We store these representations in electronic format for use in authentication (see below).   
+                  We collect audio samples from each star to create @NeutralGrammar.possessiveAdjective voiceprint. Our technology extracts pitch, tone, cadence and other voice patterns that get turned into mathematical representations and statistical models. We store these representations in electronic format for use in authentication (see below).
                 </p>
               </div>
               <div class="diagram">
@@ -103,7 +102,7 @@ footerData: models.frontend.footer.FooterData
               <div class="callout">
                 <h3>Written signature profile</h3>
                 <p>
-                  Like the voiceprint, we collect in-person samples of the star’s signature. Our signature identification technology measures a person’s speed, rhythm, acceleration and movement when they sign their name on an iPad. Similar to the voiceprint, these are stored as complex algorithms for use in authentication (see below).
+                  Like the voiceprint, we collect in-person samples of the star’s signature. Our signature identification technology measures a person’s speed, rhythm, acceleration and movement when @NeutralGrammar.subjectPronoun sign @NeutralGrammar.possessiveAdjective name on an iPad. Similar to the voiceprint, these are stored as complex algorithms for use in authentication (see below).
                 </p>
               </div>
               <p>
