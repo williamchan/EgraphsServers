@@ -17,8 +17,6 @@
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import views.html.frontend.tags
 @import controllers._
-@import egraphs.playutils.Grammar._
-
 
 @baseBody = {
     <div id="content" class="top" role="main">
@@ -37,7 +35,7 @@
   					
   						<h2>Now it's @model.celebName's Turn</h2>
   					
-  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as @subjectPronoun(model.celebrityGender) @irregularToBe(model.celebrityGender) done creating your egraph, so look forward to hearing from @objectPronoun(model.celebrityGender)!</p>
+  						<p>Congratulations! We just booked you a slice of time on @model.celebName's schedule to complete your order. For now, just sit back and relax. @model.celebName will send you an email as soon as @model.celebrityGrammar.subjectPronoun @model.celebrityGrammar.toBe done creating your egraph, so look forward to hearing from @model.celebrityGrammar.objectPronoun!</p>
   						
   						<p><small><a href="/faq#create" class="tip">What happens now?</a></small></p>
   						  				
@@ -106,8 +104,8 @@
                 <h3>When will you get the egraph?</h3>
 
                 <p>
-                  @model.celebName will create it as soon as @subjectPronoun(model.celebrityGender) can -- on average it takes 2 weeks.
-                  It's depends on @possessivePronoun(model.celebrityGender) schedule, so it may be much faster, or it may be slower!
+                  @model.celebName will create it as soon as @model.celebrityGrammar.subjectPronoun can -- on average it takes 2 weeks.
+                  It's depends on @model.celebrityGrammar.possessiveAdjective schedule, so it may be much faster, or it may be slower!
                 </p>
   							
   							<ul>

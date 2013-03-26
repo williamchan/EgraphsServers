@@ -3,7 +3,7 @@
   messageToCelebrityCharacterLimit:Int,
   guaranteedDelivery: java.util.Date,
   orderSummary: models.frontend.storefront.StorefrontOrderSummary,
-  celebrityGender: egraphs.playutils.Gender.EnumVal = egraphs.playutils.Gender.Male,
+  celebrityGrammar: egraphs.playutils.Grammar = egraphs.playutils.MaleGrammar,
   productPreviewUrl: String,
   orientation: String
 )(
@@ -28,7 +28,6 @@
 *@
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
-@import egraphs.playutils.Grammar._
 @import views.html.frontend.tags.storefront_breadcrumbs_responsive
 @import views.html.frontend.tags
 @import models.frontend.storefront.PersonalizeMessageOption
@@ -148,7 +147,7 @@
 	      				      <label class="instructions">
 	      				      	@orderSummary.celebrityName Should Write: 
 	      				      	<small>@writtenMessageCharacterLimit character limit.</small>
-	      				      	<small>All messages are subject to approval.</small></label>
+	      				      	<small>All messages are subject to approval.</small></label>
 	                    @tags.bootstrap_input_field(form.messageText) {
 	                      <div id="message-options" class="btn-group" data-toggle="buttons-radio">
 	                        <button type="button"
@@ -159,7 +158,7 @@
 	                        <button type="button" 
 	                                value="CelebrityChoosesMessage" 
 	                                class="btn btn-primary btn-custom-radio @if(form.messageOption.value == Some(CelebrityChoosesMessage)) {active}">
-                          	    Anything @subjectPronoun(celebrityGender)<br /> @regularVerb("want", celebrityGender)
+                          	Anything @celebrityGrammar.subjectPronoun<br/>@celebrityGrammar.regularVerb("want")
                         	</button>
 	                        <button type="button"
 	                                value="SignatureOnly"
@@ -173,9 +172,9 @@
 	      				                    name="@form.messageText.name"
 	      				                    rows="8"
 	      				                    cols="1"
-                                            maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
+                                    maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
                                   <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small><small> left</small></p>
-	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really @objectPronoun(celebrityGender)?</a></small>
+	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really @celebrityGrammar.objectPronoun?</a></small>
                                   </p>
 
                                   </div>
@@ -208,7 +207,7 @@
 	      				      <label class="instructions" for="your-message">
 	      				        Your Note to @orderSummary.celebrityName:
 	      				        <small>@messageToCelebrityCharacterLimit character limit.</small>
-	      				        <small>All messages are subject to approval.</small>
+	      				        <small>All messages are subject to approval.</small>
     				      		</label>
 	      				      @tags.bootstrap_input_field(form.noteToCelebrity) {
 	      				        <textarea maxlength="@messageToCelebrityCharacterLimit" id="your-message"

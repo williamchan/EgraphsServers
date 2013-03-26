@@ -1,6 +1,6 @@
 package models.frontend.email
 
-import egraphs.playutils.Gender
+import egraphs.playutils.Grammar
 
 case class OrderConfirmationEmailViewModel(
   buyerName: String,
@@ -8,7 +8,7 @@ case class OrderConfirmationEmailViewModel(
   recipientName: String,
   recipientEmail: String,
   celebrityName: String,
-  celebrityGender: Gender.EnumVal,
+  celebrityGrammar: Grammar,
   productName: String,
   orderDate: String,
   orderId: String,
