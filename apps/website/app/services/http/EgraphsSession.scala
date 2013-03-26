@@ -97,7 +97,10 @@ case class EgraphsSession(session: Session) {
       case None => otherCall
       case Some(requestedStar) => {
         PostCelebrityRequestHelper.completeRequestStar(requestedStar, customerId, email)
-        controllers.routes.WebsiteControllers.getMarketplaceResultPage(vertical = "", Some(requestedStar))
+
+        // Try to redirect to the page from which the request was made
+        Call("GET", session.get(Key.AfterLoginRedirectUrl.name).getOrElse(
+          controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url))
       }
     }
   }

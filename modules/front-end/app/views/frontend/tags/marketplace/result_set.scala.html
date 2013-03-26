@@ -64,7 +64,7 @@
 }
 
 @requestStarContentIfZeroResults = {
-  @if(results.celebrities.isEmpty) {
+  @if(results.celebrities.isEmpty && !query.isEmpty) {
     <section id="request-star-section">
 
         @safeForm(

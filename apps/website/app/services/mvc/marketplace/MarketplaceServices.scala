@@ -11,7 +11,7 @@ import com.google.inject.Inject
 
 case class MarketplaceServices @Inject() (verticalStore: VerticalStore) {
   /**
-   * Returns viewmodels for verticals and categories form the marketplace.
+   * Returns viewmodels for verticals and categories from the marketplace.
     * @param maybeSelectedVertical An optional vertical to be marked as active
    * @param activeCategoryValues Any selected category values
    * @return
