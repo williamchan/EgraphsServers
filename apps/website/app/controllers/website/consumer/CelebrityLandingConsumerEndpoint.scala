@@ -44,7 +44,6 @@ object CelebrityLandingConsumerEndpoint {
       .url
 
     val getStartedUrlBase = controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled(celebrity.urlSlug).url
-    val grammar = GrammarUtils.getGrammarByGender(celebrity.gender)
     val publicName = celebrity.publicName
 
     val masthead = LandingMasthead(
@@ -58,7 +57,7 @@ object CelebrityLandingConsumerEndpoint {
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
-      celebrityGrammar = grammar,
+      celebrityGrammar = GrammarUtils.getGrammarByGender(celebrity.gender),
       masthead = masthead
     )
   }

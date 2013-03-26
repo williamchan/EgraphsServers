@@ -175,8 +175,6 @@ case class EgraphPurchaseHandler(
       }
     }
 
-    val grammar = GrammarUtils.getGrammarByGender(celebrity.gender)
-
     // If the Stripe charge and Order persistence executed successfully, send a confirmation email and redirect to a confirmation page
     OrderConfirmationEmail(
       OrderConfirmationEmailViewModel(
@@ -185,7 +183,7 @@ case class EgraphPurchaseHandler(
         recipientName = recipientName,
         recipientEmail = recipientEmail,
         celebrityName = celebrity.publicName,
-        celebrityGrammar = grammar,
+        celebrityGrammar = GrammarUtils.getGrammarByGender(celebrity.gender),
         productName = product.name,
         orderDate = order.created.formatDayAsPlainLanguage("PST"),
         orderId = order.id.toString,

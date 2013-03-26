@@ -108,7 +108,6 @@ trait CheckoutEndpoints { this: Controller =>
       val maybePrintOrder = checkout.lineItems(CheckoutCodeType.PrintOrder).headOption map (_.domainObject)
       val recipientAccount = checkout.recipientAccount getOrElse checkout.buyerAccount
       val recipientCustomer = checkout.recipientCustomer getOrElse checkout.buyerCustomer
-      val grammar = GrammarUtils.getGrammarByGender(product.celebrity.gender)
 
       OrderConfirmationEmail(
         OrderConfirmationEmailViewModel(
@@ -117,7 +116,7 @@ trait CheckoutEndpoints { this: Controller =>
           recipientName = recipientCustomer.name,
           recipientEmail = recipientAccount.email,
           celebrityName = product.celebrity.publicName,
-          celebrityGrammar = grammar,
+          celebrityGrammar = GrammarUtils.getGrammarByGender(product.celebrity.gender),
           productName = product.name,
           orderDate = order.created.formatDayAsPlainLanguage("PST"),
           orderId = order.id.toString,

@@ -1,6 +1,6 @@
 package egraphs.playutils
 
-abstract class Grammar(
+abstract sealed class Grammar(
   val subjectPronoun: String,
   val objectPronoun: String,
   val possessiveAdjective: String,

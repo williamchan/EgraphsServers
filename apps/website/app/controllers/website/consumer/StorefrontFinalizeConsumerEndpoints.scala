@@ -82,7 +82,6 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
           
           // Create the checkout viewmodels
           val checkoutUrl = getStorefrontCheckout(celebrityUrlSlug, productUrlSlug).url
-          val grammar = GrammarUtils.getGrammarByGender(celeb.gender)
   
           val billingViewModel = FinalizeBillingViewModel(
             name=billing.name,
@@ -114,7 +113,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             messageText=PurchaseForms.makeTextForCelebToWrite(
               validPersonalizeForm.writtenMessageRequest,
               validPersonalizeForm.writtenMessageText,
-              celebrityGrammar = grammar
+              celebrityGrammar = GrammarUtils.getGrammarByGender(celeb.gender)
             ),
             editUrl = getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
           )

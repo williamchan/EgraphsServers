@@ -82,12 +82,10 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
         ) yield {
 
           // Everything looks good for rendering the page!
-          val grammar = GrammarUtils.getGrammarByGender(celeb.gender)
-
           val textCelebWillWrite = PurchaseForms.makeTextForCelebToWrite(
             validPersonalizeForm.writtenMessageRequest,
             validPersonalizeForm.writtenMessageText,
-            celebrityGrammar = grammar
+            celebrityGrammar = GrammarUtils.getGrammarByGender(celeb.gender)
           )
   
           val doPrint = forms.highQualityPrint

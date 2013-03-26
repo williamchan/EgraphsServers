@@ -101,7 +101,6 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
     val isLiveConsumerSite = (config.applicationBaseUrl == "https://www.egraphs.com/")
     val printPrice = maybePrintOrder.map(_.amountPaid).getOrElse(Money.zero(CurrencyUnit.USD))
     val printOrderShippingAddress = maybePrintOrder.map(_.shippingAddress).getOrElse("")
-    val grammar = GrammarUtils.getGrammarByGender(celebrity.gender)
     
     OrderCompleteViewModel (
       orderDate = order.created,
@@ -111,7 +110,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       ownerName = order.recipientName,
       ownerEmail = recipientAccount.email,
       celebName = celebrity.publicName,
-      celebrityGrammar = grammar,
+      celebrityGrammar = GrammarUtils.getGrammarByGender(celebrity.gender),
       productName = product.name,
       productId = product.id,
       expectedDeliveryDate = Order.expectedDeliveryDate(celebrity),

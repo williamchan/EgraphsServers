@@ -106,7 +106,6 @@ trait StorefrontPersonalizeConsumerEndpoints
           )
 
           implicit def crumbs = breadcrumbData.crumbsForRequest(celeb.id, celebrityUrlSlug, Some(productUrlSlug))(request)
-          val grammar = GrammarUtils.getGrammarByGender(celeb.gender)
 
           Ok(views.html.frontend.celebrity_storefront_personalize(
             form = formView,
@@ -114,7 +113,7 @@ trait StorefrontPersonalizeConsumerEndpoints
             writtenMessageCharacterLimit = PurchaseFormChecks.maxWrittenMessageChars,
             messageToCelebrityCharacterLimit = PurchaseFormChecks.maxNoteToCelebChars,
             orderSummary = orderSummary,
-            celebrityGrammar = grammar,
+            celebrityGrammar = GrammarUtils.getGrammarByGender(celeb.gender),
             productPreviewUrl = product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
             orientation = product.frame.previewCssClass)
           )

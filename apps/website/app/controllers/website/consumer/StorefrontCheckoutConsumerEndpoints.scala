@@ -113,7 +113,6 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
             val maybeCoupon = forms.coupon
             val subtotal = forms.subtotal(product.price)
             val discount = forms.discount(subtotal = subtotal, maybeCoupon)
-            val grammar = GrammarUtils.getGrammarByGender(celeb.gender)
             
             val orderSummary = CheckoutOrderSummary(
               celebrityName=celeb.publicName,
@@ -122,7 +121,7 @@ private[consumer] trait StorefrontCheckoutConsumerEndpoints
               messageText=PurchaseForms.makeTextForCelebToWrite(
                 validPersonalizeForm.writtenMessageRequest,
                 validPersonalizeForm.writtenMessageText,
-                celebrityGrammar = grammar
+                celebrityGrammar = GrammarUtils.getGrammarByGender(celeb.gender)
               ),
               basePrice=product.price,
               shipping=forms.shippingPrice,
