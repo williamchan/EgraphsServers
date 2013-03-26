@@ -99,7 +99,7 @@
           <div class="span3 clearfix">
             <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-microphone.png")'></img></div>
             <div class="description">
-              <strong>@star.grammar.subjectPronoun.capitalize reads and replies</strong>
+              <strong>@star.grammar.subjectPronoun.capitalize @star.grammar.regularVerb("read") and @star.grammar.stemChangingVerb("reply")</strong>
               <span>through @star.grammar.possessiveAdjective iPad microphone. This is your egraph.</span>
             </div>
           </div>
@@ -124,7 +124,7 @@
             @if(!star.isSoldOut) {          
               Follow these steps to personally connect with @star.name for <span class="money">{{selectedProduct().currencySymbol}}{{selectedProduct().price}}</span>
             } else {
-              <strong>Aw snap</strong>, @star.name has too many egraph orders queued up already! Sign up for our mailing list to be informed as soon as @star.grammar.subjectPronoun and your other favorite stars become available.
+              <strong>Aw snap</strong>, @star.name @star.grammar.toHave too many egraph orders queued up already! Sign up for our mailing list to be informed as soon as @star.grammar.subjectPronoun and your other favorite stars become available.
             }
           </h2>
         </section>
@@ -176,7 +176,7 @@
                   <label class="control-label" for="@field.id">
                     What do you want @star.grammar.objectPronoun to write in reply?
                     @fieldTooltip("What is this?", event="What is the written message?") {
-                      <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.grammar.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.grammar.subjectPronoun will hand-write whatever @star.grammar.subjectPronoun wants. Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
+                      <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.grammar.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.grammar.subjectPronoun will hand-write whatever @star.grammar.subjectPronoun @star.grammar.regularVerb("want"). Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
                     }
                   </label>
                   <div class="controls">
@@ -186,7 +186,7 @@
                                 resource-property
                                 maxlength="@maxDesiredTextChars"
                                 monitor-user-attention
-                                placeholder="Want @star.name to write something specific, e.g. &quot;Happy birthday&quot;? Leave this blank and @star.grammar.subjectPronoun'll write what @star.grammar.subjectPronoun wants."></textarea>
+                                placeholder="Want @star.name to write something specific, e.g. &quot;Happy birthday&quot;? Leave this blank and @star.grammar.subjectPronoun'll write what @star.grammar.subjectPronoun @star.grammar.regularVerb("want")."></textarea>
                     </div>
                     @field.standardErrorDiv
                     <div>

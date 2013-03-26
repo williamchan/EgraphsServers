@@ -11,6 +11,7 @@ abstract class Grammar(
 ) {
 
   def regularVerb(verb: String): String
+  def stemChangingVerb(verb: String): String // y to ie
 }
 
 object MaleGrammar extends Grammar(
@@ -25,6 +26,10 @@ object MaleGrammar extends Grammar(
 
   def regularVerb(verb: String): String = {
     verb + "s"
+  }
+
+  def stemChangingVerb(verb: String): String = {
+    verb.dropRight(1) + "ies"
   }
 }
 
@@ -41,6 +46,10 @@ object FemaleGrammar extends Grammar(
   def regularVerb(verb: String): String = {
     verb + "s"
   }
+
+  def stemChangingVerb(verb: String): String = {
+    verb.dropRight(1) + "ies"
+  }
 }
 
 object NeutralGrammar extends Grammar(
@@ -55,6 +64,10 @@ object NeutralGrammar extends Grammar(
 
   def regularVerb(verb: String): String = {
     verb
+  }
+
+  def stemChangingVerb(verb: String): String = {
+    regularVerb(verb)
   }
 }
 

@@ -172,7 +172,7 @@
 	      				                    name="@form.messageText.name"
 	      				                    rows="8"
 	      				                    cols="1"
-                                            maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
+                                    maxlength="@writtenMessageCharacterLimit">@form.messageText.value</textarea>
                                   <p class="character-count"><small id="egraph-message-count">@writtenMessageCharacterLimit</small><small> left</small></p>
 	      				          <p class="align-right"><small><a href="/inside-an-egraph#biometric" target="_blank" class="tip">How do I know it's really @celebrityGrammar.objectPronoun?</a></small>
                                   </p>
@@ -207,7 +207,7 @@
 	      				      <label class="instructions" for="your-message">
 	      				        Your Note to @orderSummary.celebrityName:
 	      				        <small>@messageToCelebrityCharacterLimit character limit.</small>
-	      				        <small>All messages are subject to approval.</small>
+	      				        <small>All messages are subject to approval.</small>
     				      		</label>
 	      				      @tags.bootstrap_input_field(form.noteToCelebrity) {
 	      				        <textarea maxlength="@messageToCelebrityCharacterLimit" id="your-message"

@@ -5,7 +5,7 @@ import models.frontend.landing.{LandingMasthead, CatalogStar}
 import models.frontend.marketplace.{CategoryValueViewModel, VerticalViewModel}
 import helpers.DefaultImplicitTemplateParameters
 import models.frontend.header.HeaderData
-import egraphs.playutils.Gender
+import egraphs.playutils.{MaleGrammar, FemaleGrammar}
 import models.frontend.masthead.{SearchBoxViewModel, VideoPlayerViewModel, CallToActionViewModel, SimpleLinkViewModel}
 
 /**
@@ -71,7 +71,7 @@ object Landing extends Controller with DefaultImplicitTemplateParameters {
       celebrityPublicName = publicName,
       celebrityCasualName = casualName,
       landingPageImageUrl = EgraphsAssets.at("images/ortiz_masthead.jpg").url,
-      celebrityGender = if (isMale) { Gender.Male } else { Gender.Female },
+      celebrityGrammar = if (isMale) { MaleGrammar } else { FemaleGrammar },
       masthead
     ))
   }
