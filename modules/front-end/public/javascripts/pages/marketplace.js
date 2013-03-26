@@ -13,7 +13,7 @@ define(["page", "services/analytics"], function (page, analytics) {
 
   marketplace.reloadPage = function() {
     window.location.href =
-      page.queryUrl + page.verticalSlug + "?" +
+      page.queryUrl + page.verticalSlug + "&" +
       $.param({
         "query" : page.query || "",
         "sort" : page.sort || "",
@@ -66,10 +66,10 @@ define(["page", "services/analytics"], function (page, analytics) {
     }
   };
 
-  marketplace.clearCategoryByKey = function(categoryKey) {
+  marketplace.clearCategoryByKey = function(categoryKey, categoryName) {
     var category = page.categories[categoryKey];
     category.length = 0;
-    events.track(["Clear category"]);
+    events.track(["Clear category", categoryName]);
   };
 
   marketplace.clearCategories = function() {

@@ -11,7 +11,7 @@
         <li>
          <a class="category" data-category="@category.id">@category.publicName</a>
        
-          @if(category.active){<a data-category="@category.id" class="clear-all">(Clear All)</a>}
+          @if(category.active){<a data-category="@category.id" data-name="@category.publicName" class="clear-all">(Clear All)</a>}
             
             <ol>
               @for((categoryValue, idx) <- category.categoryValues.sorted.zipWithIndex) {
