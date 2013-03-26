@@ -46,11 +46,11 @@ define(["page", "services/analytics"], function (page, analytics) {
     if(page.verticalSlug === "/" + verticalSlug) {
       page.verticalSlug = "";
       page.categories = {};
-      events.track(["Deselect Vertical", id]);
+      events.track(["Deselect Vertical", verticalSlug]);
     } else {
       page.verticalSlug  = "/" + verticalSlug;
       page.categories = {};
-      events.track(["Select Vertical", id]);
+      events.track(["Select Vertical", verticalSlug]);
     }
   };
 
@@ -69,7 +69,7 @@ define(["page", "services/analytics"], function (page, analytics) {
   marketplace.clearCategoryByKey = function(categoryKey) {
     var category = page.categories[categoryKey];
     category.length = 0;
-    events.track(["Clear all categories"]);
+    events.track(["Clear category"]);
   };
 
   marketplace.clearCategories = function() {
@@ -77,7 +77,7 @@ define(["page", "services/analytics"], function (page, analytics) {
     $.each(categories, function(catId, selectedValues) {
       selectedValues.length = 0;
     });
-    events.track(["Clear all categories"]);
+    events.track(["Clear category", "All"]);
   };
 
   return marketplace;
