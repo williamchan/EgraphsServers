@@ -99,8 +99,8 @@
           <div class="span3 clearfix">
             <div class="value-icon-holder"><img src='@EgraphsAssets.at("images/glyphish-microphone.png")'></img></div>
             <div class="description">
-              <strong>@star.pronoun.subject.capitalize reads and replies</strong>
-              <span>through @star.pronoun.possessiveAdjective iPad microphone. This is your egraph.</span>
+              <strong>@star.grammar.subjectPronoun.capitalize @star.grammar.regularVerb("read") and @star.grammar.stemChangingVerb("reply")</strong>
+              <span>through @star.grammar.possessiveAdjective iPad microphone. This is your egraph.</span>
             </div>
           </div>
           <div class="span3 clearfix">
@@ -124,7 +124,7 @@
             @if(!star.isSoldOut) {          
               Follow these steps to personally connect with @star.name for <span class="money">{{selectedProduct().currencySymbol}}{{selectedProduct().price}}</span>
             } else {
-              <strong>Aw snap</strong>, @star.name has too many egraph orders queued up already! Sign up for our mailing list to be informed as soon as @star.pronoun.subject and your other favorite stars become available.
+              <strong>Aw snap</strong>, @star.name @star.grammar.toHave too many egraph orders queued up already! Sign up for our mailing list to be informed as soon as @star.grammar.subjectPronoun and your other favorite stars become available.
             }
           </h2>
         </section>
@@ -144,9 +144,9 @@
               @withField("egraph", "messageToCeleb") { field =>
                 <div class="control-group note-to-star">
                   <label class="control-label" for="@field.id">
-                    What do you want to say to @star.pronoun.obj?
-                    @fieldTooltip(s"What will ${star.pronoun.subject} do with my message?", event="What will star do with message?") {
-                      <strong>This is your chance to be heard.</strong> @star.name will read this note and respond to you in a voice message, recorded from @star.pronoun.possessiveAdjective personal iPad.
+                    What do you want to say to @star.grammar.objectPronoun?
+                    @fieldTooltip(s"What will ${star.grammar.subjectPronoun} do with my message?", event="What will star do with message?") {
+                      <strong>This is your chance to be heard.</strong> @star.name will read this note and respond to you in a voice message, recorded from @star.grammar.possessiveAdjective personal iPad.
                     }
                   </label>
                   <div class="controls">
@@ -164,7 +164,7 @@
                     </div>
                     <div>
                       @fieldTooltip("Not sure what to say? Here are some tips.", event="Not sure what to say?") {
-                        <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.pronoun.obj in person. Ask a question you've always wanted to know the answer to, or request that @star.pronoun.subject say something specific.
+                        <strong>Make it personal.</strong> The more personal your note, the more personal your egraph from @star.name will be. Talk about why you're a fan. Or that special time you saw @star.grammar.objectPronoun in person. Ask a question you've always wanted to know the answer to, or request that @star.grammar.subjectPronoun say something specific.
                       }
                       <div class="explanatory-text char-remaining">{{@maxMessageToCelebChars - @{field.ngModel}.length}} left</div>
                     </div>
@@ -174,9 +174,9 @@
               @withField("egraph", "desiredText") { field =>
                 <div class="control-group note-to-star">
                   <label class="control-label" for="@field.id">
-                    What do you want @star.pronoun.obj to write in reply?
+                    What do you want @star.grammar.objectPronoun to write in reply?
                     @fieldTooltip("What is this?", event="What is the written message?") {
-                      <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.pronoun.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.pronoun.subject will hand-write whatever @star.pronoun.subject wants. Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
+                      <strong>As part of your egraph, @star.name will hand-write a short message alongside @star.grammar.possessiveAdjective signature using an iPad.</strong> Leave this field blank and @star.grammar.subjectPronoun will hand-write whatever @star.grammar.subjectPronoun @star.grammar.regularVerb("want"). Or jot down something specific you want written, like <em>"Happy 16th Birthday, Bobby"</em> or <em>"Thanks for being my #1 fan!"</em>
                     }
                   </label>
                   <div class="controls">
@@ -186,7 +186,7 @@
                                 resource-property
                                 maxlength="@maxDesiredTextChars"
                                 monitor-user-attention
-                                placeholder="Want @star.name to write something specific, e.g. &quot;Happy birthday&quot;? Leave this blank and @star.pronoun.subject'll write what @star.pronoun.subject wants."></textarea>
+                                placeholder="Want @star.name to write something specific, e.g. &quot;Happy birthday&quot;? Leave this blank and @star.grammar.subjectPronoun'll write what @star.grammar.subjectPronoun @star.grammar.regularVerb("want")."></textarea>
                     </div>
                     @field.standardErrorDiv
                     <div>
@@ -201,7 +201,7 @@
                   <label class="control-label" for="@field.id">
                     Who is this egraph for?
                     @fieldTooltip("How does gifting work?", event="How does gifting work?") {
-                      <strong>Egraphs make a great gift for a friend or family member.</strong> Just select the <em>This is a gift</em> and enter the recipient's name (this is who @star.name will address @star.pronoun.possessiveAdjective message to).
+                      <strong>Egraphs make a great gift for a friend or family member.</strong> Just select the <em>This is a gift</em> and enter the recipient's name (this is who @star.name will address @star.grammar.possessiveAdjective message to).
                     }
                     @fieldTooltip("How will they receive the gift?", event="How will they receive the gift?") {
                       On the next screen you can enter an email address for the recipient. When @star.name creates the egraph, an email will be sent to both yourself and the recipient with information on how to view and hear the graph.
@@ -233,7 +233,7 @@
                   <label class="control-label" for="@field.id">
                     {{recipientPossessive()}} name<span class="required-marker">*</span>:
                     @fieldTooltip("How is this used?", event="How is name used?") {
-                      This is the name @star.name will address the egraph to in both @star.pronoun.possessiveAdjective written and audio message.
+                      This is the name @star.name will address the egraph to in both @star.grammar.possessiveAdjective written and audio message.
                     }
                   </label>
                   <div class="controls">
@@ -354,7 +354,7 @@
           <section id="egraph-arrival">
             <h2 class="clearfix callout">
               <img src='@EgraphsAssets.at("images/glyphish-stopwatch.png")'>
-              When will {{recipientNominative()}} get the egraph? @star.name will create it as soon as @star.pronoun.subject can -- on average it takes 2 weeks. It depends on @star.pronoun.possessiveAdjective schedule, so it may be much faster, or it may be slower!
+              When will {{recipientNominative()}} get the egraph? @star.name will create it as soon as @star.grammar.subjectPronoun can -- on average it takes 2 weeks. It depends on @star.grammar.possessiveAdjective schedule, so it may be much faster, or it may be slower!
               @fieldTooltip("Need it delivered on a specific date?", event="Need it delivered on a specific date?") {
                 If this is for a special occasion (like a birthday) and you'd like it sent to {{recipientNominative()}} on a specific date, email support@@egraphs.com after placing your order to let us know.
               }

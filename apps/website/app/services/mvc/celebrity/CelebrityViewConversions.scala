@@ -1,5 +1,6 @@
 package services.mvc.celebrity
 
+import egraphs.playutils.GrammarUtils
 import models.{InventoryQuantity, ImageAsset, Celebrity}
 import models.frontend.storefront.{ChoosePhotoRecentEgraph, ChoosePhotoCelebrity}
 import models.frontend.marketplace.MarketplaceCelebrity
@@ -12,8 +13,6 @@ import services.AppConfig
 import controllers.routes.WebsiteControllers.getStorefrontChoosePhotoTiled
 import com.google.inject.{Provider, Inject}
 import models.frontend.storefront_a.{PersonalizeProduct, PersonalizeStar}
-import egraphs.playutils.Gender
-import models.frontend.{MalePersonalPronouns, FemalePersonalPronouns, NeutralPersonalPronouns}
 
 /**
  * Converts Celebrities into various view models defined in the front-end module
@@ -62,11 +61,7 @@ class CelebrityViewConversions(celeb: Celebrity) {
         .getSaved(AccessPolicy.Public)
         .url,
       products = products,
-      pronoun = celeb.gender match {
-        case Gender.Neutral => NeutralPersonalPronouns
-        case Gender.Male => MalePersonalPronouns
-        case _ => FemalePersonalPronouns
-      },
+      grammar = GrammarUtils.getGrammarByGender(celeb.gender),
       isSoldOut = products.isEmpty
     )
   }

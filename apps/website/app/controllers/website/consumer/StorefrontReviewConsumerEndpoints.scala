@@ -1,5 +1,6 @@
 package controllers.website.consumer
 
+import egraphs.playutils.GrammarUtils
 import services.http.{POSTControllerMethod, ControllerMethod}
 import play.api.mvc.Controller
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
@@ -79,11 +80,12 @@ private[consumer] trait StorefrontReviewConsumerEndpoints
                                     productUrlSlug
                                   ).right
         ) yield {
+
           // Everything looks good for rendering the page!
           val textCelebWillWrite = PurchaseForms.makeTextForCelebToWrite(
             validPersonalizeForm.writtenMessageRequest,
             validPersonalizeForm.writtenMessageText,
-            celebrityGender = celeb.gender
+            celebrityGrammar = GrammarUtils.getGrammarByGender(celeb.gender)
           )
   
           val doPrint = forms.highQualityPrint

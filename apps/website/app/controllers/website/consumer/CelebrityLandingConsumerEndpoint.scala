@@ -1,5 +1,7 @@
 package controllers.website.consumer
 
+import egraphs.authtoken.AuthenticityToken
+import egraphs.playutils.GrammarUtils
 import play.api.mvc._
 import services.http.ControllerMethod
 import services.mvc.ImplicitHeaderAndFooterData
@@ -9,7 +11,6 @@ import models.frontend.header.HeaderData
 import models.frontend.footer.FooterData
 import play.api.templates.Html
 import services.http.filters.HttpFilters
-import egraphs.authtoken.AuthenticityToken
 import models.frontend.landing.LandingMasthead
 import models.frontend.masthead.SimpleLinkViewModel
 
@@ -49,14 +50,14 @@ object CelebrityLandingConsumerEndpoint {
       headline = "Get an egraph from " + publicName,
       landingPageImageUrl = landingPageImageUrl,
       callToActionViewModel = SimpleLinkViewModel(text = "Get Started", target = CelebrityAccesskey.urlWithAccesskey(getStartedUrlBase, accesskey))
-      )
+    )
 
     views.html.frontend.celebrity_landing(
       getStartedUrl = CelebrityAccesskey.urlWithAccesskey(getStartedUrlBase, accesskey),
       celebrityPublicName = publicName,
       celebrityCasualName = celebrity.casualName.getOrElse(publicName),
       landingPageImageUrl = landingPageImageUrl,
-      celebrityGender = celebrity.gender,
+      celebrityGrammar = GrammarUtils.getGrammarByGender(celebrity.gender),
       masthead = masthead
     )
   }

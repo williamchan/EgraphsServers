@@ -20,6 +20,7 @@ import services._
 import models.frontend.email.OrderConfirmationEmailViewModel
 import services.http.EgraphsSession.Conversions._
 import services.Finance.TypeConversions._
+import _root_.egraphs.playutils.GrammarUtils
 import _root_.frontend.formatting.DateFormatting.Conversions._
 
 case class EgraphPurchaseHandlerServices @Inject() (
@@ -182,7 +183,7 @@ case class EgraphPurchaseHandler(
         recipientName = recipientName,
         recipientEmail = recipientEmail,
         celebrityName = celebrity.publicName,
-        celebrityGender = celebrity.gender,
+        celebrityGrammar = GrammarUtils.getGrammarByGender(celebrity.gender),
         productName = product.name,
         orderDate = order.created.formatDayAsPlainLanguage("PST"),
         orderId = order.id.toString,

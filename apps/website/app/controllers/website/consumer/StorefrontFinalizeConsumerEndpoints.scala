@@ -1,5 +1,6 @@
 package controllers.website.consumer
 
+import egraphs.playutils.GrammarUtils
 import services.http.{POSTControllerMethod, ControllerMethod, WithoutDBConnection}
 import services.http.filters.HttpFilters
 import play.api.mvc.Controller
@@ -103,7 +104,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
               editUrl = checkoutUrl
             )
           }
-  
+
           // Create the personalization viewmodel
           val personalizationViewModel = FinalizePersonalizationViewModel(
             celebName=celeb.publicName,
@@ -112,7 +113,7 @@ private[consumer] trait StorefrontFinalizeConsumerEndpoints
             messageText=PurchaseForms.makeTextForCelebToWrite(
               validPersonalizeForm.writtenMessageRequest,
               validPersonalizeForm.writtenMessageText,
-              celebrityGender = celeb.gender
+              celebrityGrammar = GrammarUtils.getGrammarByGender(celeb.gender)
             ),
             editUrl = getStorefrontPersonalize(celebrityUrlSlug, productUrlSlug).url
           )
