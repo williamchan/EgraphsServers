@@ -56,7 +56,9 @@
 
   <div class="new-account-fields" @if(!registrationForm.hasErrors) {style="display: none"}>
     <fieldset>
-      @helper.inputText(registrationForm("registerEmail"), '_label -> "Email Address:", '_showConstraints -> false)
+      @helper.input(registrationForm("registerEmail"), '_label -> "Email Address:", '_showConstraints -> false) { (id, name, value, args) =>
+        <input type="email" name="@name" id="@id" @toHtmlArgs(args)>
+      }
       @helper.inputPassword(registrationForm("registerPassword"), '_label -> "Password:", '_showConstraints -> false)
 
       @helper.input(registrationForm("bulk-email"), '_showConstraints -> false) { (id, name, value, args) =>
@@ -75,7 +77,9 @@
 @currentOwnerContent = {
   <div class="current-account-fields">
     <fieldset>
-      @helper.inputText(loginForm("loginEmail"), '_label -> "Email Address:", '_showConstraints -> false)
+      @helper.input(loginForm("loginEmail"), '_label -> "Email Address:", '_showConstraints -> false) { (id, name, value, args) =>
+        <input type="email" name="@name" id="@id" @toHtmlArgs(args)>
+      }
       @helper.inputPassword(loginForm("loginPassword"), '_label -> "Password:", '_showConstraints -> false)
 
       @loginForm.globalError.map { error =>
