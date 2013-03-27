@@ -38,6 +38,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
   protected def marketplaceServices: MarketplaceServices
   protected def verticalStore: VerticalStore
 
+  val queryUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url
   val categoryRegex = new scala.util.matching.Regex("""c([0-9]+)""", "id")
 
   private def sortOptionViewModels(selectedSortingType: Option[CelebritySortingTypes.EnumVal] = None) : Iterable[SortOptionViewModel] = {
@@ -102,7 +103,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
    * @param vertical The slug of a marketplace search if it is scoped by vertical
    * @return A results page or landing page.
    */
-  def getMarketplaceResultPage(vertical: String = "", query: Option[String] = None) = controllerMethod.withForm() { implicit AuthToken =>
+  def getMarketplaceResultPage(vertical: String = "") = controllerMethod.withForm() { implicit AuthToken =>
     Action { implicit request =>
 
       // Determine what search options, if any, have been appended
@@ -116,7 +117,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       )
       // Process the form
       val maybeSelectedVertical =  verticalStore.verticals.filter(v => v.urlSlug == vertical).headOption
-      val (_, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.fold(
+      val (queryOption, sortOption, viewOption, availableOnlyOption) = marketplaceResultPageForm.bindFromRequest.fold(
         errors => (None, None, None, None),
         formOptions => formOptions
       )
@@ -132,6 +133,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         case Some(vertical) => categoryValuesRefinements ++ List(Seq(vertical.categoryValue.id))
         case None => categoryValuesRefinements
       }
+
       // Yield a list of selected category values
       val activeCategoryValues = {
         for {
@@ -143,10 +145,10 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
       val verticalViewModels = marketplaceServices.getVerticalViewModels(maybeSelectedVertical, activeCategoryValues)
 
       // Check if any search options have been defined
-      if(!query.isEmpty || !verticalAndCategoryValues.isEmpty) {
+      if(queryOption.isDefined || !verticalAndCategoryValues.isEmpty) {
         // Serve results according to the query
         val unsortedCelebrities = dbSession.connected(TransactionSerializable) {
-          celebrityStore.marketplaceSearch(query, verticalAndCategoryValues)
+          celebrityStore.marketplaceSearch(queryOption, verticalAndCategoryValues)
         }
 
         val sortedCelebrities = sortCelebrities(maybeSortType.getOrElse(CelebritySortingTypes.MostRelevant), unsortedCelebrities)
@@ -157,19 +159,16 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           sortedCelebrities
         }
 
-        val subtitle = buildSubtitle(query, celebrities)
-
+        val subtitle = buildSubtitle(queryOption, celebrities)
         val viewAsList = viewOption == Some("list") //TODO "list" should be a part of an Enum
 
-        val marketplaceTargetUrl = controllers.routes.WebsiteControllers.getMarketplaceResultPage("", query).url
-
         // true if customer is logged in and has already requested this same celebrity
-        val hasAlreadyRequested = getHasAlreadyRequested(query.getOrElse(""))
+        val hasAlreadyRequested = getHasAlreadyRequested(queryOption.getOrElse(""))
 
         Ok(views.html.frontend.marketplace_results(
-          query = query.getOrElse(""),
+          query = queryOption.getOrElse(""),
           viewAsList = viewAsList,
-          marketplaceRoute = marketplaceTargetUrl,
+          marketplaceRoute = queryUrl,
           verticalViewModels = verticalViewModels,
           results = ResultSetViewModel(subtitle = Option(subtitle), verticalUrl = Option("/"), celebrities = celebrities),
           sortOptions = sortOptionViewModels(maybeSortType),
@@ -178,7 +177,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
           requestStarActionUrl = controllers.routes.WebsiteControllers.postRequestStar.url,
           hasAlreadyRequested
         ))
-        .withSession(request.session.withAfterLoginRedirectUrl(marketplaceTargetUrl))
+        .withSession(request.session.withAfterLoginRedirectUrl(request.uri))
 
       } else {
         // No search options so serve the landing page. If a vertical has a category value which feature stars, it is
@@ -194,7 +193,7 @@ private[controllers] trait GetMarketplaceEndpoint extends ImplicitHeaderAndFoote
         }
         // Serve the landing page.
         Ok(views.html.frontend.marketplace_landing(
-          marketplaceRoute = controllers.routes.WebsiteControllers.getMarketplaceResultPage("").url,
+          marketplaceRoute = queryUrl,
           verticalViewModels = verticalViewModels,
           resultSets = resultSets.toList
         ))
