@@ -13,7 +13,7 @@ define(["page", "services/analytics"], function (page, analytics) {
 
   marketplace.reloadPage = function() {
     window.location.href =
-      page.queryUrl + page.verticalSlug + "&" +
+      page.queryUrl + page.verticalSlug + "?" +
       $.param({
         "query" : page.query || "",
         "sort" : page.sort || "",

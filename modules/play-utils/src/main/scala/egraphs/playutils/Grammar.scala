@@ -1,50 +1,87 @@
 package egraphs.playutils
 
-object Grammar {
+abstract sealed class Grammar(
+  val subjectPronoun: String,
+  val objectPronoun: String,
+  val possessiveAdjective: String,
+  val possessivePronoun: String,
+  val reflexivePronoun: String,
+  val toHave: String,
+  val toBe: String
+) {
 
-  def subjectPronoun(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    genderAppropriateWord(gender, capitalize, "he", "she", "they")
+  def regularVerb(verb: String): String
+  def stemChangingVerb(verb: String): String // y to ie
+}
+
+object MaleGrammar extends Grammar(
+  subjectPronoun = "he",
+  objectPronoun = "him",
+  possessiveAdjective = "his",
+  possessivePronoun = "his",
+  reflexivePronoun = "himself",
+  toHave = "has",
+  toBe = "is"
+) {
+
+  def regularVerb(verb: String): String = {
+    verb + "s"
   }
 
-  def objectPronoun(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    genderAppropriateWord(gender, capitalize, "him", "her", "them")
+  def stemChangingVerb(verb: String): String = {
+    verb.dropRight(1) + "ies"
+  }
+}
+
+object FemaleGrammar extends Grammar(
+  subjectPronoun = "she",
+  objectPronoun = "her",
+  possessiveAdjective = "her",
+  possessivePronoun = "hers",
+  reflexivePronoun = "herself",
+  toHave = "has",
+  toBe = "is"
+) {
+
+  def regularVerb(verb: String): String = {
+    verb + "s"
   }
 
-  def possessivePronoun(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    genderAppropriateWord(gender, capitalize, "his", "her", "their")
+  def stemChangingVerb(verb: String): String = {
+    verb.dropRight(1) + "ies"
   }
-  
-  def irregularToHave(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    genderAppropriateWord(gender, capitalize, "has", "has", "have")
+}
+
+object NeutralGrammar extends Grammar(
+  subjectPronoun = "they",
+  objectPronoun = "them",
+  possessiveAdjective = "their",
+  possessivePronoun = "theirs",
+  reflexivePronoun = "themselves",
+  toHave = "have",
+  toBe = "are"
+ ) {
+
+  def regularVerb(verb: String): String = {
+    verb
   }
 
-  def irregularToBe(gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    genderAppropriateWord(gender, capitalize, "is", "is", "are")
+  def stemChangingVerb(verb: String): String = {
+    regularVerb(verb)
   }
+}
 
-  def regularVerb(verb: String, gender: Gender.EnumVal, capitalize: Boolean = false): String = {
-    genderAppropriateWord(gender, capitalize, verb + "s", verb + "s", verb)
-  }
-
+object GrammarUtils {
   def egraphOrEgraphs(numberOfEgraphs: Int): String = {
     if (numberOfEgraphs == 1) "Egraph"
     else "Egraphs"
   }
 
-  private def genderAppropriateWord(gender: Gender.EnumVal, capitalize: Boolean,
-    maleWord: String, femaleWord: String, neutralWord: String): String = {
-
-    val lowercaseWord = gender match {
-      case (Gender.Male) => maleWord
-      case (Gender.Female) => femaleWord
-      case (Gender.Neutral) => neutralWord
-      case _ => throw new IllegalStateException("You are a very rare gender")
+  def getGrammarByGender(gender: Gender.EnumVal): Grammar = {
+    gender match {
+      case Gender.Neutral => NeutralGrammar
+      case Gender.Male => MaleGrammar
+      case _ => FemaleGrammar
     }
-    capitalizeOrNo(lowercaseWord, capitalize)
-  }
-
-  private def capitalizeOrNo(word: String, capitalize: Boolean): String = {
-    if (capitalize) word.capitalize
-    else word
   }
 }

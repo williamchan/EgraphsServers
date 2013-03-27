@@ -13,6 +13,7 @@
 @import views.html.frontend.tags
 @import play.api.libs.json._
 @import egraphs.playutils.Gender
+@import egraphs.playutils.NeutralGrammar
 @import org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript
 @import views.frontend.Utils.idAttribution
 
@@ -194,11 +195,11 @@
         </ul>
         
         <div id="learn" class="tab" style="display: none">
-          @tags.landing.welcome_header(celebrityGender = Gender.Neutral)
+          @tags.landing.welcome_header(celebrityGrammar = NeutralGrammar)
 
-          @tags.landing.landing_steps(celebrityGender = Gender.Neutral)
+          @tags.landing.landing_steps(celebrityGrammar = NeutralGrammar)
 
-          @tags.landing.landing_details(celebrityGender = Gender.Neutral)
+          @tags.landing.landing_details(celebrityGrammar = NeutralGrammar)
 
           @tags.landing.landing_more(None, Some(marketplaceRoute))
         </div>        

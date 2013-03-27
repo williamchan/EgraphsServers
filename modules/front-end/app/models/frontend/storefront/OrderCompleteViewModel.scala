@@ -3,6 +3,7 @@ package models.frontend.storefront
 import java.util.Date
 import org.joda.money.Money
 import egraphs.playutils.Gender
+import egraphs.playutils.Grammar
 
 /**
  * Viewmodel for rendering the order complete page.
@@ -36,7 +37,7 @@ case class OrderCompleteViewModel (
   ownerName: String,
   ownerEmail: String,
   celebName: String,
-  celebrityGender: Gender.EnumVal,
+  celebrityGrammar: Grammar,
   productName: String,
   productId: Long,
   expectedDeliveryDate: Date,

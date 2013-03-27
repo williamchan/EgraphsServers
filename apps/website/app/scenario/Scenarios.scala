@@ -3,7 +3,7 @@ package scenario
 import services.db.Schema
 import services.blobs.Blobs
 import egraphs.playutils.Encodings.Base64
-import egraphs.playutils.Gender
+import egraphs.playutils.MaleGrammar
 import org.apache.commons.mail.HtmlEmail
 import org.squeryl.PrimitiveTypeMode._
 import models._
@@ -398,7 +398,7 @@ class Scenarios extends DeclaresScenarios {
           recipientName = "Andrew Smith",
           recipientEmail = "me@egraphs.com",
           celebrityName = "Celebrity Joe",
-          celebrityGender = Gender.Male,
+          celebrityGrammar = MaleGrammar,
           productName = "Product 1",
           orderDate = "Jan 1, 2012",
           orderId = "1234",

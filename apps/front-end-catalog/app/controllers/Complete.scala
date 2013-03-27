@@ -5,7 +5,7 @@ import play.api.mvc._
 import models.frontend.storefront.OrderCompleteViewModel
 import java.util
 import helpers.DefaultImplicitTemplateParameters
-import egraphs.playutils.Gender
+import egraphs.playutils.MaleGrammar
 
 /**
  * Permutations of the Checkout: Order Complete.
@@ -26,7 +26,7 @@ object Complete extends Controller with DefaultImplicitTemplateParameters {
       ownerName="{owner name}",
       ownerEmail="{owner email}",
       celebName="{celebrity name}",
-      celebrityGender = Gender.Male,
+      celebrityGrammar = MaleGrammar,
       productName="{product name}",
       productId=1L,
       totalPrice=BigDecimal(90.00).toMoney(),

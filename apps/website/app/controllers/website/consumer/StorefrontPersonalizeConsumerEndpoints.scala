@@ -1,5 +1,6 @@
 package controllers.website.consumer
 
+import egraphs.playutils.GrammarUtils
 import services.mvc.{StorefrontBreadcrumbData, ImplicitStorefrontBreadcrumbData, ImplicitHeaderAndFooterData}
 import play.api.mvc.Controller
 import services.http.{POSTControllerMethod, ControllerMethod}
@@ -112,7 +113,7 @@ trait StorefrontPersonalizeConsumerEndpoints
             writtenMessageCharacterLimit = PurchaseFormChecks.maxWrittenMessageChars,
             messageToCelebrityCharacterLimit = PurchaseFormChecks.maxNoteToCelebChars,
             orderSummary = orderSummary,
-            celebrityGender = celeb.gender,
+            celebrityGrammar = GrammarUtils.getGrammarByGender(celeb.gender),
             productPreviewUrl = product.photoAtPurchasePreviewSize.getSaved(AccessPolicy.Public).url,
             orientation = product.frame.previewCssClass)
           )

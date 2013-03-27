@@ -7,6 +7,7 @@ import controllers.routes.WebsiteControllers.getFAQ
 import enums.CheckoutCodeType
 import frontend.storefront.OrderCompleteViewModel
 import org.joda.money.{CurrencyUnit, Money}
+import _root_.egraphs.playutils.GrammarUtils
 import services.config.ConfigFileProxy
 
 /**
@@ -109,7 +110,7 @@ class OrderCompleteViewModelFactory @Inject()(config: ConfigFileProxy) {
       ownerName = order.recipientName,
       ownerEmail = recipientAccount.email,
       celebName = celebrity.publicName,
-      celebrityGender = celebrity.gender,
+      celebrityGrammar = GrammarUtils.getGrammarByGender(celebrity.gender),
       productName = product.name,
       productId = product.id,
       expectedDeliveryDate = Order.expectedDeliveryDate(celebrity),
