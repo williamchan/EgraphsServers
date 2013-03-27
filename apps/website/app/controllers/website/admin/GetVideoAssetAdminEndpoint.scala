@@ -1,11 +1,14 @@
 package controllers.website.admin
 
+import controllers.PaginationInfoFactory
 import models.enums.VideoStatus
 import models.Celebrity
 import models.VideoAsset
 import models.VideoAssetCelebrityStore
 import models.VideoAssetStore
 import models.website.video.VideoAssetViewModel
+import play.api.data._
+import play.api.data.Forms._
 import play.api.mvc.Controller
 import play.api.mvc.Action
 import services.Time.IntsToSeconds.intsToSecondDurations
@@ -46,12 +49,21 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
               case None => BadRequest("Unknown status: " + status)
               case Some(maybeVideoStatus) => {
                 val unsortedVideos = videoAssetStore.getVideosWithStatus(maybeVideoStatus)
-                val videos = unsortedVideos.sortBy(_.created.getTime).reverse
 
-                // create a view model for each video, which contains: the secure video URL,
+                // Pagination stuff
+                val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
+                val pagedQuery: (Iterable[VideoAsset], Int, Option[Int]) =
+                  services.Utils.pagedQuery(select = unsortedVideos, page = page, pageLength = 5)
+                implicit val paginationInfo = PaginationInfoFactory.create(
+                  pagedQuery = pagedQuery,
+                  pageLength = 5,
+                  baseUrl = controllers.routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(status).url
+                )
+
+                // Create a view model for each video, which contains: the secure video URL,
                 // the video ID and the associated celebrity's public name
-                val videoAssetViewModels = for {
-                  video <- videos
+                val videoAssetViewModels: List[VideoAssetViewModel] = for {
+                  video <- pagedQuery._1.toList
                   newVideoUrl <- video.getSecureTemporaryUrl
                   publicName <- videoAssetCelebrityStore.getCelebrityByVideoId(video.id).map(_.publicName)
                 } yield {
@@ -64,7 +76,7 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
                 }
 
                 // if above tasks failed for any video, InternalServerError
-                if (videoAssetViewModels.length != videos.length)
+                if (videoAssetViewModels.length != pagedQuery._1.size)
                   InternalServerError("There was at least one video with improper formatting")
                 else {
                   Ok(views.html.Application.admin.admin_videoassets(videoAssetViewModels, status))

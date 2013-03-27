@@ -1,18 +1,14 @@
 @(videoAssetViewModels: List[models.website.video.VideoAssetViewModel], status: String)(
   implicit authToken: egraphs.authtoken.AuthenticityToken,
+  paginationInfo: models.frontend.PaginationInfo,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
   
 @import egraphs.authtoken.AuthenticityToken.safeForm
-@import views.html.frontend.base_template
 @import models.enums.VideoStatus  
-@import controllers.WebsiteControllers
 @import models.website.video.VideoAssetViewModel
-
-@init = {
-
-  Egraphs.page.videos = @videoAssetViewModels
-}
+@import views.html.frontend.base_template
+@import views.html.frontend.tags.pagination
 
 @videoButton(formId: String, videoType: String, buttonId: String, buttonTitle: String) = {
   <td>
@@ -56,14 +52,15 @@
         </tr>
       </table> 
 
-      <h1> @status Videos </h1>
+      <h1>@status Videos</h1>
+      <h2>All @paginationInfo.totalResultsStr</h2>
 
       <div class="videos">
           @videoAssetViewModels.map { case VideoAssetViewModel(videoUrl, videoId, celebrityPublicName, created) =>
 	
 	          <div class="video" style="margin: 20px; float: left;">
 	          
-	            <p> @celebrityPublicName <small style="font-size:12px">(Uploaded @created GMT)</small></p>
+	            <p>@celebrityPublicName <small style="font-size:12px">(Uploaded @created GMT)</small></p>
 
                 <video width="540" height="340" controls>
                   <source src='@videoUrl' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
@@ -78,9 +75,10 @@
             </div>
           }
       </div>
+      @pagination()
     </div>
   </div>
 </section>
 }
 
-@base_template(title = "Admin - Unprocessed Videos", body = body, headJs = init, jsMain = "pages/admin/video-assets")
+@base_template(title = "Admin - Unprocessed Videos", body = body, jsMain = "pages/admin/celebrity")
