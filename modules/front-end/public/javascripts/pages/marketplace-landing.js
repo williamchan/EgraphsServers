@@ -1,5 +1,5 @@
 define(["Egraphs", "pages/marketplace"], function (Egraphs, marketplace) {
- 
+
   return {
     go: function () {
       /**
@@ -19,7 +19,7 @@ define(["Egraphs", "pages/marketplace"], function (Egraphs, marketplace) {
           marketplace.selectVertical(slug, id);
           marketplace.reloadPage();
        });
-        
+
         /**
          * Binds apply filters link to processing the multiple select widget visible on resolutions < 720px.
          * Unlike the categories on the larger view, a user can select more than one at a time.
@@ -49,7 +49,7 @@ define(["Egraphs", "pages/marketplace"], function (Egraphs, marketplace) {
             var link = $(this);
             var category = window.Egraphs.page.categories["c" + link.attr("data-category")];
             var catVal = parseInt(link.attr("data-categoryvalue"), 10);
-            
+
             marketplace.updateCategories(catVal, category, $(this).attr("data-vertical"));
             marketplace.reloadPage();
           }
