@@ -1,7 +1,5 @@
 @(orderConfirmationEmailStack: models.frontend.email.OrderConfirmationEmailViewModel)
 
-@import egraphs.playutils.Grammar._
-
 <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 32px; line-height: 40px; color: #444444; text-shadow: 0 1px 0 #ffffff; text-align: left; margin-top: 0; margin-bottom: 0;">
   Order Confirmation
 </p>
@@ -15,8 +13,7 @@
 </p>
 
 <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-  Thank you so much for purchasing an Egraph. Please find your order summary information below. A detailed summary of your order is also at
-  <a style="color: #ff5124; text-decoration: none; border: none; outline: none;" href="https://www.egraphs.com">www.egraphs.com</a>.
+  Thank you so much for purchasing an egraph. Please find your order summary information below.
 </p>
 
 <img border="0" src="https://s3.amazonaws.com/egraphs-static-resources/public/images/email-rule-content.gif" width="520" height="42" />
@@ -143,7 +140,7 @@
 </p>
 
 <p style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; font-weight: normal; color: #888888; text-shadow: 0 1px 0 #ffffff; text-align: left;">
-  @orderConfirmationEmailStack.celebrityName will create it as soon as @subjectPronoun(orderConfirmationEmailStack.celebrityGender) can -- on average it takes 2 weeks. It's depends on @possessivePronoun(orderConfirmationEmailStack.celebrityGender) schedule, so it may be much faster, or it may be slower!
+  @orderConfirmationEmailStack.celebrityName will create it as soon as @orderConfirmationEmailStack.celebrityGrammar.subjectPronoun can -- on average it takes 2 weeks. It depends on orderConfirmationEmailStack.celebrityGrammar.possessiveAdjective schedule, so it may be much faster, or it may be slower!
 </p>
 
 @if(orderConfirmationEmailStack.hasPrintOrder) {

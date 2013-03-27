@@ -3,12 +3,21 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models.frontend.email._
-import egraphs.playutils.Gender
+import egraphs.playutils.MaleGrammar
 
 /**
  * Permutations of Emails.
  */
 object Email extends Controller {
+
+  def celebrityRequest = Action {
+    Ok(views.html.frontend.email.celebrity_request(
+      CelebrityRequestEmailViewModel(
+        requesterEmail = "awesomeemail@gmail.com",
+        requestedStar = "Celebrity Jane"
+      )
+    ))
+  }
 
   def celebrityWelcome = Action {
     val publicName = "Rodney Strong"
@@ -49,7 +58,7 @@ object Email extends Controller {
         recipientName = "Carlos Pena",
         recipientEmail = "carlos@egraphs.com",
         celebrityName = "David Price",
-        celebrityGender = Gender.Male,
+        celebrityGrammar = MaleGrammar,
         productName = "First MLB Victory",
         orderDate = "June 12, 2012",
         orderId = "2387354",

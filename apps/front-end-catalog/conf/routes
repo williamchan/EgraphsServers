@@ -51,6 +51,7 @@ GET     /Egraph/embed                                             controllers.Eg
 GET     /Egraph/landscape                                         controllers.Egraph.classicLandscape(isPromotional: Boolean ?= false)
 GET     /Egraph/portrait                                          controllers.Egraph.classicPortrait(isPromotional: Boolean ?= false)
 
+GET     /Email/celebrityRequest                                   controllers.Email.celebrityRequest
 GET     /Email/celebrityWelcome                                   controllers.Email.celebrityWelcome
 GET     /Email/confirm                                            controllers.Email.confirm
 GET     /Email/enrollmentComplete                                 controllers.Email.enrollmentComplete
@@ -95,6 +96,7 @@ GET     /Login/storefront                                         controllers.Lo
 GET     /Marketplace/results/list                                 controllers.Marketplace.resultsList
 GET     /Marketplace/results                                      controllers.Marketplace.results
 GET     /Marketplace/results/zero                                 controllers.Marketplace.zeroResults
+GET     /Marketplace/results/zero/requested                       controllers.Marketplace.zeroResultsAlreadyRequested
 GET     /Marketplace/landing                                      controllers.Marketplace.landing
 
 GET     /Mlbpa/egraphs                                            controllers.Mlbpa.egraphs

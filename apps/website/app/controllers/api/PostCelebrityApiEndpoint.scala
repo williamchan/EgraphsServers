@@ -28,8 +28,7 @@ private[controllers] trait PostCelebrityApiEndpoint
               case Some(contactInfo) =>
                 val existingSecureInfo = celebrity.secureInfo.getOrElse(DecryptedCelebritySecureInfo())
                 val secureInfo = existingSecureInfo.updateFromContactInfo(contactInfo).encrypt.save()
-                val twitter = contactInfo.twitterUsername.fold(celebrity.twitterUsername)(username => if(username.isEmpty) None else Some(username))
-                celebrity.copy(twitterUsername = twitter, secureInfoId = Some(secureInfo.id)).save()
+                celebrity.copy(twitterUsername = contactInfo.twitterUsername, secureInfoId = Some(secureInfo.id)).save()
                 Ok
             }
           }

@@ -1,6 +1,6 @@
 package models.frontend.storefront_a
 
-import models.frontend.PersonalPronouns
+import egraphs.playutils.Grammar
 import org.joda.money.Money
 import play.api.templates.{HtmlFormat, Html}
 import play.api.libs.json._
@@ -11,7 +11,7 @@ case class PersonalizeStar (
   id: Long,
   name: String,
   products: Seq[PersonalizeProduct],
-  pronoun: PersonalPronouns,
+  grammar: Grammar,
   mastheadUrl: String,
   isSoldOut: Boolean
 )

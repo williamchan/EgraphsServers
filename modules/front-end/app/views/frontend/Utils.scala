@@ -41,4 +41,8 @@ object Utils {
       "url=" + link +
       "&text=" + text
   }
+
+  def idAttribution(name: String , category: String): String = {
+   "id=" + name.filter(_ != ' ') + "-" + category
+  }
 }

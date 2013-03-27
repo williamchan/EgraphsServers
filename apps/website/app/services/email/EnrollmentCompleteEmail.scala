@@ -23,9 +23,9 @@ case class EnrollmentCompleteEmail(
   def send() = {
     val emailStack = EmailViewModel(
       subject = "Enrollment by " + celebrity.publicName,
-      fromEmail = "webserver@egraphs.com",
-      fromName = "Egraphs",
-      toAddresses = List(("celebalert@egraphs.com", None))
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
+      toAddresses = List((EmailConstants.celebEnrolledEmail, None))
     )
 
     val enrollmentCompleteEmailStack = EnrollmentCompleteEmailViewModel(
@@ -35,8 +35,9 @@ case class EnrollmentCompleteEmail(
       timeEnrolled = celebrity.updated.formatDayAsPlainLanguage("PST")
     )
 
-    log("Sending enrollment complete mail for celebrity : " + celebrity.publicName + " to : celebalert@egraphs.com")
-    mailService.send(emailStack, MailUtils.getEnrollmentCompleteTemplateContentParts(EmailType.EnrollmentComplete, enrollmentCompleteEmailStack))
+    log(s"Sending enrollment complete mail for celebrity: ${celebrity.publicName} to: celebalert@egraphs.com")
+    mailService.send(emailStack, MailUtils.getEnrollmentCompleteTemplateContentParts(
+      EmailType.EnrollmentComplete, enrollmentCompleteEmailStack))
   }
 }
 

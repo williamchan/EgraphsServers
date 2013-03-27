@@ -1,6 +1,7 @@
 /*global angular console mixpanel*/
-define(["Egraphs", "pages/marketplace", "ngApp", "services/logging", "module", "libs/angular", "libs/waypoints.min", "libs/jquery-ui"],
-function (Egraphs, marketplace, ngApp, logging, requireModule) {
+define(["page", "pages/marketplace", "ngApp", "services/logging", "services/analytics", "module", "libs/angular", "libs/waypoints.min", "libs/jquery-ui"],
+function (page, marketplace, ngApp, logging, analytics, requireModule) {
+  var events = analytics.eventCategory("Marketplace");
   var log = logging.namespace(requireModule.id);
 
   /**
@@ -45,15 +46,15 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
       }, {offset: 'bottom-in-view', continuous: false, triggerOnce : false});
     };
   });
-  
-  return {
+
+   return {
     ngControllers: {
      /**
       * Define controller for marketplace
       * @param $scope Global Angular Scope
       */
       MarketplaceCtrl: ["$scope", function ($scope) {
-        $scope.results = angular.copy(Egraphs.page.results);
+        $scope.results = angular.copy(page.results);
         $scope.total = $scope.results.celebrities.length;
         $scope.celebrities = [];
         var count = 0;
@@ -82,9 +83,9 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
             count += incr;
             atBottom = false;
             log("Loading celebrities");
-            mixpanel.track("Loaded more results");
+            events.track(["Loaded more results"]);
             if(count >= $scope.total) {
-              mixpanel.track("Loaded all results");
+              events.track(["Loaded all results"]);
               $(".see-more").addClass("hidden");
             }
           }
@@ -116,7 +117,7 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
          * Reconstructs url from any changes to data model.
          * Used to retain state across reloads.
          **/
-        
+
         $("#remove-query").click( function(e) {
           marketplace.clearQuery();
           marketplace.reloadPage();
@@ -135,7 +136,7 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
          **/
         $(".sort-link").click(function(e) {
           var selectedValue = $(this).attr("data-value");
-          if(selectedValue !== window.Egraphs.page.sort) {
+          if(selectedValue !== page.sort) {
             marketplace.selectSort(selectedValue);
           } else {
             marketplace.selectSort("");
@@ -178,7 +179,7 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
           marketplace.selectVertical(slug, id);
           marketplace.reloadPage();
        });
-        
+
         /**
          * Binds apply filters link to processing the multiple select widget visible on resolutions < 720px.
          * Unlike the categories on the larger view, a user can select more than one at a time.
@@ -190,12 +191,12 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
           $("#category-select").find(":selected").each(
             function(index) {
               var categoryId = $(this).attr("data-category");
-              var categoryValues = Egraphs.page.categories["c" + categoryId];
+              var categoryValues = page.categories["c" + categoryId];
               var catVal = parseInt($(this).val(), 10);
               marketplace.updateCategories(catVal, categoryValues);
             }
           );
-          
+
           marketplace.reloadPage();
         });
 
@@ -207,11 +208,11 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
           function(e) {
             var link = $(this);
             var name = link.html().trim();
-            var category = window.Egraphs.page.categories["c" + link.attr("data-category")];
+            var category = page.categories["c" + link.attr("data-category")];
             var catVal = parseInt(link.attr("data-categoryvalue"), 10);
             // Special use scenario...user searches, gets zero results, clicking on a category resets their search.
-            if(Egraphs.page.results.celebrities.length === 0 && Egraphs.page.categorySelected === false){
-              window.Egraphs.page.query = "";
+            if(page.results.celebrities.length === 0 && page.categorySelected === false){
+              page.query = "";
             }
             marketplace.updateCategories(catVal, category, $(this).attr("data-vertical"), name);
             marketplace.reloadPage();
@@ -226,10 +227,10 @@ function (Egraphs, marketplace, ngApp, logging, requireModule) {
         });
 
         $(".clear-all").click(function(e) {
-          marketplace.clearCategoryByKey("c" + $(this).attr("data-category"));
+          var link = $(this);
+          marketplace.clearCategoryByKey("c" + link.attr("data-category"), link.attr("data-name"));
           marketplace.reloadPage();
         });
-
       });
     }
   };

@@ -1,4 +1,4 @@
-define(["Egraphs"], function (Egraphs) {
+define(["page", "services/analytics"], function (page, analytics) {
   /**
    * Base marketplace code shared by the marketplace landing page and the results page.
    * The aim of most of the functions below is to retain the state of a search in the url bar.
@@ -8,49 +8,49 @@ define(["Egraphs"], function (Egraphs) {
    * settings may not be applicable and give a confusing set of results.
    *
   **/
-
+  var events = analytics.eventCategory("Marketplace");
   var marketplace = {};
 
   marketplace.reloadPage = function() {
     window.location.href =
-      Egraphs.page.queryUrl + Egraphs.page.verticalSlug + "?" +
+      page.queryUrl + page.verticalSlug + "?" +
       $.param({
-        "query" : Egraphs.page.query || "",
-        "sort" : Egraphs.page.sort || "",
-        "view" : Egraphs.page.view || "",
-        "availableOnly" : Egraphs.page.availableOnly || false
-    }) + "&" + $.param(Egraphs.page.categories);
+        "query" : page.query || "",
+        "sort" : page.sort || "",
+        "view" : page.view || "",
+        "availableOnly" : page.availableOnly || false
+    }) + "&" + $.param(page.categories);
   };
 
   marketplace.clearQuery = function() {
-    Egraphs.page.query = "";
-    mixpanel.track("Cleared query");
+    page.query = "";
+    events.track(["Cleared query"]);
   };
 
   marketplace.selectSort = function(sort) {
-    Egraphs.page.sort = sort;
-    mixpanel.track("Sorted by", {name: sort});
+    page.sort = sort;
+    events.track(["Sorted by", sort]);
   };
 
   marketplace.selectView = function(view) {
-    Egraphs.page.view = view;
-    mixpanel.track("Selected view", {name:view});
+    page.view = view;
+    events.track(["Selected view", view]);
   };
 
   marketplace.toggleAvailableOnly = function(availableOnly) {
-    Egraphs.page.availableOnly = availableOnly;
-    mixpanel.track("Filter by available stars", {value: availableOnly});
+    page.availableOnly = availableOnly;
+    events.track(["Filter by available stars", availableOnly]);
   };
 
   marketplace.selectVertical = function(verticalSlug, id) {
-    if(Egraphs.page.verticalSlug === "/" + verticalSlug) {
-      Egraphs.page.verticalSlug = "";
-      Egraphs.page.categories = {};
-      mixpanel.track("Deselect Vertical", {name: id});
+    if(page.verticalSlug === "/" + verticalSlug) {
+      page.verticalSlug = "";
+      page.categories = {};
+      events.track(["Deselect Vertical", verticalSlug]);
     } else {
-      Egraphs.page.verticalSlug  = "/" + verticalSlug;
-      Egraphs.page.categories = {};
-      mixpanel.track("Select Vertical", {name: id});
+      page.verticalSlug  = "/" + verticalSlug;
+      page.categories = {};
+      events.track(["Select Vertical", verticalSlug]);
     }
   };
 
@@ -58,26 +58,26 @@ define(["Egraphs"], function (Egraphs) {
     if($.inArray(catVal, category) > -1) {
       var idx = $.inArray(catVal, category);
       category.splice(idx, 1);
-      mixpanel.track("Remove Category", {name: catValString});
+      events.track(["Remove Category", catValString]);
     } else {
       category.push(catVal);
-      Egraphs.page.verticalSlug = "/" + vertical;
-      mixpanel.track("Add Category", {name: catValString});
+      page.verticalSlug = "/" + vertical;
+      events.track(["Add Category", catValString]);
     }
   };
 
-  marketplace.clearCategoryByKey = function(categoryKey) {
-    var category = Egraphs.page.categories[categoryKey];
+  marketplace.clearCategoryByKey = function(categoryKey, categoryName) {
+    var category = page.categories[categoryKey];
     category.length = 0;
-    mixpanel.track("Clear all categories");
+    events.track(["Clear category", categoryName]);
   };
 
   marketplace.clearCategories = function() {
-    var categories = Egraphs.page.categories;
+    var categories = page.categories;
     $.each(categories, function(catId, selectedValues) {
       selectedValues.length = 0;
     });
-    mixpanel.track("Clear all categories");
+    events.track(["Clear category", "All"]);
   };
 
   return marketplace;

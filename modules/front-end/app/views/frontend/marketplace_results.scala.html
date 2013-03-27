@@ -6,7 +6,8 @@
   sortOptions: Iterable[models.frontend.marketplace.SortOptionViewModel],
   availableOnly: Boolean = false,
   requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
-  requestStarActionUrl: String
+  requestStarActionUrl: String,
+  hasAlreadyRequested: Boolean
   )(
   implicit
   headerData: models.frontend.header.HeaderData,
@@ -94,7 +95,8 @@
               results,
               query,
               requestStarForm,
-              requestStarActionUrl
+              requestStarActionUrl,
+              hasAlreadyRequested
             )
           }
         </div>

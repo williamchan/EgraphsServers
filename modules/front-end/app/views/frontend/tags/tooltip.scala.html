@@ -1,6 +1,10 @@
 @(text: String, classes: Seq[String]=Seq.empty[String], event: String="")(body: => Html)
+@import views.frontend.Utils.idAttribution
+
 @** 
   Tooltip library adapted from http://osvaldas.info/elegant-css-and-jquery-tooltip-responsive-mobile-friendly 
+  
+  Creates a unique ID for the tooltip anchor based on the text or the event name if it is defined.
 
   Usage:
 
@@ -8,4 +12,19 @@
     <strong>Hey Dummy</strong>, it's a tooltip of course!
   }
 *@
-<div class="tooltip-link @classes.mkString(" ")"><a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @if(event != ""){event="@event"} tabindex="-1" >@text</a></div>
+
+@eventTag(event: String) = {
+  @if(event != "") { event="@event" }
+}
+
+@defining( if (event != "") event else text ) { idUnstripped =>
+  @defining( idAttribution(idUnstripped, "tooltip") ) { id =>
+    @defining( classes.mkString(" ") ) { classString =>
+      <div class="tooltip-link @classString">
+        <a data-tooltip="@HtmlFormat.escape(body.body)" rel="tooltip" @id @eventTag(event) tabindex="-1">
+          @text
+        </a>
+      </div>
+    }
+  }
+}

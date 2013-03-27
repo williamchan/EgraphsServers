@@ -14,8 +14,7 @@ case class CelebrityWelcomeEmail(
   toAddress: String,
   consumerApp: ConsumerApplication,
   celebrity: Celebrity,
-  mailService: TransactionalMail = AppConfig.instance[TransactionalMail],
-  bccEmail: Option[String] = None  
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
 ) {
 
   import CelebrityWelcomeEmail.log
@@ -28,19 +27,21 @@ case class CelebrityWelcomeEmail(
   def send() = {
     val emailStack = EmailViewModel(
       subject = "Welcome to Egraphs!",
-      fromEmail = "webserver@egraphs.com",
-      fromName = "Egraphs",
-      toAddresses = List((toAddress, Some(celebrity.publicName))),
-      bccAddress = bccEmail
+      fromEmail = EmailConstants.generalFromEmail,
+      fromName = EmailConstants.generalFromName,
+      toAddresses = List((toAddress, Some(celebrity.publicName)))
     )
 
     val appDownloadLink = consumerApp.getIOSClient(redirectToItmsLink=true).url
-    val celebrityWelcomeEmailStack = CelebrityWelcomeEmailViewModel(celebrityName = celebrity.publicName,
-                                                                    celebrityEmail = celebrity.account.email,
-                                                                    appPlistUrl = appDownloadLink)
+    val celebrityWelcomeEmailStack = CelebrityWelcomeEmailViewModel(
+      celebrityName = celebrity.publicName,
+      celebrityEmail = celebrity.account.email,
+      appPlistUrl = appDownloadLink
+    )
 
-    log("Sending celebrity welcome mail to : " + celebrity.account.email + " for celebrity " + celebrity.publicName)
-    mailService.send(emailStack, MailUtils.getCelebrityWelcomeTemplateContentParts(EmailType.CelebrityWelcome, celebrityWelcomeEmailStack))      
+    log(s"Sending celebrity welcome mail to: ${celebrity.account.email} for celebrity: ${celebrity.publicName}")
+    mailService.send(emailStack, MailUtils.getCelebrityWelcomeTemplateContentParts(
+      EmailType.CelebrityWelcome, celebrityWelcomeEmailStack))
   }
 }
 

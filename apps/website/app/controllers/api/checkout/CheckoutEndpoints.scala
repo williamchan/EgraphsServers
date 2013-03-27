@@ -3,8 +3,8 @@ package controllers.api.checkout
 import com.stripe.exception._
 import models.checkout.Checkout
 import Checkout._
+import egraphs.playutils.GrammarUtils
 import models.checkout.CheckoutAdapterServices
-
 import models.checkout.forms.enums.ApiError
 import models.enums.CheckoutCodeType
 import play.api.mvc._
@@ -116,7 +116,7 @@ trait CheckoutEndpoints { this: Controller =>
           recipientName = recipientCustomer.name,
           recipientEmail = recipientAccount.email,
           celebrityName = product.celebrity.publicName,
-          celebrityGender = product.celebrity.gender,
+          celebrityGrammar = GrammarUtils.getGrammarByGender(product.celebrity.gender),
           productName = product.name,
           orderDate = order.created.formatDayAsPlainLanguage("PST"),
           orderId = order.id.toString,

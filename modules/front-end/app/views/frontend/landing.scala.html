@@ -13,7 +13,9 @@
 @import views.html.frontend.tags
 @import play.api.libs.json._
 @import egraphs.playutils.Gender
+@import egraphs.playutils.NeutralGrammar
 @import org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript
+@import views.frontend.Utils.idAttribution
 
 @loremIpsum = {
   <h2> Lorem ipsum dolor sit amet</h2>
@@ -117,14 +119,14 @@
             @for(category <- vertical.categoryViewModels if(category.publicName != "MLB Prospects");
                  categoryValue <- category.categoryValues.sorted) {
               <li>
-                <a data-vertical="@vertical.urlSlug" data-category="@category.id" data-categoryvalue="@categoryValue.id" class="cv-link">
+                <a data-vertical="@vertical.urlSlug" @idAttribution(categoryValue.publicName, "link") data-category="@category.id" data-categoryvalue="@categoryValue.id" class="cv-link">
                   @categoryValue.publicName&nbsp;
                 </a>
               </li>
 
               }
               <li>
-                <a data-vertical="@vertical.urlSlug" name="@vertical.shortName" class="all-teams">See all @vertical.shortName stars &raquo;</a>
+                <a data-vertical="@vertical.urlSlug" @idAttribution(vertical.shortName, "see-all") name="@vertical.shortName" class="all-teams">See all @vertical.shortName stars &raquo;</a>
               </li>
             </ul>
           </article>
@@ -143,7 +145,7 @@
              iconUrl <- vertical.iconUrl
         ) {
           <div class="vertical-select span4">
-            <a class="glowborder vertical-tile" title="Shop @vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" href="#">
+            <a class="glowborder vertical-tile" title="Shop @vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" @idAttribution(vertical.shortName, "row")>
               <div class="backdrop" style="background-image: url('@EgraphsAssets.at(tileUrl).url')">
                 <h3>@vertical.shortName &gt;&gt;</i></h3>
                 <img class="icon" src="@EgraphsAssets.at(iconUrl).url"/>
@@ -193,11 +195,11 @@
         </ul>
         
         <div id="learn" class="tab" style="display: none">
-          @tags.landing.welcome_header(celebrityGender = Gender.Neutral)
+          @tags.landing.welcome_header(celebrityGrammar = NeutralGrammar)
 
-          @tags.landing.landing_steps(celebrityGender = Gender.Neutral)
+          @tags.landing.landing_steps(celebrityGrammar = NeutralGrammar)
 
-          @tags.landing.landing_details(celebrityGender = Gender.Neutral)
+          @tags.landing.landing_details(celebrityGrammar = NeutralGrammar)
 
           @tags.landing.landing_more(None, Some(marketplaceRoute))
         </div>        

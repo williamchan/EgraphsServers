@@ -60,6 +60,16 @@ class CelebrityRequestStore @Inject() (schema: Schema)
     for (celebrityRequest <- schema.celebrityRequests) yield celebrityRequest
   }
 
+  def getCelebrityRequestByCustomerIdAndCelebrityName(customerId: Long, celebrityName: String)
+  : Option[CelebrityRequest] = {
+
+    from(schema.celebrityRequests)(celebrityRequest =>
+      where(celebrityRequest.customerId === customerId
+        and celebrityRequest.celebrityName === celebrityName)
+          select (celebrityRequest)
+    ).headOption
+  }
+
   //
   // SavesWithLongKey[CelebrityRequest] methods
   //

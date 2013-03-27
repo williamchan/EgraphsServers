@@ -2,7 +2,8 @@
   results: models.frontend.marketplace.ResultSetViewModel,
   query: String,
   requestStarForm: Form[models.frontend.marketplace.RequestStarViewModel],
-  requestStarActionUrl: String
+  requestStarActionUrl: String,
+  hasAlreadyRequested: Boolean
   )(
   implicit
   authToken: egraphs.authtoken.AuthenticityToken
@@ -16,17 +17,7 @@
     <section>
       <div class="clearfix">
         <h1><span>{{results.subtitle}}</span></h1>
-        <div class="available-only">
-            <ol>
-              <li>
-              @if(!availableOnly){
-                <a data-value="true">Hide Sold Out Stars</a>
-              } else {
-                <a data-value="false"> Show Sold Out Stars</a>
-              }
-              </li>
-            </ol>
-        </div>
+        @soldOutStarsSection
       </div>
       @requestStarContentIfZeroResults
       <div class="clearfix">
@@ -56,8 +47,24 @@
   </section>
 </div>
 
+@soldOutStarsSection = {
+  @if(!results.celebrities.isEmpty) {
+    <div class="available-only">
+      <ol>
+        <li>
+          @if(!availableOnly){
+            <a data-value="true">Hide Sold Out Stars</a>
+          } else {
+            <a data-value="false">Show Sold Out Stars</a>
+          }
+        </li>
+      </ol>
+    </div>
+  }
+}
+
 @requestStarContentIfZeroResults = {
-  @if(results.celebrities.isEmpty) {
+  @if(results.celebrities.isEmpty && !query.isEmpty) {
     <section id="request-star-section">
 
         @safeForm(
@@ -68,23 +75,31 @@
         ) {
 
           <div class="clearfix">
-            <div id="request-star-explanation">
-              <p>
-                Don't see what you're looking for? Click the button below to register an Egraphs account, and we'll do our best to 
-                sign them up and let you know as soon as they're available!
-              </p>
-            </div>
-            <div class="request-star-button">
-              <span>
-                @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
-                  <input type="hidden" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
-                }
-              </span>
-              <button id="request-star-button" type="submit" class="button">
-                <strong><em>Request @query</em></strong>
-                <span>&raquo;</span>
-              </button>
-            </div>
+            @if(!hasAlreadyRequested) {
+              <div id="request-star-explanation">
+                <p>
+                  Don't see what you're looking for? Click the button below to register an Egraphs account, and we'll do our best to
+                  sign them up and let you know as soon as they're available!
+                </p>
+              </div>
+              <div class="request-star-button">
+                <span>
+                  @helper.input(requestStarForm("starName")) { (id, name, value, args) =>
+                    <input type="hidden" name="@name" value="@query" id="@id" @toHtmlArgs(args)>
+                  }
+                </span>
+                <button id="request-star-button" type="submit" class="button">
+                  <strong><em>Request @query</em></strong>
+                  <span>&raquo;</span>
+                </button>
+              </div>
+            } else {
+              <div id="thank-you-message">
+                <p>
+                  We have received your request for @query. Thanks!
+                </p>
+              </div>
+            }
           </div>
 
         } <!-- end safe form -->
