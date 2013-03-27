@@ -47,7 +47,7 @@ function(window, logging, requireModule) {
         return {
           track: function(targetUrl) {
             // filter falsy values (e.g. undefined if called with no args)
-            var targetArgArray = [targetUrl].filter(Boolean); 
+            var targetUrlArray = [targetUrl].filter(Boolean);
             
             // not sure whether social events are as useful as normal events, so let's track both
             trackInCategory(networkAndAction);
@@ -86,7 +86,7 @@ function(window, logging, requireModule) {
           },
 
           pinterest: {
-            pin: socialEvent(['Pinterest', 'Pinned'])
+            pin: socialEvent('Pinterest', 'Pinned')
           }
         },
 
