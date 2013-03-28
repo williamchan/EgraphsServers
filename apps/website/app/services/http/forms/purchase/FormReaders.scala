@@ -28,12 +28,6 @@ class FormReaders @Inject()(
     }
   }
 
-  def forCustomerLoginForm: ReadsForm[CustomerLoginForm] = {
-    newReaderWithConstructor { readable =>
-      new CustomerLoginForm(readable, formChecks)
-    }
-  }
-
   def forEmailSubscriptionForm: ReadsForm[EmailSubscriptionForm] = {
     newReaderWithConstructor { readable =>
       new EmailSubscriptionForm(readable, formChecks)

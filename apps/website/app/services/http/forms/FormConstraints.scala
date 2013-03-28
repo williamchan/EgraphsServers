@@ -1,10 +1,10 @@
 package services.http.forms
 
 import com.google.inject.Inject
-import play.api.data.validation.Constraint
 import models.{Account, Password, AccountStore}
-import play.api.data.validation.{ Valid, Invalid }
 import models.Password.{PasswordRequired, PasswordTooShort}
+import play.api.data.validation.Constraint
+import play.api.data.validation.{ Valid, Invalid }
 
 class FormConstraints @Inject() (accountStore: AccountStore) {
    // TODO: think about making a composable constraint class, so that we can cascade errors. An implementation similar to
@@ -43,6 +43,21 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
         case Right(_) => Valid
         case Left(PasswordTooShort(_)) => Invalid(Account.minPasswordLength + " characters minimum")
         case Left(PasswordRequired) => Invalid("Password is required")
+      }
+    }
+  }
+
+  /**
+   * Returns whether or not the email and password corresponded to actual customer account credentials.
+   */
+  def isValidCustomerAccount(email: String, password: String): Boolean = {
+    accountStore.authenticate(email, password) match {
+      case Left(_) => false
+      case Right(account) => {
+        account.customerId match {
+          case None => false
+          case Some(account) => true
+        }
       }
     }
   }

@@ -1,4 +1,6 @@
-@(loginForm: models.frontend.login_page.LoginFormViewModel,
+@(loginForm: Form[models.frontend.login_page.LoginViewModel],
+  loginActionUrl: String,
+  forgotPasswordUrl: String,
   registrationForm: Form[models.frontend.login_page.RegisterConsumerViewModel],
   registrationActionUrl: String,
   fbAuthUrl: String,
@@ -11,10 +13,12 @@
       existing customers to sign in, non-customers to create accounts, and social media users to
       log in via their networks' oauth services.
 
-      loginForm - the form used to log people in through egraphs.
+      loginForm - the form used to log people in through egraphs
+      loginActionUrl - the url to redirect to post existing-account login
+      forgotPasswordUrl - the url to redirect to in the case that the user has forgotten their password
       registrationForm - the form used to create a new Egraphs account
-      fbAuthUrl - the redirect URL that allows an individual to sign into our service via
-          facebook.
+      registrationActionUrl - the url to redirect to post new-account login
+      fbAuthUrl - the redirect URL that allows an individual to sign into our service via facebook
 
 *@
 
@@ -37,6 +41,8 @@
  
 @newOwnerHeader = {With a new account}
 
+@fbHeader = {With Facebook}
+
 @newOwnerContent = {
   <div class="new-account-benefits @if(registrationForm.hasErrors) {hidden}">
     <p>You can enjoy an Egraphs account without even owning any egraphs. Having an account can provide quite a few benefits:</p>
@@ -50,11 +56,10 @@
 
   <div class="new-account-fields" @if(!registrationForm.hasErrors) {style="display: none"}>
     <fieldset>
-      <span id="register-email-field">
-        @helper.inputText(registrationForm("email"), '_label -> "Email Address:", '_showConstraints -> false)
-      </span>
-
-      @helper.inputPassword(registrationForm("password"), '_label -> "Password:", '_showConstraints -> false)
+      @helper.input(registrationForm("registerEmail"), '_label -> "Email Address:", '_showConstraints -> false) { (id, name, value, args) =>
+        <input type="email" name="@name" id="@id" @toHtmlArgs(args)>
+      }
+      @helper.inputPassword(registrationForm("registerPassword"), '_label -> "Password:", '_showConstraints -> false)
 
       @helper.input(registrationForm("bulk-email"), '_showConstraints -> false) { (id, name, value, args) =>
         <input type="checkbox" name="@name" id="@id" value="true" checked @toHtmlArgs(args)>
@@ -69,7 +74,25 @@
   </div> <!-- End new account fields -->
 }
 
-@fbHeader = {With Facebook}
+@currentOwnerContent = {
+  <div class="current-account-fields">
+    <fieldset>
+      @helper.input(loginForm("loginEmail"), '_label -> "Email Address:", '_showConstraints -> false) { (id, name, value, args) =>
+        <input type="email" name="@name" id="@id" @toHtmlArgs(args)>
+      }
+      @helper.inputPassword(loginForm("loginPassword"), '_label -> "Password:", '_showConstraints -> false)
+
+      @loginForm.globalError.map { error =>
+        <div class="alert alert-error">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <span class="error-message">@error.message</span>
+        </div>
+      }
+
+      <p class="account-actions"><small><a href="@forgotPasswordUrl" class="tip">Need your password?</a></small>
+    </fieldset>
+  </div>
+}
 
 @fbContent = {
   <p>
@@ -81,17 +104,18 @@
 }
 
 @login_template(
-  loginForm=loginForm,
-  headJs=headJs,
-  header=header,
-  title="Sign in",
-  currentOwnerHeader=currentOwnerHeader,
-  jsMain="pages/login",
-  newOwnerHeader=newOwnerHeader,
-  newOwnerContent=newOwnerContent,
-  newOwnerTargetUrl=registrationActionUrl,
-  fbHeader=fbHeader,
-  fbContent=fbContent,
-  fbAuthUrl=fbAuthUrl,
+  headJs = headJs,
+  header = header,
+  title = "Sign in",
+  currentOwnerHeader = currentOwnerHeader,
+  currentOwnerContent = currentOwnerContent,
+  currentOwnerTargetUrl = loginActionUrl,
+  jsMain = "pages/login",
+  newOwnerHeader = newOwnerHeader,
+  newOwnerContent = newOwnerContent,
+  newOwnerTargetUrl = registrationActionUrl,
+  fbHeader = fbHeader,
+  fbContent = fbContent,
+  fbAuthUrl = fbAuthUrl,
   bannerMessage = bannerMessage
 )

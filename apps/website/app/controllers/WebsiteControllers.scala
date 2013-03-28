@@ -15,7 +15,7 @@ import services.db.DBSession
 import services.social.FacebookAppId
 import services.http._
 import services.http.filters._
-import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, CustomerLoginFormFactory, FormConstraints}
+import forms.{AccountRecoverFormFactory, AccountPasswordResetFormFactory, AccountSettingsFormFactory, FormConstraints}
 import forms.purchase.{PurchaseFormChecksFactory, FormReaders, PurchaseFormFactory}
 import services.mvc.celebrity.CatalogStarsQuery
 import services.mvc.marketplace._
@@ -35,7 +35,6 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val facebookAppId = annotatedInstance[FacebookAppId, String]
 
   override protected val breadcrumbData = instance[StorefrontBreadcrumbData]
-  override protected val customerLoginForms = instance[CustomerLoginFormFactory]
   override protected val accountSettingsForms = instance[AccountSettingsFormFactory]
   override protected val accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
   override protected val accountRecoverForms = instance[AccountRecoverFormFactory]

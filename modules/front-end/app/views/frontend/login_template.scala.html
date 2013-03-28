@@ -1,8 +1,9 @@
-@(loginForm: models.frontend.login_page.LoginFormViewModel,
-  title: String,
+@(title: String,
   jsMain: String,  
   header: => Html,
   currentOwnerHeader: => Html,
+  currentOwnerContent: => Html,
+  currentOwnerTargetUrl: String,
   newOwnerHeader: => Html,
   newOwnerContent: => Html,  
   newOwnerTargetUrl: String,
@@ -20,15 +21,13 @@
 @** Base template for rendering permutations of the 3-column login page. See login.scala.html
       for a good usage example.
 
-      loginForm - the form for existing users to log in to our system.
       header - the title of the login page. e.g. "How would you like to sign in?"
-      currentOwnerHeader - header for the column enabling current Egraphs account
-          holders to log-in.
-      newOwnerHeader - header for the column enabling people new to Egraphs
-          to log in and/or check out.
+      currentOwnerHeader - header for the column enabling current Egraphs account holders to log in
+      currentOwnerContent - HTML content for the left column
+      currentOwnerTargetUrl - the POST target for signing in with an existing account
+      newOwnerHeader - header for the column enabling people new to Egraphs to log in
       newOwnerContent - HTML content for the center column
-      newOwnerTargetUrl - the POST target for whatever action occurs in the
-          center column (for example, registration)
+      newOwnerTargetUrl - the POST target for center column action (i.e. registration)
       fbHeader - Header text for the facebook column
       fbContent - Content for the facebook login column
       fbAuthUrl - Url the user's browser should GET in order to begin the oauth login flow
@@ -44,9 +43,7 @@
 
 @baseBody = {
     <div id="content" class="top" role="main">
-    
       <div id="main" class="sub">
-      
         <section id="checkout" class="container">
 
           <div id="banner-message">
@@ -59,95 +56,70 @@
 
           <div class="row login clearfix">
           
-            <section class="span4">
-            
-              @safeForm(
-                'action -> loginForm.actionUrl, 
-                'method -> "post", 
-                'class -> "login-option"
-               ) {
-              
-                <h2>@currentOwnerHeader</h2>
-                
-                <div class="clearfix">
-                
-                  <fieldset>          
-                    @tags.bootstrap_text_input_field(labelText = "Email:", field = loginForm.email, inputType="email")
+            @existing_account_login
+            @register_account_login
+            @facebook_login
 
-                    @tags.bootstrap_text_input_field(
-                      "Password:", 
-                      loginForm.password,
-                      inputType="password"
-                    )
-
-                    <p class="account-actions"><small><a href="@loginForm.forgotPasswordUrl" class="tip">Need your password?</a></small>
-                    
-                    @for(error <- loginForm.generalErrors.headOption) {
-                      <div class="general-errors">
-                        <div class="alert alert-error @if(loginForm.generalErrors.isEmpty) {hidden}">
-                          <button type="button" class="close" data-dismiss="alert">&times;</button>
-                          <span class="error-message">@error</span>
-                        </div>
-                      </div>
-                    }
-
-                    @**  <em>&ndash; or &ndash;</em>
-                    <a href="#" class="create-account">Create an account<span>&gt;</span></a></p>
-                    *@
-                    
-                  </fieldset>
-                
-                </div>
-                
-                @tags.arrow_button(caption="Sign In", classes="button")          
-          
-              } <!-- end safe form -->
-          
-            </section>
-
-            <section class="span4">
-            
-              @safeForm(
-                'id -> "new-account-form",
-                'action -> newOwnerTargetUrl,
-                'method -> "post",
-                'class -> "login-option"
-              ) {
-
-                <h2>@newOwnerHeader</h2>
-
-                <div class="clearfix">@newOwnerContent</div>
-                                
-                @tags.arrow_button(caption="Continue", classes="button create-account")    
-
-              } <!-- end safe form -->      
-          
-            </section>
-            
-             <section class="span4">
-             
-               <div class="login-option last">
-               
-                 <h2>@fbHeader</h2>
-            
-                 <div class="clearfix">
-                  @fbContent                
-                 </div>          
-                <a href="@fbAuthUrl">
-                  @tags.arrow_button(caption="Facebook", classes="button facebook")
-                </a>
-              
-              </div>
-          
-            </section>
-          
           </div> <!-- end .login_page -->
-
         </section> <!-- end #checkout -->
-
       </div> <!-- end #main -->
-    
     </div> <!-- end #content -->
+}
+
+@existing_account_login = {
+  <section class="span4">
+            
+    @safeForm(
+      'id -> "existing-account-form",
+      'action -> currentOwnerTargetUrl,
+      'method -> "post",
+      'class -> "login-option"
+    ) {
+              
+      <h2>@currentOwnerHeader</h2>
+
+      <div class="clearfix">@currentOwnerContent</div>
+
+      @tags.arrow_button(caption="Sign In", classes="button")
+          
+    } <!-- end safe form -->
+  </section>
+}
+
+@register_account_login = {
+  <section class="span4">
+            
+    @safeForm(
+      'id -> "new-account-form",
+      'action -> newOwnerTargetUrl,
+      'method -> "post",
+      'class -> "login-option"
+    ) {
+
+      <h2>@newOwnerHeader</h2>
+
+      <div class="clearfix">@newOwnerContent</div>
+                                
+      @tags.arrow_button(caption="Continue", classes="button create-account")
+
+    } <!-- end safe form -->
+  </section>
+}
+
+@facebook_login = {
+  <section class="span4">
+    <div class="login-option last">
+               
+      <h2>@fbHeader</h2>
+            
+      <div class="clearfix">@fbContent</div>
+
+      <a href="@fbAuthUrl">
+        @tags.arrow_button(caption="Facebook", classes="button facebook")
+      </a>
+
+    </div>
+  </section>
 }
 
 @base_template(
