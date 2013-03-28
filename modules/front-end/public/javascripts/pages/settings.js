@@ -1,7 +1,15 @@
 /* Scripting for the settings page */
 /*global angular*/
-define(["Egraphs", "services/logging", "module"], function (Egraphs, logging, module) {
+define(["Egraphs", "services/logging", "module", "services/analytics"],
+function (Egraphs, logging, module, analytics) {
   var log = logging.namespace(module.id);
+  var mailEvents = analytics.eventCategory("Mail");
+
+  var isSubscribedToNewsletter = function() {
+    var checkbox = $("[name=notices\\.new_stars]")[0];
+    if (!checkbox) return false;
+    else return checkbox.checked;
+  };
 
   return {
     ngControllers: {
@@ -49,6 +57,8 @@ define(["Egraphs", "services/logging", "module"], function (Egraphs, logging, mo
      * @return nothing
      */
     go: function () {
+      var initiallySubscribedToNewsletter = false;
+
       // Bindings for edit buttons
       $(document).ready(function () {
 
@@ -59,6 +69,18 @@ define(["Egraphs", "services/logging", "module"], function (Egraphs, logging, mo
           thisRow.next().removeClass('none');
           e.preventDefault();
         });
+
+        $("#account-settings-form").submit( function(e) {
+          var justSignedUpForNewsletter = !initiallySubscribedToNewsletter && isSubscribedToNewsletter();
+          if (justSignedUpForNewsletter) {
+            mailEvents.track(['Subscribed to newsletter', 'Account settings']);
+          }
+          return true;
+        });
+      });
+
+      $(window).load(function() {
+        initiallySubscribedToNewsletter = isSubscribedToNewsletter();
       });
     }
   };
