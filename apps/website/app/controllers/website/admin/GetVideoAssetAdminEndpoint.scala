@@ -50,7 +50,7 @@ private[controllers] trait GetVideoAssetAdminEndpoint extends ImplicitHeaderAndF
               case Some(maybeVideoStatus) => {
                 val unsortedVideos = videoAssetStore.getVideosWithStatus(maybeVideoStatus)
 
-                // Pagination stuff
+                // Paginate query to prevent browser crashes/slowness. Override default page length to show 5 videos.
                 val page: Int = Form("page" -> number).bindFromRequest.fold(formWithErrors => 1, validForm => validForm)
                 val pagedQuery: (Iterable[VideoAsset], Int, Option[Int]) =
                   services.Utils.pagedQuery(select = unsortedVideos, page = page, pageLength = 5)
