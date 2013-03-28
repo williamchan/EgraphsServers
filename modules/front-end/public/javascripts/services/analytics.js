@@ -48,12 +48,12 @@ function(window, logging, requireModule) {
           track: function(targetUrl) {
             // filter falsy values (e.g. undefined if called with no args)
             var targetUrlArray = [targetUrl].filter(Boolean);
-            
+
             // not sure whether social events are as useful as normal events, so let's track both
             trackInCategory(networkAndAction);
             googleTrackSocialEvent(networkAndAction.concat(targetUrlArray));
           }
-        }
+        };
       };
 
       var self = {
@@ -95,7 +95,7 @@ function(window, logging, requireModule) {
           var label = actionLabelAndSampleRate[1];
           // Default to sample rate of 100
           var sampleRate = actionLabelAndSampleRate[3] || 100;
-          
+
           return startEvent(function(durationMs) {
             var timingSpec = [action, durationMs, label, sampleRate];
 

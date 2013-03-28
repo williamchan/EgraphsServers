@@ -49,7 +49,7 @@ define(["Egraphs", "services/analytics"], function (Egraphs, analytics) {
         // Twitter Events
         // https://developers.google.com/analytics/devguides/collection/gajs/gaTrackingSocial#twitter
         var tweetTracker = social.twitter.tweet.track;
-        var bindTweetTracker = function(twttr) { twttr.events.bind('tweet', tweetTracker) };
+        var bindTweetTracker = function(twttr) { twttr.events.bind('tweet', tweetTracker); };
         twttr.ready(bindTweetTracker);
 
         //
