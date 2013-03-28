@@ -1,6 +1,6 @@
 package services.login
 
-import models.frontend.login_page.LoginViewModel
+import models.frontend.login.LoginViewModel
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraint

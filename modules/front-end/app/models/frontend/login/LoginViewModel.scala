@@ -1,4 +1,4 @@
-package models.frontend.login_page
+package models.frontend.login
 
 /**
  * ViewModel for rendering the existing customer form on the login page.

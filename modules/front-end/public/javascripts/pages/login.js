@@ -50,5 +50,4 @@ function(forms, Egraphs) {
       });
     }
   };
-  
 });

@@ -1,4 +1,4 @@
-package models.frontend.login_page
+package models.frontend.login
 
 /**
  * ViewModel for rendering the account registration form on the login page.

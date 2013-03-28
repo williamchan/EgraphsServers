@@ -1,6 +1,8 @@
 /* Scripting for the password reset page */
-/*global angular*/
-define(["Egraphs"], function (Egraphs) {
+/* global angular */
+define(["services/forms", "Egraphs"],
+function (forms, Egraphs) {
+
   return {
     ngControllers: {
       PasswordMatchController: ["$scope", function ($scope) {

@@ -33,8 +33,21 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
     }
   }
 
+  def isValidEmail(constraint: Account => Boolean = { account => true}): Constraint[String] = {
+    Constraint { email: String =>
+      accountStore.findByEmail(email) match {
+        case None => Invalid("Account not found for given email")
+        case Some(_) => Valid
+      }
+    }
+  }
+
   def isValidNewCustomerEmail: Constraint[String] = {
     isValidNewEmail(constraint = {account: Account => account.customerId.isDefined})
+  }
+
+  def isValidCustomerEmail: Constraint[String] = {
+    isValidEmail(constraint = {account: Account => account.customerId.isDefined})
   }
 
   def isPasswordValid: Constraint[String] = {

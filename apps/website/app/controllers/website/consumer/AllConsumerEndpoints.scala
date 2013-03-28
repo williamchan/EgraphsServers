@@ -15,6 +15,7 @@ trait AllConsumerEndpoints
   with GetLoginEndpoint
   with GetRecoverAccountEndpoint
   with GetResetPasswordEndpoint
+  with GetSimpleMessageEndpoint
   with GetStaticEndpoint
   with LogoutEndpoints
   with PostAccountSettingsEndpoint
