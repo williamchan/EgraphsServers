@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import java.sql.Timestamp
 import models.enums.HasVideoStatus
 import models.enums.VideoStatus
+import org.squeryl.Query
 import services.{ AppConfig, Time }
 import services.db.KeyedCaseClass
 import services.db.SavesWithLongKey
@@ -69,13 +70,14 @@ class VideoAssetStore @Inject() (schema: Schema)
 
   import org.squeryl.PrimitiveTypeMode._
 
-  def getVideosWithStatus(status: VideoStatus.EnumVal): List[VideoAsset] = {
+  def getVideosWithStatus(status: VideoStatus.EnumVal): Query[VideoAsset] = {
 
     val queryResult = from(schema.videoAssets)(videoAsset =>
       where(videoAsset._videoStatus === status.name)
-        select (videoAsset))
+      select (videoAsset)
+      orderBy (videoAsset.created.getTime desc))
 
-    queryResult.toList
+    queryResult
   }
 
   //

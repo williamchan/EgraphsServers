@@ -1,13 +1,43 @@
 @(videoAssetViewModels: List[models.website.video.VideoAssetViewModel], status: String)(
   implicit authToken: egraphs.authtoken.AuthenticityToken,
+  paginationInfo: models.frontend.PaginationInfo,
   headerData: models.frontend.header.HeaderData,
   footerData: models.frontend.footer.FooterData)
   
 @import egraphs.authtoken.AuthenticityToken.safeForm
-@import views.html.frontend.base_template
 @import models.enums.VideoStatus  
-@import controllers.WebsiteControllers
 @import models.website.video.VideoAssetViewModel
+@import views.html.frontend.base_template
+@import views.html.frontend.tags.pagination
+
+@videoButton(formId: String, videoType: String, buttonId: String, buttonTitle: String) = {
+  <td>
+    @safeForm('id -> formId, 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(videoType)).url) {
+
+      <fieldset>
+        <input name="status" type="hidden" value="@videoType">
+        <div class="actions">
+          <button type="submit" id="@buttonId" class="btn primary fade in">@buttonTitle</button>
+        </div>
+      </fieldset>
+    }
+  </td>
+}
+
+@actionButton(formId: String, videoType: String, buttonId: String, buttonTitle: String, videoId: Long) = {
+  <td>
+    @safeForm('id -> formId, 'method -> "POST", 'action -> (
+      routes.WebsiteControllers.postProcessVideoAdmin(
+      action = videoType, id = videoId)).url) {
+
+      <fieldset>
+        <div class="actions">
+          <button type="submit" id="@buttonId" class="btn primary fade in">@buttonTitle</button>
+        </div>
+      </fieldset>
+    }
+  </td>
+}
 
 @body = {
 <section id="content" class="top admin-content" role="main">
@@ -16,52 +46,21 @@
       
       <table>
         <tr>
-          <td>
-            @safeForm('id -> "see-unprocessed-form", 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(VideoStatus.Unprocessed.name)).url) {
-
-              <fieldset>
-                <input name="status" type="hidden" value="@VideoStatus.Unprocessed.name">
-                <div class="actions">
-                  <button type="submit" id="see-unprocessed-button" class="btn primary fade in">Unprocessed</button>
-                </div>
-              </fieldset> 
-            } 
-          </td>
-
-          <td>
-            @safeForm('id -> "see-approved-form", 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(VideoStatus.Approved.name)).url) {
-
-              <fieldset>
-                <input name="status" type="hidden" value="@VideoStatus.Approved.name">
-                <div class="actions">
-                  <button type="submit" id="see-approved-button" class="btn primary fade in">Approved</button>
-                </div>
-              </fieldset> 
-            } 
-          </td>
-                    
-          <td>
-            @safeForm('id -> "see-rejected-form", 'method -> "GET", 'action -> (routes.WebsiteControllers.getVideoAssetsWithStatusAdmin(VideoStatus.Rejected.name)).url) {
-
-              <fieldset>
-                <input name="status" type="hidden" value="@VideoStatus.Rejected.name">
-                <div class="actions">
-                  <button type="submit" id="see-rejected-button" class="btn primary fade in">Rejected</button>
-                </div>
-              </fieldset> 
-            } 
-          </td>
+          @videoButton("see-unprocessed-form", VideoStatus.Unprocessed.name, "see-unprocessed-button", "Unprocessed")
+          @videoButton("see-approved-form", VideoStatus.Approved.name, "see-approved-button", "Approved")
+          @videoButton("see-rejected-form", VideoStatus.Rejected.name, "see-rejected-button", "Rejected")
         </tr>
       </table> 
 
-      <h1> @status Videos </h1>
+      <h1>@status Videos</h1>
+      <h2>All @paginationInfo.totalResultsStr</h2>
 
       <div class="videos">
           @videoAssetViewModels.map { case VideoAssetViewModel(videoUrl, videoId, celebrityPublicName, created) =>
 	
 	          <div class="video" style="margin: 20px; float: left;">
 	          
-	            <p> @celebrityPublicName <small style="font-size:12px">(Uploaded @created GMT)</small></p>
+	            <p>@celebrityPublicName <small style="font-size:12px">(Uploaded @created GMT)</small></p>
 
                 <video width="540" height="340" controls>
                   <source src='@videoUrl' type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
@@ -69,40 +68,17 @@
                             
                 <table>
                   <tr>
-                    <td>
-                      @safeForm('id -> "approve-video-form", 'method -> "POST", 'action -> (
-                          routes.WebsiteControllers.postProcessVideoAdmin(
-                          action = VideoStatus.Approved.name, id = videoId)).url) {
-                        
-                        <fieldset>
-                          <div class="actions">
-                            <button type="submit" id="submit-approve-button" class="btn primary fade in">Approve</button>  
-                          </div>
-                        </fieldset>
-                      }
-                    </td>
-
-                    <td>
-                      @safeForm('id -> "reject-video-form", 'method -> "POST", 'action -> (
-                          routes.WebsiteControllers.postProcessVideoAdmin(
-                          action = VideoStatus.Rejected.name, id = videoId)).url) {
-                        
-                        <fieldset>
-                          <div class="actions">
-                            <button type="submit" id="submit-reject-button" class="btn primary fade in">Reject</button>  
-                          </div>
-                        </fieldset>
-                      }
-                    </td>
+                    @actionButton("approve-video-form", VideoStatus.Approved.name, "submit-approve-button", "Approve", videoId)
+                    @actionButton("reject-video-form", VideoStatus.Rejected.name, "submit-reject-button", "Reject", videoId)
                   </tr>
                 </table>
-
             </div>
           }
       </div>
+      @pagination()
     </div>
   </div>
 </section>
 }
 
-@base_template(title="Admin - Unprocessed Videos", body=body, jsMain="pages/admin/celebrity")
+@base_template(title = "Admin - Unprocessed Videos", body = body, jsMain = "pages/admin/celebrity")

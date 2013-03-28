@@ -39,25 +39,7 @@
       <h1>
         Celebrity Administration
       </h1>
-      <section>
-        <h2>Featured Celebrities</h2>
-        @safeForm('id -> "postFeaturedCelebrities-form", 'method -> "POST", 'action -> postFeaturedCelebrities.url) {
-          <div class="row-fluid">
-            <div class="span5">
-              <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
-                @for(celeb <- allCelebrities) {
-                  <option name=@{"celebIds[" + (celeb.id-1) + "]"} value="@celeb.id" @if(celeb.isFeatured){selected="selected"}>
-                    @celeb.publicName
-                  </option>
-                }
-              </select>
-            </div>
-            <div class="span7">
-              @tags.arrow_button(caption="Save")  
-            </div>
-          </div>
-        } 
-      </section>
+      @featuredCelebritiesSection
       <section>
         <div class="row-fluid">
           <div class="span12">
@@ -150,6 +132,28 @@
     </div>
   </div>
 </section>    
+}
+
+@featuredCelebritiesSection = {
+  <section>
+    <h2>Featured Celebrities</h2>
+    @safeForm('id -> "postFeaturedCelebrities-form", 'method -> "POST", 'action -> postFeaturedCelebrities.url) {
+      <div class="row-fluid">
+        <div class="span5">
+          <select data-placeholder="Choose celebrities to feature" name="celebIds" style="width:350px" multiple class="chzn-select">
+            @for(celeb <- allCelebrities) {
+              <option name=@{"celebIds[" + (celeb.id-1) + "]"} value="@celeb.id" @if(celeb.isFeatured){selected="selected"}>
+                @celeb.publicName
+              </option>
+            }
+          </select>
+        </div>
+        <div class="span7">
+          @tags.arrow_button(caption="Save")
+        </div>
+      </div>
+    }
+  </section>
 }
 
 @base_template(title="Admin - Celebrities", body=body, jsMain="pages/admin/celebrity")

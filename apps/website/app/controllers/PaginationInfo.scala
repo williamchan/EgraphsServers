@@ -4,13 +4,17 @@ import services.Utils
 import models.frontend.PaginationInfo
 
 object PaginationInfoFactory {
-  def create[A](pagedQuery: (Iterable[A], Int, Option[Int]),
-		  		baseUrl: String,
-		  		filter: Option[String] = None): PaginationInfo = {
+  def create[A](
+    pagedQuery: (Iterable[A], Int, Option[Int]),
+    pageLength: Int = Utils.defaultPageLength,
+    baseUrl: String,
+    filter: Option[String] = None)
+  : PaginationInfo = {
+
     val curPage = pagedQuery._2
     val totalResults = pagedQuery._3
 
-    val showPaging = totalResults.isDefined && totalResults.get > Utils.defaultPageLength
+    val showPaging = totalResults.isDefined && totalResults.get > pageLength
     val totalResultsStr = if (totalResults.isDefined) ("- " + totalResults.get + " results") else ""
 
     val (firstUrl, prevUrl, nextUrl, lastUrl) = if (showPaging) {
@@ -20,10 +24,10 @@ object PaginationInfoFactory {
       val showPrev: Boolean = curPage > 1
       val prevUrl = if (showPrev) Some(withPageQuery(baseUrl, curPage - 1, filter)) else None
 
-      val totalNumPages = if (totalResults.get % Utils.defaultPageLength > 0) {
-        totalResults.get / Utils.defaultPageLength + 1
+      val totalNumPages = if (totalResults.get % pageLength > 0) {
+        totalResults.get / pageLength + 1
       } else {
-        totalResults.get / Utils.defaultPageLength
+        totalResults.get / pageLength
       }
 
       val showNext: Boolean = curPage < totalNumPages

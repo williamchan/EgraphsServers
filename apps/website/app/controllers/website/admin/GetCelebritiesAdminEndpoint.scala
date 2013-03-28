@@ -29,7 +29,11 @@ private[controllers] trait GetCelebritiesAdminEndpoint extends ImplicitHeaderAnd
 
         val query = celebrityStore.getCelebrityAccounts
         val pagedQuery: (Iterable[(Celebrity, Account)], Int, Option[Int]) = services.Utils.pagedQuery(select = query, page = page)
-        implicit val paginationInfo = PaginationInfoFactory.create(pagedQuery = pagedQuery, baseUrl = GetCelebritiesAdminEndpoint.location)
+        implicit val paginationInfo = PaginationInfoFactory.create(
+          pagedQuery = pagedQuery,
+          pageLength = services.Utils.defaultPageLength,
+          baseUrl = GetCelebritiesAdminEndpoint.location
+        )
 
         // get all celebrities and mark the featured ones
         val featuredCelebrities = celebrityStore.marketplaceSearch(refinements = List(List(featured.categoryValue.id))).toList
