@@ -295,6 +295,9 @@ class Schema @Inject() (
   val lineItemTypeToProduct = oneToManyRelation(lineItemTypes, products)
     .via((lineItemType, product) => lineItemType.id === product.lineItemTypeId)
 
+  val mastheadToCategoryValue = oneToManyRelation(mastheads, categoryValues)
+    .via((masthead, categoryValue) => masthead.id === categoryValue.mastheadId)
+
   val orderToEgraphs = oneToManyRelation(orders, egraphs)
     .via((order, egraph) => order.id === egraph.orderId)
   val orderToPrintOrders = oneToManyRelation(orders, printOrders)

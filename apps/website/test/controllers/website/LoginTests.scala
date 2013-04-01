@@ -17,24 +17,26 @@ import controllers.routes.WebsiteControllers.{getLogin, postLogin}
 
 @RunWith(classOf[JUnitRunner])
 class LoginTests extends EgraphsUnitTest with ClearsCacheBefore with CsrfProtectedResourceTests {
-  private def db = AppConfig.instance[DBSession]
+  import services.login.PostLoginHelper.keys
   
+  private def db = AppConfig.instance[DBSession]
   override protected def routeUnderTest = postLogin()
 
   routeName(routeUnderTest) should "redirect to login with form information when account doesn't exist" in new EgraphsTestApplication {
-
+    val badEmail = "idontexist@egraphs.com"
     val Some(result) = route(
       FakeRequest().toCall(routeUnderTest).withFormUrlEncodedBody(
-        "loginEmail" -> "idontexist@egraphs.com",
-        "loginPassword" -> TestData.defaultPassword).withAuthToken
+        keys.email -> badEmail,
+        keys.password -> TestData.defaultPassword
+      ).withAuthToken
     )
 
     status(result) should be (SEE_OTHER)
     redirectLocation(result) should be (Some(getLogin().url))
 
     // Email and password should be stored in the flash
-    result.flash.get.get("loginEmail") should be (Some("idontexist@egraphs.com"))
-    result.flash.get.get("loginPassword") should be (Some(TestData.defaultPassword))
+    result.flash.get.get(keys.email) should be (Some(badEmail))
+    result.flash.get.get(keys.password) should be (Some(TestData.defaultPassword))
   }
 
   routeName(routeUnderTest) should "redirect to login with form information when given invalid password" in new EgraphsTestApplication {
@@ -46,8 +48,8 @@ class LoginTests extends EgraphsUnitTest with ClearsCacheBefore with CsrfProtect
 
     val Some(result) = route(
       FakeRequest().toCall(routeUnderTest).withFormUrlEncodedBody(
-        "loginEmail" -> account.email,
-        "loginPassword" -> "wrong password").withAuthToken
+        keys.email -> account.email,
+        keys.password -> "wrong password").withAuthToken
     )
 
     status(result) should be (SEE_OTHER)
@@ -63,8 +65,8 @@ class LoginTests extends EgraphsUnitTest with ClearsCacheBefore with CsrfProtect
 
     val Some(result) = route(
       FakeRequest().toCall(routeUnderTest).withFormUrlEncodedBody(
-        "loginEmail" -> account.email,
-        "loginPassword" -> "real password").withAuthToken
+        keys.email -> account.email,
+        keys.password -> "real password").withAuthToken
     )
 
     val maybeResultCustomerId = result.session.flatMap(session => session.customerId)

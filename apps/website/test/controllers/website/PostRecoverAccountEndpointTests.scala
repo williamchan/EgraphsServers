@@ -14,6 +14,7 @@ import services.db.DBSession
 import utils.CsrfProtectedResourceTests
 
 class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
+  import PostRecoverAccountEndpoint._
 
   private def accountStore = AppConfig.instance[AccountStore]
   private def db = AppConfig.instance[DBSession]
@@ -26,7 +27,7 @@ class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtected
 
     val Some(result) = route(
       FakeRequest().toCall(postRecoverAccount).withFormUrlEncodedBody(
-        "email" -> "gnuggets@gangstaville.com").withAuthToken
+        keys.email -> "gnuggets@gangstaville.com").withAuthToken
     )
 
     redirectLocation(result) should be (Some(
@@ -42,14 +43,12 @@ class PostRecoverAccountEndpointTests extends EgraphsUnitTest with CsrfProtected
     val Some(result) = route(
       FakeRequest()
         .toCall(postRecoverAccount)
-        .withFormUrlEncodedBody("email" -> account.email)
+        .withFormUrlEncodedBody(keys.email -> account.email)
         .withAuthToken
     )
 
     // We expect a redirect to a success message here.
-    redirectLocation(result) should be (Some(controllers.routes.WebsiteControllers.getSimpleMessage(
-      header = "Success",
-      body = "Instructions for recovering your account have been sent to your email address.").url))
+    redirectLocation(result) should be (Some(successTarget.url))
 
     val updatedAccount = db.connected(TransactionSerializable) {
       accountStore.findByEmail(account.email).get

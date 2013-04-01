@@ -27,6 +27,7 @@ import utils.CsrfProtectedResourceTests
 
 class PostResetPasswordEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
   import controllers.WebsiteControllers
+  import PostResetPasswordEndpoint._
   
   override protected def routeUnderTest = postResetPassword
   
@@ -36,9 +37,7 @@ class PostResetPasswordEndpointTests extends EgraphsUnitTest with CsrfProtectedR
     val result = performPostResetPassword(accountWithResetPasswordKey)("password", "password")
 
     // We expect a redirect to a success message here.
-    redirectLocation(result) should be (Some(controllers.routes.WebsiteControllers.getSimpleMessage(
-      header = "Password Reset",
-      body = "You have successfully changed your password!").url))
+    redirectLocation(result) should be (Some(successTarget.url))
 
     formErrors(result) should be (None)
   }

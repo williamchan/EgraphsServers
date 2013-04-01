@@ -25,6 +25,7 @@ case class CategoryValue(
   categoryId: Long = 0L,
   name: String = "",
   publicName: String = "",
+  mastheadId: Option[Long] = None,
   created: Timestamp = Time.defaultTimestamp,
   updated: Timestamp = Time.defaultTimestamp,
   services: CategoryServices = AppConfig.instance[CategoryServices]
