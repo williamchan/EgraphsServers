@@ -31,7 +31,7 @@ case class HeaderLoggedIn (
 /**
  * Implementation for users that are not logged in
  *
- * @param loginUrl URL to the login_page page.
+ * @param loginUrl URL to the login page.
  */
 case class HeaderNotLoggedIn (
   loginUrl: String

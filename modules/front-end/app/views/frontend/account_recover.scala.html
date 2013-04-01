@@ -1,44 +1,50 @@
-@(form:models.frontend.account.AccountRecoverForm, displayableErrors: List[String] = List())(
-implicit authToken: egraphs.authtoken.AuthenticityToken,
-headerData: models.frontend.header.HeaderData,
-footerData: models.frontend.footer.FooterData
+@(accountRecoverForm: Form[String],
+  accountRecoverActionUrl: String
+)(implicit authToken: egraphs.authtoken.AuthenticityToken,
+  headerData: models.frontend.header.HeaderData,
+  footerData: models.frontend.footer.FooterData
 )
 
 @import egraphs.authtoken.AuthenticityToken.safeForm
+@import models.frontend.forms.{Field, FormError}
+@import views.frontend.Utils.bootstrapFields
 @import views.html.frontend.tags
-@import views.html.frontend.tags.ng
 
 @baseBody = {
-<section ng-cloak id="content" class="top" role="main" ng-controller="PasswordMatchController">
+<section id="content" class="top" role="main">
   <div id="main" class="sub">
     <div class="container" id="settings-page">
-      @safeForm('method -> "POST", 'action -> "/account/recover"){
-      <section class="settings-group" id="password-reset">
-        <div class="row-settings row-fluid">
-          <div class="span12">
-            <h3>Need to set your password? Please enter your email address.</h3>
-            <div class="control-group">
-              <label class="control-label ng-label">Email</label>
-              <div class="controls">
-                <input ng-model="user.email" type="email" name="email" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"/>
-              </div>
+
+      @safeForm(
+        'id -> "recover-account-form",
+        'action -> accountRecoverActionUrl,
+        'method -> "POST"
+      ){
+
+        <section class="settings-group" id="password-reset">
+          <div class="row-settings row-fluid">
+            <div class="span12">
+              <h3>Need to set your password? Please enter your email address.</h3>
+              <span>
+                @helper.input(accountRecoverForm("email"), '_label -> "Email Address:", '_showConstraints -> false) { (id, name, value, args) =>
+                  <input type="email" name="@name" id="@id" @toHtmlArgs(args)>
+                }
+              </span>
             </div>
           </div>
+        </section>
+        <div class="row-fluid">
+          <div class="span9"></div>
+          <div class="span3 save-button">
+            @tags.arrow_button(caption="Submit")
+          </div>
         </div>
-      </section>
-      <div class="row-fluid">
-        <div class="span9"></div>
-        <div class="span3 save-button">
-          @tags.arrow_button(caption="Submit")
-        </div>
-      </div>
-      }
+
+      } <!-- end safe form -->
+
     </div>
   </div>
 </section>
 }
 
-@base_template(
-title="Account Recovery",
-jsMain = "pages/account-password-reset",
-body=baseBody)
+@base_template(title = "Account Recovery", jsMain = "pages/account-password-reset", body = baseBody)

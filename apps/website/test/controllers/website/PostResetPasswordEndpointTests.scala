@@ -27,6 +27,7 @@ import utils.CsrfProtectedResourceTests
 
 class PostResetPasswordEndpointTests extends EgraphsUnitTest with CsrfProtectedResourceTests {
   import controllers.WebsiteControllers
+  import PostResetPasswordEndpoint._
   
   override protected def routeUnderTest = postResetPassword
   
@@ -35,10 +36,12 @@ class PostResetPasswordEndpointTests extends EgraphsUnitTest with CsrfProtectedR
   routeName(routeUnderTest) should "set a new password when the new one and its confirmation match and it meets the strength requirement" in new EgraphsTestApplication {
     val result = performPostResetPassword(accountWithResetPasswordKey)("password", "password")
 
-    status(result) should be (OK)
+    // We expect a redirect to a success message here.
+    redirectLocation(result) should be (Some(successTarget.url))
+
     formErrors(result) should be (None)
   }
-  
+
   it should "redirect requests whose password and password confirmation didn't match back to getResetPassword" in new EgraphsTestApplication {
     val account = accountWithResetPasswordKey
     val result = performPostResetPassword(account)("password1", "password2")

@@ -5,9 +5,9 @@ import play.api.mvc.Results.Redirect
 import services.http.POSTControllerMethod
 import services.http.EgraphsSession.Key._
 import services.mvc.ImplicitHeaderAndFooterData
+import services.http.EgraphsSession
 import services.http.EgraphsSession.Conversions._
 import services.login.PostRegisterHelper
-import services.http.EgraphsSession
 
 /**
  * The POST target for creating a new account at Egraphs.

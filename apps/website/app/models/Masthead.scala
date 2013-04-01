@@ -108,7 +108,7 @@ class MastheadStore @Inject() (
   import org.squeryl.PrimitiveTypeMode._
 
   /**
-   * Returns all celebrities associated with the provided CategoryValue.
+   * Returns all mastheads associated with the provided CategoryValue.
    */
   def mastheads(categoryValue: CategoryValue) : Query[Masthead] with ManyToMany[Masthead, MastheadCategoryValue] = {
     schema.mastheadCategoryValues.right(categoryValue)

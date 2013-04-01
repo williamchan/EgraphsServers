@@ -62,5 +62,4 @@ function(forms, Egraphs, analytics) {
       });
     }
   };
-  
 });

@@ -2,7 +2,7 @@ package services.login
 
 import egraphs.playutils.FlashableForm._
 import models._
-import models.frontend.login_page.RegisterConsumerViewModel
+import models.frontend.login.RegisterConsumerViewModel
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraint

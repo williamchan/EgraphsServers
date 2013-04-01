@@ -2,6 +2,7 @@ package controllers.website
 
 import play.api.data.Forms._
 import play.api.mvc._
+import play.api.mvc.Results._
 import models.AccountStore
 import services.http.POSTControllerMethod
 import services.http.forms.{AccountPasswordResetFormFactory, Form}
@@ -13,7 +14,7 @@ import egraphs.authtoken.AuthenticityToken
 import Form.Conversions._
 
 private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFooterData { this: Controller =>
-
+  import PostResetPasswordEndpoint._
 
   protected def postController: POSTControllerMethod
   protected def httpFilters: HttpFilters
@@ -52,16 +53,18 @@ private[controllers] trait PostResetPasswordEndpoint extends ImplicitHeaderAndFo
               }
               
               validationOrAccount.right.get.emailVerify().save()
-              Ok(
-                views.html.frontend.simple_message(
-                  header = "Password Reset",
-                  body = "You have successfully changed your password!"
-                )
-              )
+              Redirect(successTarget)
             }
           }
         }
       }
     }
   }
+}
+
+object PostResetPasswordEndpoint {
+  protected[website] def successTarget = controllers.routes.WebsiteControllers.getSimpleMessage(
+    header = "Password Reset",
+    body = "You have successfully changed your password!"
+  )
 }

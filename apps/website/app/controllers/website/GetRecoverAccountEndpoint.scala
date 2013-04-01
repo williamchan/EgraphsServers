@@ -1,13 +1,9 @@
 package controllers.website
 
+import egraphs.playutils.FlashableForm._
 import play.api.mvc._
 import services.http.ControllerMethod
-
 import services.mvc.ImplicitHeaderAndFooterData
-import models.frontend.forms.Field
-import models.frontend.account.{AccountRecoverForm => AccountRecoverFormView}
-import services.http.forms.AccountRecoverFormFactory
-import services.http.forms.AccountRecoverForm.Fields
 
 private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
@@ -16,21 +12,13 @@ private[controllers] trait GetRecoverAccountEndpoint extends ImplicitHeaderAndFo
   import services.http.forms.Form.Conversions._
 
   protected def controllerMethod: ControllerMethod
-  protected def accountRecoverForms: AccountRecoverFormFactory
 
   def getRecoverAccount = controllerMethod.withForm() { implicit authToken =>
     Action { implicit request =>
-      val flash = request.flash
-      val maybeFormData = accountRecoverForms.getFormReader.read(flash.asFormReadable).map { form =>
-        AccountRecoverFormView(
-          form.email.asViewField
-        )
-      }
   
       Ok(views.html.frontend.account_recover(
-        maybeFormData.getOrElse(
-          AccountRecoverFormView(email = Field(name = Fields.Email.name, values = List("")))
-        )
+        accountRecoverForm = PostRecoverAccountEndpoint.form.bindWithFlashData(PostRecoverAccountEndpoint.formName),
+        accountRecoverActionUrl = controllers.routes.WebsiteControllers.postRecoverAccount.url
       ))
     }
   }

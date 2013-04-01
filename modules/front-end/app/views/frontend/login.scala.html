@@ -1,7 +1,7 @@
-@(loginForm: Form[models.frontend.login_page.LoginViewModel],
+@(loginForm: Form[models.frontend.login.LoginViewModel],
   loginActionUrl: String,
   forgotPasswordUrl: String,
-  registrationForm: Form[models.frontend.login_page.RegisterConsumerViewModel],
+  registrationForm: Form[models.frontend.login.RegisterConsumerViewModel],
   registrationActionUrl: String,
   fbAuthUrl: String,
   maybeBannerMessage: Option[String] = None
@@ -95,12 +95,8 @@
 }
 
 @fbContent = {
-  <p>
-    Click the blue button to log into Egraphs through your Facebook account.
-  </p>
-  <p>
-    Could it really be that easy? Let's find out...
-  </p>
+  <p>Click the blue button to log into Egraphs through your Facebook account.</p>
+  <p>Could it really be that easy? Let's find out...</p>
 }
 
 @login_template(
