@@ -24,30 +24,30 @@ class FormConstraints @Inject() (accountStore: AccountStore) {
    * @return
    */
 
-  def isValidNewEmail(constraint: Account => Boolean = { account => true}): Constraint[String] = {
+  def isValidNewEmail(accountConstraint: Account => Boolean = { account => true}): Constraint[String] = {
     Constraint { email: String =>
       accountStore.findByEmail(email) match {
-        case Some(preexistingAccount) if constraint(preexistingAccount) => Invalid("Account with e-mail address (" + email + ") already exists")
+        case Some(preexistingAccount) if accountConstraint(preexistingAccount) => Invalid("Account with e-mail address (" + email + ") already exists")
         case _ => Valid
       }
     }
   }
 
-  def isValidEmail(constraint: Account => Boolean = { account => true}): Constraint[String] = {
+  def isValidExistingEmail(accountConstraint: Account => Boolean = { account => true}): Constraint[String] = {
     Constraint { email: String =>
       accountStore.findByEmail(email) match {
+        case Some(existingAccount) if accountConstraint(existingAccount) => Valid
         case None => Invalid("Account not found for given email")
-        case Some(_) => Valid
       }
     }
   }
 
   def isValidNewCustomerEmail: Constraint[String] = {
-    isValidNewEmail(constraint = {account: Account => account.customerId.isDefined})
+    isValidNewEmail(accountConstraint = {account: Account => account.customerId.isDefined})
   }
 
   def isValidCustomerEmail: Constraint[String] = {
-    isValidEmail(constraint = {account: Account => account.customerId.isDefined})
+    isValidExistingEmail(accountConstraint = {account: Account => account.customerId.isDefined})
   }
 
   def isPasswordValid: Constraint[String] = {

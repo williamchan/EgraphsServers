@@ -48,7 +48,6 @@ case class TestWebsiteControllers @Inject()(
   productStore: ProductStore,
   videoAssetCelebrityStore: VideoAssetCelebrityStore,
   videoAssetStore: VideoAssetStore,
-  customerLoginForms: CustomerLoginFormFactory,
   egraphsSessionFactory: () => EgraphsSession,
   fakeRequest: Request[AnyContent] = FakeRequest()
 )() extends Controller with AllWebsiteEndpoints {
@@ -66,7 +65,6 @@ case class TestWebsiteControllers @Inject()(
   override def couponStore = instance[CouponStore]  
   override def accountSettingsForms = instance[AccountSettingsFormFactory]
   override def accountPasswordResetForms = instance[AccountPasswordResetFormFactory]
-  override def accountRecoverForms = instance[AccountRecoverFormFactory]
   override def blobs = instance[Blobs]
   override def bulkMailList = instance[BulkMailList]
   override def breadcrumbData = instance[StorefrontBreadcrumbData]

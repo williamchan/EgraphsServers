@@ -1,5 +1,9 @@
 package controllers
 
+import play.api.data._
+import play.api.data.Form
+import play.api.data.Forms._
+import play.api.data.validation.Constraints._
 import play.api.mvc._
 import play.api.libs.json.Json.toJson
 import models.frontend.egraphs._
@@ -53,9 +57,10 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def getRecovery() = Action {
-    Ok(views.html.frontend.account_recover(AccountRecoverForm(
-      email = Field(name="email")
-    )))
+    Ok(views.html.frontend.account_recover(
+      accountRecoverForm = defaultAccountRecoverForm,
+      accountRecoverActionUrl = "this-is-the-action-url"
+    ))
   }
 
   def postRecovery() = Action { request =>
@@ -74,9 +79,10 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
   }
 
   def getVerify() = Action {
-    Ok(views.html.frontend.account_recover(AccountRecoverForm(
-      email = Field(name="email")
-    )))
+    Ok(views.html.frontend.account_recover(
+      accountRecoverForm = defaultAccountRecoverForm,
+      accountRecoverActionUrl = "this-is-the-action-url"
+    ))
   }
 
   def postVerify() = Action { request =>
@@ -183,7 +189,11 @@ object Account extends Controller with DefaultImplicitTemplateParameters {
   private def makeFulfilledGiftEgraphs(user: String, count: Int): List[FulfilledEgraphViewModel]  = {
     List.fill(count)(getFulfilledEgraphViewModel(buyerId = 1, recipientId = 2, recipientName = "Derp Herpson", user = user))
   }
-  
+
+  private def defaultAccountRecoverForm = Form(
+    single("email" -> email.verifying(nonEmpty))
+  )
+
   private def getFulfilledEgraphViewModel(buyerId: Int, recipientId: Int, recipientName: String, user: String): FulfilledEgraphViewModel = {
     FulfilledEgraphViewModel(
       buyerId = buyerId,

@@ -3,7 +3,6 @@ package controllers.website
 import egraphs.authtoken.AuthenticityToken
 import egraphs.playutils.FlashableForm._
 import models.AccountStore
-import models.frontend.website.RecoverAccountViewModel
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraint
@@ -34,25 +33,30 @@ private[controllers] trait PostRecoverAccountEndpoint extends ImplicitHeaderAndF
         val (form, formName) = (PostRecoverAccountEndpoint.form, PostRecoverAccountEndpoint.formName)
 
         form.bindFromRequest.fold(
-          formWithErrors => Redirect(controllers.routes.WebsiteControllers.getRecoverAccount()).flashingFormData(formWithErrors, formName),
-          validForm => {
+          invalidEmail => Redirect(controllers.routes.WebsiteControllers.getRecoverAccount()).flashingFormData(invalidEmail, formName),
+          validEmail => {
 
-            val email = validForm.email
-            val customerAccount = accountStore.findByEmail(email).getOrElse(
-              throw new RuntimeException("The email provided by existing user " +
-              email + " somehow passed validation but failed while attempting to retrieve the account"))
+            val maybeCustomerAccount = accountStore.findByEmail(validEmail)
+            maybeCustomerAccount match {
+              case None => {
+                play.Logger.info("The email provided by existing user " +
+                  validEmail + " somehow passed validation but failed while attempting to retrieve the account")
+                Redirect(controllers.routes.WebsiteControllers.getRecoverAccount())
+              }
+              case Some(customerAccount) => {
+                val accountWithResetPassKey = dbSession.connected(TransactionSerializable) {
+                  customerAccount.withResetPasswordKey.save()
+                }
 
-            val accountWithResetPassKey = dbSession.connected(TransactionSerializable) {
-              customerAccount.withResetPasswordKey.save()
+                // Send out reset password email
+                ResetPasswordEmail(account = accountWithResetPassKey).send()
+
+                Redirect(controllers.routes.WebsiteControllers.getSimpleMessage(
+                  header = "Success",
+                  body = "Instructions for recovering your account have been sent to your email address."
+                ))
+              }
             }
-
-            // Send out reset password email
-            ResetPasswordEmail(account = accountWithResetPassKey).send()
-
-            Redirect(controllers.routes.WebsiteControllers.getSimpleMessage(
-              header = "Success",
-              body = "Instructions for recovering your account have been sent to your email address."
-            ))
           }
         )
       }
@@ -64,9 +68,7 @@ object PostRecoverAccountEndpoint {
   def formName = "recover-account-form"
   def formConstraints = AppConfig.instance[FormConstraints]
 
-  def form: Form[RecoverAccountViewModel] = Form(
-    mapping(
-      "email" -> email.verifying(nonEmpty, formConstraints.isValidCustomerEmail)
-    )(RecoverAccountViewModel.apply)(RecoverAccountViewModel.unapply)
+  def form = Form(
+    single("email" -> email.verifying(formConstraints.isValidCustomerEmail))
   )
 }

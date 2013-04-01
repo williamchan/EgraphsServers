@@ -176,6 +176,7 @@ GET     /about                                                            contro
 GET     /account/settings                                                 controllers.WebsiteControllers.getAccountSettings
 POST    /account/settings                                                 controllers.WebsiteControllers.postAccountSettings
 GET     /account/recover                                                  controllers.WebsiteControllers.getRecoverAccount
+GET     /account/recover/success                                          controllers.WebsiteControllers.getSimpleMessage(header: String, body: String)
 POST    /account/recover                                                  controllers.WebsiteControllers.postRecoverAccount
 GET     /account/reset                                                    controllers.WebsiteControllers.getResetPassword(email: String, secretKey: String)
 POST    /account/reset                                                    controllers.WebsiteControllers.postResetPassword
@@ -201,7 +202,6 @@ GET     /orders/$orderId<[0-9]+>/egraph-gift-explanation                  contro
 GET     /privacy                                                          controllers.WebsiteControllers.getPrivacy
 POST    /register                                                         controllers.WebsiteControllers.postRegisterConsumerEndpoint
 POST    /requestStar                                                      controllers.WebsiteControllers.postRequestStar
-GET     /simpleMessage                                                    controllers.WebsiteControllers.getSimpleMessage(header: String, body: String)
 GET     /stars                                                            controllers.WebsiteControllers.getMarketplaceResultPage(vertical = "")
 GET     /stars/:vertical                                                  controllers.WebsiteControllers.getMarketplaceResultPage(vertical)
 POST    /subscribe                                                        controllers.WebsiteControllers.postSubscribeEmail

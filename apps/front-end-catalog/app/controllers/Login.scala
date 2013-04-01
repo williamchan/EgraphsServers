@@ -5,7 +5,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.mvc._
-import models.frontend.login.{RegisterConsumerViewModel, LoginFormViewModel}
+import models.frontend.login.{RegisterConsumerViewModel, LoginViewModel}
 import models.frontend.forms.{FormError, Field}
 import helpers.DefaultImplicitTemplateParameters
 
