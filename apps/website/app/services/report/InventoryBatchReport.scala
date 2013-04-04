@@ -15,7 +15,7 @@ class InventoryBatchReport @Inject()(schema: Schema) extends Report {
   override val reportName = "inventory-batch-report"
 
   def report(): File = {
-    val ninetyDaysAgo = new DateTime().minusDays(90).toDate
+    val ninetyDaysAgo = new DateTime().minusDays(360).toDate
     import schema.{inventoryBatches, celebrities}
     val batchesAndCelebrityName = from(inventoryBatches, celebrities)((inventoryBatch, celebrity) =>
       where((inventoryBatch.endDate > ninetyDaysAgo) and
