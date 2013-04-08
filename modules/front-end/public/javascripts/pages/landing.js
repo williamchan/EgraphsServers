@@ -153,6 +153,10 @@ function (page, marketplace, analytics, logging, requireModule) {
           e.preventDefault();
         });
 
+        $("#tile-signup").click(function(){
+          $('#emailSignupForm').modal();
+        });
+
         // Configure shopping links
         $(".vertical-button").click(verticalFunction);
         $(".all-teams").click(verticalFunction);

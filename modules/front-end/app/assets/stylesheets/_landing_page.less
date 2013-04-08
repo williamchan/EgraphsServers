@@ -1,3 +1,4 @@
+
 // The Egraphs landing page stylesheet.
 
 // Masthead styles
@@ -152,10 +153,13 @@
           z-index: 0;
 
           h3 {
+            font-size: 26px;
+            margin-left: 10px;
+          }
+
+          h3, .subtext {
             bottom: 0;
             color: @white;
-            font-size: 32px;
-            margin-left: 10px;
             margin-bottom: 0;
             margin-top: 0;
             position: absolute;
@@ -163,6 +167,13 @@
             i {
               vertical-align: middle;
             }
+          }
+
+          .subtext {
+            font-size: 12px;
+            line-height: 28px;
+            text-decoration: underline;
+            right: 2px;
           }
 
           .icon {
@@ -771,6 +782,10 @@
 @media (max-width: 978px) and (min-width: 768px) {
   #shop #verticals .vertical-select.span4 .backdrop {
     min-height: 120px;
+  }
+
+  .subtext {
+    display: none;
   }
 }  
 

@@ -139,28 +139,31 @@
   <div id="verticals" class="module">
     <h2>Find your star</h2>
     <div class="row">
-      <div class="clearfix">
-        @for(vertical <- verticals;
-             tileUrl <- vertical.tileUrl;
-             iconUrl <- vertical.iconUrl
-        ) {
-          <div class="vertical-select span4">
-            <a class="glowborder vertical-tile" title="Shop @vertical.publicName" name="@vertical.shortName" data-vertical="@vertical.urlSlug" @idAttribution(vertical.shortName, "row")>
-              <div class="backdrop" style="background-image: url('@EgraphsAssets.at(tileUrl).url')">
-                <h3>@vertical.shortName &gt;&gt;</i></h3>
-                <img class="icon" src="@EgraphsAssets.at(iconUrl).url"/>
-              </div>
-            </a>
-          </div> 
-        }
-          <div class="vertical-select span4">
-            <a class="glowborder" title="Egraph of the Week" href="http://blog.egraphs.com/">
-              <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/crowd.jpg").url')">
-                <h3>Egraphs Blog</h3>
-              </div>
-            </a>
-          </div>  
+      <div class="clearfix">        
+        <div class="vertical-select span4">
+          <a class="glowborder" title="Enter Store" href="@marketplaceRoute">
+            <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/nba-stadium.jpg").url')">
+              <h3>Enter Store</h3>
+            </div>
+          </a>
         </div>
+        <div class="vertical-select span4">
+          <a class="glowborder" id="tile-signup" title="Become an Egraphs Insider">
+            <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/mlb-stadium.jpg").url')">
+              <h3>Become an Insider</h3>
+              <span class="subtext">
+                See benefits  
+              </span>
+            </div>
+          </a>
+        </div>
+        <div class="vertical-select span4">
+          <a class="glowborder" title="Egraph's Blog'" href="http://blog.egraphs.com/">
+            <div class="backdrop" style="background-image: url('@EgraphsAssets.at("images/crowd.jpg").url')">
+              <h3>Egraphs Blog</h3>
+            </div>
+          </a>
+        </div>  
       </div>
     </div>
 }
