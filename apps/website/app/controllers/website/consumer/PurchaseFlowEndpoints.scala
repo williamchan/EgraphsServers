@@ -9,6 +9,7 @@ import services.mvc.ImplicitHeaderAndFooterData
 import models.checkout.forms.EgraphForm
 import models.checkout.CheckoutAdapterServices
 import services.payment.Payment
+import controllers.routes.WebsiteControllers.getRootConsumerEndpoint
 
 trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controller =>
   import controllers.routes.WebsiteControllers
@@ -50,6 +51,8 @@ trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controll
             maxDesiredTextChars=EgraphForm.maxDesiredTextChars,
             maxMessageToCelebChars=EgraphForm.maxMessageToCelebChars
           ))
+
+          redirectToHomepage
         }
       }
     }
@@ -66,10 +69,14 @@ trait PurchaseFlowEndpoints extends ImplicitHeaderAndFooterData { this: Controll
             paymentJsModule=payment.browserModule,
             paymentPublicKey=payment.publishableKey
           ))
+
+          redirectToHomepage
         }.getOrElse {
           Redirect(controllers.routes.WebsiteControllers.getPersonalize(celebrityUrlSlug))
         }
       }
     }
   }
+
+  val redirectToHomepage = Redirect(getRootConsumerEndpoint())
 }
