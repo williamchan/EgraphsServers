@@ -12,32 +12,23 @@
   <div class="modal-body">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <div>
-      <h2>Become an <span class="bold">Egraphs Insider</span></h2>
+      <h2><span class="bold">Notice</span></h2>
       <p>
-        Get great deals and be the first to know about new sports and entertainment stars on Egraphs
+        Egraphs is undergoing some major changes under the hood. We apologize for the inconvenience, but <span class="bold">we are unable
+        to accept orders at this time.</span> You can still access your account by logging in at the top bar.
+      </p>
+      <p>
+        <span class="bold">Thanks,</span><br>
+        The Egraphs Team
       </p>
     </div>
-    <br>
-    <img src='@EgraphsAssets.at("images/modal-egraph.jpg")'/>
+    <div>
+      <button id="signup-button" data-dismiss="modal" aria-hidden="true" class="button">
+        <strong><em>Continue</em></strong>
+        <span>&raquo;</span>
+      </button>
+    </div>
 
-    <form ng-controller="ModalController" ng-submit="subscribe()">
-      <div>
-        <label>Email:</label>
-        <input class="input-xlarge" type="email" name="email" ng-model="email"/>
-      </div>
-      <div>
-        <button id="signup-button" type="submit" class="button">
-          <strong><em>Submit</em></strong>
-          <span>&raquo;</span>
-        </button>
-        <br>
-        <button type="button" class="modal-dismissal" data-dismiss="modal" aria-hidden="true">Maybe Later</button>
-      </div>
-      <p class="privacy-statement">
-        We won't share your email, ever.
-        <a href="/privacy">Privacy Policy</a>
-      </p>
-    </form>
   </div>
 </div>
       
