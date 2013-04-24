@@ -170,9 +170,7 @@
 
 
 @headJs = {
-  @if(signup) {
-    Egraphs.page.modalOn = true;
-  }
+  Egraphs.page.modalOn = true;
   Egraphs.page.categories =  @Html(
     Json.toJson(verticalViewModels.flatMap{v =>
       v.categoryViewModels.foldLeft[Map[String, JsValue]](Map())(
