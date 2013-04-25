@@ -50,6 +50,9 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
           //
           // Write your one-time script here.
           //
+          val numAssets = orderStore.generatePrintOrderAssets()
+          Ok("Generating assets")
+
           case "sheriff" => {
             // orderStore.get(543).copy(recipientName = "Ernesto J Pantoia").save()
             Ok

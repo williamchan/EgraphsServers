@@ -9,7 +9,7 @@ import services.mail.TransactionalMail
 
 case class CelebrityRequestEmail(
   celebrityRequestEmailStack: CelebrityRequestEmailViewModel,
-  mailService: TransactionalMail = AppConfig.instance[TransactionalMail]  
+  mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
 ) {
 
   import CelebrityRequestEmail.log
@@ -20,13 +20,13 @@ case class CelebrityRequestEmail(
       fromEmail = EmailConstants.generalFromEmail,
       fromName = EmailConstants.generalFromName,
       toAddresses = List((celebrityRequestEmailStack.requesterEmail, None))
-    )    
+    )
 
     val celebrityRequestTemplateContentParts = MailUtils.getCelebrityRequestTemplateContentParts(
       EmailType.CelebrityRequest, celebrityRequestEmailStack)
 
     log(s"Sending celebrity request mail to: ${celebrityRequestEmailStack.requesterEmail} for star: ${celebrityRequestEmailStack.requestedStar}")
-    mailService.send(emailStack, celebrityRequestTemplateContentParts) 
+    mailService.send(emailStack, celebrityRequestTemplateContentParts)
   }
 }
 
