@@ -7,10 +7,24 @@ import java.sql.Timestamp
 import org.apache.commons.mail.HtmlEmail
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
+import play.api.libs.concurrent.Execution.Implicits._
 import services.config.ConfigFileProxy
-import services.db.{KeyedCaseClass, Schema, SavesWithLongKey}
+import services.db._
 import services.mail._
 import services.{Time, AppConfig}
+import services.cache.CacheFactory
+import services.print.LandscapeFramedPrint
+import Time.stopwatch
+import services.blobs.AccessPolicy
+import play.api.libs.ws.WS
+import java.io.OutputStream
+import scala.concurrent._
+import scala.concurrent.duration._
+import org.squeryl.Query
+import services.logging.Logging
+import models.CustomerServices
+import models.AccountServices
+import scala.Some
 
 /** Services used by each instance of Customer */
 case class CustomerServices @Inject() (
@@ -18,6 +32,12 @@ case class CustomerServices @Inject() (
   customerStore: CustomerStore,
   inventoryBatchStore: InventoryBatchStore,
   usernameHistoryStore: UsernameHistoryStore,
+  dbSession: DBSession,
+  egraphStore: EgraphStore,
+  blobs: services.blobs.Blobs,
+  egraphQueryFilters: EgraphQueryFilters,
+  cacheFactory: CacheFactory,
+  orderStore: OrderStore,
   mail: TransactionalMail,
   config: ConfigFileProxy
 )
@@ -36,6 +56,8 @@ case class Customer(
   services: CustomerServices = AppConfig.instance[CustomerServices]
 ) extends KeyedCaseClass[Long] with HasCreatedUpdated
 {
+  import Customer._
+
   //
   // Public methods
   //
@@ -48,6 +70,70 @@ case class Customer(
   /** Retrieves the Customer's Account from the database */
   def account: Account = {
     services.accountStore.findByCustomerId(id).get
+  }
+
+  def writeZipFile() {
+    import java.util.zip._
+    import java.io._
+
+    val outputStream = new ByteArrayOutputStream()
+
+    val zipStream = new ZipOutputStream(outputStream)
+    zipStream.setComment(s"$name's egraphs")
+    val (_, timing) = stopwatch {
+      val allOrderAssets = services.dbSession.connected(TransactionReadCommitted) {
+        services.egraphStore.findCompletedByRecipient(id).toList.map { case (order, egraph, celeb) =>
+          log(s"ZIP cust=$id: Processing Order ${order.id}")
+          val pngUrl = egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false)
+            .asPng
+            .getSavedUrl(AccessPolicy.Public)
+
+          (order, egraph, celeb,
+          List(
+            (pngUrl, "Image.png"),
+            (egraph.getStandaloneCertificateUrl, "Certificate.png"),
+            (egraph.assets.audioMp3Url, "Audio.mp3"),
+            (egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public), "Video.mp4")
+          )
+          )
+        }
+      }
+
+      allOrderAssets.foreach { orderAssets =>
+        val (order, egraph, celeb, zipAssets) = orderAssets
+        val futureAssets = zipAssets.map { case (url, extension) =>
+          WS.url(url).get().map { resp =>
+            (resp.ahcResponse.getResponseBodyAsBytes, extension)
+          }
+        }
+
+        futureAssets.foreach { futureBytes =>
+          val (bytes, extension) = Await.result(futureBytes, 1000 seconds)
+
+          zipStream.putNextEntry(new ZipEntry(s"${order.id}_${celeb.urlSlug}_${extension}"))
+          zipStream.write(bytes)
+          zipStream.closeEntry()
+        }
+      }
+    }
+
+    zipStream.close()
+    log(s"ZIP cust=$id: Assembled ZIP in $timing seconds.")
+    val (_, uploadTiming) = stopwatch { services.blobs.put(zipFileBlobKey, outputStream.toByteArray, AccessPolicy.Public) }
+    log(s"ZIP cust=$id: Uploaded to S3 in $uploadTiming seconds. Available at https://s3.amazonaws.com/$zipFileBlobKey")
+  }
+
+  def zipFileName = s"egraphs-${created.getTime}.zip"
+
+  def zipFileBlobKey = s"customer/$id/$zipFileName"
+
+  def zipFileCacheKey = s"customer/$id/zip-was-generated"
+
+  def isZipGenerated: Boolean = {
+    val (isGenerated, timing) = stopwatch(services.blobs.exists(zipFileBlobKey))
+    log(s"ZIP cust=$id: Tested entry presence in S3 in $timing seconds")
+
+    isGenerated
   }
 
   /**
@@ -122,6 +208,8 @@ object JsCustomer {
   }
 }
 
+object Customer extends Logging
+
 class CustomerStore @Inject() (
   schema: Schema,
   accountStore: AccountStore,
@@ -149,6 +237,26 @@ class CustomerStore @Inject() (
   }
 
   def findOrCreateByEmail(email: String): Customer = findOrCreateByEmail(email, email takeWhile (_ != '@'))
+
+  def allRecipients: Query[Customer] = {
+    import models.enums.EgraphState._
+
+    from(schema.customers)( c =>
+      where(
+        exists(
+          from(schema.orders, schema.egraphs)( (o, e) =>
+            where(
+              c.id === o.recipientId and
+              e.orderId === o.id and
+              (e._egraphState in Seq(Published.name, ApprovedByAdmin.name))
+            )
+            select(o.id))
+        )
+      )
+      select(c)
+      orderBy(c.id)
+    )
+  }
 
   def createByEmail(email: String, name: String): Customer = {
     val accountOption = accountStore.findByEmail(email)
