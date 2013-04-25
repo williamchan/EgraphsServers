@@ -20,7 +20,7 @@ import play.api.libs.concurrent.Akka
  */
 trait TransactionalMail {
   def actionUrl: String
-  def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)])
+  def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)], html: String = "")
 }
 
 /**
@@ -40,7 +40,7 @@ class MailProvider @Inject()(config: ConfigFileProxy) extends InjectionProvider[
 private[mail] class StubTransactionalMail extends TransactionalMail {
   override def actionUrl = "#"
 
-  override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)]) = {
+  override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)], html: String ="") = {
     play.Logger.info("MOCK MAILER: send email")
     play.Logger.info("FROM: " + mailStack.fromEmail)
     play.Logger.info("REPLY-TO: " + mailStack.replyToEmail)
@@ -57,10 +57,10 @@ private[mail] class StubTransactionalMail extends TransactionalMail {
 private[mail] class MandrillTransactionalMail (key: String) extends TransactionalMail {
   override def actionUrl = "https://mandrillapp.com/api/1.0/"
 
-  override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)]) {
-    val methodAndOutputFormat = "messages/send-template.json"
-
-    val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key)
+  override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)], html: String ="") {
+    val methodAndOutputFormat = "messages/send.json"
+    templateContentParts.foreach{ case (name, htmlContent) => play.Logger.info("HTML BODY: " + htmlContent) }
+    val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key, html)
 
     val futureResponse = WS.url(actionUrl + methodAndOutputFormat).post(jsonIterable)
 

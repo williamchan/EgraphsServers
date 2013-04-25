@@ -1,8 +1,9 @@
 package services.email
 
-import services.mail.TransactionalMail
+import services.mail.{MailUtils, TransactionalMail}
 import services.AppConfig
 import models.frontend.email.EmailViewModel
+import services.logging.Logging
 
 case class SiteShutdownEmail(
   mailService: TransactionalMail = AppConfig.instance[TransactionalMail]
@@ -14,9 +15,10 @@ case class SiteShutdownEmail(
       fromName = EmailConstants.generalFromName,
       toAddresses = List((customerEmail, Some(customerName)))
     )
-    val emailParts = List(("title", "<title>Important Egraphs Announcement, Action Required</title>"),
-    ("Egraphs Announcement", views.html.frontend.email.site_shutdown(customerName, zipUrl).body))
-     mailService.send(emailHeader, emailParts)
+    val emailParts = MailUtils.baseList("Important Egraphs Announcement, Action Required") :::
+      List(("egraphs_announcement", views.html.frontend.email.site_shutdown(customerName, zipUrl).body))
+     mailService.send(emailHeader, emailParts, views.html.frontend.email.site_shutdown(customerName, zipUrl).body)
   }
 }
 
+object SiteShutdownEmail extends Logging

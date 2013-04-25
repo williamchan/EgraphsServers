@@ -4,6 +4,7 @@ import models._
 import models.enums._
 import play.api.mvc.{Action, Controller}
 import services.blobs.Blobs
+import services.email.SiteShutdownEmail
 import services.http.{WithDBConnection, ControllerMethod}
 import services.http.filters.HttpFilters
 import org.squeryl.Query
@@ -13,6 +14,7 @@ import play.api.data._
 import play.api.data.Forms._
 import services.mvc.ImplicitHeaderAndFooterData
 import models.Egraph
+import services.logging.Logging
 
 /**
  * These are the Sheriff's tools to handle tasks that are not yet self-serve. If writing a one-time script, use "sheriff".
@@ -50,11 +52,15 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
           //
           // Write your one-time script here.
           //
-          val numAssets = orderStore.generatePrintOrderAssets()
-          Ok("Generating assets")
 
           case "sheriff" => {
             // orderStore.get(543).copy(recipientName = "Ernesto J Pantoia").save()
+
+            // HOWTO send a customer our shutdown email. 
+            val maybeCustomer = customerStore.findByEmail("david@egraphs.com")
+            maybeCustomer.map( c => {
+              SiteShutdownEmail().send(c.name, c.account.email, "http://www.google.com")
+            })
             Ok
           }
 

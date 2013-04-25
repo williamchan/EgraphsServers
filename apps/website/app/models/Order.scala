@@ -522,8 +522,8 @@ class OrderStore @Inject() (
       }
     )
 //
-    for(i <- 0 to 356) {
-      for((order, egraph) <- ordersAndEgraphs.page(i * 10, 10)) {
+    for(i <- 34 to 37) {
+      for((order, egraph) <- ordersAndEgraphs.page(i * 100, 100)) {
         scala.concurrent.Future {
           db.connected(TransactionSerializable) {
             (egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false).asPng.getSavedUrl(AccessPolicy.Public)
