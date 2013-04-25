@@ -120,7 +120,7 @@ case class Customer(
     zipStream.close()
     log(s"ZIP cust=$id: Assembled ZIP in $timing seconds.")
     val (_, uploadTiming) = stopwatch { services.blobs.put(zipFileBlobKey, outputStream.toByteArray, AccessPolicy.Public) }
-    log(s"ZIP cust=$id: Uploaded to S3 in $uploadTiming seconds. Available at https://s3.amazonaws.com/$zipFileBlobKey")
+    log(s"ZIP cust=$id: Uploaded to S3 in $uploadTiming seconds. Available at https://s3.amazonaws.com/egraphs/$zipFileBlobKey")
   }
 
   def zipFileName = s"egraphs-${created.getTime}.zip"

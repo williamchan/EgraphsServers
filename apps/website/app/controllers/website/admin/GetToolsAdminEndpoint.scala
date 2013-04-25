@@ -43,7 +43,7 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
   protected def cacheFactory: CacheFactory
   protected def enrollmentBatchStore: EnrollmentBatchStore
   protected def dbSession: DBSession
-
+  val oneWeek = 25200
   //
   // Controllers
   //
@@ -59,23 +59,31 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
 
           case "sheriff" => {
             // orderStore.get(543).copy(recipientName = "Ernesto J Pantoia").save()
+            val maybeCustomer = customerStore.findByEmail("david@egraphs.com")
+            maybeCustomer.map( c =>
+              cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, false, oneWeek)
+            )
+            Ok
+          }
 
+          case "shutdown" => {
             // HOWTO send a customer our shutdown email.
-
             val maybeCustomer = customerStore.findByEmail("david@egraphs.com")
             maybeCustomer.map( c => {
-              cacheFactory.applicationCache.get("shutdown-email-" + c.id) match  {
-                case None => {
+              cacheFactory.applicationCache.get[Boolean]("shutdown-email-" + c.id) match  {
+                case Some(result) if(result == true) => println("Email already sent to customer " + c.id)
+                case _ => {
                   SiteShutdownEmail().send(
                     c.name,
-                    c.account.email,
-                    "https://s3.amazonaws.com/" + c.zipFileBlobKey
+                    //                    c.account.email,
+                    "sbilstein@gmail.com",
+                    "https://s3.amazonaws.com/egraphs/" + c.zipFileBlobKey
                   )
-                  cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, true)
+                  cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, true, oneWeek)
                 }
-                case _ => println("Email already sent to customer " + c.id)
               }
             })
+
             Ok
           }
 
