@@ -12,21 +12,27 @@ import org.squeryl.Query
 import org.apache.commons.lang3.time.DateUtils
 import com.google.inject._
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 import play.api.mvc.RequestHeader
 import enums._
 import frontend.egraphs.{OrderDetails, PendingEgraphViewModel, FulfilledEgraphViewModel}
 import services._
+import print.LandscapeFramedPrint
 import services.db._
 import services.Finance.TypeConversions._
 import services.blobs.AccessPolicy
+import concurrent.ExecutionContext
+import ExecutionContext.Implicits.global
 import services.mail.TransactionalMail
 import services.payment.{Charge, Payment}
 import services.social.{Twitter, Facebook}
 import controllers.website.consumer.StorefrontChoosePhotoConsumerEndpoints
+import scala.Some
 import controllers.api.FulfilledOrderBundle
+import db.{FilterOneTable, Schema, KeyedCaseClass, SavesWithLongKey}
+import scala.util.{Success, Failure}
 
 case class OrderServices @Inject() (
+  db : DBSession,
   store: OrderStore,
   customerStore: CustomerStore,
   celebrityStore: CelebrityStore,
@@ -371,7 +377,9 @@ case class FulfilledOrder(order: Order, egraph: Egraph)
 case class FulfilledProductOrder(product: Product, order:Order, egraph: Egraph)
 
 class OrderStore @Inject() (
-  schema: Schema
+  schema: Schema,
+  db : DBSession,
+  egraphQueryFilters: EgraphQueryFilters
 ) extends SavesWithLongKey[Order]
   with SavesCreatedUpdated[Order]
   with Deletes[Long, Order]
@@ -502,6 +510,30 @@ class OrderStore @Inject() (
         select(order, egraph)
         on(order.id === egraph.map(_.orderId))
     )
+  }
+
+  def generatePrintOrderAssets() = {
+
+    val ordersAndEgraphs = from(schema.orders, schema.egraphs) (
+      (order, egraph) => {
+        where(egraph.orderId === order.id and
+          FilterOneTable.reduceFilters(List(egraphQueryFilters.publishedOrApproved), egraph))
+        select(order, egraph)
+      }
+    )
+//
+    for(i <- 0 to 356) {
+      for((order, egraph) <- ordersAndEgraphs.page(i * 10, 10)) {
+        scala.concurrent.Future {
+          db.connected(TransactionSerializable) {
+            (egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false).asPng.getSavedUrl(AccessPolicy.Public)
+            ,egraph.getStandaloneCertificateUrl, order.id)
+          }
+        }
+      }
+    }
+
+//    ordersAndEgraphs.size
   }
 
   def findByBuyerCustomerId(customerId: Long, filters: FilterOneTable[Order]*): Query[Order] = {
