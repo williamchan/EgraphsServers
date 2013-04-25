@@ -15,6 +15,7 @@ import play.api.data.Forms._
 import services.mvc.ImplicitHeaderAndFooterData
 import models.Egraph
 import play.api.libs.concurrent.Execution.Implicits._
+import scala.concurrent._
 import services.cache.CacheFactory
 import services.logging.Logging
 
