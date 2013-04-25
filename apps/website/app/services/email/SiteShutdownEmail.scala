@@ -9,13 +9,14 @@ case class SiteShutdownEmail(
 ) {
   def send(customerName: String, customerEmail: String, zipUrl: String) {
     val emailHeader = EmailViewModel(
-      subject = "Egraphs is shutting down, Download your Egraphs",
+      subject = "Important Egraphs Announcement - Action Required",
       fromEmail = EmailConstants.generalFromEmail,
       fromName = EmailConstants.generalFromName,
       toAddresses = List((customerEmail, Some(customerName)))
     )
-
-   mailService.send(emailHeader, List())
+    val emailParts = List(("title", "<title>Important Egraphs Announcement, Action Required</title>"),
+    ("Egraphs Announcement", views.html.frontend.email.site_shutdown(customerName, zipUrl).body))
+     mailService.send(emailHeader, emailParts)
   }
 }
 

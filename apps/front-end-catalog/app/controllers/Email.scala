@@ -82,6 +82,10 @@ object Email extends Controller {
     ))
   }
 
+  def siteShutdown = Action {
+    Ok(views.html.frontend.email.site_shutdown("Herp Derpson", "http://egraphs.com"))
+  }
+
   def verify = Action {
     Ok(views.html.frontend.email.account_verification(
       AccountVerificationEmailViewModel(

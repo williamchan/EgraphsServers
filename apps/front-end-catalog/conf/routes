@@ -58,6 +58,7 @@ GET     /Email/enrollmentComplete                                 controllers.Em
 GET     /Email/mlbStatic                                          controllers.Email.mlbStatic
 GET     /Email/orderConfirmation                                  controllers.Email.orderConfirmation
 GET     /Email/resetPassword                                      controllers.Email.resetPassword
+GET     /Email/siteShutdown                                       controllers.Email.siteShutdown
 GET     /Email/verify                                             controllers.Email.verify
 GET     /Email/viewEgraph                                         controllers.Email.viewEgraph
 GET     /Email/viewGiftEgraph                                     controllers.Email.viewGiftEgraph
