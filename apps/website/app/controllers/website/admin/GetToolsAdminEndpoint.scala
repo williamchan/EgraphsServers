@@ -9,11 +9,13 @@ import services.http.{WithDBConnection, ControllerMethod}
 import services.http.filters.HttpFilters
 import org.squeryl.Query
 import org.squeryl.PrimitiveTypeMode._
-import services.db.{DBSession, Schema}
+import services.db.{TransactionReadCommitted, DBSession, Schema}
 import play.api.data._
 import play.api.data.Forms._
 import services.mvc.ImplicitHeaderAndFooterData
 import models.Egraph
+import play.api.libs.concurrent.Execution.Implicits._
+import services.cache.CacheFactory
 import services.logging.Logging
 
 /**
@@ -21,6 +23,7 @@ import services.logging.Logging
  */
 private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooterData {
   this: Controller =>
+  import GetToolsAdminEndpoint._
 
   //
   // Injected services
@@ -37,6 +40,7 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
   protected def productStore: ProductStore
   protected def orderStore: OrderStore
   protected def schema: Schema
+  protected def cacheFactory: CacheFactory
   protected def enrollmentBatchStore: EnrollmentBatchStore
   protected def dbSession: DBSession
 
@@ -56,10 +60,21 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
           case "sheriff" => {
             // orderStore.get(543).copy(recipientName = "Ernesto J Pantoia").save()
 
-            // HOWTO send a customer our shutdown email. 
+            // HOWTO send a customer our shutdown email.
+
             val maybeCustomer = customerStore.findByEmail("david@egraphs.com")
             maybeCustomer.map( c => {
-              SiteShutdownEmail().send(c.name, c.account.email, "http://www.google.com")
+              cacheFactory.applicationCache.get("shutdown-email-" + c.id) match  {
+                case None => {
+                  SiteShutdownEmail().send(
+                    c.name,
+                    c.account.email,
+                    "https://s3.amazonaws.com/" + c.zipFileBlobKey
+                  )
+                  cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, true)
+                }
+                case _ => println("Email already sent to customer " + c.id)
+              }
             })
             Ok
           }
@@ -105,6 +120,28 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
             Ok("I gave all pending EnrollmentBatches a kick")
           }
 
+          case "generate-assets" => {
+            val pageStart = request.getQueryString("pageStart").map(_.toInt).getOrElse(0)
+            val pageLength = request.getQueryString("pageLength").map(_.toInt).getOrElse(10)
+            customerStore.allRecipients.page(pageStart, pageLength).foreach { cust =>
+              scala.concurrent.future {
+                if (!(cust.isZipGenerated || cust.id == 7) /* Ignore J. Cohn, employee */ ) {
+                  val (_, timing) = services.Time.stopwatch {
+                    cust.writeZipFile()
+                  }
+
+                  log(s"ZIP cust=${cust.id}: Finished in $timing seconds.")
+                } else {
+                  log(s"ZIP cust=${cust.id}: Skipping ZIP file generation: Already generated")
+                }
+
+                log(s"ZIP cust=${cust.id}: ZIP available at https://s3.amazonaws.com/egraphs/${cust.zipFileBlobKey}")
+              }
+            }
+
+            Ok("Generated assets for customers")
+          }
+
           //
           // Keep the rest of these actions commented out. With great power comes great responsibility...
           // at least until these actions are made self-serve for the Operations team.
@@ -145,3 +182,5 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
     }
   }
 }
+
+object GetToolsAdminEndpoint extends Logging

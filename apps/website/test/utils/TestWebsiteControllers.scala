@@ -25,6 +25,7 @@ import services.blobs.Blobs
 import services.db.Schema
 import services.mvc.marketplace.MarketplaceServices
 import services.mvc.landing.LandingMastheadsQuery
+import services.cache.CacheFactory
 
 /**
  * Injectable version of AllWebsiteEndpoints with configurable session, flash,
@@ -56,6 +57,7 @@ case class TestWebsiteControllers @Inject()(
   override def enrollmentBatchStore = instance[EnrollmentBatchStore]
   override def schema = instance[Schema]
   override def featured = instance[Featured]
+  override def cacheFactory = instance[CacheFactory]
   override def verticalStore = instance[VerticalStore]
   override def mastheadStore = instance[MastheadStore]
   override def mastheadCategoryValueStore = instance[MastheadCategoryValueStore]

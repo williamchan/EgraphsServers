@@ -23,6 +23,7 @@ import services.mvc.{OrderCompleteViewModelFactory, StorefrontBreadcrumbData}
 import services.config.ConfigFileProxy
 import services.db.Schema
 import services.mvc.landing.LandingMastheadsQuery
+import services.cache.CacheFactory
 
 object WebsiteControllers extends Controller with AllWebsiteEndpoints
 {
@@ -52,6 +53,7 @@ object WebsiteControllers extends Controller with AllWebsiteEndpoints
   override protected val httpFilters = instance[HttpFilters]
 
   override protected val blobs = instance[Blobs]
+  override protected val cacheFactory = instance[CacheFactory]
   override protected val transactionalMail = instance[TransactionalMail]
   override protected val bulkMailList = instance[BulkMailList]
   override protected val payment = instance[Payment]

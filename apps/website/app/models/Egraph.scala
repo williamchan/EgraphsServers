@@ -1,5 +1,6 @@
 package models
 
+import enums.EgraphState._
 import enums.{HasEgraphState, EgraphState}
 import java.sql.Timestamp
 import services.blobs.AccessPolicy
@@ -18,6 +19,8 @@ import org.squeryl.Query
 import print.{StandaloneCertificatePrint, LandscapeFramedPrint}
 import xyzmo.{XyzmoVerifyUserStore, XyzmoVerifyUser}
 import java.util.Date
+import scala.Some
+import services.Dimensions
 
 /**
  * Vital services for an Egraph to perform its necessary functionality
@@ -549,6 +552,21 @@ class EgraphStore @Inject() (schema: Schema) extends SavesWithLongKey[Egraph] wi
           FilterOneTable.reduceFilters(filters, egraph)
       )
         select (egraph)
+    )
+  }
+
+  def findCompletedByRecipient(customerId: Long): Query[(Order, Egraph, Celebrity)] = {
+    import schema._
+
+    from(customers, orders, products, celebrities, egraphs)( (c, o, p, cel, e) =>
+      where(
+        c.id === customerId and
+        o.recipientId === c.id and
+        e.orderId === o.id and
+        o.productId === p.id and
+        p.celebrityId === cel.id and
+          (e._egraphState in Seq(Published.name, ApprovedByAdmin.name))
+      ) select (o, e, cel)
     )
   }
 
