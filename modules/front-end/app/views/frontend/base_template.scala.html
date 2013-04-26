@@ -65,6 +65,8 @@
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="edge,chrome=1">
+    <link href='http://fonts.googleapis.com/css?family=Meie+Script|Miss+Fajardose' rel='stylesheet' type='text/css'>
+
     <title>@{title + " | Egraphs"}</title>
     @**
       Understanding the viewport tag below: https://egraphs.atlassian.net/wiki/display/DEV/HTML+Viewport
@@ -134,7 +136,7 @@
             src='@EgraphsAssets.at("javascripts/require-1.0.2.js")'
             type="text/javascript" ></script>
 
-    @tags.newsletter_modal.apply
+    @* @tags.newsletter_modal.apply *@
     @if(!suppressHeaderAndFooter) {
       @tags.olark()
     }
