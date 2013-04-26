@@ -72,16 +72,18 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
             for(i <- 0 to 293) {
               for(c <- customerStore.allRecipients.page(i *10, 10)) {
                 scala.concurrent.Future {
-                  cacheFactory.applicationCache.get[Boolean]("shutdown-email-" + c.id) match  {
-                    case Some(result) if(result == true) => println("Email already sent to customer " + c.id)
-                    case _ => {
-                      SiteShutdownEmail().send(
-                        c.name,
-                        //                    c.account.email,
-                        c.account.email,
-                        "https://s3.amazonaws.com/egraphs/" + c.zipFileBlobKey
-                      )
-                      cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, true, oneWeek)
+                  if(c.isZipGenerated){
+                    cacheFactory.applicationCache.get[Boolean]("shutdown-email-" + c.id) match  {
+                      case Some(result) if(result == true) => println("Email already sent to customer " + c.id)
+                      case _ => {
+                        SiteShutdownEmail().send(
+                          c.name,
+                          //                    c.account.email,
+                          c.account.email,
+                          "https://s3.amazonaws.com/egraphs/" + c.zipFileBlobKey
+                        )
+                        cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, true, oneWeek)
+                      }
                     }
                   }
                 }
