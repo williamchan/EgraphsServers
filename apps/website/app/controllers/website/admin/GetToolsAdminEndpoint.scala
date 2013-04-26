@@ -136,23 +136,62 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
           case "generate-assets" => {
             val pageStart = request.getQueryString("pageStart").map(_.toInt).getOrElse(0)
             val pageLength = request.getQueryString("pageLength").map(_.toInt).getOrElse(10)
-            customerStore.allRecipients.page(pageStart, pageLength).foreach { cust =>
-              scala.concurrent.future {
-                if (!(cust.isZipGenerated || cust.id == 7) /* Ignore J. Cohn, employee */ ) {
-                  val (_, timing) = services.Time.stopwatch {
-                    cust.writeZipFile()
+            val subPageSize = pageLength
+            val subPages = pageStart to (pageStart + pageLength) by subPageSize
+            subPages.map { subPageOffset =>
+              val futures = customerStore.allRecipients.page(subPageOffset, subPageSize).map { cust =>
+                future {
+                  if (!(cust.isZipGenerated || cust.id == 7 /* Ignore J Cohn, Employee */)) {
+                    val (_, timing) = services.Time.stopwatch {
+                      cust.writeZipFile()
+                    }
+
+                    log(s"ZIP cust=${cust.id}: Finished in $timing seconds.")
+                  } else {
+                    log(s"ZIP cust=${cust.id}: Skipping ZIP file generation: Already generated")
                   }
 
-                  log(s"ZIP cust=${cust.id}: Finished in $timing seconds.")
-                } else {
-                  log(s"ZIP cust=${cust.id}: Skipping ZIP file generation: Already generated")
+                  log(s"ZIP cust=${cust.id}: ZIP available at https://s3.amazonaws.com/egraphs/${cust.zipFileBlobKey}")
                 }
+              }
 
-                log(s"ZIP cust=${cust.id}: ZIP available at https://s3.amazonaws.com/egraphs/${cust.zipFileBlobKey}")
+              val subPageFutures = Future.sequence(futures)
+
+              import duration._
+              Await.result(subPageFutures, 10000 seconds)
+            }
+
+
+            Ok("Generated assets for customers")
+          }
+
+          case "ungenerated-customers" => {
+            val futures = customerStore.allRecipients.map { cust =>
+              scala.concurrent.future {
+                (cust, cust.isZipGenerated)
               }
             }
 
-            Ok("Generated assets for customers")
+            val futureResult = Future.sequence(futures).map { custsAndZipAvailable =>
+              Ok(
+                <html>
+                  <body>
+                    <h1>The following still need to be generated:</h1>
+                    <table>
+                      <tbody>
+                        {
+                          custsAndZipAvailable.filter(!_._2).map { case (cust, isZipAvailable) =>
+                            <tr><td>{cust.id}</td></tr>
+                          }
+                        }
+                      </tbody>
+                    </table>
+                  </body>
+                </html>
+              )
+            }
+
+            Async(futureResult)
           }
 
           //

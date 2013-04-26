@@ -78,50 +78,61 @@ case class Customer(
 
     val outputStream = new ByteArrayOutputStream()
 
-    val zipStream = new ZipOutputStream(outputStream)
-    zipStream.setComment(s"$name's egraphs")
-    val (_, timing) = stopwatch {
-      val allOrderAssets = services.dbSession.connected(TransactionReadCommitted) {
-        services.egraphStore.findCompletedByRecipient(id).toList.map { case (order, egraph, celeb) =>
-          log(s"ZIP cust=$id: Processing Order ${order.id}")
-          val pngUrl = egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false)
-            .asPng
-            .getSavedUrl(AccessPolicy.Public)
+    try {
+      val zipStream = new ZipOutputStream(outputStream)
+      zipStream.setComment(s"$name's egraphs")
+      val (_, timing) = stopwatch {
+        val allOrderAssets = services.dbSession.connected(TransactionReadCommitted) {
+          services.egraphStore.findCompletedByRecipient(id).toList.map { case (order, egraph, celeb) =>
+            log(s"ZIP cust=$id: Processing Order ${order.id}")
+            val pngUrl = egraph.getEgraphImage(LandscapeFramedPrint.targetEgraphWidth, ignoreMasterWidth=false)
+              .asPng
+              .getSavedUrl(AccessPolicy.Public)
 
-          (order, egraph, celeb,
-          List(
-            (pngUrl, "Image.png"),
-            (egraph.getStandaloneCertificateUrl, "Certificate.png"),
-            (egraph.assets.audioMp3Url, "Audio.mp3"),
-            (egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public), "Video.mp4")
-          )
-          )
-        }
-      }
-
-      allOrderAssets.foreach { orderAssets =>
-        val (order, egraph, celeb, zipAssets) = orderAssets
-        val futureAssets = zipAssets.map { case (url, extension) =>
-          WS.url(url).get().map { resp =>
-            (resp.ahcResponse.getResponseBodyAsBytes, extension)
+            (order, egraph, celeb,
+            List(
+              (pngUrl, "Image.png"),
+              (egraph.getStandaloneCertificateUrl, "Certificate.png"),
+              (egraph.assets.audioMp3Url, "Audio.mp3"),
+              (egraph.getVideoAsset.getSavedUrl(AccessPolicy.Public), "Video.mp4")
+            )
+            )
           }
         }
 
-        futureAssets.foreach { futureBytes =>
-          val (bytes, extension) = Await.result(futureBytes, 1000 seconds)
+        allOrderAssets.foreach { orderAssets =>
+          val (order, egraph, celeb, zipAssets) = orderAssets
+          val futureAssets = zipAssets.map { case (url, extension) =>
+            WS.url(url).get().map { resp =>
+              (resp.ahcResponse.getResponseBodyAsBytes, extension)
+            }
+          }
 
-          zipStream.putNextEntry(new ZipEntry(s"${order.id}_${celeb.urlSlug}_${extension}"))
-          zipStream.write(bytes)
-          zipStream.closeEntry()
+          futureAssets.foreach { futureBytes =>
+            try {
+              val (bytes, extension) = Await.result(futureBytes, 1000 seconds)
+
+              zipStream.putNextEntry(new ZipEntry(s"${order.id}_${celeb.urlSlug}_${extension}"))
+              zipStream.write(bytes)
+              zipStream.closeEntry()
+            } catch {
+              case e: ZipException =>
+                error(s"ZipException in customer id $id")
+                e.printStackTrace
+            }
+          }
         }
       }
+
+      zipStream.close()
+      log(s"ZIP cust=$id: Assembled ZIP in $timing seconds.")
+      val (_, uploadTiming) = stopwatch { services.blobs.put(zipFileBlobKey, outputStream.toByteArray, AccessPolicy.Public) }
+      log(s"ZIP cust=$id: Uploaded to S3 in $uploadTiming seconds. Available at https://s3.amazonaws.com/$zipFileBlobKey")
+    } catch {
+      case e: Exception =>
+        error("ZIP cust=$id: Error while creating zip file")
+        e.printStackTrace()
     }
-
-    zipStream.close()
-    log(s"ZIP cust=$id: Assembled ZIP in $timing seconds.")
-    val (_, uploadTiming) = stopwatch { services.blobs.put(zipFileBlobKey, outputStream.toByteArray, AccessPolicy.Public) }
-    log(s"ZIP cust=$id: Uploaded to S3 in $uploadTiming seconds. Available at https://s3.amazonaws.com/egraphs/$zipFileBlobKey")
-
   }
 
   def zipFileName = s"egraphs-${created.getTime}.zip"
