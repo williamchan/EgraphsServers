@@ -45,6 +45,7 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
   protected def enrollmentBatchStore: EnrollmentBatchStore
   protected def dbSession: DBSession
   val oneWeek = 25200
+  val oneMonth = oneWeek * 4
   //
   // Controllers
   //
@@ -62,27 +63,30 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
             // orderStore.get(543).copy(recipientName = "Ernesto J Pantoia").save()
             val maybeCustomer = customerStore.findByEmail("david@egraphs.com")
             maybeCustomer.map( c =>
-              cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, false, oneWeek)
+              cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, false, oneMonth)
             )
             Ok
           }
 
           case "shutdown" => {
             // 2934 recipients
-            for(i <- 0 to 293) {
+            for(i <- 0 to 300) {
               for(c <- customerStore.allRecipients.page(i *10, 10)) {
-                scala.concurrent.Future {
-                  if(c.isZipGenerated){
-                    cacheFactory.applicationCache.get[Boolean]("shutdown-email-" + c.id) match  {
-                      case Some(result) if(result == true) => println("Email already sent to customer " + c.id)
-                      case _ => {
-                        SiteShutdownEmail().send(
-                          c.name,
-                          //                    c.account.email,
-                          c.account.email,
-                          "https://s3.amazonaws.com/egraphs/" + c.zipFileBlobKey
-                        )
-                        cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, true, oneWeek)
+                if (/*c.id == 108*/ true) {
+                  future {
+                    if(c.isZipGenerated) {
+                      val acct = dbSession.connected(TransactionReadCommitted)(c.account)
+                      cacheFactory.applicationCache.get[Boolean]("shutdown-email-" + c.id) match  {
+                        case Some(result) if(result == true) => println("Email already sent to customer " + c.id)
+                        case _ => {
+                          SiteShutdownEmail().send(
+                            c.name,
+                            //                    c.account.email,
+                            acct.email,
+                            "https://s3.amazonaws.com/egraphs/" + c.zipFileBlobKey
+                          )
+                          cacheFactory.applicationCache.set[Boolean]("shutdown-email-" + c.id, true, oneMonth)
+                        }
                       }
                     }
                   }
@@ -91,6 +95,28 @@ private[controllers] trait GetToolsAdminEndpoint extends ImplicitHeaderAndFooter
             }
            Ok("Sending some emails. Bye Bye :(")
          }
+
+          case "not-yet-emailed" => {
+            val futureUnemailed = for (cust <- customerStore.allRecipients) yield {
+              future {
+                val wasEmailed = cacheFactory.applicationCache.get[Boolean]("shutdown-email-" + cust.id).getOrElse(false)
+
+                (cust, wasEmailed)
+              }
+            }
+
+            Async {
+              Future.sequence(futureUnemailed).map { case unemailed =>
+                Ok(
+                  <customers>
+                    {
+                      unemailed.filter(!_._2).map { case (cust, emailed) => <customer>{cust.id}</customer> }
+                    }
+                  </customers>
+                )
+              }
+            }
+          }
 
           /**
            * Prints basic parameters about the JVM the instance is running on
