@@ -15,7 +15,6 @@ object JsonEmailBuilder {
         Map(
           "subject" -> Json.toJson(mailStack.subject),
           "html" -> Json.toJson(html),
-          "text" -> Json.toJson("derp"),
           "from_email" -> Json.toJson(mailStack.fromEmail),
           "from_name" -> Json.toJson(mailStack.fromName),
           "to" -> Json.toJson(getToAddresses(mailStack)),

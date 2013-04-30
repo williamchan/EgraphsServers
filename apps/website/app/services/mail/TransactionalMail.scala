@@ -60,7 +60,12 @@ private[mail] class MandrillTransactionalMail (key: String) extends Transactiona
   override def send(mailStack: EmailViewModel, templateContentParts: List[(String, String)], html: String ="") {
     val methodAndOutputFormat = "messages/send.json"
     templateContentParts.foreach{ case (name, htmlContent) => play.Logger.info("HTML BODY: " + htmlContent) }
-    val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key, html)
+
+    val finalHtml = html.isEmpty match {
+      case true => templateContentParts.foldLeft("")((body, name_part) => body + name_part._2)
+      case _ => html
+    }
+    val jsonIterable = JsonEmailBuilder.sendTemplateJson(mailStack, templateContentParts, key, finalHtml)
 
     val futureResponse = WS.url(actionUrl + methodAndOutputFormat).post(jsonIterable)
 
